@@ -1,0 +1,14 @@
+ENVI
+description = {areassmi}
+samples = 304
+lines   = 448
+bands   = 1
+header offset = 0
+file type = ENVI Standard
+data type = 1
+interleave = bsq
+byte order = 0
+map info = {NSIDC Sea Ice North,1.000000,1.000000,-3850000.000000,5850000.000000,25000.000000,25000.000000,Hughes,units=meters}
+projection info = {31,6378273.000,6356889.449,70.0,-45.0,0.0,0.0,NSIDC Sea Ice North,units=meters}
+band names = {
+	areassmi}

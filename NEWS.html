@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style type="text/css">
+@font-face {
+font-family: octicons-link;
+src: url(data:font/woff;charset=utf-8;base64,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) format('woff');
+}
+body {
+-webkit-text-size-adjust: 100%;
+text-size-adjust: 100%;
+color: #333;
+font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+font-size: 16px;
+line-height: 1.6;
+word-wrap: break-word;
+}
+a {
+background-color: transparent;
+}
+a:active,
+a:hover {
+outline: 0;
+}
+strong {
+font-weight: bold;
+}
+h1 {
+font-size: 2em;
+margin: 0.67em 0;
+}
+img {
+border: 0;
+}
+hr {
+box-sizing: content-box;
+height: 0;
+}
+pre {
+overflow: auto;
+}
+code,
+kbd,
+pre {
+font-family: monospace, monospace;
+font-size: 1em;
+}
+input {
+color: inherit;
+font: inherit;
+margin: 0;
+}
+html input[disabled] {
+cursor: default;
+}
+input {
+line-height: normal;
+}
+input[type="checkbox"] {
+box-sizing: border-box;
+padding: 0;
+}
+table {
+border-collapse: collapse;
+border-spacing: 0;
+}
+td,
+th {
+padding: 0;
+}
+* {
+box-sizing: border-box;
+}
+input {
+font: 13px / 1.4 Helvetica, arial, nimbussansl, liberationsans, freesans, clean, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+a {
+color: #4078c0;
+text-decoration: none;
+}
+a:hover,
+a:active {
+text-decoration: underline;
+}
+hr {
+height: 0;
+margin: 15px 0;
+overflow: hidden;
+background: transparent;
+border: 0;
+border-bottom: 1px solid #ddd;
+}
+hr:before {
+display: table;
+content: "";
+}
+hr:after {
+display: table;
+clear: both;
+content: "";
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+margin-top: 15px;
+margin-bottom: 15px;
+line-height: 1.1;
+}
+h1 {
+font-size: 30px;
+}
+h2 {
+font-size: 21px;
+}
+h3 {
+font-size: 16px;
+}
+h4 {
+font-size: 14px;
+}
+h5 {
+font-size: 12px;
+}
+h6 {
+font-size: 11px;
+}
+blockquote {
+margin: 0;
+}
+ul,
+ol {
+padding: 0;
+margin-top: 0;
+margin-bottom: 0;
+}
+ol ol,
+ul ol {
+list-style-type: lower-roman;
+}
+ul ul ol,
+ul ol ol,
+ol ul ol,
+ol ol ol {
+list-style-type: lower-alpha;
+}
+dd {
+margin-left: 0;
+}
+code {
+font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+font-size: 12px;
+}
+pre {
+margin-top: 0;
+margin-bottom: 0;
+font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+.select::-ms-expand {
+opacity: 0;
+}
+.octicon {
+font: normal normal normal 16px/1 octicons-link;
+display: inline-block;
+text-decoration: none;
+text-rendering: auto;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+-webkit-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+user-select: none;
+}
+.octicon-link:before {
+content: '\f05c';
+}
+.markdown-body:before {
+display: table;
+content: "";
+}
+.markdown-body:after {
+display: table;
+clear: both;
+content: "";
+}
+.markdown-body>*:first-child {
+margin-top: 0 !important;
+}
+.markdown-body>*:last-child {
+margin-bottom: 0 !important;
+}
+a:not([href]) {
+color: inherit;
+text-decoration: none;
+}
+.anchor {
+display: inline-block;
+padding-right: 2px;
+margin-left: -18px;
+}
+.anchor:focus {
+outline: none;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+margin-top: 1em;
+margin-bottom: 16px;
+font-weight: bold;
+line-height: 1.4;
+}
+h1 .octicon-link,
+h2 .octicon-link,
+h3 .octicon-link,
+h4 .octicon-link,
+h5 .octicon-link,
+h6 .octicon-link {
+color: #000;
+vertical-align: middle;
+visibility: hidden;
+}
+h1:hover .anchor,
+h2:hover .anchor,
+h3:hover .anchor,
+h4:hover .anchor,
+h5:hover .anchor,
+h6:hover .anchor {
+text-decoration: none;
+}
+h1:hover .anchor .octicon-link,
+h2:hover .anchor .octicon-link,
+h3:hover .anchor .octicon-link,
+h4:hover .anchor .octicon-link,
+h5:hover .anchor .octicon-link,
+h6:hover .anchor .octicon-link {
+visibility: visible;
+}
+h1 {
+padding-bottom: 0.3em;
+font-size: 2.25em;
+line-height: 1.2;
+border-bottom: 1px solid #eee;
+}
+h1 .anchor {
+line-height: 1;
+}
+h2 {
+padding-bottom: 0.3em;
+font-size: 1.75em;
+line-height: 1.225;
+border-bottom: 1px solid #eee;
+}
+h2 .anchor {
+line-height: 1;
+}
+h3 {
+font-size: 1.5em;
+line-height: 1.43;
+}
+h3 .anchor {
+line-height: 1.2;
+}
+h4 {
+font-size: 1.25em;
+}
+h4 .anchor {
+line-height: 1.2;
+}
+h5 {
+font-size: 1em;
+}
+h5 .anchor {
+line-height: 1.1;
+}
+h6 {
+font-size: 1em;
+color: #777;
+}
+h6 .anchor {
+line-height: 1.1;
+}
+p,
+blockquote,
+ul,
+ol,
+dl,
+table,
+pre {
+margin-top: 0;
+margin-bottom: 16px;
+}
+hr {
+height: 4px;
+padding: 0;
+margin: 16px 0;
+background-color: #e7e7e7;
+border: 0 none;
+}
+ul,
+ol {
+padding-left: 2em;
+}
+ul ul,
+ul ol,
+ol ol,
+ol ul {
+margin-top: 0;
+margin-bottom: 0;
+}
+li>p {
+margin-top: 16px;
+}
+dl {
+padding: 0;
+}
+dl dt {
+padding: 0;
+margin-top: 16px;
+font-size: 1em;
+font-style: italic;
+font-weight: bold;
+}
+dl dd {
+padding: 0 16px;
+margin-bottom: 16px;
+}
+blockquote {
+padding: 0 15px;
+color: #777;
+border-left: 4px solid #ddd;
+}
+blockquote>:first-child {
+margin-top: 0;
+}
+blockquote>:last-child {
+margin-bottom: 0;
+}
+table {
+display: block;
+width: 100%;
+overflow: auto;
+word-break: normal;
+word-break: keep-all;
+}
+table th {
+font-weight: bold;
+}
+table th,
+table td {
+padding: 6px 13px;
+border: 1px solid #ddd;
+}
+table tr {
+background-color: #fff;
+border-top: 1px solid #ccc;
+}
+table tr:nth-child(2n) {
+background-color: #f8f8f8;
+}
+img {
+max-width: 100%;
+box-sizing: content-box;
+background-color: #fff;
+}
+code {
+padding: 0;
+padding-top: 0.2em;
+padding-bottom: 0.2em;
+margin: 0;
+font-size: 85%;
+background-color: rgba(0,0,0,0.04);
+border-radius: 3px;
+}
+code:before,
+code:after {
+letter-spacing: -0.2em;
+content: "\00a0";
+}
+pre>code {
+padding: 0;
+margin: 0;
+font-size: 100%;
+word-break: normal;
+white-space: pre;
+background: transparent;
+border: 0;
+}
+.highlight {
+margin-bottom: 16px;
+}
+.highlight pre,
+pre {
+padding: 16px;
+overflow: auto;
+font-size: 85%;
+line-height: 1.45;
+background-color: #f7f7f7;
+border-radius: 3px;
+}
+.highlight pre {
+margin-bottom: 0;
+word-break: normal;
+}
+pre {
+word-wrap: normal;
+}
+pre code {
+display: inline;
+max-width: initial;
+padding: 0;
+margin: 0;
+overflow: initial;
+line-height: inherit;
+word-wrap: normal;
+background-color: transparent;
+border: 0;
+}
+pre code:before,
+pre code:after {
+content: normal;
+}
+kbd {
+display: inline-block;
+padding: 3px 5px;
+font-size: 11px;
+line-height: 10px;
+color: #555;
+vertical-align: middle;
+background-color: #fcfcfc;
+border: solid 1px #ccc;
+border-bottom-color: #bbb;
+border-radius: 3px;
+box-shadow: inset 0 -1px 0 #bbb;
+}
+.pl-c {
+color: #969896;
+}
+.pl-c1,
+.pl-s .pl-v {
+color: #0086b3;
+}
+.pl-e,
+.pl-en {
+color: #795da3;
+}
+.pl-s .pl-s1,
+.pl-smi {
+color: #333;
+}
+.pl-ent {
+color: #63a35c;
+}
+.pl-k {
+color: #a71d5d;
+}
+.pl-pds,
+.pl-s,
+.pl-s .pl-pse .pl-s1,
+.pl-sr,
+.pl-sr .pl-cce,
+.pl-sr .pl-sra,
+.pl-sr .pl-sre {
+color: #183691;
+}
+.pl-v {
+color: #ed6a43;
+}
+.pl-id {
+color: #b52a1d;
+}
+.pl-ii {
+background-color: #b52a1d;
+color: #f8f8f8;
+}
+.pl-sr .pl-cce {
+color: #63a35c;
+font-weight: bold;
+}
+.pl-ml {
+color: #693a17;
+}
+.pl-mh,
+.pl-mh .pl-en,
+.pl-ms {
+color: #1d3e81;
+font-weight: bold;
+}
+.pl-mq {
+color: #008080;
+}
+.pl-mi {
+color: #333;
+font-style: italic;
+}
+.pl-mb {
+color: #333;
+font-weight: bold;
+}
+.pl-md {
+background-color: #ffecec;
+color: #bd2c00;
+}
+.pl-mi1 {
+background-color: #eaffea;
+color: #55a532;
+}
+.pl-mdr {
+color: #795da3;
+font-weight: bold;
+}
+.pl-mo {
+color: #1d3e81;
+}
+kbd {
+display: inline-block;
+padding: 3px 5px;
+font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+line-height: 10px;
+color: #555;
+vertical-align: middle;
+background-color: #fcfcfc;
+border: solid 1px #ccc;
+border-bottom-color: #bbb;
+border-radius: 3px;
+box-shadow: inset 0 -1px 0 #bbb;
+}
+.task-list-item {
+list-style-type: none;
+}
+.task-list-item+.task-list-item {
+margin-top: 3px;
+}
+.task-list-item input {
+margin: 0 0.35em 0.25em -1.6em;
+vertical-align: middle;
+}
+:checked+.radio-label {
+z-index: 1;
+position: relative;
+border-color: #4078c0;
+}
+.sourceLine {
+display: inline-block;
+}
+code .kw { color: #000000; }
+code .dt { color: #ed6a43; }
+code .dv { color: #009999; }
+code .bn { color: #009999; }
+code .fl { color: #009999; }
+code .ch { color: #009999; }
+code .st { color: #183691; }
+code .co { color: #969896; }
+code .ot { color: #0086b3; }
+code .al { color: #a61717; }
+code .fu { color: #63a35c; }
+code .er { color: #a61717; background-color: #e3d2d2; }
+code .wa { color: #000000; }
+code .cn { color: #008080; }
+code .sc { color: #008080; }
+code .vs { color: #183691; }
+code .ss { color: #183691; }
+code .im { color: #000000; }
+code .va {color: #008080; }
+code .cf { color: #000000; }
+code .op { color: #000000; }
+code .bu { color: #000000; }
+code .ex { color: #000000; }
+code .pp { color: #999999; }
+code .at { color: #008080; }
+code .do { color: #969896; }
+code .an { color: #008080; }
+code .cv { color: #008080; }
+code .in { color: #008080; }
+</style>
+<style>
+body {
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 45px;
+  padding-top: 0px;
+}
+</style>
+
+</head>
+
+<body>
+
+<p>2018-05-31</p>
+<style>
+   code,
+   kbd,
+   pre {
+     font-family: Cousine, Consolas, Menlo, "Liberation Mono", Courier, monospace;
+     font-weight: regular;
+     line-height: 115%;
+     font-size: 90%;
+     background-color: #E6F1FF;
+   }
+</style>
+
+<h3 id="version-387">version 3.8.7</h3>
+<ul>
+<li><p>In suggestion, sf (&gt;= 0.6-1)</p></li>
+<li><p>Support importing of 3-dimensional ‘stars’ arrays</p></li>
+<li><p>Improvement of character encoding for attributes of spatial objects</p></li>
+</ul>
+<h3 id="version-386">version 3.8.6</h3>
+<ul>
+<li><p>Coastline is updated to version 2018-03-27 09:31</p></li>
+<li><p>Corrected graticules and scalebar for ‘+proj=merc’ projection class for non zero latitude of true scale (e.g., ‘+lat_ts=80.8’)</p></li>
+<li><p>Package <code>fasterize</code> is suggested. Version of suggested package <code>sf</code> should be <code>&gt;=0.6-1</code>.</p></li>
+</ul>
+<h3 id="version-385">version 3.8.5</h3>
+<ul>
+<li><p>Imporing results of <code>sf::gdal_read</code>.</p></li>
+<li><p>Increased contrasting in cubehelix for low-colored palettes.</p></li>
+<li><p>Fixed cubehelix for colorizing with <code>breakvalue=0</code></p></li>
+<li><p>Corrected band names for opening rasters using GDAL</p></li>
+<li><p>Performance improvement for Group Summary (comparisson) of <code>ursaRaster</code> class.</p></li>
+<li><p>Coastline is updated 2018-03-07</p></li>
+</ul>
+<h3 id="version-384">version 3.8.4</h3>
+<ul>
+<li><p>Added argument <code>coords</code> for function <code>allocate</code>.</p></li>
+<li><p>New wrappers and checkers for spatial (vector GIS) objects.</p></li>
+<li><p>Some issues for web services are fixed.</p></li>
+<li><p>in DESCRIPTION file ‘exportPattern’ is replaced by multiple ‘export’ for ability to use non-public funstions which names don’t start with “.”</p></li>
+<li><p>In <code>panel_coastline</code> improved detection of polygons’ coodrinates spreading in result of reprojection</p></li>
+</ul>
+<h3 id="version-38-3">version 3.8-3</h3>
+<ul>
+<li>Visualization output is included to R-markdown document and R-Jupyter code without additional controls. Currently, some outputs are not supported (e.g., bookdown::gitbook)</li>
+</ul>
+<h3 id="version-38-2">version 3.8-2</h3>
+<ul>
+<li><p>Changed registration of native routines.</p></li>
+<li><p>Package <code>knitr</code> is added as suggested.</p></li>
+<li><p>In <code>spatial_coordinates()</code>: fixed return value for ‘POINT’ geometry for ‘sf’ engine.</p></li>
+<li><p>In <code>glance()</code>: if all attributes are <code>NA</code>, then plot only geometry.</p></li>
+<li><p>In <code>band_blank()</code> 1) fixed inaccuracy for values not in memory 2) added argument <code>verbose</code>.</p></li>
+<li><p>In <code>cubehelix()</code> canceled auto brightness changing if <code>dark</code> and <code>light</code> are specified</p></li>
+<li><p>In <code>read_envi</code> and <code>open_envi</code> added argument <code>cache</code> to use cache for compressed files.</p></li>
+</ul>
+<h3 id="version-38-1">version 3.8-1</h3>
+<ul>
+<li><p>Internal land polygons (coastline) data are replaced from GSHHG to OSM. Function <code>update_coastline</code> is added to update coastline data personally.</p></li>
+<li><p>Caching is introduced for downloaded files.</p></li>
+<li><p>Changed structure of <code>inst</code> directory by adding sudirectories <code>requisite</code> with neccessary files and <code>optional</code> with secondary files and directories.</p></li>
+<li><p>Added family of functions <code>spatial_xxxxxxx</code> to retrieve properties from non-raster spatial objects: simple features (package <strong>sf</strong>) and Spatial abstract class (package <strong>sp</strong>).</p></li>
+</ul>
+<h3 id="version-37-19">version 3.7-19</h3>
+<ul>
+<li><p>Argument ‘attr’ is replaced to ‘field’ in internal functions <code>.spatialize</code> and <code>.glance</code>.</p></li>
+<li><p>Argument ‘r’ is replaced to ‘rotate’ in public function <code>cubehelix</code>.</p></li>
+<li><p>In coersion from “stack” to “brick”: if nodata values are the same, then nodata is assigned.</p></li>
+<li><p>in <code>polygonize</code> added choice of “engine” by means applying functions from either <strong>sp</strong> or <strong>sf</strong> packages.</p></li>
+</ul>
+<h3 id="version-37-18">version 3.7-18</h3>
+<ul>
+<li><p>Improved consistence beetween ‘dim’ interity in non-public <code>.regrid()</code></p></li>
+<li><p>Supporting categories in exporting to <code>data.frame</code></p></li>
+<li><p>Back to patch of failure with ‘rgdal’ of Unix build machine at r-forge</p></li>
+</ul>
+<h3 id="version-37-17">version 3.7-17</h3>
+<ul>
+<li>Correction for bounding around 180 degree longitude</li>
+</ul>
+<h3 id="version-37-16">version 3.7-16</h3>
+<ul>
+<li><p>minor improvement to spatial allocation of vector objects with crossing of 180 degree longitude</p></li>
+<li><p>allocate(): slightly improvement for regular grid detection</p></li>
+<li><p>background for future functionality</p></li>
+</ul>
+<h3 id="version-37-15">version 3.7-15</h3>
+<ul>
+<li><p>added possibility of image annotation; argument ‘label’ in ‘panel_annotation’ can be object of class ‘array’</p></li>
+<li><p>fixed divergent coloring for (only) two values in ‘cubehelix()’</p></li>
+<li><p>‘ggmap’, ‘foreign’ are removed from the list of suggested packages; ‘ncdf4’ is added to the list of suggested packages.</p></li>
+</ul>
+<h3 id="version-37-14">version 3.7-14</h3>
+<ul>
+<li>fixed export to Raster(Layer|Brick|Stack) with NA nodata</li>
+</ul>
+<h3 id="version-37-13">version 3.7-13</h3>
+<ul>
+<li><p>gentle requirements to “chessboard” grid in ‘panel_new()’</p></li>
+<li><p>fix layout in ‘compose_design()’ for images like strips</p></li>
+<li><p>in suggestion, sf (&gt;= 0.5-0)</p></li>
+</ul>
+<h3 id="version-37-12">version 3.7-12</h3>
+<ul>
+<li>Minor changes for geocoded glance()</li>
+</ul>
+<h3 id="version-37-11">version 3.7-11</h3>
+<ul>
+<li><p>‘nominatim’ geocoding for 180-longitute-objects is more correct, but traffic is higher</p></li>
+<li><p>alternate geocoding service in the case of base one failure</p></li>
+</ul>
+<h3 id="version-37-10">version 3.7-10</h3>
+<ul>
+<li>Adapation glance() for if argument “dsn” is “point” ‘c(lon,lat)’ and “boundary” ‘c(minx,miny,maxx,maxy)’</li>
+</ul>
+<h3 id="version-37-9">version 3.7-9</h3>
+<ul>
+<li>Vectors without data table - fixed</li>
+</ul>
+<h3 id="version-37-8">version 3.7-8</h3>
+<ul>
+<li>Bypass for ‘rgdal’ usage diring examples on r-forge UNIX building machine. E.g.: Error in dyn.load(file, DLLpath = DLLpath, …) : unable to load shared object ‘/home/rforge/lib/R/3.4/rgdal/libs/rgdal.so’: libgdal.so.1: cannot open shared object file: No such file or directory</li>
+</ul>
+<h3 id="version-37-7">version 3.7-7</h3>
+<ul>
+<li>Better matching for floating-point coordinates</li>
+</ul>
+<h3 id="version-37-6">version 3.7-6</h3>
+<ul>
+<li><p>Minor fixes for categories after resample</p></li>
+<li><p>‘glance()’ is recoded</p></li>
+</ul>
+<h3 id="version-37-5">version 3.7-5</h3>
+<ul>
+<li>Adaptation for R-exts’ “5.4 Registering native routines” for R-3.4.0.</li>
+</ul>
+<h3 id="version-37-4">version 3.7-4</h3>
+<ul>
+<li><p>Non-ascii for geocoding in ‘glance’</p></li>
+<li><p>New function ‘get_earthdata’ for retreiving MODIS mosaics.</p></li>
+<li><p>Added package ‘jpeg’ in the category ‘Imported’.</p></li>
+</ul>
+<h3 id="version-37-3">version 3.7-3</h3>
+<ul>
+<li>Non-ascii for geocoding in ‘glance’</li>
+</ul>
+<h3 id="version-37-2">version 3.7-2</h3>
+<ul>
+<li><p>Introduce geocode to ‘glance’. There is no relation between data and geocoded place.</p></li>
+<li><p>Introduce tiles to ‘glance’. Now static maps and tiles for basemap in “+proj=merc”</p></li>
+<li><p>Dismiss from dQuote() and sQuote(), which put non-symmetrical quotes in Rgui; GDAL does’t understad it.</p></li>
+<li><p>‘inst/glance’ contains mock-up to create vector/raster file associantion with glance()</p></li>
+<li><p>‘glance’ can work without package ‘sf’; however “package:methods” should be in “search()”</p></li>
+<li><p>Rename ‘panel_gridline’ to ‘panel_graticule’.</p></li>
+</ul>
+<h3 id="version-37-1">version 3.7-1</h3>
+<ul>
+<li>Public wrapper ‘glance()’ for non-public ‘.glance()’: quick-look of GIS raster and vector data</li>
+</ul>
+<h3 id="version-36-3">version 3.6-3</h3>
+<ul>
+<li>Documentation for ‘ursaProgressBar’</li>
+</ul>
+<h3 id="version-36-2">version 3.6-2</h3>
+<ul>
+<li>Added argument “…” to function ‘read_gdal’. Now, if ‘as.ursa(uri)’ or ‘display(uri)’, then additional arguments can be passed to ‘download.file’. For example, if you need ‘mode=“wb”’ or ignore certificate for HTTPS</li>
+</ul>
+<h3 id="version-36-1">version 3.6-1</h3>
+<ul>
+<li>Added ‘session_pngviewer()’ and ‘session_tempdir()’ to follow CRAN policy. If “Rscript”, then external software is used to open PNG; current directory is used to write files If ‘interactive()’ or “R CMD BATCH”, no external software for PNG; ‘tempdir()’ is used to write files</li>
+</ul>
+<h3 id="version-35-2">version 3.5-2</h3>
+<ul>
+<li>Initial submission to R-Forge</li>
+</ul>
+
+</body>
+</html>

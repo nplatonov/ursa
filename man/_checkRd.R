@@ -1,0 +1,1 @@
+tools::checkRd("colorize.Rd")

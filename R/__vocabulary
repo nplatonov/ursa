@@ -1,0 +1,13 @@
+image - matrix
+
+raster  - image with georeference
+
+border - extarnal part of image
+
+margin - outside of the image
+
+graticule - grid
+
+colortable ursa.colortable ctable ursa.ctable
+
+session_grid - rmap_grid

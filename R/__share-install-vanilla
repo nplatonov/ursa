@@ -1,0 +1,1 @@
+install.packages("ursa",repos=c("http://R-Forge.R-project.org","https://cran.rstudio.com"))
