@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Get and set sessional parameters for grid.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for session.grid"><tr><td>session.grid</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Get and set sessional parameters for grid.
+</h2>
+
+<h3>Description</h3>
+
+<p><code>session.grid</code> without arguments returns current grid properties. <code>session.grid</code> with arguments specifies grid, which is used by functions of this package, e.g., for plotting, for opened and created raster images during current session.
+
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+session.grid(obj)
+session.proj4()
+session.cellsize()
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+<p>Either missing, or <code>NULL</code>, or file name, or object of class <code>rmapRaster</code>, or object of class <code><a href="../../rmap/html/classGrid.html">rmapGrid</a></code>
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+
+<p><code>session.grid</code> deals with option &ldquo;rmapSessionGrid&rdquo;: <code>options(rmapSessionGrid=...)</code> or <code>getOption("rmapSessionGrid")</code>.
+</p>
+<p>Usage <code>session.grid()</code> without arguments return value of &ldquo;rmapSessionGrid&rdquo; option via calling <code>getOption("rmapSessionGrid")</code>. If <code>is.null(getOption("rmapSessionGrid"))</code> then <code>session.grid()</code> returns default CRS.
+</p>
+<p>Usage <code>session.grid(NULL)</code> resets &ldquo;rmapSessionGrid&rdquo; option via calling <code>options(rmapSessionGrid=NULL)</code>.
+</p>
+<p>The sequential calling </p>
+<pre>
+session.grid(NULL)
+session.grid()
+</pre><p> returns default CRS. For checking that the option has been resetted successfully, use <code>getOption("rmapSessionGrid")</code> after <code>session.grid(NULL)</code>
+</p>
+
+
+<h3>Value</h3>
+
+<p>Object of class <code><a href="../../rmap/html/classGrid.html">rmapGrid</a></code>. It is a list. Default values are grid parameters of NSIDC polar stereo gridded data of Northern hemispere with nominal gridded resolution 25 km (<a href="http://nsidc.org/data/polar_stereo/ps_grids.html">http://nsidc.org/data/polar_stereo/ps_grids.html</a>).</p>
+<pre>
+List of 9
+ $ columns: int 304
+ $ rows   : int 448
+ $ resx   : num 25000
+ $ resy   : num 25000
+ $ minx   : num -3850000
+ $ maxx   : num 3750000
+ $ miny   : num -5350000
+ $ maxy   : num 5850000
+ $ proj4  : chr "+proj=stere +lat_0=90 +lat_ts=70.0 +lon_0=-45.0 +k=1
+                 +x_0=0.0 +y_0=0.0 +a=6378273.000 +b=6356889.449 +units=m +no_defs"
+ - attr(*, "class")= chr "rmapGrid"
+NULL
+</pre>
+
+
+
+
+
+
+
+
+
+<p><code>session.proj4</code> returns item <code>proj4</code>.
+</p>
+<p><code>session.cellsize</code> returns squared root from multiplication of cell dimension: <code>sqrt(resx*resy)</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a></p>
+
+
+<h3>See Also</h3>
+
+<p>Class <code><a href="../../rmap/html/classGrid.html">rmapGrid</a></code>. Use <code><a href="../../rmap/html/regrid.html">regrid</a></code> to partial grid changing.
+</p>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+getOption("rmapSessionGrid") ## NULL
+(g1 &lt;- session.grid()) ## default
+g1$resx &lt;- g1$resy &lt;- 12500
+g1$columns &lt;- as.integer(with(g1,(maxx-minx)/resx))
+g1$rows &lt;- as.integer(with(g1,(maxy-miny)/resy))
+session.grid(g1)
+session.grid(NULL)
+a &lt;- rmap.new(value=3)
+session.grid(a)
+</pre>
+
+
+</body></html>

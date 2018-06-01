@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Write raster image to ENVI .hdr Labelled Raster file.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for envi.write"><tr><td>envi.write</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Write raster image to ENVI .hdr Labelled Raster file.
+</h2>
+
+<h3>Description</h3>
+
+<p><code>envi.write</code> writes in-memory object of class <code>rmapRaster</code> to disk in the ENVI .hdr Labelled Raster file format.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+envi.write(obj, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+
+<p>Object of class <code>rmapRaster</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Arguments, which are passed to <code><a href="../../rmap/html/conn.any.create.html">envi.create</a></code>. Usually, only file name (character) is required. If <a href="../../base/html/missing.html">missing</a>, then occasional name is assigned.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p><code>envi.write</code> implements writting the whole <code>rmapRaster</code> object to disk. For multiple access to disk (by chunks), use followed construction: </p>
+<pre>
+a &lt;- envi.create(fname)
+a[condition_1] &lt;- value1
+a[condition_2] &lt;- value2
+...
+close(a)
+</pre>
+
+
+<h3>Value</h3>
+
+<p>Integer code of ENVI data type. See values of the &ldquo;data type&rdquo; field in description of the <a href="http://www.harrisgeospatial.com/docs/ENVIHeaderFiles.html">ENVI Header Format</a>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../rmap/html/conn.any.create.html">envi.create</a></code>, <em><a href="../../rmap/html/classRaster.Replace.html">Replace</a></em> method <code><a href="../../rmap/html/classRaster.Replace.html">[&lt;-</a></code> for <code>rmapRaster</code> object, <code><a href="../../rmap/html/classRaster_close.html">envi.close</a></code> (<code><a href="../../rmap/html/classRaster_close.html">close</a></code> for <code>rmapRaster</code> object).
+</p>
+<p><code><a href="../../rmap/html/conn.gdal.write.html">gdal.write</a>(...,driver="ENVI")</code> uses GDAL (<span class="pkg">rgdal</span>) for writting <code>rmapRaster</code> object to the ENVI .hdr Labelled Raster file.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+list1a &lt;- envi.list(tempdir())
+list1b &lt;- envi.list()
+fname &lt;- tempfile()
+a &lt;- rmap.dummy()
+bandname(a) &lt;- c("first","second","third")
+envi.write(a)
+envi.write(a,fname)
+list2a &lt;- envi.list(tempdir())
+list2b &lt;- envi.list()
+fname1 &lt;- list2a[!(list2a %in% list1a)]
+fname2 &lt;- list2b[!(list2b %in% list1b)]
+a2 &lt;- envi.open(fname1)
+print(a2)
+close(a2)
+envi.remove(c(fname1,fname2))
+</pre>
+
+
+</body></html>

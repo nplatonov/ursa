@@ -1,0 +1,12 @@
+invisible({
+   plutil::mysource(ursa)
+   session_grid(NULL)
+   pdf.start(pdfname())
+   a <- pixelsize()
+   plot(a,asp=1)
+   image(a,asp=1)
+   b <- colorize(a)
+   plot(b,asp=1)
+   image(b,asp=1)
+   pdf.stop(pdfname())
+})

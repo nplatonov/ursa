@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Zonal statistics for raster maps</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for zonal.stat"><tr><td>zonal.stat</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Zonal statistics for raster maps
+</h2>
+
+<h3>Description</h3>
+
+<p>'Zonal' operator of map algebra. Applied to raster images.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+zonal.stat(x, by, table = FALSE)
+
+## S3 method for class 'rmapRaster'
+aggregate(x, by, FUN, table = FALSE, ...)
+
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+<p><code>rmapRaster</code> object. Image for analysis.
+</p>
+</td></tr>
+<tr valign="top"><td><code>by</code></td>
+<td>
+
+<p><code>rmapRaster</code> object. Image of grouping elements.
+</p>
+</td></tr>
+<tr valign="top"><td><code>FUN</code></td>
+<td>
+
+<p>a function to compute the summary statistics which can be applied to all data subsets.
+</p>
+</td></tr>
+<tr valign="top"><td><code>table</code></td>
+<td>
+
+<p>Logical. If <code>table=TRUE</code> then summary statistics for each group is returned. The statistics is defined by <code>FUN</code>. If <code>stat=FALSE</code> then result is presented as <code>rmapRaster</code> object.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Other arguments which passed to function <code><a href="../../stats/html/aggregate.html">aggregate</a></code> of package <span class="pkg">stats</span>
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+
+<p><code>zonal.stat</code> is a wrapper of <code>aggregate(x,by,FUN,table=FALSE,na.rm=TRUE)</code>
+</p>
+
+<p>You can use multichannel image (argument <code>x</code>) for analysis.
+</p>
+<p>You can use multichannel raster image for group elements (argument <code>by</code>)
+</p>
+
+
+<h3>Value</h3>
+
+<p>If <code>table=FALSE</code> then <code>rmapRaster</code> object of summarized statistics.
+<br />
+If <code>table=TRUE</code> then <code>data.frame</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+a &lt;- pixelsize()
+val &lt;- c(normal=a,half=a/2)
+gr &lt;- c(group=colorize(a,nbreak=1))#+0
+print(as.table(gr))
+##~ display(gr)
+ra &lt;- round(aggregate(val,gr,mean),4)
+print(ra)
+print(as.table(ra[1]))
+print(as.table(ra[2]))
+da &lt;- aggregate(val,gr,table=TRUE,mean)
+n &lt;- aggregate(a,gr,table=TRUE,length)[,2,drop=FALSE]
+da &lt;- cbind(da,n=unname(n))
+gr2 &lt;- c(group2=colorize(a,nbreak=6))#+0
+mgr &lt;- c(gr,gr2)
+da2 &lt;- aggregate(val[1],mgr,table=TRUE,mean)
+print(da2)
+da3 &lt;- aggregate(val,mgr,table=TRUE,mean)
+print(da3)
+ra3 &lt;- aggregate(val,mgr,table=FALSE,mean)
+print(ra3)
+display(ra3)
+</pre>
+
+
+</body></html>

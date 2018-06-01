@@ -1,0 +1,16 @@
+invisible({
+   plutil::ursula(2)
+   .elapsedTime("a")
+   session_grid(NULL)
+   .elapsedTime("b")
+   a <- ursa_dummy(5)
+   .elapsedTime("c")
+   a[3] <- a[2]
+   .elapsedTime("d")
+   print(a)
+   .elapsedTime("e")
+   print(duplicated(a))
+   .elapsedTime("f")
+   print(diff(a))
+   .elapsedTime("g")
+})

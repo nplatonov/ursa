@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Does any band contain no information?</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for blank"><tr><td>blank</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Does any band contain no information?
+</h2>
+
+<h3>Description</h3>
+
+<p>Set of functions for checking is any or all bands have no data, and for retrieving indices for non-data bands.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+band.blank(obj)
+
+rmap.blank(obj)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+
+<p>Object of class <code>rmapRaster</code>
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>It is defined locally that if all values of band are <code>NA</code> or 0, then such band band.blank. The fact is <code><a href="../../rmap/html/rmap.new.html">rmap.new</a></code> create new object in memory with default values <code>NA</code>, but <code><a href="../../rmap/html/conn.any.create.html">envi.create</a></code> writes zeros to disk quick. It is decided to consider both these cases as blank. Function <code>band.blank</code> checks blanks for each band of image. If all bands are blank then function <code>rmap.blank</code> returns <code>TRUE</code>.
+
+</p>
+
+
+<h3>Value</h3>
+
+<p>Function <code>rmap.blank</code> returns logical value of length 1.
+</p>
+<p>Function <code>band.blank</code> returns logical value of length <code><a href="../../rmap/html/classRaster_length.html">nband(obj)</a></code>.
+</p>
+
+
+
+
+
+
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../rmap/html/classRaster_is.na.html">is.na</a></code> returns object of class <code>rmapRaster</code>; it is mask of cells, which have <code>NA</code> value.
+
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+a &lt;- rmap.new(bandname=c("first","second","third","fourth"))
+rmap.value(a,"first") &lt;- 0 ## 'a[1] &lt;- 1' works, but it is slow
+print(rmap.blank(a))
+a[3] &lt;- pixelsize()
+a[4] &lt;- a[3]&gt;625
+print(a)
+print(band.blank(a))
+print(which(band.blank(a)))
+print(rmap.blank(a))
+</pre>
+
+
+</body></html>

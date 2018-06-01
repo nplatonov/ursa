@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Plot raster images and decorations on the multipanel layout.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for compose.panel"><tr><td>compose.panel</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Plot raster images and decorations on the multipanel layout.
+</h2>
+
+<h3>Description</h3>
+
+<p><code>compose.panel</code> divides the multi-band raster image (<em>brick</em>) or layers of raster images (<em>stack</em>) on the sequence of single-band images and plots each image on the separate panel of layout. Panel plotting is finalized by adding of decoration (gridlines, coastline, annotation, scalebar).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+compose.panel(...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Set of argumetns, which are passed to <code><a href="../../rmap/html/panel.new.html">panel.new</a></code>, <code><a href="../../rmap/html/panel.raster.html">panel.raster</a></code>, <code><a href="../../rmap/html/panel.coastline.html">panel.coastline</a></code>, <code><a href="../../rmap/html/panel.gridline.html">panel.gridline</a></code>, <code><a href="../../rmap/html/panel.annotation.html">panel.annotation</a></code>, <code><a href="../../rmap/html/panel.scalebar.html">panel.scalebar</a></code>.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>For each panel of layout the sequence of called functions is permanent:<br /><code><a href="../../rmap/html/panel.new.html">panel.new</a></code> - - &gt; <code><a href="../../rmap/html/panel.raster.html">panel.raster</a></code> - - &gt; <code><a href="../../rmap/html/panel.coastline.html">panel.coastline</a></code> - - &gt; <code><a href="../../rmap/html/panel.gridline.html">panel.gridline</a></code> - - &gt; <code><a href="../../rmap/html/panel.annotation.html">panel.annotation</a></code> - -&gt; <code><a href="../../rmap/html/panel.scalebar.html">panel.scalebar</a></code>.
+</p>
+<p>If this order is undesirable, then call these functions in the required sequence.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>NULL</code>
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../rmap/html/compose.plot.html">compose.plot</a></code>, <code><a href="../../rmap/html/compose.legend.html">compose.legend</a></code>
+</p>
+<p><code><a href="../../rmap/html/panel.new.html">panel.new</a></code>, <code><a href="../../rmap/html/panel.raster.html">panel.raster</a></code>, <code><a href="../../rmap/html/panel.coastline.html">panel.coastline</a></code>, <code><a href="../../rmap/html/panel.gridline.html">panel.gridline</a></code>, <code><a href="../../rmap/html/panel.annotation.html">panel.annotation</a></code>, <code><a href="../../rmap/html/panel.scalebar.html">panel.scalebar</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+a &lt;- rmap.dummy(6)
+b1 &lt;- list(maxi=a[1:4]*1e2,mini=a[5:6]/1e2)
+print(b1)
+b2 &lt;- lapply(b1,function(x) colorize(x,nbreak=ifelse(global.mean(x)&lt;100,5,NA)))
+compose.open(b2,byrow=FALSE
+            ,legend=list(list("bottom",1:2),list("bottom",3),list("left")))
+ct &lt;- compose.panel(b2,scalebar=2,coastline=3:4,gridline=5:6,gridline.margin=5
+                   ,annotation.text=as.character(seq(6)))
+compose.legend(ct)
+legend.mtext(as.expression(substitute(italic("Colorbars are on the bottom"))))
+compose.close()
+</pre>
+
+
+</body></html>

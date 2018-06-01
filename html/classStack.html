@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: List of raster images.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for rmapStack"><tr><td>rmapStack</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+List of raster images.
+</h2>
+
+<h3>Description</h3>
+
+<p>Functions to create list (layers) of multiband raster images (<em>stack</em> in the notation of <span class="pkg">raster</span> package) and to coerce list of images to single multiband image (<em>brick</em> in the notation of <span class="pkg">raster</span> package).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+
+rmap.stack(...)
+
+rmap.brick(obj)
+
+rmap.apply(obj, FUN, ...)
+
+## S3 method for class 'rmapRaster'
+as.list(x, ...)
+
+## S3 method for class 'rmapStack'
+unlist(x, recursive, use.names)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj, x</code></td>
+<td>
+
+<p>Object of class <code>rmapRaster</code> or list of <code>rmapRaster</code> objects. In function <code>rmap.apply</code> argument &quot;<code>X</code>&quot;, which is passed to function <code><a href="../../base/html/lapply.html">lapply</a></code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>FUN</code></td>
+<td>
+
+<p>Argument &quot;<code>FUN</code>&quot;, which is passed to function <code><a href="../../base/html/lapply.html">lapply</a></code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>recursive</code></td>
+<td>
+
+<p>Not used. For consistency with generic function <code><a href="../../base/html/unlist.html">unlist</a></code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>use.names</code></td>
+<td>
+
+<p>Not used. For consistency with generic function <code><a href="../../base/html/unlist.html">unlist</a></code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Denending of functions:<br />
+</p>
+
+<table summary="Rd table">
+<tr>
+ <td style="text-align: left;">
+   <code>rmap.stack</code>, <code>as.list</code> </td><td style="text-align: left;"></td>
+</tr>
+<tr>
+ <td style="text-align: left;"></td><td style="text-align: left;"> List of <code>rmapRaster</code> objects</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+   <code>rmap.apply</code> </td><td style="text-align: left;"></td>
+</tr>
+<tr>
+ <td style="text-align: left;"></td><td style="text-align: left;"> Arguments "<code>...</code>", which are passed to function <code><a href="../../base/html/lapply.html">lapply</a></code>.
+   </td>
+</tr>
+
+</table>
+
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p><code>as.list</code> (of <code>rmapRaster</code> object(s)), <code>rmap.stack</code> create list of <code>rmapRaster</code> objects, where items of list are sinle-band images. If <code>x</code> is <code>rmapRaster</code> object, then <code>list(x)</code> create a list of length one, which item is multiband image.
+</p>
+<p><code>unlist</code> (for list of <code>rmapRaster</code> objects), <code>rmap.brick</code> create single multiband <code>rmapRaster</code> object. There is an alternative way for unlisting the list of <code>rmapRaster</code>: <code><a href="../../rmap/html/rmap.as.html">as.rmap</a></code>.
+</p>
+<p>Raster <em>stack</em> is a way to group bands, for example, by units (degree Celsium, meters).<br />
+Raster <em>brick</em> is a way to combine versalite images to the single multiband image, for example, for saving in file.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>rmap.stack</code>, <code>as.list</code> return object of class <code>rmapStack</code>. It is a list, with class &quot;rmapStack&quot; attribute.
+</p>
+<p><code>unlist</code> (for list of <code>rmapRaster</code> objects), <code>rmap.brick</code> return object of class <code>rmapRaster</code>.
+</p>
+<p><code>rmap.apply</code> returns object of class <code>rmapStack</code>, if result is list of <code>rmapRaster</code> objects, otherwise returns general <code><a href="../../base/html/list.html">list</a></code>.
+</p>
+
+
+<h3>Warning </h3>
+
+<p>There is no any verifications, that <a href="../../rmap/html/classGrid.html">grids</a> of <code>rmapRaster</code> objects are the same.
+</p>
+
+
+<h3>Note</h3>
+
+<p>Generic <code><a href="../../base/html/unlist.html">unlist</a>(x)</code> deals only with class of <code>x</code>, but doesn't take into account class of objects in list (e. g., <code>x[[1]]</code>). So, there is no effective way to use only <code><a href="../../base/html/list.html">list</a></code>/<code><a href="../../base/html/unlist.html">unlist</a></code> for <code>rmapRaster</code> objects to do a conversion between raster <em>brick</em> and <em>stack</em>.
+Generic <code><a href="../../base/html/unlist.html">unlist</a>(x)</code> deals only with class of <code>x</code>, but doesn't take into account class of objects in list (e. g., <code>x[[1]]</code>). So, there is no effective way to use only <code><a href="../../base/html/list.html">list</a></code>/<code><a href="../../base/html/unlist.html">unlist</a></code> for <code>rmapRaster</code> objects to do a conversion between raster <em>brick</em> and <em>stack</em>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov
+</p>
+
+
+<h3>References</h3>
+
+<p><a href="https://CRAN.R-project.org/package=raster">https://CRAN.R-project.org/package=raster</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../base/html/lapply.html">lapply</a></code> <code><a href="../../base/html/list.html">list</a></code> <code><a href="../../base/html/unlist.html">unlist</a></code>
+</p>
+<p><code><a href="../../rmap/html/classRaster_c.html">c</a></code> for <code>rmapRaster</code> objects.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+a &lt;- rmap.dummy(3)
+print(a)
+b1 &lt;- rmap.stack(a[1:2],colorize(a[3],ramp=FALSE))
+print(b1)
+b2 &lt;- as.list(a)
+print(b2)
+b3 &lt;- list(a[1],a[2:3])
+print(b3)
+b31 &lt;- lapply(b3,colorize,ramp=FALSE)
+print(b31)
+b32 &lt;- rmap.apply(b3,colorize,ramp=FALSE,rev=TRUE)
+print(b32)
+s311 &lt;- rmap.apply(b31,rmap.colortable)
+print(s311)
+s21 &lt;- lapply(b2,global.mean)
+print(s21)
+s22 &lt;- sapply(b2,global.mean)
+print(s22)
+s31 &lt;- lapply(b3,global.mean)
+print(s31)
+s32 &lt;- sapply(b3,global.mean)
+print(s32)
+c1 &lt;- unlist(b1)
+print(c1)
+c2 &lt;- unlist(b2)
+print(c2)
+c3 &lt;- unlist(b3)
+print(if (is.rmap(c3)) c3 else "broken object")
+d3 &lt;- as.rmap(b3)
+print(if (is.rmap(d3)) d3 else "broken object")
+</pre>
+
+
+</body></html>

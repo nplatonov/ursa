@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Plot multi-band homogenous raster image in the PNG format.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for display.brick"><tr><td>display.brick</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Plot multi-band homogenous raster image in the PNG format.
+</h2>
+
+<h3>Description</h3>
+
+<p>Raster image is forced to be interpeted as homogenuous (having the same units). It implies creating multi-panel layout with multiple colorbars. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+display.brick(obj, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+
+<p>Object of class <code>rmapRaster</code> or <code><a href="../../base/html/list.html">list</a></code> of <code>rmapRaster</code> objects.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Passed to hierarchy of plotting functions:
+</p>
+
+<ul>
+<li> <p><code><a href="../../rmap/html/compose.open.html">compose.open</a></code>
+</p>
+
+<ul>
+<li> <p><code><a href="../../rmap/html/compose.design.html">compose.design</a></code>
+</p>
+</li></ul>
+
+</li>
+<li> <p><code><a href="../../rmap/html/compose.plot.html">compose.plot</a></code>
+</p>
+
+<ul>
+<li> <p><code><a href="../../rmap/html/panel.new.html">panel.new</a></code>
+</p>
+</li>
+<li> <p><code><a href="../../rmap/html/panel.raster.html">panel.raster</a></code>
+</p>
+</li>
+<li> <p><code><a href="../../rmap/html/panel.decor.html">panel.decor</a></code>
+</p>
+
+<ul>
+<li> <p><code><a href="../../rmap/html/panel.gridline.html">panel.gridline</a></code>
+</p>
+</li>
+<li> <p><code><a href="../../rmap/html/panel.coastline.html">panel.coastline</a></code>
+</p>
+</li>
+<li> <p><code><a href="../../rmap/html/panel.scalebar.html">panel.scalebar</a></code>
+</p>
+</li>
+<li> <p><code><a href="../../rmap/html/panel.annotation.html">panel.annotation</a></code>
+</p>
+</li></ul>
+
+</li>
+<li> <p><code><a href="../../rmap/html/compose.legend.html">compose.legend</a></code>
+</p>
+</li></ul>
+
+</li>
+<li> <p><code><a href="../../rmap/html/compose.close.html">compose.close</a></code>
+</p>
+</li></ul>
+
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>If argument <code>obj</code> is <code><a href="../../base/html/list.html">list</a></code> of <code>rmapRaster</code> objects (or object of class <code>rmapStack</code>) then <code>obj</code> is coerced to class <code>rmapRaster</code> ('stack' is coerced to 'brick').
+</p>
+
+
+<h3>Value</h3>
+
+<p>Function returns <code>NULL</code> value.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../rmap/html/display.html">display</a></code>, <code><a href="../../rmap/html/display.stack.html">display.stack</a></code>, <code><a href="../../rmap/html/display.rgb.html">display.rgb</a></code>
+
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+a &lt;- rmap.dummy(nband=3,min=0,max=250)
+a[2] &lt;- -a[1]
+a[3] &lt;- sqrt(a[1])
+## Not run:  a &lt;- rmap.stack(a) # all the same, further coercion to 'brick'
+print(a)
+## Not run: display(a) # likely 'display.stack' will be called 
+display.brick(a,stretch="eq",labels=c(-150,-100,0,10,12,20,100,150))
+</pre>
+
+
+</body></html>

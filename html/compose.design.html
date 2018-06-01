@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Organize multi-panel layout with images and color bars.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for compose.design"><tr><td>compose.design</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Organize multi-panel layout with images and color bars.
+</h2>
+
+<h3>Description</h3>
+
+<p><code>compose.design</code> prepares scheme for layout of images and color bars.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+compose.design(...)
+
+
+
+
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Set of argumetns, which are recognized via their names and classes:
+</p>
+
+<dl>
+<dt><code>obj</code></dt><dd><p>Object of class <code>rmapRaster</code> or list of objects of class <code>rmapRaster</code> or <code>NULL</code>. Default is <code>NULL</code>. Used to detect panel layout and coordinate reference system.</p>
+</dd>
+<dt><code>layout</code></dt><dd><p>Integer of length 2 or <code>NA</code>. Layout matrix has dimensions<code>c(nr, nc)</code>, where <code>nr</code> is number of rows, and <code>nc</code> is number of columns. If <code>layout=NA</code> then layout matrix is recognized internally using number of bands of <code>obj</code> and argument <code>ratio</code>. If <code>layout=NA</code> and <code>obj=NULL</code> then matrix <code>c(1,1)</code> is used.</p>
+</dd>
+<dt><code>byrow</code></dt><dd><p>Logical. The order of filling of layout matrix. Default is <code>TRUE</code>. If <code>byrow=TRUE</code> then matrix is filled by rows (from top row, consequently from left element to right element, then next row). If <code>byrow=FALSE</code> then matrix is filled by columns.</p>
+</dd>
+<dt><code>skip</code></dt><dd><p>Positive integer of variable length. Default in <code>NULL</code> (length is zero). Indices of panels in the layout matrix, which are not used.</p>
+</dd>
+<dt><code>legend</code></dt><dd><p>The descripition of rules how color bars (legends) or panel captions are located in the layout. It is the list of embedded lists of two elements, which describe the color bars position in the layout. of Default is <code>NA</code>, it means using of internal rules. If <code>legend=NULL</code> then no plotting of color bars. If <code>legend</code> is positive integer in the range <code>1L:4L</code>, then sinlge color bar is used and legend's side is corresponded to margins of <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> graphic system.</p>
+</dd>
+<dt><code>side</code></dt><dd><p>Positive integer <code>1L</code>, <code>2L</code>, <code>3L</code>, or <code>4L</code>. Default is <code>NA</code>. Simplification of color bar position in the case that single color bar is used. The value is corresponded to margins of <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> graphic system. The synonym of integer value of <code>legend</code>.</p>
+</dd>
+<dt><code>ratio</code></dt><dd><p>Positive numeric. The desired ratio of layout sides (width per height). If <code>layout=NA</code> then the dimensions of layout matrix are defined internally to get the given ratio of layout's width per height. The default is <code>(16+1)/(9+1)</code> in the assumtion of optimal filling on the usual 16:9 screens.</p>
+</dd>
+</dl>
+
+</td></tr>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3>Details</h3>
+
+<p>Function <code>compose.design</code> extracts and validates required arguments from a list of parameters (three-dots construct) and passes them to internal function <code>.compose.design</code>.
+</p>
+<p>Argument <code>legend</code> is a <code><a href="../../base/html/list.html">list</a></code> or coerced to a <code><a href="../../base/html/list.html">list</a></code>. The length of this list is equal to number of color bars; each item describes certain color bar. This desctiption is a list again with two elements, which desribes the position of color bar in relation to main panels of images.
+</p>
+<p>If argument <code>legend</code> is in interval <code>1L:4L</code> then it is intepreted as argument <code>side</code> in functions <code><a href="../../graphics/html/axis.html">axis</a></code>, <code><a href="../../graphics/html/mtext.html">mtext</a></code>.  Argument <code>side</code> in function <code>compose.design</code> plays the same role. It is introduced for consistency with <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> graphic system.
+</p>
+<p>In the one of example below (See <cite>Examples</cite> section) the layout with dimension of two rows by three columns is considered (<code>layout=c(2,3)</code>). The dimension of resulting layout matrix is <code>c(7,9)</code>, where 7=<strong>2</strong>*2+3, and 9=<strong>3</strong>*2+3.
+</p>
+<pre>
+     [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9]
+[1,]    0    0    0    0    0    0    0    0    0
+[2,]    0    0    0    0    0    0    0    0    0
+[3,]    0    0    1    0    2    0    3    0    0
+[4,]    0    0    0    0    0    0    0    0    0
+[5,]    0    0    4    0    5    0    6    0    0
+[6,]    0    0    0    0    0    0    0    0    0
+[7,]    0    0    0    0    0    0    0    0    0
+</pre>
+<p>The complicated color bar structure is specified via <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span>'s <code><a href="../../base/html/list.html">list</a></code> function: </p>
+<pre>
+&gt;   leg &lt;- list("7"=list(row=1,col=0),"8"=list(2,"left")
++              ,"9"=list("full","right"),"10"=list("top","full")
++              ,"11"=list(99,1:2),"12"=list("bottom",3))
+&gt; str(leg)
+ $ 7 :List of 2
+  ..$ row: num 1
+  ..$ col: num 0
+ $ 8 :List of 2
+  ..$ : num 2
+  ..$ : chr "left"
+ $ 9 :List of 2
+  ..$ : chr "full"
+  ..$ : chr "right"
+ $ 10:List of 2
+  ..$ : chr "top"
+  ..$ : chr "full"
+ $ 11:List of 2
+  ..$ : num 99
+  ..$ : int [1:2] 1 2
+ $ 12:List of 2
+  ..$ : chr "bottom"
+  ..$ : num 3
+</pre>
+<p>Here, six color bars are specified. It is a list of six lists (sub-lists). First item of sub-list is row number, and the second one is column number. Integers can be replaces by character keywords.
+</p>
+<p>For row-position, <code>"top"</code> means <code>0L</code> (less than first row), <code>"bottom"</code> means large integer value (greater than last row, currently, <code>99L</code>), <code>"first"</code> means <code>1L</code>, <code>"last"</code> means number of last row (<code>2L</code> in this example), <code>"full"</code> means whole range from first to last rows (<code>1L:2L</code> in this example). Values <code>"top"</code> and <code>"bottom"</code> are used for horizontal color bars (last three sub-lists), and the rest for vertical color bars (first three sub-lists).
+</p>
+<p>For column-position, <code>"left"</code> means <code>0L</code> (less then first column), <code>"bottom"</code> means large integer value (greater than last column, currently, <code>99L</code>), <code>"first"</code> means first column (<code>1L</code>), <code>"last"</code> means last column (<code>3L</code> in this example), <code>"full"</code> means whole range from first to last columns ((<code>1L:3L</code> in this example)). Values <code>"left"</code> and <code>"right"</code> are used for vertical color bars, and the rest are for horizontal ones.
+</p>
+<p>The resulting layout is a sparse matrix with zero values for each even row and each column. These zeros plays role of white space between panels in the plotted layout. In our example, values <code>1L:6L</code> are corresponded to six map panels, and values <code>7L:12L</code> are corresponded to six narrow panels of color bars (legends). </p>
+<pre>
+     [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9]
+[1,]    0    0   10    0   10    0   10    0    0
+[2,]    0    0    0    0    0    0    0    0    0
+[3,]    7    0    1    0    2    0    3    0    9
+[4,]    0    0    0    0    0    0    0    0    0
+[5,]    8    0    4    0    5    0    6    0    9
+[6,]    0    0    0    0    0    0    0    0    0
+[7,]    0    0   11    0   11    0   12    0    0
+</pre>
+<p><img src="../help/figures/composedesign.png" alt="Caption" />
+</p>
+
+
+<h3>Value</h3>
+
+<p>It is a list of class <code>rmapLayout</code>.
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>layout</code></td>
+<td>
+<p>Integer matrix with dimension <code>c(2*nr+3, 2*nc+3)</code>, where <code>nr</code> and <code>nc</code> are number of rows and colunms of the layout matrix. The layout matrix of image panels is surrounded by colorbar panels. The orignial layout matrix is expanded by adding zero columns and rows. In the new matrix each even column has zero values, and each even row has zero values.</p>
+</td></tr>
+<tr valign="top"><td><code>image</code></td>
+<td>
+<p>Nonnegative integer. Number of panels with images.</p>
+</td></tr>
+<tr valign="top"><td><code>legend</code></td>
+<td>
+<p>Nonnegative integer. Number of panels with color bars (legends).</p>
+</td></tr>
+</table>
+<p>The returned value is passed to function <code><a href="../../rmap/html/compose.open.html">compose.open</a></code> and further is kept in the <code><a href="../../base/html/options.html">options</a></code> until calling of <code><a href="../../rmap/html/compose.close.html">compose.close</a></code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+session.grid(regrid(mul=1/4))
+a &lt;- rmap.dummy(nband=5,min=1,max=200)
+b &lt;- list(colorize(a[1:3],pal.rich=240,pal.r=0)
+         ,colorize(sqrt(a[4:5]),pal.rich=-15,pal.r=0))
+cl1 &lt;- compose.design(layout=c(2,3),byrow=TRUE,legend=NULL)
+print(cl1$layout)
+## Not run: 
+   compose.open(cl1)
+   compose.close()
+## End(Not run)
+
+cl2 &lt;- compose.design(layout=c(2,3),byrow=FALSE,legend="left")
+print(cl2$layout)
+## Not run: 
+   compose.open(cl2)
+   compose.close()
+## End(Not run)
+
+cl3 &lt;- compose.design(a,side=2)
+print(cl3$layout)
+## Not run: 
+   compose.open(cl3)
+   compose.close()
+## End(Not run)
+
+cl4 &lt;- compose.design(b)
+print(cl4$layout)
+## Not run: 
+   compose.open(cl4)
+   compose.close()
+## End(Not run)
+
+cl5 &lt;- compose.design(b,byrow=FALSE,skip=3
+                     ,legend=list(list("full","left"),list(1:2,"right")))
+print(cl5)
+## Not run: 
+   compose.open(cl5)
+   compose.plot(b)
+   compose.close()
+## End(Not run)
+
+leg &lt;- list(list(1,0),list(2,"left")
+           ,list("full","right"),list("top","full")
+           ,list(99,1:2),list("bottom",3))
+str(leg)
+cl6 &lt;- compose.design(layout=c(2,3),skip=NA,legend=leg)
+print(cl6)
+## Not run: 
+   compose.open(cl6)
+   compose.close()
+## End(Not run)
+</pre>
+
+
+</body></html>

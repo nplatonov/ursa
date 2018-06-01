@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Create raster image in memory</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for rmap.new"><tr><td>rmap.new</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Create raster image in memory
+</h2>
+
+<h3>Description</h3>
+
+<p><code>rmap.new</code> creates object of class <code>rmapRaster</code> in memory using <a href="../../rmap/html/session.grid.html">session grid parameters</a> or properties of input object (<code><a href="../../base/html/matrix.html">matrix</a></code> or <code><a href="../../base/html/array.html">array</a></code>). By option, <a href="../../rmap/html/classRaster_names.html">band names</a> and <a href="../../rmap/html/ignorevalue.html">ignore values</a> are specified.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+rmap.new(...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Set of argumetns, which are recognized via their names (using <a href="../../base/html/regex.html">regular expressions</a>) and classes:
+</p>
+
+<dl>
+<dt><code>value</code></dt><dd><p>Pattern is <code>"(|^value)"</code>. Admissible classes are (<code><a href="../../base/html/matrix.html">matrix</a></code>, <code><a href="../../base/html/array.html">array</a></code>,<code><a href="../../base/html/numeric.html">numeric</a></code>,<code><a href="../../base/html/logical.html">logical</a></code>. Values to fill image. Array or matrix defines raster grid. If <code>value=FALSE</code> (logical), then created raster image has no values. By default, <code>value=NA</code>, the created raster image is filled by blank values (<code>NA</code>).</p>
+</dd>
+<dt><code>nband</code></dt><dd><p>Positive integer. Number of bands. Default is <code>1L</code>.</p>
+</dd>
+<dt><code>bandname</code></dt><dd><p>Character. Band names. Default is <code>NULL</code>. If specified, then <code>nband</code> is ignored, and the number of bands is equal to length of <code>bandname</code> character vector.</p>
+</dd>
+<dt><code>ignorevalue</code></dt><dd><p>Integer or numeric. Value in ENVI binary file, which is iterpetted as <code>NA</code> in <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span>.</p>
+</dd>
+<dt><code>datatype</code></dt><dd><p>Positive integer <code>c(1L, 2L, 3L, 4L, 5L, 11L, 12L, 13L)</code> or character. Data type (integer, floating-point) and byte length. See details for argument <code>datatype</code> of function <code><a href="../../rmap/html/conn.any.create.html">envi.create</a></code>. Required for writting raster to ENVI binart file. Optional for rasters in memory. Default is <code>NA</code>: data type is defined internally.</p>
+</dd>
+<dt><code>colortable</code></dt><dd><p>Object of class <code><a href="../../rmap/html/classColorTable.html">rmapColorTable</a></code>. Color table for raster. Default is <code>NULL</code>: color table is absent</p>
+</dd>
+<dt><code>permute</code></dt><dd><p>Logical. Should dimensions of input matrix be changed. Default is <code>FALSE</code>.</p>
+</dd>
+<dt><code>flip</code></dt><dd><p>Logical. Vertical flip for input matrix. Default is <code>FALSE</code>: no flip.</p>
+</dd>
+<dt><code>crs</code></dt><dd><p>Character or object of class <code>rmapGrid</code>. The reference grid for raster's cells. Default is <code>NULL</code>: the grid is defined ether from matrix/array structure or from <a href="../../rmap/html/session.grid.html">sessional parameters</a>.</p>
+</dd>
+<dt><code>verb(ose)*</code></dt><dd><p>Logical. Value <code>TRUE</code> may provide some additional information on console. Default is <code>FALSE</code>.</p>
+</dd>
+</dl>
+
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p><code>rmap.new</code> creates <code>rmapRaster</code> object in memory. To manipulate with raster chunks use the followed construction: </p>
+<pre>
+a &lt;- envi.create(fname,...)
+a[condition_1] &lt;- value
+print(a[condition_2]
+...
+close(a)
+</pre>
+<p><code>rmap.new</code> is designed to create blank raster images. Use <code><a href="../../rmap/html/rmap.as.html">as.rmap</a></code> for conversion <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> objects to <code>rmapRaster</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Object of class <code>rmapRaster</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../rmap/html/rmap.as.html">as.rmap</a></code>, <code><a href="../../rmap/html/conn.any.create.html">envi.create</a></code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+a1 &lt;- rmap.new(volcano)
+print(a1)
+display(a1)
+
+a2 &lt;- rmap.new(volcano,flip=TRUE)
+print(a2)
+display(a2)
+
+a3 &lt;- rmap.new(volcano,permute=TRUE)
+print(a3)
+display(a3)
+
+dima &lt;- c(200,300,4)
+b1 &lt;- as.rmap(array(runif(prod(dima)),dim=dima))
+print(b1)
+display.brick(b1,scale=1,palname="Greys",decor=FALSE)
+
+session.grid(NULL)
+
+c1 &lt;- rmap.new(seq(3))
+print(c1)
+c2 &lt;- rmap.new(seq(3),bands=3)
+print(c2)
+
+c3 &lt;- rmap.new(value=FALSE)
+str(rmap.value(c3))
+
+c4 &lt;- rmap.new(bands=2,nodata=-99L)
+print(c4)
+print(ignorevalue(c4))
+
+c5 &lt;- rmap.new(bandname=format(Sys.Date()+seq(7)-1,"%A"))
+rmap.value(c5) &lt;- rev(seq(nband(c5)))
+c5 &lt;- colorize(c5)
+ct &lt;- rmap.colortable(c5)
+print(c5)
+
+v &lt;- rmap.value(c5[3:5])
+str(v)
+v &lt;- c(v)
+str(v)
+c6 &lt;- rmap.new(v,colortable=ct)
+print(c6)
+print(rmap.colortable(c6))
+</pre>
+
+
+</body></html>

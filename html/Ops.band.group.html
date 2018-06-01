@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Extract certain statistics of each band.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for band.group"><tr><td>band.group</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Extract certain statistics of each band.
+</h2>
+
+<h3>Description</h3>
+
+<p>Function from this <code>band.*</code> list returns requred statistics for each band.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+band.mean(obj)
+band.sd(obj)
+band.sum(obj)
+band.min(obj)
+band.max(obj)
+band.n(obj)
+band.nNA(obj)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+
+<p>Object of class <code>rmapRaster</code>.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+
+<ul>
+<li> <p><code>band.mean</code> returns mean value.
+</p>
+</li>
+<li> <p><code>band.sd</code> returns value of standard deviation with <code>n-1</code> denominator.
+</p>
+</li>
+<li> <p><code>band.sum</code> returns sum of values.
+</p>
+</li>
+<li> <p><code>band.min</code> returns minimal value.
+</p>
+</li>
+<li> <p><code>band.max</code> returns maximal value.
+</p>
+</li>
+<li> <p><code>band.n</code> returns number of non-<code>NA</code> pixels.
+</p>
+</li>
+<li> <p><code>band.nNA</code> returns number of <code>NA</code> pixels.
+</p>
+</li></ul>
+
+
+
+<h3>Value</h3>
+
+<p>Named vector of numerical or integer values. Band names are used for naming.
+</p>
+
+
+<h3>Note</h3>
+
+<p>Currently, implementation is not optimal, because firstly bundle of statistics is computed using <a href="../../rmap/html/Ops.band.stat.html">band.stat</a> function, and then required statistics is extracted.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../rmap/html/Ops.band.stat.html">band.stat</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+a &lt;- rmap.dummy()
+print(a)
+print(a&lt;80)
+print(class(a))
+a[a&lt;80]
+a[a&lt;80] &lt;- NA
+b1 &lt;- band.stat(a)
+print(b1)
+b2.n &lt;- band.n(a)
+str(b2.n)
+b2.mean &lt;- band.mean(a)
+print(b1$mean)
+print(b2.mean)
+print(b1$mean-b2.mean)
+</pre>
+
+
+</body></html>

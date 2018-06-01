@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Dimension of multiband raster image</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for dim"><tr><td>dim</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Dimension of multiband raster image
+</h2>
+
+<h3>Description</h3>
+
+<p>Retrieve the dimension of an object of class <code>rmapRaster</code>. The replacement function is dummy; it doesn't change raster dimension.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'rmapRaster'
+dim(x)
+## S3 replacement method for class 'rmapRaster'
+dim(x) &lt;- value
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+<p>Object of class <code>rmapRaster</code>
+</p>
+</td></tr>
+<tr valign="top"><td><code>value</code></td>
+<td>
+
+<p>Any. Ignored
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Use extract operator <code><a href="../../rmap/html/classRaster.Extract.html">[]</a></code> and combine function <code><a href="../../rmap/html/classRaster_c.html">c</a></code> to change third (e.g., temporal) dimension of raster.<br />
+
+Use <code><a href="../../rmap/html/regrid.html">regrid</a></code> function to change grid parameters and to resize/resample raster into new grid.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The 'Extract' function <code>dim</code> returns named integer vector of length three: 1) number of lines/rows, 2) number of samples/columns, 3) number of bands/channels/layers.<br />
+The 'Replacement' function <code>dim&lt;-</code> returns <code>rmapRaster</code> object without changes.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+session.grid(regrid(mul=1/16))
+a &lt;- rmap.dummy(nband=3)
+rmap.info(a)
+print(dim(a))
+dim(a) &lt;- c(25,00,34)
+print(dim(a))
+b &lt;- envi.create("tmp1",bandname=letters[1:5],compress=FALSE)
+print(dim(b))
+close(b)
+envi.remove("tmp1")
+</pre>
+
+
+</body></html>

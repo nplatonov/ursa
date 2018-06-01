@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Extract certains statistics for whole image</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for global operator"><tr><td>global operator</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Extract certains statistics for whole image
+</h2>
+
+<h3>Description</h3>
+
+<p>Function from this <code style="white-space: pre;">global.\emph{FUN}</code> list returns requred statistics <em>FUN</em> for the whole image.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+global.mean(x, rmap = FALSE, ...)
+global.median(x, rmap = FALSE, ...)
+global.sd(x, rmap = FALSE, ...)
+global.sum(x, rmap = FALSE, ...)
+global.min(x, rmap = FALSE, ...)
+global.max(x, rmap = FALSE, ...)
+global.n(x, rmap = FALSE, ...)
+global.range(x, rmap = FALSE, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+<p>Object of class <code>rmapRaster</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>rmap</code></td>
+<td>
+
+<p>Logical. The class of returned value. If <code>FALSE</code> then numeric vector of length one is returned (for <code>global.range</code> vector has length two). If <code>TRUE</code> then returned value is single-band raster image (two-bands image for <code>global.range</code>) with constant value for all cells (blank image). Default is <code>FALSE</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Arguments in function <code style="white-space: pre;">global.\emph{FUN}</code> which are passed to function <code style="white-space: pre;">\emph{FUN}</code>. 
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>For any function <code style="white-space: pre;">global.\emph{FUN}</code>, if argument <code>na.rm</code> is not in <code>...</code>, then <code style="white-space: pre;">\emph{FUN}</code> is called with forced <code>na.rm=TRUE</code>.
+</p>
+<p><code style="white-space: pre;">global.range\emph{list of arguments}</code> is implemented as <code style="white-space: pre;">c(global.min(\emph{list of arguments}), global.max(\emph{list of arguments}))</code> with the same list of arguments.
+</p>
+<p>Alternative method to get global statistics is function applying directly to the raster value. For example, <code>sd(rmap.value(x,na.rm=TRUE))</code>. This way is also appropriate for missing global functions: for example, <code>var(rmap.value(x,na.rm=TRUE))</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>If <code>rmap=FALSE</code> then <code><a href="../../base/html/numeric.html">numeric</a></code>.
+<br />
+If <code>rmap=TRUE</code> then object of class <code><a href="../../rmap/html/classRaster.html">rmapRaster</a></code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+a &lt;- rmap.dummy(2,min=-40,max=80)
+a[a&lt;0] &lt;- NA
+print(a)
+a.mean &lt;- global.mean(a)
+a.sd &lt;- global.sd(a)
+a.sum &lt;- global.sum(a)
+a.min &lt;- global.min(a)
+a.max &lt;- global.max(a)
+a.median &lt;- global.median(a)
+print(c(mean=a.mean,sd=a.sd,sum=a.sum,min=a.min,max=a.max,median=a.median))
+v.max &lt;- max(rmap.value(a),na.rm=TRUE)
+print(c('global.max()'=a.max,'max(rmap.value())'=v.max,dif=a.max-v.max))
+r.max &lt;- global.max(a,rmap=TRUE)
+print(r.max)
+b &lt;- c(a,'appended scalar value'=a.max)
+print(b)
+</pre>
+
+
+</body></html>

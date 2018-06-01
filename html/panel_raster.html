@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Add raster to the image panel</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for panel_raster"><tr><td>panel_raster</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Add raster to the image panel
+</h2>
+
+<h3>Description</h3>
+
+<p>If specified image has 3 or 4 bands, then color composite is plotted on image panel, else the image is plotted regarding to its color table.
+
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+panel_raster(...)
+
+
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Set of argumetns, which are recognized via their names (using <a href="../../base/html/regex.html">regular expressions</a>) and classes.
+<br /> 1. Passed to <code><a href="../../ursa/html/colorize.html">colorize</a></code>.
+<br /> 2. Interpeted in this function:
+
+</p>
+
+<dl>
+<dt><code>"(^$|obj)"</code> <var>as</var> <code>obj</code></dt><dd><p>Object of class <code>ursaRaster</code>. Raster band for plotting. Multiple bands are allowed if then can be interpreted as RGB or RGBA.</p>
+</dd>
+<dt><code>"useRaster"</code>  <var>as</var> <code>useRaster</code></dt><dd><p>Logical. If <code>TRUE</code> then a bitmap raster is used to plot the image instead of polygons. See argument <code>useRaster</code> in function <code><a href="../../graphics/html/image.html">image</a></code>. Default depends on PNG device (<code>getOption("ursaPngDevice")</code>, which is set up in <code><a href="../../ursa/html/compose_open.html">compose_open</a></code>); it is <code>TRUE</code> for <code>"cairo"</code> device, and <code>FALSE</code> for <code>"windows"</code> device.</p>
+</dd>
+<dt><code>"interp(olate)*"</code> <var>as</var> <code>interpolate</code></dt><dd><p>Logical. Passed as argument <code>interpolate</code> to function <code><a href="../../graphics/html/rasterImage.html">rasterImage</a></code>.</p>
+</dd>
+<dt><code>"(alpha|transp(aren(cy)*)*)"</code> <var>as</var> <code>alpha</code></dt><dd><p>Numeric or character. Level of transparency. If numeric, the either <code style="white-space: pre;">0 &lt;= alpha &lt;= 1</code> or <code>0 &lt;= alpha &lt;= 255</code>. If character, then one byte of hexadecimal value <code style="white-space: pre;">"00" &lt;= alpha &lt;= "FF"</code>. If <code>NA</code>, then transparency is used from colortable, else transparency of colortable is overwritten by <code>alpha</code>. Default is <code>NA</code>.</p>
+</dd>
+<dt><code>"verb(ose)*"</code> <var>as</var> <code>verbose</code></dt><dd><p>Logical. Value <code>TRUE</code> may provide some additional information on console. Default is <code>FALSE</code>.</p>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+</td></tr>
+</table>
+
+
+
+
+
+
+
+<h3>Details</h3>
+
+<p>If <code>obj</code> is list of raster images, then <code>panel_raster</code> is applied to each item of list, and colortable of last item is returned.
+</p>
+<p>If <code>obj</code> has 3 or 4 bands then <code>obj</code> is intepreted as RGB(A) image.
+</p>
+<p>Function attempts to speed up plotting by reduce image matrix for big rasters.
+</p>
+
+
+<h3>Value</h3>
+
+<p>If argument <code>obj</code> has strictly one band, then function returns <a href="../../ursa/html/classColorTable.html">color table</a> - object of class <code>ursaColorTable</code>, which can be used as an input argument for the colorbar legend (function <code><a href="../../ursa/html/legend_colorbar.html">legend_colorbar</a></code>). Otherwise function returns <code>NULL</code> value.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session_grid(NULL)
+# example no.1 -- direct use
+session_grid(regrid(mul=1/32))
+dima &lt;- with(session_grid(),c(columns,rows,3))
+a &lt;- ursa_new(value=array(runif(prod(dima),min=127,max=255),dim=dima))
+p &lt;- colorize(a,pal=c("black","white"),ramp=TRUE,value=0:256)
+compose_open(layout=c(2,3),skip=4,legend=list(list("top","full"),list("bottom",2:3)))
+for (i in seq(6)) {
+   panel_new()
+   if (i&lt;4)
+      panel_raster(p[i])
+   else
+      panel_raster(a,interpolate=i==5)
+   panel_decor(col="black")
+   panel_annotation(c("red","green","blue"
+                    ,"interpolate=FALSE","interpolate=TRUE"))
+}
+legend_colorbar(p,label=seq(0,256,by=16),units="channels")
+legend_mtext("color composite")
+compose_close()
+
+# example no.2 -- indirect use
+display(pixelsize(NULL),raster.verb=TRUE)
+
+# example no.3 -- color table for legend
+session_grid(NULL)
+compose_open()
+panel_new()
+ct &lt;- panel_raster(pixelsize(),palname="Greens")
+panel_decor()
+compose_legend(ct)
+compose_close()
+
+</pre>
+
+
+</body></html>

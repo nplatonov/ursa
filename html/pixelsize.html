@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: The actual size of each grid cell with considerable...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for pixelsize"><tr><td>pixelsize</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+The actual size of each grid cell with considerable distortion in area of map projection.
+</h2>
+
+<h3>Description</h3>
+
+<p>This function helps to calculate size of pixels in the unit of area (squared km) for zonal statistics with taking into account distortion in area for classes of projections.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+pixelsize(obj, verbose = FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+
+<p>Either <code>rmapRaster</code> object or <code>rmapGrid</code> object or <code>NULL</code> or <code><a href="../../base/html/missing.html">missing</a></code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>verbose</code></td>
+<td>
+
+<p>Logical. Value <code>TRUE</code> may provide some additional information on console. Default is <code>FALSE</code>.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p><code>pixelsize()</code> is applied to coordinate reference system (grid) of <code>rmapRaster</code> object or to <a href="../../rmap/html/classGrid.html">raster grid</a> directly. If argument <code>obj</code> is <a href="../../base/html/missing.html">missed</a>, then <a href="../../rmap/html/session.grid.html">session grid</a> is used.
+</p>
+<p>Currently, only <em>Stereographic</em> (<code>"+stere"</code> in PROJ.4 notation), <em>Mercator</em> (<code>"+merc"</code>), and <em>Lambert Azimuthal Equal Area</em> (<code>"+laea"</code>) classes of map projections are implemented, though the last one (LAEA) has no distortion in area.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Object of class <code>rmapRaster</code>, single-band. If size of cell is more than <code>10e5</code> square meters, then the unit is squared kilometers (band name is &quot;Pixel Size (sq.km)&quot;) else squared meters (band name is &quot;Pixel Size (sq.m)&quot;).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+pixelsize()
+
+## Not run: 
+dpath &lt;- file.path("ftp://sidads.colorado.edu/pub/DATASETS"
+                  ,"nsidc0081_nrt_nasateam_seaice/F18_uncalibrated/north")
+dst &lt;- tempfile(fileext=".bin")
+isOK &lt;- FALSE
+d3 &lt;- Sys.Date()
+for (i in seq(5)) {
+   src &lt;- file.path(dpath,format(d3,"nt_%Y%m%d_f18_nrt_n.bin"))
+   a &lt;- try(download.file(src,dst,mode="wb"))
+   if ((is.integer(a))&amp;&amp;(a==0)) {
+      isOK &lt;- TRUE
+      break
+   }
+   d3 &lt;- d3-1
+}
+if (isOK) {
+   g1 &lt;- regrid(bbox=c(-385,-535,375,585)*1e4,res=25*1e3
+               ,proj4=paste("+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45"
+                           ,"+k=1 +x_0=0 +y_0=0 +a=6378273 +b=6356889.449"
+                           ,"+units=m +no_defs"))
+   session.grid(g1)
+   b &lt;- readBin(dst,integer(),size=1L,n=136492L,signed=FALSE)
+   ice &lt;- rmap.new(value=tail(b,-300))
+   ice[ice&gt;251] &lt;- NA ## keep Pole
+   ice[ice==251] &lt;- 250 ## consider 100% ice at Pole
+   ice &lt;- ice/2.5 ## uncategorize
+   ice[ice&lt;15] &lt;- 0 ## not ice, if less 15%
+   extent1 &lt;- band.sum(ice*1e-2*with(g1,resx*resy*1e-6))*1e-6
+   extent2 &lt;- band.sum(ice*1e-2*pixelsize(ice))*1e-6
+   message(paste("Near real-time Arctic sea ice extent(NASA Team algorithm, NSIDC)"))
+   message(sprintf("   Direct area calculation:         %5.2f*1e6 km^2.",extent1))
+   message(sprintf("   Distortion in area is corrected: %5.2f*1e6 km^2.",extent2))
+}
+else
+   message("It is failed to get sea ice concentration data.")
+
+## End(Not run)
+</pre>
+
+
+</body></html>

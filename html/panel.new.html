@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Start plotting on the new image panel</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for panel.new"><tr><td>panel.new</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Start plotting on the new image panel
+</h2>
+
+<h3>Description</h3>
+
+<p><code>panel.new</code> finishes plotting on previuos image panel and starts plotting on next image panel.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## as is
+panel.new(...)
+
+## coerced to 'panel.new(fill = "grey80", density = NA, angle = NA, lwd = 1, lty = 1L, asp = 1, mar = rep(0, 4))'
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Set of argumetns, which are recognized via their names (using <a href="../../base/html/regex.html">regular expressions</a>) and classes:
+</p>
+
+<dl>
+<dt><code>blank</code></dt><dd><p>Prefix for indirect use. Separated by a dot <code>"."</code>, e.g., <code>blank.col="transparent"</code>.</p>
+</dd>
+<dt><code>(col|fill)</code></dt><dd><p>Character. Color code/name for panel filling/shadowing. Default is <code>"grey80"</code> for georeferenced images, and <code>"grey90"</code> for non-projected images.</p>
+</dd>
+<dt><code>density</code></dt><dd><p>Numeric. The density of shading lines for fill/shadowing. If <code>NA</code> then no shading lines are drawn. Default is <code>NA</code>. See <code>density</code> in <code><a href="../../graphics/html/rect.html">rect</a></code>.</p>
+</dd>
+<dt><code>angle</code></dt><dd><p>Numeric. The slope of shading lines, given as an angle in degrees (counter-clockwise). If <code>NA</code> then no shading lines are drawn. Default is <code>NA</code>. See <code>angle</code> in <code><a href="../../graphics/html/rect.html">rect</a></code>.</p>
+</dd>
+<dt><code>lwd</code></dt><dd><p>Positive numeric. Width of coastline. Default is <code>1</code>. See <code>lwd</code> in <code><a href="../../graphics/html/rect.html">rect</a></code>.</p>
+</dd>
+<dt><code>lty</code></dt><dd><p>Character or positive integer. Type (pattern) of coasltline. Default is <code>1L</code> (solid). See <code>lty</code> in <code><a href="../../graphics/html/rect.html">rect</a></code>.</p>
+</dd>
+<dt><code>asp</code></dt><dd><p>Positive numeric. The <em>y/x</em> aspect ration. Default is <code>1</code>. See <code>asp</code> in <code><a href="../../graphics/html/plot.window.html">plot.window</a></code>.</p>
+</dd>
+<dt><code>mar</code></dt><dd><p>Positive numeric of length 4. Plot margins. Default is <code>rep(0,4L)</code>. See <code>mar</code> in <code><a href="../../graphics/html/par.html">par</a></code>.</p>
+</dd>
+<dt><code>verb(ose)*</code></dt><dd><p>Logical. Value <code>TRUE</code> may provide some additional information on console. Default is <code>FALSE</code>.</p>
+</dd>
+</dl>
+
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Prefix <code>blank</code> is introduced for manipulations with <code>panel.new</code> inside of high-level functions (e.g., <code><a href="../../rmap/html/display.html">display</a></code>). Prefix skipping is the subject for confict with functions, which use the same name of arguments.
+</p>
+<p>It is required to call <code>panel.new</code> for every image panel. First calling starts plotting on the first panel. Second and next callings change image panels.
+</p>
+<p>The panel sequence is set in function <code><a href="../../rmap/html/compose.design.html">compose.design</a></code>, which is called directly or indirectly from <code><a href="../../rmap/html/compose.open.html">compose.open</a></code>, and keeps in the options (access via <code>getOption("rmapPngLayout")$layout</code>).
+</p>
+<p>Image background is formed via consecutive call of functions <code><a href="../../graphics/html/plot.html">plot</a>(...,type="n")</code>, and <code><a href="../../graphics/html/rect.html">rect</a>(...)</code>.
+
+</p>
+
+
+<h3>Value</h3>
+
+<p>Function returns <code>NULL</code> value.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+# example no.1 -- direct use
+compose.open(layout=c(1,2),legend=NULL)
+panel.new()
+panel.annotation(label="Default + Empty")
+panel.new(col="#0000FF3F",density=15,angle=45,lwd=3)
+panel.decor()
+panel.annotation(label="Settings + Grid")
+compose.close()
+
+# example no.2 -- indirect use
+a &lt;- pixelsize()
+a &lt;- a[a&gt;560]
+display(a,blank.col="#0000FF3F",blank.density=15,blank.angle=45,blank.lwd=3
+       ,coast.fill="#007F005F",coast.density=20,coast.angle=c(-30,60))
+</pre>
+
+
+</body></html>

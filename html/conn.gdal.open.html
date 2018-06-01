@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Open GDAL file</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for gdal.open"><tr><td>gdal.open</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Open GDAL file
+</h2>
+
+<h3>Description</h3>
+
+<p><code>gdal.open</code> creates object of <code>rmapRaster</code> class, and prepares <code><a href="../../base/html/connections.html">connections</a></code> for data reading.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+gdal.open(fname, verbose = FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>fname</code></td>
+<td>
+
+<p>Character. Filename; full-name or short-name.
+</p>
+</td></tr>
+<tr valign="top"><td><code>verbose</code></td>
+<td>
+
+<p>Logical. <code>verbose=TRUE</code> provides some additional information on console. Default is <code>FALSE</code>.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p><code>gdal.open</code> doesn't read data. Data can be read later using <em><a href="../../rmap/html/classRaster.Extract.html">Extract</a></em> operator <code><a href="../../rmap/html/classRaster.Extract.html">[</a></code>.
+</p>
+<p>If argument <code>fname</code> is <a href="http://www.gdal.org/frmt_various.html#ENVI">ENVI .hdr Labelled Raster</a> then either <code>gdal.open</code> or <code><a href="../../rmap/html/conn.envi.open.html">envi.open</a></code> can be used. The former provides external implementation for data reading via GDAL in <span class="pkg">rgdal</span> package.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returns object of class <code>rmapRaster</code>. Values are not in memory.
+
+
+
+
+
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../rmap/html/classRaster_close.html">close</a></code>, <code><a href="../../rmap/html/conn.envi.open.html">envi.open</a></code>, <code><a href="../../rmap/html/conn.gdal.read.html">gdal.read</a></code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+fname1 &lt;- system.file("pictures/cea.tif",package="rgdal")
+message(fname1)
+a1 &lt;- gdal.open(fname1)
+print(a1)
+print(a1[])
+close(a1)
+fname2 &lt;- system.file("pictures/test_envi_class.envi",package="rgdal")
+message(fname2)
+b1 &lt;- gdal.open(fname2)
+b2 &lt;- envi.open(fname2)
+print(b1)
+print(b2)
+print(c('The same grid?'=identical(rmap.grid(b1),rmap.grid(b2))
+       ,'The same data?'=identical(rmap.value(b1[]),rmap.value(b2[]))))
+close(b1,b2)
+</pre>
+
+
+</body></html>

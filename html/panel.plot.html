@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Add graphical elements to the image panel</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for panel.plot"><tr><td>panel.plot</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Add graphical elements to the image panel
+</h2>
+
+<h3>Description</h3>
+
+<p>Standard fuctions for plotting from package <span class="pkg">graphics</span> are used for manual adding elements to current plot. Theses series of functions used that standard instruments with additional controling the acceptability of plotting.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+panel.plot(obj,...)
+
+panel.box(...)
+panel.lines(...)
+panel.points(...)
+panel.text(...)
+panel.abline(...)
+panel.polygon(...)
+panel.segments(...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+<p><span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> object.</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+
+<p>In <code>panel.plot</code> arguments are passed to function <code><a href="../../graphics/html/plot.html">plot</a></code>.<br />
+In <code>panel.box</code> arguments are passed to function <code><a href="../../graphics/html/box.html">box</a></code>.<br />
+In <code>panel.lines</code> arguments are passed to function <code><a href="../../graphics/html/lines.html">lines</a></code>.<br />
+In <code>panel.points</code> arguments are passed to function <code><a href="../../graphics/html/points.html">points</a></code>.<br />
+In <code>panel.text</code> arguments are passed to function <code><a href="../../graphics/html/text.html">text</a></code>.<br />
+In <code>panel.abline</code> arguments are passed to function <code><a href="../../graphics/html/abline.html">abline</a></code>.<br />
+In <code>panel.polygon</code> arguments are passed to function <code><a href="../../graphics/html/polygon.html">polygon</a></code>.<br />
+In <code>panel.segments</code> arguments are passed to function <code><a href="../../graphics/html/segments.html">segments</a></code>.<br />
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>If unable to get value <code>TRUE</code> from <code>getOption("rmapPngPlot")</code> then plotting is disable, and any function from this series returns <code>NULL</code>.
+</p>
+<p>Generally, for spatial objects argument <code>add=TRUE</code> is used in <code>panel.plot</code>.
+</p>
+
+
+
+<h3>Value</h3>
+
+<p>Function <code>panel.plot</code> returns value of function <code><a href="../../graphics/html/plot.html">plot</a></code>.<br />
+Function <code>panel.box</code> returns value of function <code><a href="../../graphics/html/box.html">box</a></code>.<br />
+Function <code>panel.lines</code> returns value of function <code><a href="../../graphics/html/lines.html">lines</a></code>.<br />
+Function <code>panel.points</code> returns value of function <code><a href="../../graphics/html/points.html">points</a></code>.<br />
+Function <code>panel.text</code> returns value of function <code><a href="../../graphics/html/text.html">text</a></code>.<br />
+Function <code>panel.abline</code> returns value of function <code><a href="../../graphics/html/abline.html">abline</a></code>.<br />
+Function <code>panel.polygon</code> returns value of function <code><a href="../../graphics/html/polygon.html">polygon</a></code>.<br />
+Function <code>panel.segments</code> returns value of function <code><a href="../../graphics/html/segments.html">segments</a></code>.<br />
+</p>
+
+
+<h3>Note</h3>
+
+<p>For plotted elements it is possible to create legend for colors using color bars. No shapes kind and size, no line widths.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../rmap/html/panel.contour.html">panel.contour</a></code>
+</p>
+
+<p>Package <span class="pkg">graphics</span> (<code>help(package="graphics")</code>) and functions <code><a href="../../graphics/html/plot.html">plot</a></code>, <code><a href="../../graphics/html/box.html">box</a></code>, <code><a href="../../graphics/html/lines.html">lines</a></code>, <code><a href="../../graphics/html/points.html">points</a></code>, <code><a href="../../graphics/html/text.html">text</a></code>, <code><a href="../../graphics/html/abline.html">abline</a></code>, <code><a href="../../graphics/html/polygon.html">polygon</a></code>, <code><a href="../../graphics/html/segments.html">segments</a></code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+require(rgdal)
+a &lt;- pixelsize()
+g1 &lt;- session.grid()
+n &lt;- 12L
+k &lt;- 5L
+x &lt;- with(g1,runif(n,min=minx,max=maxx))
+y &lt;- with(g1,runif(n,min=miny,max=maxy))
+panel.plot(x,y) ## plots nothing, because 'compose.open(...,dev=F)' is not called yet
+sl &lt;- lapply(seq(k),function(id){
+   x &lt;- sort(with(g1,runif(n,min=minx,max=maxx)))
+   y &lt;- sort(with(g1,runif(n,min=miny,max=maxy)))
+   Lines(Line(cbind(x,y)),ID=id)
+})
+sl &lt;- SpatialLines(sl,proj4string=CRS(rmap.proj(g1)))#,id=length(sl))
+lab &lt;- t(sapply(coordinates(sl),function(xy) xy[[1]][round(n/2),]))
+lab &lt;- as.data.frame(cbind(lab,z=seq(k)))
+sl &lt;- SpatialLinesDataFrame(sl
+              ,data=data.frame(ID=runif(k,min=5,max=9),desc=LETTERS[seq(k)]))
+print(sl@data)
+ct &lt;- colorize(sl@data$ID)#,name=sldf@data$desc)
+shpname &lt;- tempfile(pattern = "___tmp",tmpdir=".",fileext=".shp")
+layername &lt;- gsub("\\.shp$","",basename(shpname))
+writeOGR(sl,dirname(shpname),layername,driver="ESRI Shapefile")
+compose.open(layout=c(1,2),legend=list(list("bottom",2)))
+panel.new()
+panel.decor()
+panel.lines(x,y,col="orange")
+panel.points(x,y,cex=5,pch=21,col="transparent",bg="#00FF005F")
+panel.points(0,0,pch=3)
+panel.text(0,0,"North\nPole",pos=4,cex=1.5,family="Courier New",font=3)
+panel.new()
+panel.decor()
+panel.plot(sl,lwd=4,col="grey20",add=TRUE)
+panel.plot(shpname,lwd=3,col=ct$colortable[ct$index])
+panel.points(lab$x,lab$y,pch=as.character(lab$z),cex=2)
+compose.legend(ct$colortable)
+compose.close()
+file.remove(dir(path=dirname(shpname)
+               ,pattern=paste0(layername,"\\.(cpg|dbf|prj|shp|shx)")
+               ,full.names=TRUE))
+</pre>
+
+
+</body></html>

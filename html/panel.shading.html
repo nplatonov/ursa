@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Shaded overlay by image mask</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for panel.shading"><tr><td>panel.shading</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Shaded overlay by image mask
+</h2>
+
+<h3>Description</h3>
+
+<p>This specific function is designed to illustrate linear slope and areas of statistically significant slope on the same panel, however can be used commonly for shading by raster mask.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+panel.shading(obj, level = NA, col = NULL, density = 25, angle = c( -45, 45),
+                  lwd = 1, lty = 1, verbose = TRUE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+
+<p>Object of class <code>rmapRaster</code>. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>level</code></td>
+<td>
+
+<p>Positive numeric. Threshold for <code>obj</code> reclassification <code>{ obj&lt;(-level) | obj&gt;(+level) }</code>. If <code>NULL</code> then mask is created from non-<code>NA</code> values of <code>obj</code>. Default is <code>NULL</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>col</code></td>
+<td>
+
+<p><code>rmapColorTable</code> (<code>rmapRaster</code> with color table) or <code>character</code>. Color for shading lines (grid). If object of class <code>rmapColorTable</code>.<br />
+Two colors on the limits of color vector are extracted to separate source values <code>&lt;=(-level)</code> and <code>&gt;=(+level)</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>density</code></td>
+<td>
+
+<p>Numeric. The density of shading lines, in lines per inch. Default is <code>25</code>. See description of argument <code>density</code> in function <code><a href="../../graphics/html/polygon.html">polygon</a></code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>angle</code></td>
+<td>
+
+<p>Numeric. The slope of shading lines, given as an angle in degrees (counter-clockwise). Default is vector of length two <code>c(-45,45)</code>. See description of argument <code>angle</code> in <code><a href="../../graphics/html/polygon.html">polygon</a></code> function.
+</p>
+</td></tr>
+<tr valign="top"><td><code>lwd</code></td>
+<td>
+
+<p>Numeric. Line width for shading. Default is <code>1</code>. See description of <code>lwd</code> in <code><a href="../../graphics/html/par.html">par</a></code> function
+</p>
+</td></tr>
+<tr valign="top"><td><code>lty</code></td>
+<td>
+
+<p>Numeric or character. Line type for shading. Default is <code>1</code>. See description of <code>lty</code> in <code><a href="../../graphics/html/par.html">par</a></code> function.
+</p>
+</td></tr>
+<tr valign="top"><td><code>verbose</code></td>
+<td>
+
+<p>Logical. If <code>TRUE</code> then progresss bar is appeared. Default is <code>TRUE</code>.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Values of input <code>obj</code> is reclassified to raster mask: { values<code>&lt;=(-level)</code> OR values<code>&gt;=(+level)</code> }. For common use, select appropriate <code>level</code> and, if necessary, reclassify <code>obj</code> prior.
+</p>
+<p>Color limits are extracted using <code><a href="../../base/html/range.html">range</a></code> function.
+</p>
+<p>Raster images can be used for colored shading using <code>alpha</code> argument of <code><a href="../../rmap/html/panel.raster.html">panel.raster</a></code> function, e.g. <code>panel.raster(a,alpha=3/4)</code>
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>NULL</code>
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+if (first.example &lt;- TRUE) {
+   session.grid(NULL)
+   session.grid(regrid(mul=1/8))
+   ps &lt;- pixelsize()
+   compose.open()
+   ct &lt;- compose.panel()
+   panel.shading(ps&gt;1.1*global.mean(ps),angle=90)
+   compose.legend(ct)
+   compose.close()
+}
+if (second.example &lt;- TRUE) {
+   session.grid(NULL)
+   a &lt;- rmap.dummy(nband=15,mul=1/8)
+   b &lt;- local.stat(a)
+   compose.open()
+   lev &lt;- 0.90
+   d &lt;- as.matrix(b["slopeS"],coords=TRUE)
+   e &lt;- contourLines(d,levels=c(-lev,lev))
+   p &lt;- list(significance.raw=colorize(b["slopeS"])
+            ,significance.formatted=colorize(b["slopeS"],stretch="significance")
+            ,slope=colorize(b["slope"]))
+   p &lt;- c(p,rep(p[3],3))
+   names(p)[c(3,4,5)] &lt;- c("Slope and shaded significance"
+                          ,"Slope and contoured significance"
+                          ,"Slope and 'contourLines'")
+   compose.open(p,layout=c(2,NA),byrow=FALSE)
+   compose.panel(p[1])
+   compose.panel(p[2])
+   compose.panel(p[3])
+   panel.shading(b["slopeS"],level=lev)
+   compose.panel(p[4])
+   panel.contour(b["slopeS"],value=c(-lev,lev))
+   compose.panel(p[5])
+   lapply(e,panel.polygon)
+   compose.panel(p[6])
+   ct &lt;- panel.contour(b["slopeS"],"color"
+                      ,value=c(-0.99,-0.95,-0.9,-0.5,0.5,0.9,0.95,0.99))
+   compose.legend(c(head(p,-1),'(Colorbar for contours)'=list(ct)),las=3)
+   compose.close()
+}
+</pre>
+
+
+</body></html>

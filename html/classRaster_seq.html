@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Sequence Generation for raster image and coordinate grid</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for seq"><tr><td>seq</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Sequence Generation for raster image and coordinate grid
+</h2>
+
+<h3>Description</h3>
+
+<p>Set of functions to generate regular sequences of bands, x-/y-cordinates and columns/rows.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'rmapRaster'
+seq(...)
+
+## S3 method for class 'rmapGrid'
+seq(...)
+
+rmap.seqx(obj)
+rmap.seqy(obj)
+rmap.seqc(obj)
+rmap.seqr(obj)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Set of argumetns, which are recognized via their names (using <a href="../../base/html/regex.html">regular expressions</a>), position and classes.
+</p>
+
+<dl>
+<dt><code>.*</code></dt><dd><p>First argument (position 1). Object of classes <code>rmapRaster</code>, <code>rmapGrid</code>.</p>
+</dd>
+<dt><code>.*</code></dt><dd><p>Second argument (position &gt;1). One-character name. Valid values are in the list <code>c("z","x","y","c","r","lines","samples")</code>. <code>"c"</code> (<code>"samples"</code>) and <code>"r"</code> (<code>"lines"</code>) specify to generate cell sequence in the horizontal and vertical directions from bottom-left corner, whereas <code>"z"</code> specifies to generate sequence of bands. <code>x</code> and <code>"y"</code> return cell midpoints in spatial dimension.</p>
+</dd>
+</dl>
+
+</td></tr>
+<tr valign="top"><td><code>obj</code></td>
+<td>
+
+<p>Object of classes <code>rmapRaster</code>, <code>rmapGrid</code>. Missing <code>obj</code> is allowed; in this case the session grid is considered.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>All ordinal sequences (<code style="white-space: pre;">axis</code> is <code style="white-space: pre;">\dQuote{c}</code>, <code style="white-space: pre;">\dQuote{r}</code>, <code style="white-space: pre;">\dQuote{z}</code>) start from <code>1L</code>.
+</p>
+<p><code style="white-space: pre;">axis=\dQuote{z}</code> is ignored in the function <code>seq</code> for <code>rmapGrid</code> object. The returned value is <code>1L</code>.
+</p>
+<p><code>seq(obj)</code> for <code>rmapRaster</code> objects is suitable for using in cycles across bands.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Functions <code>rmap.seqx</code> and <code>seq(obj, "x")</code> return x-coordinates of cell midpoints.
+<br />
+Functions <code>rmap.seqy</code> and <code>seq(obj, "y")</code> return y-coordinates of cell midpoints.
+<br />
+Functions <code>rmap.seqc</code>, <code>seq(obj, "samples")</code> and <code>seq(obj, "c")</code> return sequence of cells in horizontal direction.
+<br />
+Functions <code>rmap.seqr</code>, <code>seq(obj, "lines")</code> and <code>seq(obj, "r")</code> return sequence of cells in vertical direction.
+<br />
+Functions <code>seq(obj)</code> and <code>seq(obj, "z")</code> for <code>rmapRaster</code> object returns sequence of bands.
+<br />
+Function <code>seq(obj)</code> and <code>seq(obj, "z")</code> for <code>rmapGrid</code> object returns <code>1L</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+session.grid(regrid(mul=1/16))
+print(session.grid())
+a &lt;- rmap.dummy(nband=5)
+print(a)
+print(seq(a))
+print(seq(a,"c"))
+print(seq(a,"x"))
+print(rmap.seqx())
+</pre>
+
+
+</body></html>

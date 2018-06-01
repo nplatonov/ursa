@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Coercion to package 'raster' objects</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for as.Raster"><tr><td>as.Raster</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Coercion to package 'raster' objects
+</h2>
+
+<h3>Description</h3>
+
+<p><code>as.Raster</code> converts singe-band <code>ursaRaster</code> object to <em>raster</em>, multi-band <code>ursaRaster</code> object to <em>brick</em> and list of <code>ursaRaster</code> objects to <em>stack</em>. S4 classes &ldquo;raster&rdquo;, &ldquo;brick&rdquo;, and &ldquo;stack&rdquo; are defined in package <span class="pkg">raster</span>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+as.Raster(obj)
+
+## S3 method for class 'ursaRaster'
+as.Raster(obj)
+
+## S3 method for class 'list'
+as.Raster(obj)
+
+## S3 method for class 'ursaStack'
+as.Raster(obj)
+
+## S3 method for class 'NULL'
+as.Raster(obj)
+
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+
+<p>Object of class <code>ursaRaster</code> or list of <code>ursaRaster</code> objects
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Package <span class="pkg">raster</span> is required for conversions. 
+</p>
+<p>The uppercase <code style="white-space: pre;">as.\bold{R}aster</code> is important, because <code><a href="../../ursa/html/classRaster_as.raster.html">as.raster</a></code> is used in internal functions for coersion to object of class <code><a href="../../grDevices/html/as.raster.html">raster</a></code>.
+</p>
+<p>Single-banded <code>ursaRaster</code> object (with or without colortable) is coerced to <code><a href="../../raster/html/raster.html">RasterLayer</a></code>. Colortables are kept.
+<br />
+Multi-banded <code>ursaRaster</code> object is coerced to <code><a href="../../raster/html/raster.html">RasterBrick</a></code>. Colortables are destroyed.
+<br />
+Multi-layered object (list of <code>ursaRaster</code> objects) is coerced to <code><a href="../../raster/html/raster.html">RasterStack</a></code>. Colortables are destroyed.
+<br />
+</p>
+
+
+<h3>Value</h3>
+
+<p>Either <code><a href="../../raster/html/raster.html">RasterLayer</a></code>, <code><a href="../../raster/html/brick.html">RasterBrick</a></code>, or <code><a href="../../raster/html/stack.html">RasterStack</a></code> object.
+</p>
+<p>If package <span class="pkg">raster</span> is not installed then return value is <code>NULL</code>
+</p>
+
+
+<h3>Note</h3>
+
+<p>Package <span class="pkg">raster</span> is marked as &quot;Suggested&quot;.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session_grid(NULL)
+if (requireNamespace("raster")) {
+   require(methods) ## need to 'raster::plot'
+   msk &lt;- ursa_dummy(1,min=0,max=100)&gt;40
+   a1 &lt;- ursa_dummy(1,min=200,max=500)[msk]
+   a2 &lt;- colorize(a1,ramp=FALSE)
+   a3 &lt;- as.integer(ursa_dummy(3,min=0,max=255.99))
+   a4 &lt;- ursa_stack(a3[msk])
+   if (isLayer &lt;- TRUE) {
+      print(a1)
+      r1 &lt;- as.Raster(a1)
+      message(as.character(class(r1)))
+      print(r1)
+      raster::plot(r1)
+      b1 &lt;- as.ursa(r1)
+      print(c(exported=a1,imported=b1,failed=b1-a1))
+      print(c(theSameValue=identical(ursa_value(a1),ursa_value(b1))
+             ,rheSameGrid=identical(ursa_grid(a1),ursa_grid(b1))))
+   }
+   if (isLayerColortable &lt;- TRUE) {
+      r2 &lt;- as.Raster(a2)
+      message(as.character(class(r2)))
+      print(r2)
+      raster::plot(r2)
+      b2 &lt;- as.ursa(r2)
+      print(c(theSameValue=identical(ursa_value(a2),ursa_value(b2))
+             ,rheSameGrid=identical(ursa_grid(a2),ursa_grid(b2))))
+   }
+   if (isBrickOrRGB &lt;- TRUE) {
+      r3 &lt;- as.Raster(a3)
+      message(as.character(class(r3)))
+      print(r3)
+      raster::plot(r3)
+      raster::plotRGB(r3)
+      b3 &lt;- as.ursa(r3)
+      print(c(theSameValue=identical(ursa_value(a3),ursa_value(b3))
+             ,rheSameGrid=identical(ursa_grid(a3),ursa_grid(b3))))
+   }
+   if (isStack &lt;- TRUE) {
+      r4 &lt;- as.Raster(a4)
+      message(as.character(class(r4)))
+      print(r4)
+      raster::plot(r4)
+      b4 &lt;- as.ursa(r4)
+      print(c(theSameValue=identical(ursa_value(a4),ursa_value(b4))
+             ,theSameGrid=identical(ursa_grid(a4),ursa_grid(b4))))
+   }
+}
+</pre>
+
+
+</body></html>

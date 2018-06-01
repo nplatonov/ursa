@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Fill gaps across bands using moving mean window</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for temporal.interpolate"><tr><td>temporal.interpolate</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Fill gaps across bands using moving mean window
+</h2>
+
+<h3>Description</h3>
+
+<p><code>temporal.interpolate</code> is applicable for multiband raster image, where bands are regular timestamps or period. For each cell (<em>local</em> operation of map algebra), <code>NA</code> value is replaced by averaging of two closest values (one value before, one value later) inside of moving window.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+temporal.interpolate(obj, win = 7, cover = 0, verbose = FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+
+<p>Object of class <code>rmapRaster</code> or <code><a href="../../base/html/matrix.html">matrix</a></code>, where spatial locations are by rows and temporal observations are by columns.
+</p>
+</td></tr>
+<tr valign="top"><td><code>win</code></td>
+<td>
+
+<p>Positive integer. Size of moving window. Required odd value; otherwise is coerced to the closest odd integer.
+</p>
+</td></tr>
+<tr valign="top"><td><code>cover</code></td>
+<td>
+
+<p><em><b>Not applicable</b></em>. For consistence call with <code><a href="../../rmap/html/temporal.mean.html">temporal.mean</a></code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>verbose</code></td>
+<td>
+
+<p>Logical. <code>TRUE</code> provides some additional information on console. Default is FALSE.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Function uses weighted averaging depending of proximity of found non-<code>NA</code> values. For example, if <code>ind</code> is temporal index of <code>NA</code> value in the center of movind window, <code>indL=ind-2</code> is temporal index of the closest early value <code>valL</code>, and <code>indR=ind+1</code> is temporal index of the closest late value <code>valR</code>, then result is <code style="white-space: pre;">val &lt;- (1/3) * valL + (2/3) * valR</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>rmapRaster</code> object, if <code>obj</code> is object of class <code>rmapRaster</code>.
+</p>
+<p><code>matrix</code> object, if <code>obj</code> is a matrix.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../rmap/html/temporal.mean.html">temporal.mean</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+n &lt;- 45 # bands
+m &lt;- 3 # sample size
+k &lt;- median(seq(n))+seq(m)-(m %/% 2)-1 ## sample subset
+s &lt;- 5 # window size
+a &lt;- round(rmap.dummy(n,min=-60,max=60,elements=15,mul=1/8))
+a[a&lt;(-40)] &lt;- NA
+b &lt;- temporal.interpolate(a,7)
+p1 &lt;- colorize(a,lazy=TRUE)
+p2 &lt;- colorize(b,lazy=TRUE,colortable=p1)
+display(list('Source'=p1[k],'Gaps are filled'=p2[k]),layout=c(2,NA)
+       ,legend=list(list(1,"right"),list(2,"right")),decor=FALSE)
+</pre>
+
+
+</body></html>

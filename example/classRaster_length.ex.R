@@ -1,0 +1,10 @@
+invisible({
+   plutil::mysource(ursa)
+   session_grid(NULL)
+   a1 <- pixelsize()
+   print(a1)
+   print(nband(a1))
+   a2 <- c("Band 1"=a1,Band2=a1/2,sqrt=sqrt(a1),NA)
+   print(a2)
+   print(nband(a2))
+})

@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Create single-band raster using statistics of multi-bands...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for local.group"><tr><td>local.group</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Create single-band raster using statistics of multi-bands raster.
+</h2>
+
+<h3>Description</h3>
+
+<p>Local operations (mean value, sum of values, median, minimum, maximum) of map algebra for multi-bands <code>rmapRaster</code> object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+local.mean(x, cover = 0.5 - 1e-3, weight = NULL, verbose = FALSE, bandname = "mean")
+local.sum(x, cover = 0.5 - 1e-3, weight = NULL, verbose = FALSE, bandname = "sum")
+local.median(x, cover = 0.5 - 1e-3, verbose = FALSE)
+local.min(x, cover = 0.5 - 1e-3, verbose = FALSE)
+local.max(x, cover = 0.5 - 1e-3, verbose = FALSE)
+local.sd(x, cover = 0.5 - 1e-3, verbose = FALSE)
+local.var(x, cover = 0.5 - 1e-3, verbose = FALSE)
+
+## S3 method for class 'rmapRaster'
+mean(x, ...)
+
+## S3 method for class 'rmapRaster'
+median(x, ...)
+
+# non public
+.average(x, cover = 0.5 - 1e-3, weight = NULL, sum = FALSE, verbose = FALSE)
+
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+<p><code>rmapRaster</code> object. In function <code>local.mean</code> and <code>local.sum</code> it is allowed to specify array with 3 dimensions (col, row, band) or (row, col, band)
+</p>
+</td></tr>
+<tr valign="top"><td><code>cover</code></td>
+<td>
+
+<p>Numeric. <code>0&lt;=cover&lt;=1</code> or <code>&gt;1</code>. Quota for <code>NA</code> values in the location for all bands. Quota exceeding leads to recording <code>NA</code> value in the created map. If <code>code&gt;1</code> then number of bands. If <code>0&lt;=cover&lt;=1</code> then proportion <code>cover</code> to number of bands.
+</p>
+</td></tr>
+<tr valign="top"><td><code>weight</code></td>
+<td>
+
+<p>Positive numeric of length equal to number of bands. For <code>local.mean</code> and <code>local.sum</code> only. If specified, then weighted mean or sum are applied. The prior normalization is not required.
+</p>
+</td></tr>
+<tr valign="top"><td><code>sum</code></td>
+<td>
+
+<p>Logical. For <code>.average</code> only. If <code>sum=TRUE</code> then fuction returns sum of values else mean value.
+</p>
+</td></tr>
+<tr valign="top"><td><code>verbose</code></td>
+<td>
+
+<p>Logical. If <code>verbose=TRUE</code> then some output appears in console. Used for debug and benchark.
+</p>
+</td></tr>
+<tr valign="top"><td><code>bandname</code></td>
+<td>
+
+<p>Character. Band name for created single-band image.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Function <code>mean</code> - arguments, which are passed to <code>local.mean</code>.
+<br />
+Function <code>median</code> - arguments, which are passed to <code>local.median</code>.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>If for valid output cell value it is requred to have at least <code>m</code> values not marked as <code>NA</code>, specify quota as <code>cover=m/nband(x)</code>.
+</p>
+<p><code>local.mean</code> and <code>local.sum</code> are wrapper to non-public function <code>.average</code>.
+</p>
+<p>Generic functions <code>mean</code>, <code>median</code>, <code>sd</code> for <code>rmapRaster</code> class are implemented via <code>local.mean</code>, <code>local.median</code>, <code>local.sd</code>, respectively. 
+</p>
+
+
+<h3>Value</h3>
+
+<p>Single-band <code>rmapRaster</code> object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p>If bands are interpreted as time series, apply <code><a href="../../rmap/html/Ops.local.stat.html">local.stat</a></code>
+</p>
+<p>Mean value for image brick <code><a href="../../rmap/html/Ops.global.group.html">global.mean</a></code>
+</p>
+<p>Mean value for each band <code><a href="../../rmap/html/Ops.band.group.html">band.mean</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+b &lt;- rmap.dummy(nband=7,min=0,max=100)
+b[b&lt;40] &lt;- NA
+print(b)
+res &lt;- c('mean'=mean(b),'local.mean'=local.mean(b)
+        ,'sum0'=local.sum(b,cover=0),'sum1'=local.sum(b,cover=1))
+print(res)
+
+## Not run: 
+display(b)
+display(res)
+## End(Not run)
+</pre>
+
+
+</body></html>

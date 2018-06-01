@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Simple display of raster images</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for plot"><tr><td>plot</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Simple display of raster images
+</h2>
+
+<h3>Description</h3>
+
+<p>Function <code>image</code> for <code>rmapRaster</code> object calls generic function <code><a href="../../graphics/html/image.html">image</a></code>.
+<br />
+Function <code>plot</code> for <code>rmapRaster</code> object calls function <code><a href="../../graphics/html/filled.contour.html">filled.contour</a></code>.
+<br />
+<a href="../../rmap/html/classColorTable.html">Color tables</a> are supported.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'rmapRaster'
+plot(x, ...)
+
+## S3 method for class 'rmapRaster'
+image(x, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+<p>Object of class <code>rmapRaster</code>
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Other parameters. Are passed to or <code><a href="../../graphics/html/filled.contour.html">filled.contour</a></code> or to generic function <code><a href="../../graphics/html/image.html">image</a></code>.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Usage of both these functions is justified for low-level control of plotting. It is recommended to use high-level function <code><a href="../../rmap/html/display.html">display</a></code>. It is flexible and power instrument for raster images visualization.
+</p>
+<p>Function <code><a href="../../rmap/html/classStack.html">as.list</a></code> for <code>rmapRaster</code> object transforms single band of raster image to a suitable object for plotting via function <code><a href="../../graphics/html/image.html">image</a></code> from package <span class="pkg">graphics</span>
+</p>
+
+
+<h3>Value</h3>
+
+<p>Returned value from <code><a href="../../graphics/html/image.html">image</a></code> or <code><a href="../../graphics/html/filled.contour.html">filled.contour</a></code> (both functions are in the package <span class="pkg">graphics</span>)
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../rmap/html/display.html">display</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+a &lt;- pixelsize()
+plot(a,asp=1)
+image(a,asp=1)
+b &lt;- colorize(a)
+plot(b,asp=1)
+image(b,asp=1)
+</pre>
+
+
+</body></html>

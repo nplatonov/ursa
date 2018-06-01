@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Some generic functions for 'ursaRaster' class.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for commonGeneric"><tr><td>commonGeneric</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Some generic functions for <code>ursaRaster</code> class.
+</h2>
+
+<h3>Description</h3>
+
+<p>Set of generic functions, implemented for objects of <code>ursaRaster</code> class.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'ursaRaster'
+duplicated(x, incomparables = FALSE, MARGIN = 2, fromLast = FALSE, ...)
+
+## S3 method for class 'ursaRaster'
+diff(x, lag = 1, differences = 1, ...)
+
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+<p>Object of <code>ursaRaster</code> class
+</p>
+</td></tr>
+<tr valign="top"><td><code>incomparables</code></td>
+<td>
+
+<p>Passed to S3 method <code>duplicated</code> for class <code>matrix</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>MARGIN</code></td>
+<td>
+
+<p>Overwitten to value <code>2</code>. Passed to S3 method <code>duplicated</code> for class <code>matrix</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>fromLast</code></td>
+<td>
+
+<p>Passed to S3 method <code>duplicated</code> for class <code>matrix</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>lag</code></td>
+<td>
+
+<p>Passed to default S3 method <code>diff</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>differences</code></td>
+<td>
+
+<p>Passed to default S3 method <code>diff</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Other arguments, which are passed to the respective S3 method.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p><code>duplicated()</code>: logical of length number of bands
+</p>
+<p><code>diff()</code>: <code>ursaRaster</code> object
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../base/html/diff.html">duplicated</a></code>, <code><a href="../../base/html/diff.html">diff</a></code>,
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+a &lt;- ursa_dummy(5)
+a[3] &lt;- a[2]
+a
+duplicated(a)
+diff(a)
+</pre>
+
+
+</body></html>

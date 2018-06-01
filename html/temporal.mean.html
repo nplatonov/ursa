@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Smooth value across bands using moving mean window</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for temporal.mean"><tr><td>temporal.mean</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Smooth value across bands using moving mean window
+</h2>
+
+<h3>Description</h3>
+
+<p><code>temporal.mean</code> is applicable for multiband raster image, where bands are regular timestamps or period. For each cell (<em>local</em> operation of map algebra), the values are averaged using moving window.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+temporal.mean(obj, win = 7, cover = 0, verbose = FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+
+<p>Object of class <code>rmapRaster</code> or matrix, where spatial locations are by rows and temporal observations are by columns.
+</p>
+</td></tr>
+<tr valign="top"><td><code>win</code></td>
+<td>
+
+<p>Positive integer. Size of moving window. Required odd value; otherwise is coerced to the closest odd integer.
+</p>
+</td></tr>
+<tr valign="top"><td><code>cover</code></td>
+<td>
+
+<p>Numeric in the interval <code>0 &lt;= cover &lt;= 1</code> or positive numeric &gt;1. The required amount of non-<code>NA</code> elements in window to do a filtering. Otherwise, <code>NA</code> value is in output cell. If <code>cover&lt;=1</code> then amount is relative to window size. Default is <code>0</code>: <code>NA</code> values are produced only if all elements in window have <code>NA</code> value.
+</p>
+</td></tr>
+<tr valign="top"><td><code>verbose</code></td>
+<td>
+
+<p>Logical. <code>TRUE</code> provides some additional information on console. Default is FALSE.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p><code>temporal.mean</code> is similar to function <code>runmean(x=obj, k=win, endrule="mean")</code> from package <span class="pkg">caTools</span>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>rmapRaster</code> object, if <code>obj</code> is object of class <code>rmapRaster</code>.
+</p>
+<p><code>matrix</code> object, if <code>obj</code> is a matrix.
+</p>
+
+
+<h3>Advanced</h3>
+
+<p><code>temporal.mean</code> is only smoothing of time-series. For time-series analysis and processing it is suggested to apply lower-level approach.
+</p>
+<p><code><a href="../../rmap/html/classRaster_as.matrix.html">as.matrix</a></code> (for <code>rmapRaster</code> object with argument <code>coords=FALSE</code>) or <code><a href="../../rmap/html/classValue.html">rmap.value</a></code> return matrix with spatial component by rows and temporal component by columns. It is possible to use <code><a href="../../base/html/apply.html">apply</a></code> with argument <code>MARGIN=1</code> to this matrix. If <code>apply</code> returns matrix <code>Y</code>, then this matrix can be coerced to <code>rmapRaster</code> object by calling <code><a href="../../rmap/html/rmap.as.html">as.rmap</a></code> with argument <code>t(Y)</code>. </p>
+<pre>
+      X &lt;- as.matrix(obj)
+      Y &lt;- apply(X, 1, function(x) {y &lt;- do_something_return_matrix(x); y})
+      res &lt;- as.rmap(t(Y))
+   </pre>
+<p>For example, package <span class="pkg">caTools</span> provides some functions for manipulation with moving window.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>References</h3>
+
+<p>Package <span class="pkg">caTools</span> <a href="https://CRAN.R-project.org/package=caTools">https://CRAN.R-project.org/package=caTools</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../caTools/html/runmean.html">caTools::runmean</a></code> (clickable correctly if package <span class="pkg">caTools</span> is installed)
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+set.seed(352)
+n &lt;- 45 # bands
+m &lt;- 3 # sample size
+k &lt;- median(seq(n))+seq(m)-(m %/% 2)-1 ## sample subset
+s &lt;- 5 # window size
+a &lt;- round(rmap.dummy(n,min=-60,max=60,elements=15,mul=1/8))
+if (requireNamespace("caTools")) {
+   b1 &lt;- as.rmap(t(apply(as.matrix(a),1,caTools::runmean,k=s,endrule="mean")))
+   b2 &lt;- temporal.mean(a,s)
+   print(b1[k])
+   print(b2[k])
+   print(c('identical?'=all.equal(rmap.value(b1),rmap.value(b2))))
+}
+a[a&lt;(-40)] &lt;- NA
+va &lt;- as.matrix(a) # or 'rmap.value(a)'
+b3 &lt;- temporal.mean(a,s,cover=3/4,verbose=TRUE)
+b4 &lt;- as.rmap(temporal.mean(as.matrix(va),s,cover=3/4,verbose=TRUE))
+p &lt;- list('Before moving window'=a[k]
+         ,'After moving window'=b3[k]
+         ,'\'temporal.mean\' to matrix'=b4[k])
+print(p)
+print(c('identical?'=all.equal(rmap.value(b3),rmap.value(b4))))
+display(p[1:2],legend=list(list(1,"right"),list(2,"right")),decor=FALSE)
+</pre>
+
+
+</body></html>

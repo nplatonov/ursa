@@ -1,0 +1,237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Create ENVI or GDAL files on disk</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for envi.create"><tr><td>envi.create</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Create ENVI or GDAL files on disk
+</h2>
+
+<h3>Description</h3>
+
+
+<p><code>envi.create</code> creates ENVI binary and header files on disk. ENVI binary file is filled by blank (zero) values.
+<br />
+<code>gdal.create</code> is a wrapper for creating new object of class <code><a href="../../rgdal/html/GDALTransientDataset-class.html">GDALTransientDataset</a></code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+gdal.create(x, ...)
+
+envi.create(x, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+
+<p>Filename, or any refenerce object to help assign properties of new ENVI file. Can be missed.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+
+<p>Use <code>name = value</code> sequence. Properties of new ENVI file are extracted from keywords in 'name' and data types of 'value'.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p><code>envi.create</code> and <code>gdal.create</code> use parameters of grid (boundary box, cell size, projection) from reference object of class <code>rmapRaster</code> in argument <code>x</code> or calls <code><a href="../../rmap/html/session.grid.html">session.grid</a></code>. You may specify values of GDAL or ENVI binary file later using <code><a href="../../rmap/html/classRaster.Replace.html">[&lt;-</a></code>. If <code>x</code> is object of class <code>rmapRaster</code> then metadata parameters (interleave, data type, ignore value, etc) are inherited. 
+</p>
+<p>Keywords:
+</p>
+
+<ul>
+<li><p><code>fname</code> - character. File name for created GDAL or ENVI file.
+<br /><br /> <em>For</em> <code>envi.create</code> <em>only</em>: If <code>compress</code> of <code>connections</code> is not specified then example for &ldquo;fileout&rdquo; file name:
+</p>
+
+<ul>
+<li><p>&quot;fileout&quot; - If external 'gzip' is found then &quot;fileout.envigz&quot; is created else &quot;fileout.envi&quot;
+</p>
+</li>
+<li><p>&quot;fileout.envi&quot; - &quot;fileout.envi&quot; is created without any compression.
+</p>
+</li>
+<li><p>&quot;fileout.&quot; - &quot;fileout&quot; is created without any compression.
+</p>
+</li>
+<li><p>&quot;fileout.bin&quot; - &quot;fileout.bin&quot; is created without any compression.
+</p>
+</li>
+<li><p>&quot;fileout.img&quot; - &quot;fileout.img&quot; is created without any compression.
+</p>
+</li>
+<li><p>&quot;fileout.dat&quot; - &quot;fileout.dat&quot; is created without any compression.
+</p>
+</li></ul>
+
+
+</li>
+<li><p><code>driver</code> - character. <em>For</em> <code>gdal.create</code> <em>only</em>. Which GDAL driver is used.
+</p>
+</li>
+<li><p><code>layername</code> - character of length&gt;=1. Layernames (&lsquo;Band name&rsquo; in ENVI header file)
+</p>
+</li>
+<li><p><code>bandname</code> - character of length&gt;=1. Layernames (&lsquo;Band name&rsquo; in ENVI header file)
+</p>
+</li>
+<li><p><code>name</code> - character of length&gt;=1. Layernames (&lsquo;Band name&rsquo; in ENVI header file)
+</p>
+</li>
+<li><p><code>nodata</code> - integer or numeric. Value in GDAL or ENVI binary file, which is iterpetted as <code>NA</code> in <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span>
+</p>
+</li>
+<li><p><code>ignore</code> - integer or numeric. Value in GDAL or ENVI binary file, which is iterpetted as <code>NA</code> in <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span>
+</p>
+</li>
+<li><p><code>ignorevalue</code> - integer or numeric. Value in GDAL or ENVI binary file, which is iterpetted as <code>NA</code> in <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span>
+</p>
+</li>
+<li><p><code>bg</code> - integer or numeric. Value in GDAL or ENVI binary file, which is iterpetted as <code>NA</code> in <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span>
+</p>
+</li>
+<li><p><code>connection</code> - character. <em>For</em> <code>envi.create</code> <em>only</em>. <code><a href="../../base/html/connections.html">connections</a></code> for ENVI binary file.
+<br /><br /> Valid values are:
+</p>
+
+<ul>
+<li><p>&quot;gz&quot; - connection is &quot;gzfile&quot;
+</p>
+</li>
+<li><p>&quot;bz&quot; - connection is &quot;bzfile&quot;
+</p>
+</li>
+<li><p>&quot;xz&quot; - connection is &quot;xzfile&quot;
+</p>
+</li>
+<li><p>&quot;file&quot; - connection is &quot;file&quot;
+</p>
+</li></ul>
+
+</li>
+<li><p><code>interleave</code> - character. Interleave. Valid values are &quot;bsq&quot;, &quot;bil&quot;, &quot;bip&quot;. For <code>gdal.create</code> and <code>driver="GTiff"</code> valid values are &quot;bsq&quot; and &quot;bil&quot;.
+</p>
+</li>
+<li><p><code>datatype</code> - character or integer (numeric). Data type.
+<br /><br /> Valid values are:
+</p>
+
+<ul>
+<li><p>1, &quot;byte&quot;, &quot;Byte&quot;, &quot;UInt8&quot; = Byte: 8-bit unsigned integer
+</p>
+</li>
+<li><p>2, &quot;integer&quot;, &quot;Int16&quot; = Integer: 16-bit signed integer
+</p>
+</li>
+<li><p>3, &quot;Int32&quot; = Long: 32-bit signed integer
+</p>
+</li>
+<li><p>4, &quot;real&quot;, &quot;float&quot;, &quot;Float32&quot; = Floating-point: 32-bit single-precision
+</p>
+</li>
+<li><p>5, &quot;Float64&quot; = Double-precision: 64-bit double-precision floating-point
+</p>
+</li>
+<li><p>11, &quot;UInt8&quot; = Byte: 8-bit signed integer. <b>Not in specification.</b> Only for use with this package.
+</p>
+</li>
+<li><p>12, &quot;UInt16&quot; = Integer: 16-bit unsigned integer
+</p>
+</li>
+<li><p>13, &quot;UInt32&quot; = Long: 32-bit unsigned integer
+</p>
+</li></ul>
+
+<p>Specification <a href="http://www.exelisvis.com/docs/ENVIHeaderFiles.html">http://www.exelisvis.com/docs/ENVIHeaderFiles.html</a> is used.
+
+</p>
+</li>
+<li><p><code>byteorder</code> - numeric (integer). Byte order.
+</p>
+</li>
+<li><p><code>bands</code> - numeric( integer). Number of bands/layers
+</p>
+</li>
+<li><p><code>nband</code> - numeric( integer). Number of bands/layers
+</p>
+</li>
+<li><p><code>nlayer</code> - numeric( integer). Number of bands/layers
+</p>
+</li>
+<li><p><code>layers</code> - numeric( integer). Number of bands/layers
+</p>
+</li>
+<li><p><code>compress</code> - integer (numeric) or logical. <em>For</em> <code>envi.create</code> <em>only</em>. Should ENVI binary file be compressed after closing connection.
+</p>
+</li>
+<li><p><code>wkt</code> - integer (numeric) or logical. Forced adding &lsquo;coordinate system string&rsquo; to ENVI header file
+</p>
+</li>
+<li><p><code>ext</code> - character. <em>For</em> <code>envi.create</code> <em>only</em>. Extension of ENVI binary file. For extensions not in <code>c("envi","bin","dat","img")</code> list
+</p>
+</li></ul>
+
+<p>If file name is unknown, then random file name is used with informing via <code>message()</code>. 
+
+</p>
+
+
+<h3>Value</h3>
+
+<p>Object of class <code>rmapRaster</code> with opened connection of GDAL or ENVI binary file.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a></p>
+
+
+<h3>See Also</h3>
+
+
+<p><code><a href="../../rmap/html/rmap.new.html">rmap.new</a></code> creates object of class <code>rmapRaster</code> in memory and allows to assign values at once.
+</p>
+<p>Use <code><a href="../../rmap/html/session.grid.html">session.grid</a></code> to check or specify parameters of grid before calling <code>envi.create</code>.
+</p>
+<p>Use <code><a href="../../rmap/html/classRaster.Replace.html">[&lt;-</a></code> to assign values to ENVI binary file after calling <code>envi.create</code>.
+</p>
+<p>Use <code><a href="../../rmap/html/classRaster_close.html">close</a></code> (or <code><a href="../../rmap/html/classRaster_close.html">envi.close</a></code>) to close <code><a href="../../base/html/connections.html">connections</a></code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+a &lt;- envi.create()
+fname &lt;- a$con$fname
+dir(pattern=basename(envi.list(fname)))
+close(a)
+invisible(envi.remove(fname))
+
+a &lt;- envi.create("exam1",layername=paste("Band",1:5)
+                ,ignorevalue=99,datatype="Int16",interleave="bil")
+rmap.info(a)
+print(a[])
+close(a)
+invisible(envi.remove("exam1"))
+</pre>
+
+
+</body></html>

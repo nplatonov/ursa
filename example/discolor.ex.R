@@ -1,0 +1,11 @@
+invisible({
+   plutil::mysource(ursa)
+   session_grid(NULL)
+   a <- colorize(pixelsize(),ncolor=7)
+   print(ursa_colortable(a))
+   print(a)
+   display(a)
+   b <- discolor(a)
+   print(ursa_colortable(b))
+   print(b)
+})

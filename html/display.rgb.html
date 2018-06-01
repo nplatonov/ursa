@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Plot RGB (RGBA) color composition in the PNG format.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for display.rgb"><tr><td>display.rgb</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Plot RGB (RGBA) color composition in the PNG format.
+</h2>
+
+<h3>Description</h3>
+
+<p>Raster images are forced to be interpeted as color composition with 3 (RGB) or 4 (RGBA) channels. Values should be in the range between 0 and 255.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+display.rgb(obj, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+
+<p>Object of class <code>rmapRaster</code> or <code><a href="../../base/html/list.html">list</a></code> of <code>rmapRaster</code> objects.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Passed to hierarchy of plotting functions:
+</p>
+
+<ul>
+<li> <p><code><a href="../../rmap/html/compose.open.html">compose.open</a></code>
+</p>
+
+<ul>
+<li> <p><code><a href="../../rmap/html/compose.design.html">compose.design</a></code>
+</p>
+</li></ul>
+
+</li>
+<li> <p><code><a href="../../rmap/html/compose.plot.html">compose.plot</a></code>
+</p>
+
+<ul>
+<li> <p><code><a href="../../rmap/html/panel.new.html">panel.new</a></code>
+</p>
+</li>
+<li> <p><code><a href="../../rmap/html/panel.raster.html">panel.raster</a></code>
+</p>
+</li>
+<li> <p><code><a href="../../rmap/html/panel.decor.html">panel.decor</a></code>
+</p>
+
+<ul>
+<li> <p><code><a href="../../rmap/html/panel.gridline.html">panel.gridline</a></code>
+</p>
+</li>
+<li> <p><code><a href="../../rmap/html/panel.coastline.html">panel.coastline</a></code>
+</p>
+</li>
+<li> <p><code><a href="../../rmap/html/panel.scalebar.html">panel.scalebar</a></code>
+</p>
+</li></ul>
+
+</li></ul>
+
+</li>
+<li> <p><code><a href="../../rmap/html/compose.close.html">compose.close</a></code>
+</p>
+</li></ul>
+
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>If argument <code>obj</code> is <code><a href="../../base/html/list.html">list</a></code> of <code>rmapRaster</code> objects (or object of class <code>rmapStack</code>) then <code>obj</code> is coerced to class <code>rmapRaster</code> ('stack' is coerced to 'brick').
+</p>
+<p>Colorbar is not plotted.
+</p>
+<p>By default, the created PNG has 24 bits per pixel. This is equal to parameter <code>bpp=24</code> (<code><a href="../../rmap/html/compose.close.html">compose.close</a></code>). It is allow to specify other value, e.g., <code>display.rgb(a,bpp=8)</code>.
+</p>
+<p>By default, labels of gridlines are located in bottom and left sides of the panel with raster. This is equal to parameter <code>margin=c(TRUE,TRUE,FALSE,FALSE)</code> (<code><a href="../../rmap/html/panel.gridline.html">panel.gridline</a></code>). It is allow to specify other value, e.g., <code>display.rgb(a,margin=T)</code>.
+</p>
+<p>Currently, for color compositions the argument <code>useRaster</code> (<code><a href="../../rmap/html/panel.raster.html">panel.raster</a></code>) is introduced to fix possible coordinate mismatch for Cairo-devices, but have never used.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Function returns <code>NULL</code> value.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../rmap/html/display.html">display</a></code>, <code><a href="../../rmap/html/display.brick.html">display.brick</a></code>, <code><a href="../../rmap/html/display.stack.html">display.stack</a></code>
+
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+a &lt;- rmap.dummy(nband=3)
+display.rgb(a)
+</pre>
+
+
+</body></html>

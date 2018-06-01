@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: 'No data' values for raster images.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for is.na"><tr><td>is.na</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+&lsquo;No data&rsquo; values for raster images.
+</h2>
+
+<h3>Description</h3>
+
+<p>The &quot;Extract&quot; function <code>is.na</code> creates mask for each band. In this mask value <code>1L</code> corresponds to <code>NA</code> value in the source image, and value <code>NA</code> corresponds non-missing values in the source image. The &quot;Replacement&quot; function <code>is.na&lt;-</code> assings numerical value for cells with &lsquo;no data&rsquo; value.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'rmapRaster'
+is.na(x)
+
+## S3 method for class 'rmapRaster'
+is.infinite(x)
+
+## S3 method for class 'rmapRaster'
+is.nan(x)
+
+## S3 replacement method for class 'rmapRaster'
+is.na(x) &lt;- value
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+<p>Object of class <code>rmapRaster</code>
+</p>
+</td></tr>
+<tr valign="top"><td><code>value</code></td>
+<td>
+
+<p>Numeric.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>These functions are corresponded to <em><strong>local</strong></em> operators of map algebra.
+</p>
+
+
+<h3>Value</h3>
+
+<p>&quot;Extract&quot; functions <code>is.na</code>, <code>is.infinite</code>, <code>is.nan</code> return object of class <code>rmapRaster</code>.
+</p>
+<p>&quot;Replacement&quot; function <code>is.na&lt;-</code> modifies object of class <code>rmapRaster</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+session.grid(regrid(mul=1/4))
+a &lt;- rmap.dummy(nband=2,min=0,max=100)
+print(a)
+print(is.na(a))
+a2 &lt;- rmap.new(nband=2)
+print(a2)
+print(is.na(a2))
+a3 &lt;- a
+a3[a3&lt;30 | a3&gt;70] &lt;- NA
+print(a3)
+print(is.na(a3))
+is.na(a3) &lt;- 200
+print(a3)
+</pre>
+
+
+</body></html>

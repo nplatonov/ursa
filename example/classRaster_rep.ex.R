@@ -1,0 +1,13 @@
+invisible({
+   plutil::mysource(ursa)
+   session_grid(NULL)
+   session_grid(regrid(mul=1/4))
+   a <- ursa_dummy(nband=3)
+   print(a)
+   b1 <- rep(a,by=2)
+   print(b1)
+   b2 <- rep(a,length=5)
+   print(b2)
+   b3 <- rep(a[3],3)
+   print(b3)
+})

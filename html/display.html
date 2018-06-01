@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Plot raster image(s) in the PNG format.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for display"><tr><td>display</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Plot raster image(s) in the PNG format.
+</h2>
+
+<h3>Description</h3>
+
+<p>High-level function to create multi-panel layout of images and to display with decoration (gridlines, coastlines, scalebar, colorbars) in the PNG format. It is an aggregator of low-level functions for typical plotting.
+
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+display(obj, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+
+<p>Object of class <code>rmapRaster</code> or <code><a href="../../base/html/list.html">list</a></code> of <code>rmapRaster</code> objects.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Passed to either <code><a href="../../rmap/html/display.brick.html">display.brick</a></code> or <code><a href="../../rmap/html/display.stack.html">display.stack</a></code> or <code><a href="../../rmap/html/display.rgb.html">display.rgb</a></code> functions and further to hierarchy of plotting functions:
+</p>
+
+<ul>
+<li> <p><code><a href="../../rmap/html/compose.open.html">compose.open</a></code>
+</p>
+
+<ul>
+<li> <p><code><a href="../../rmap/html/compose.design.html">compose.design</a></code>
+</p>
+</li></ul>
+
+</li>
+<li> <p><code><a href="../../rmap/html/compose.plot.html">compose.plot</a></code>
+</p>
+
+<ul>
+<li> <p><code><a href="../../rmap/html/panel.new.html">panel.new</a></code>
+</p>
+</li>
+<li> <p><code><a href="../../rmap/html/panel.raster.html">panel.raster</a></code>
+</p>
+</li>
+<li> <p><code><a href="../../rmap/html/panel.decor.html">panel.decor</a></code>
+</p>
+
+<ul>
+<li> <p><code><a href="../../rmap/html/panel.gridline.html">panel.gridline</a></code>
+</p>
+</li>
+<li> <p><code><a href="../../rmap/html/panel.coastline.html">panel.coastline</a></code>
+</p>
+</li>
+<li> <p><code><a href="../../rmap/html/panel.scalebar.html">panel.scalebar</a></code>
+</p>
+</li>
+<li> <p><code><a href="../../rmap/html/panel.annotation.html">panel.annotation</a></code>
+</p>
+</li></ul>
+
+</li>
+<li> <p><code><a href="../../rmap/html/compose.legend.html">compose.legend</a></code>
+</p>
+</li></ul>
+
+</li>
+<li> <p><code><a href="../../rmap/html/compose.close.html">compose.close</a></code>
+</p>
+</li></ul>
+
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>If argument <code>obj</code> is missing (e.g, calling <code>display()</code> without parameters) then plotting the sessional CRS with blank image.
+</p>
+<p>If argument <code>obj</code> is <code><a href="../../base/html/list.html">list</a></code> of <code>rmapRaster</code> objects (or object of class <code>rmapStack</code>) then <code><a href="../../rmap/html/display.stack.html">display.stack</a></code> is called.
+</p>
+<p>If argument <code>obj</code> is object of class <code>rmapRaster</code> and has 3 or 4 bands and values in each band are <code><a href="../../base/html/integer.html">integer</a></code> and in interval between 0 and 255, then <code><a href="../../rmap/html/display.rgb.html">display.rgb</a></code> is called.
+</p>
+<p>If argument <code>obj</code> is object of class <code>rmapRaster</code> then firstly internal test is applied to detect either image's bands contains homogeneous information (raster brick) or heterogeneous information (raster stack). Then either <code><a href="../../rmap/html/display.brick.html">display.brick</a></code> or <code><a href="../../rmap/html/display.stack.html">display.stack</a></code> is called. This test is rough due to unknown data origin. It is supposed to adjust kind of plotting by means of direct specifiction of <code><a href="../../rmap/html/display.brick.html">display.brick</a></code> or <code><a href="../../rmap/html/display.stack.html">display.stack</a></code>.
+</p>
+
+
+<h3>Value</h3>
+
+
+<p>Returned value from either <code><a href="../../rmap/html/display.brick.html">display.brick</a></code> or <code><a href="../../rmap/html/display.stack.html">display.stack</a></code> or <code><a href="../../rmap/html/display.rgb.html">display.rgb</a></code> functions.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../rmap/html/display.brick.html">display.brick</a></code>, <code><a href="../../rmap/html/display.stack.html">display.stack</a></code>, <code><a href="../../rmap/html/display.rgb.html">display.rgb</a></code>
+</p>
+<p><span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span>-styled plotting:  <code><a href="../../rmap/html/classRaster_plot.html">plot</a></code>, <code><a href="../../rmap/html/classRaster_plot.html">image</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+set.seed(500)
+a.brick &lt;- a.stack &lt;- rmap.dummy(nband=3,min=0,max=255)
+a.stack[2] &lt;- a.stack[2]/10
+a.stack[3] &lt;- sqrt(a.stack[3])
+a.rgb &lt;- as.integer(round(a.brick))
+print(a.brick)
+print(a.stack)
+print(a.rgb)
+display(a.brick)
+display(a.stack)
+display(a.rgb)
+</pre>
+
+
+</body></html>

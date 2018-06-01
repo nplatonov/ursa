@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Get and set sessional parameters for grid, CRS, external...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for session"><tr><td>session</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Get and set sessional parameters for grid, CRS, external software for open PNG files.
+</h2>
+
+<h3>Description</h3>
+
+<p><code>session_grid</code> without arguments returns current grid properties. <code>session_grid</code> with arguments specifies grid, which is used by functions of this package, e.g., for plotting, for opened and created raster images during current session.
+</p>
+<p><code>session_pngviwer</code> is used to permit external software to open PNG files.
+</p>
+<p><code>session_tempdir</code> spefies directory for temporal files in some cases.
+</p>
+<p><code>session_use_experimental_functions</code> allows to use undocumented (experimental) functions.
+</p>
+<p>Group of functions <code>session_proj4</code>, <code>session_crs</code>, <code>session_cellsize</code>, <code>session_bbox</code> extracts certain properties of sessional grid.
+</p>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+session_grid(obj)
+session_proj4()
+session_crs()
+session_cellsize()
+session_bbox()
+
+session_pngviewer(allow = NA)
+session_tempdir(dst = character())
+session_use_experimental_functions()
+
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+<p>Either missing, or <code>NULL</code>, or file name, or object of class <code>ursaRaster</code>, or object of class <code><a href="../../ursa/html/classGrid.html">ursaGrid</a></code>.</p>
+</td></tr>
+<tr valign="top"><td><code>allow</code></td>
+<td>
+<p>Logical. If <code>TRUE</code> then it is allowed to use external software for viewing PNG files. <code>NA</code> is interpreted as <code>TRUE</code> in the case of &quot;Rscript&quot; usage, and intepreted as <code>FALSE</code> in the case of interactive session or &quot;R CMD BATCH&quot; usage. Default is <code>NA</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>dst</code></td>
+<td>
+<p>Character. Directory name for temporal files. Empty character or non-character is interpreted as <code><a href="../../base/html/getwd.html">getwd()</a></code> in the case of &quot;Rscript&quot; usage, and intepreted as <code><a href="../../base/html/tempfile.html">tempdir()</a></code> in the case of interactive session or &quot;R CMD BATCH&quot; usage. Default is <code>character()</code> (empty character).</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+
+<p><code>session_grid</code> deals with option &ldquo;ursaSessionGrid&rdquo;: <code>options(ursaSessionGrid=...)</code> or <code>getOption("ursaSessionGrid")</code>.
+</p>
+<p>Usage <code>session_grid()</code> without arguments return value of &ldquo;ursaSessionGrid&rdquo; option via calling <code>getOption("ursaSessionGrid")</code>. If <code>is.null(getOption("ursaSessionGrid"))</code> then <code>session_grid()</code> returns default CRS.
+</p>
+<p>Usage <code>session_grid(NULL)</code> resets &ldquo;ursaSessionGrid&rdquo; option via calling <code>options(ursaSessionGrid=NULL)</code>.
+</p>
+<p>The sequential calling </p>
+<pre>
+session_grid(NULL)
+session_grid()
+</pre><p> returns default CRS. For checking that the option has been resetted successfully, use <code>getOption("ursaSessionGrid")</code> after <code>session_grid(NULL)</code>
+</p>
+<p><code>session_proj4</code> and <code>session_crs</code> are synonyms.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Object of class <code><a href="../../ursa/html/classGrid.html">ursaGrid</a></code>. It is a list. Default values are grid parameters of NSIDC polar stereo gridded data of Northern hemispere with nominal gridded resolution 25 km (<a href="http://nsidc.org/data/polar_stereo/ps_grids.html">http://nsidc.org/data/polar_stereo/ps_grids.html</a>).</p>
+<pre>
+List of 9
+ $ columns: int 304
+ $ rows   : int 448
+ $ resx   : num 25000
+ $ resy   : num 25000
+ $ minx   : num -3850000
+ $ maxx   : num 3750000
+ $ miny   : num -5350000
+ $ maxy   : num 5850000
+ $ proj4  : chr "+proj=stere +lat_0=90 +lat_ts=70.0 +lon_0=-45.0 +k=1
+                 +x_0=0.0 +y_0=0.0 +a=6378273.000 +b=6356889.449 +units=m +no_defs"
+ - attr(*, "class")= chr "ursaGrid"
+NULL
+</pre>
+
+
+
+
+
+
+
+
+
+<p><code>session_proj4</code> and <code>session_crs</code> return item <code>proj4</code>.
+</p>
+<p><code>session_cellsize</code> returns squared root from multiplication of cell dimension: <code>sqrt(resx*resy)</code>.
+</p>
+<p><code>sessiong_pngviewer</code> returns value of <code>getOption("ursaAllowPngViewer")</code>.
+</p>
+<p><code>sessiong_bbox</code> returns named numeric of lenght 4: minimal x-coodrinate (<code>xmin</code>), minimal y-coordinate (<code>ymin</code>), maximal x-coordinate  (<code>xmax</code>), maximal y-coordinate  (<code>ymax</code>).
+</p>
+<p><code>session_use_experimental_functions</code> added some non-public functions to current namespaces and returns invisile list of function names.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a></p>
+
+
+<h3>See Also</h3>
+
+<p>Class <code><a href="../../ursa/html/classGrid.html">ursaGrid</a></code>. Use <code><a href="../../ursa/html/regrid.html">regrid</a></code> to partial grid changing.
+</p>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+session_grid(NULL)
+getOption("ursaSessionGrid") ## NULL
+(g1 &lt;- session_grid()) ## default
+g1$resx &lt;- g1$resy &lt;- 12500
+g1$columns &lt;- as.integer(with(g1,(maxx-minx)/resx))
+g1$rows &lt;- as.integer(with(g1,(maxy-miny)/resy))
+session_grid(g1)
+session_grid(NULL)
+a &lt;- ursa_new(value=3)
+session_grid(a)
+
+print(session_pngviewer())
+</pre>
+
+
+</body></html>

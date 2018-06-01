@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Add auxiliary elements to the plotting panel.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for panel.decor"><tr><td>panel.decor</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Add auxiliary elements to the plotting panel.
+</h2>
+
+<h3>Description</h3>
+
+<p><code>panel.decor</code> adds over plot sequentially the followed elements: coastline, gridline, scalebar. Unlike <code>panel.decor</code>, function <code>layout.grid</code> does not add scalebar.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+panel.decor(...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Passed to sequence of plotting functions:
+</p>
+
+<ul>
+<li> <p><code><a href="../../rmap/html/panel.gridline.html">panel.gridline</a></code>. To distinguish the same agrument names in different functions it is provided to use prefix &ldquo;<code>grid.*</code>&rdquo;, e.g., <code>grid.col="grey40"</code>.
+</p>
+</li>
+<li> <p><code><a href="../../rmap/html/panel.coastline.html">panel.coastline</a></code>. To distinguish the same agrument names in different functions it is provided to use prefix &ldquo;<code>coast.*</code>&rdquo;, e.g., <code>coast.col="grey60"</code>.
+</p>
+</li>
+<li> <p><em>(not applicable for <code>layout.grid</code>)</em> <code><a href="../../rmap/html/panel.scalebar.html">panel.scalebar</a></code>. To distinguish the same agrument names in different functions it is provided to use prefix &ldquo;<code>scalebar.*</code>&rdquo;, e.g., <code>scalebar.col="black"</code>.
+</p>
+</li></ul>
+
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>The sequence of elements is constant. To change order, use direct calling of <code><a href="../../rmap/html/panel.gridline.html">panel.gridline</a></code>, <code><a href="../../rmap/html/panel.coastline.html">panel.coastline</a></code>, <code><a href="../../rmap/html/panel.scalebar.html">panel.scalebar</a></code> in any sequence.
+</p>
+<p>Sometimes, for rasters with <code>NA</code> values the followed sequence may be used: </p>
+<pre>
+panel.coastline(col="transparent",fill="grey80")
+panel.raster(a)
+panel.coastline(col="grey40")</pre>
+
+
+<h3>Value</h3>
+
+<p><code>panel.decor</code> returns <code>NULL</code> value.<br />
+<code>layout.grid</code> returns <code>NULL</code> value.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sebin.ru">platonov@sebin.ru</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+a &lt;- rmap.dummy(nband=1,min=0,max=100)
+a[a&lt;30] &lt;- NA
+compose.open()
+panel.new()
+ct &lt;- panel.raster(a)
+panel.decor(grid.col="green4",scalebar.col="brown")
+compose.legend(ct)
+compose.close()
+</pre>
+
+
+</body></html>

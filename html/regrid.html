@@ -1,0 +1,299 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Change raster image resolution and extent</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for regrid"><tr><td>regrid</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Change raster image resolution and extent
+</h2>
+
+<h3>Description</h3>
+
+<p>General function to change parameters of cells under the same geographical projection. It is implemented via raster resampling to the new grid.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+regrid(x, ...)
+
+## non-public
+.regrid(grid = NULL, mul = NA, res = NA, resx = NA, resy = NA, setbound = NA,
+        columns = NA, rows = NA, dim = NA, bbox = NA, expand = NA,
+        minx = NA, miny = NA, maxx = NA, maxy = NA, cut = NA, proj4 = NA, border = 0,
+        zero = c("keep", "node", "center"), raster = FALSE, tolerance = NA,
+        verbose = FALSE, ...)
+
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+<p>Object of class <code>ursaRaster</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<ol>
+<li><p> Arguments, which are passed to non-public <code>.regrid</code> to define parameters of new grid.
+</p>
+</li>
+<li><p> Set of arguments, which are recognized via their names (using <a href="../../base/html/regex.html">regular expressions</a>) and classes:
+</p>
+
+<dl>
+<dt><code>^reset(Grid)*</code></dt><dd><p>Logical. Whether new grid will be defined as a sessional parameter? If <code>TRUE</code> then returned raster defines new sessional grid. If <code>FALSE</code> then session grid is not changed. Default is <code>TRUE</code>.</p>
+</dd>
+<dt><code>resample</code></dt><dd><p>Logical or positive numeric. The range of aggregation in the units of cell area. If <code>0</code> or <code>FALSE</code> then &quot;nearest neighbor&quot; value is used. The <code>resample&gt;0</code> defines the side of rectangular area in proportion to cell size; and aggregation of adjacent cells is weighted in proportion to overlapping parts of cells. Default is <code>1</code> (or, equally, <code>TRUE</code>); it means that value of output cell is weighted mean of values of overlapped input cells in proportion of overlapping of output cell by input cells.</p>
+</dd>
+<dt><code>cover</code></dt><dd><p>Positive numeric in the range <code>[0, 1]</code>. The maximal fraction of <code>NA</code> values in adjusted input cells for the rule to write <code>NA</code> value to the output cell. Default is <code>0.499</code>.</p>
+</dd>
+<dt><code>cascade</code></dt><dd><p>Logical. Option to get more smooth results. If <code>TRUE</code> and <code>resample&gt;2</code> then <code>resize</code> function is applied sequentially with argument <code>resample&lt;=2</code>.</p>
+</dd>
+<dt><code>verb(ose)*</code></dt><dd><p>Logical. Value <code>TRUE</code> may provide some additional information on console. Default is <code>FALSE</code>.</p>
+</dd>
+</dl>
+
+</li></ol>
+
+</td></tr>
+<tr valign="top"><td><code>grid</code></td>
+<td>
+
+<p>Reference <code><a href="../../ursa/html/classGrid.html">ursaGrid</a></code> or <code>ursaRaster</code> object. If missing then reference grid is obtained from sessional grid <code>session_grid()</code>
+</p>
+</td></tr>
+<tr valign="top"><td><code>mul</code></td>
+<td>
+
+<p><code>numeric</code> of length 1. Multiplication for changing image size by means of changing of cell size (<code>1/mul</code>). <code>mul&gt;1</code> decreases cell size, <code>mul&lt;1</code> increases cell size
+</p>
+</td></tr>
+<tr valign="top"><td><code>res</code></td>
+<td>
+
+<p><code>numeric</code> of length 1 or 2. New grid size by horizontal and vertical axes. If length is 1 then the same grid size for both axes.
+</p>
+</td></tr>
+<tr valign="top"><td><code>resx</code></td>
+<td>
+
+<p>Positive <code>numeric</code> of length 1. New grid size by horizontal axis.
+</p>
+</td></tr>
+<tr valign="top"><td><code>resy</code></td>
+<td>
+
+<p>Positive <code>numeric</code> of length 1. New grid size by vertical axis.
+</p>
+</td></tr>
+<tr valign="top"><td><code>setbound</code></td>
+<td>
+
+<p><code>numeric</code> of length 4. Change units of spatial extension and define new spatial extension (boundary box) in the notation <code>c(minx,miny,maxx,maxy)</code>. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>columns</code></td>
+<td>
+
+<p>Positive <code>integer</code> of length 1. Number of columns/samples in the case of definition of new spatial extension (<code>setbound</code> is non-<code>NA</code>).
+</p>
+</td></tr>
+<tr valign="top"><td><code>rows</code></td>
+<td>
+
+<p>Positive <code>integer</code> of length 1. Number of rows/lines in the case of definition of new spatial extension (<code>setbound</code> is non-<code>NA</code>).
+</p>
+</td></tr>
+<tr valign="top"><td><code>dim</code></td>
+<td>
+
+<p>Positive <code>integer</code> of length 2. Dimenstion of raste image in the notation <code>c(rows, columns)</code> (or, <code>c(lines, samples)</code>) in the case of definition of new spatial extension (<code>setbound</code> is non-<code>NA</code>).
+</p>
+</td></tr>
+<tr valign="top"><td><code>bbox</code></td>
+<td>
+
+<p><code>numeric</code> of length 4. New spatial extension (boundary box) in the notation <code>c(minx,miny,maxx,maxy)</code> in the same units of existing spatial extension.
+
+</p>
+</td></tr>
+<tr valign="top"><td><code>minx</code></td>
+<td>
+
+<p><code>numeric</code> of length 1. New value for left boundary.
+</p>
+</td></tr>
+<tr valign="top"><td><code>miny</code></td>
+<td>
+
+<p><code>numeric</code> of length 1. New value for bottom boundary.
+</p>
+</td></tr>
+<tr valign="top"><td><code>maxx</code></td>
+<td>
+
+<p><code>numeric</code> of length 1. New value for right boundary.
+</p>
+</td></tr>
+<tr valign="top"><td><code>maxy</code></td>
+<td>
+
+<p><code>numeric</code> of length 1. New value for top boundary.
+</p>
+</td></tr>
+<tr valign="top"><td><code>cut</code></td>
+<td>
+
+<p><code>numeric</code> of length 4. Vector (left, bottom, right, top) in CRS units for extent expand.
+</p>
+</td></tr>
+<tr valign="top"><td><code>border</code></td>
+<td>
+
+<p><code>numeric</code> of length 1 or 4. If length 4, then vector (bottom, left, top, right) in cells for extent expand. If length &lt;4, then value is repeated for length 4.
+</p>
+</td></tr>
+<tr valign="top"><td><code>proj4</code></td>
+<td>
+
+<p><code>character</code> of length 1. New projection string in the PROJ.4 notation
+</p>
+</td></tr>
+<tr valign="top"><td><code>expand</code></td>
+<td>
+
+<p><code>numeric</code> of length 1. Multiplier of boundary box.
+</p>
+</td></tr>
+<tr valign="top"><td><code>raster</code></td>
+<td>
+
+<p><code>logical</code>. Should return blank <code>ursaRaster</code> object instead of <code><a href="../../ursa/html/classGrid.html">ursaGrid</a></code> object? See &lsquo;Value&rsquo; section
+</p>
+</td></tr>
+<tr valign="top"><td><code>zero</code></td>
+<td>
+
+<p><code>character</code>. Define central cell position relative to zero coordinates. If value is &quot;keep&quot;, then central cell position is without changes. If value is &quot;node&quot;, then zero coordinates are on the crossing of cell borders. If value is &quot;center&quot;, then zero coordinates are in the center of central cell. <em>Currently is not implemented. If grid is consistent, then value &quot;keep&quot; is used, else &quot;node&quot;</em>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>tolerance</code></td>
+<td>
+
+<p><code>numeric</code>. Threshold for comparison float point numerics. Required for internal check of grid consistence. Default is <code>NA</code>; value <code>.Machine$double.eps</code> multiplied on maximal value of coordinates is used.
+</p>
+</td></tr>
+<tr valign="top"><td><code>verbose</code></td>
+<td>
+
+<p>Reporting via <code>message</code> about violation and restoration of coordinate grid regilarity after non-consistence usage of paramaters.
+
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Generally, argument <code>resample</code> sets a rectangular region. The area of this region is in proportion to area of output cell. Argument <code>resample</code> is the value of this proportion. Each cell is interpeted as a set of adjoining rectangular figures. The value of output cells is a weighted mean of that input cells, which fall into rectangular region. The weights are defined as an partial area inside of rectangular region.
+</p>
+<p>Function implements &quot;nearest neighbor&quot; resampling method if argument <code>resample=0</code> (or, <code>resample=FALSE</code>). If <code>resample=1</code> (or, <code>resample=TRUE</code>) and both input and output rasters have the same cell size, then resampling method is &quot;bilinear interpolation&quot;.
+</p>
+<p>Expand raster <code>x</code> to 3 times with cell repeating: <code>regrid(x,mul=3,resample=FALSE) ## nearest neighbor</code>;<br />
+Expand raster <code>x</code> to 3 times with cell aggregation: <code>regrid(x,mul=3,resample=TRUE) ## bilinear interpolation</code>;<br />
+Contract raster <code>x</code> to 3 times without cell aggregation: <code>regrid(x,mul=1/3,resample=FALSE) ## nearest neighbor</code>;<br />
+Contract raster <code>x</code> to 3 times with cell aggregation: <code>regrid(x,mul=1/3,resample=TRUE) ## weighted mean</code>;<br />
+Low-pass filtering by <code>3 x 3</code> window size: <code>regrid(x,resample=3*3) ##</code> see <code><a href="../../ursa/html/Ops.focal_mean.html">focal_mean</a></code>
+</p>
+<p>However, simple contraction <code>regrid(x,mul=1/2,resample=FALSE)</code> is implemented as contration with aggregation (<code>regrid(x,mul=1/2,resample=FALSE)</code>), because centers or output cells are located in the nodes (crossing of boundaries of input cells).
+</p>
+<p>It seems that for categorical rasters parameter <code>resample=0</code> is more suitable, because nearest neigboring does not introduce new values to output raster, excepting coincidence of input cells' nodes and output cell centers.
+</p>
+<p>Usage of <code>proj4</code> argument specifiles only desirable PROJ.4 string and does not do reprojection.
+</p>
+<p>The violation of grid regualarity is due to columns and rows of image should be integer. The restoration of grid regularity is realized by spatial extension (boundary box) expansion.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>regrid</code> returns object of class <code>ursaRaster</code>.
+</p>
+<p>Return value of non-public function <code>.regrid</code> depends on logical value of <code>raster</code> argument. If <code>raster=FALSE</code> then <code>.regrid</code> returns new grid without any change of sessional grid. If <code>raster=TRUE</code> then <code>.regrid</code> returns blank image and changes sessional grid.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../ursa/html/regrid.html">regrid</a></code>, <code><a href="../../ursa/html/Ops.focal_mean.html">focal_mean</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session_grid(NULL)
+print(g1 &lt;- session_grid())
+print(g2 &lt;- regrid(g1,mul=2))
+print(g3 &lt;- regrid(g1,res=50000,lim=c(-1200000,-1400000,1600000,1800000)))
+print(g4 &lt;- regrid(g1,res=50000,lim=c(-1200100,-1400900,1600900,1800100),verbose=TRUE))
+print(g5 &lt;- regrid(g1,mul=1/4))
+print(g6 &lt;- regrid(g1,mul=1/4,cut=c(-1,-2,3,4)*25000))
+print(g7 &lt;- regrid(g1,mul=1/4,expand=1.05))
+print(session_grid()) ## equal to 'g1'
+print(a &lt;- regrid(g1,mul=1/4,border=3,raster=TRUE))
+print(session_grid()) ## not equal to 'g1'
+
+session_grid(NULL)
+'.makeRaster' &lt;- function(nc=6,nr=8) {
+   as.ursa(t(matrix(runif(nc*nr,min=0,max=255),ncol=nc,nrow=nr)))
+}
+session_grid(NULL)
+a &lt;- .makeRaster(12,18)
+expand &lt;- 1/3
+a1 &lt;- regrid(regrid(a,mul=expand,resample=FALSE),a,resample=FALSE)
+a2 &lt;- regrid(regrid(a,mul=expand,resample=TRUE),a,resample=FALSE)
+b &lt;- c('source'=a,'contract'=a1,'aggregation'=a2)
+print(b)
+display_brick(b,grid=TRUE
+             ,grid.lon=(seq(ncol(a)*expand+1)-1)/expand
+             ,grid.lat=(seq(nrow(a)*expand+1)-1)/expand)
+session_grid(NULL)
+a &lt;- .makeRaster(6,8)
+expand &lt;- 3
+b &lt;- c("source"=regrid(a,mul=expand,resample=FALSE,resetGrid=FALSE)
+      ,"simple"=regrid(a,mul=expand,cascade=TRUE,resetGrid=FALSE)
+      ,"cascaded"=regrid(a,mul=expand,cascade=FALSE,resetGrid=FALSE))
+print(b)
+display_brick(b)
+session_grid(a)
+eps &lt;- 1e-4
+r &lt;- c(0,expand^(-2)-eps,expand^(-2)+eps,1,expand^0.5
+      ,(expand+2/3)^2-eps,(expand+2/3)^2+eps,99)
+g2 &lt;- regrid(mul=expand)
+session_grid(g2)
+b &lt;- ursa_new(bandname=sprintf("Resample=%.4f",r))
+for (i in seq(b))
+   b[i] &lt;- regrid(a,g2,resample=r[i])
+print(b)
+display_brick(b,layout=c(2,NA)
+             ,grid=TRUE,grid.lon=seq(ncol(a)+1)-1,grid.lat=seq(nrow(a)+1)-1)
+</pre>
+
+
+</body></html>

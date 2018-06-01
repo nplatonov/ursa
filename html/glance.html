@@ -1,0 +1,284 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Command line utility for spatial view of raster or vector GIS...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for glance"><tr><td>glance</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Command line utility for spatial view of raster or vector GIS file.
+</h2>
+
+<h3>Description</h3>
+
+<p><code>glance</code> is a parser of command line arguments for non-public function <code>.glance</code>, which creates multi-panel plots for each attribute of vector file or for each band of raster file.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+glance(...)
+
+# non-public
+.glance(dsn, layer = ".*", grid = NULL, field = ".+", size = NA, expand = 1,
+        border = 27, lat0 = NA, lon0 = NA, resetProj = FALSE, style = "auto",
+        feature = c("auto", "field", "geometry"), alpha = NA,
+        basemap.order = c("after", "before"), basemap.alpha = NA,
+        engine = c("native", "sp", "sf"), geocode = "",place="",
+        area = c("bounding", "point"), zoom = NA, gdal_rasterize = FALSE,
+        verbose = FALSE, ...)
+
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>dsn</code></td>
+<td>
+
+<p>Character or object of either <code>ursaRaster</code>, <code>Spatial</code>, or <code>sf</code> classes. If character, then data source name (interpretation varies by driver - for some drivers, dsn is a file name, but may also be a folder, or contain the name and access credentials of a database).
+
+</p>
+</td></tr>
+<tr valign="top"><td><code>layer</code></td>
+<td>
+
+<p>Character or integer. If integer, then layer index. If character, then pattern (<a href="../../base/html/regex.html">regular expressions</a>) to recognize layer by name. Only one layer selection is allowed. If selected more then one layer, the error message contains indices and names of layers. Usually, datasets (e. g., &quot;ESRI Shapefile&quot;) have only one layer. Default is <code>".*"</code>; interpreted as all layers.
+</p>
+</td></tr>
+<tr valign="top"><td><code>grid</code></td>
+<td>
+
+<p>Object of class <code>ursaGrid</code> or NULL. Reference CRS and boundary box for visualization. If <code>NULL</code>, then CRS and boundary box are zoomed to layer. Default is <code>NULL</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>field</code></td>
+<td>
+
+<p>Character. Pattern for field (attribute, column,...) selection by name using <a href="../../base/html/regex.html">regular expressions</a>. Multiple selection is allowed. Default is <code>".+"</code>; all fields.
+</p>
+</td></tr>
+<tr valign="top"><td><code>size</code></td>
+<td>
+
+<p>Integer of length 1 or 2 or character of length 1. Size of plotting panel in pixels. If character, then parsed to integer of length 1 or 2. Length 2 is used only for web cartography. If length 1, then <code>size</code> defines width of panel, and height is defined automatically. If integer, then width of panel for plotting in pixels. Default is <code>NA</code>; for web cartogrpaphy value of maximal size of static maps, and code640 for other cases.
+</p>
+</td></tr>
+<tr valign="top"><td><code>expand</code></td>
+<td>
+
+<p>Numeric. Multiplier for plotting panel zoom in relation to extent of plotting geometry. Default is <code>1.0</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>border</code></td>
+<td>
+
+<p>Integer. Value in pixels of fixed margins around plotting geometry. Default is <code>27L</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>lat0</code></td>
+<td>
+
+<p>Numeric. Parallel os zero distortion. If <code>NA</code>, then parallel os zero distortion is determed from object geometry. Actual for <code>"+proj=stere"</code> projections. Default is <code>NA</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>lon0</code></td>
+<td>
+
+<p>Numeric. Central meridian, which have vertical direction on the plot. If <code>NA</code>, then central meridian is determed from object geometry. Default is <code>NA</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>resetProj</code></td>
+<td>
+
+<p>Logical. Value <code>TRUE</code> overwrites projection of vector file. Default is <code>FALSE</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>style</code></td>
+<td>
+
+<p>Character. Either projection class or source of web-catrogrpaphy for basemep. Specified by a sentence of words separated by spaces.
+</p>
+
+<ul>
+<li><p> Projection class <br />
+Valid values are <code>"stere"</code>, <code>"laea"</code>, <code>"merc"</code>, <code>"longlat"</code>. Default is keyword <code>"auto"</code>; use object projection, if this projection differs from projection class <code>"+longlat"</code>, otherwise, projection (<code>"stere"</code> or <code>"merc"</code>) is determed internally.
+</p>
+</li>
+<li><p> Web cartography.
+</p>
+
+<ul>
+<li><p> Static map<br />
+Valid values are <code>"google"</code>, <code>"openstreetmap"</code>, <code>"sputnikmap"</code>. Static maps have priority over tile services. however additional word <code>"static"</code> can be specified in the sentence, e.g., <code>"openstreetmap static"</code> or <code>"static google"</code>. Additional parameters for request to web-script can be added in the sentence in the form <code>"argument1=value1 [argument2=value2]"</code>, e.g., <code>style="google static maptype=terrain language=ru-RU scale=2"</code>.
+</p>
+</li>
+<li><p> Tile service<br />
+Supported tile services can be returned by calling of non-public function <code>ursa:::.tileService()</code> without arguments. Valid values are <code>"mapnik"</code>, <code>"cycle"</code>, <code>"transport"</code>, <code>"mapsurfer"</code>, <code>"sputnik"</code>, <code>"thunderforest"</code>, <code>"carto"</code>, <code>"kosmosnimki"</code>, etc. 
+
+</p>
+</li></ul>
+
+<p>By default, if data has no data fields (e. g., geometry only), then basemap is drawn in color, else in grayscale. Adding word <code>"color"</code> (or <code>"colour"</code>) to the sentence forces to use colored basemap. Adding word <code>"gray"</code> (or <code>"grey"</code>, <code>"greyscale"</code>, <code>"grayscale"</code>) to the sentence forces to use colored basemap.
+</p>
+<p>The order of words in the sentence is any.
+</p>
+</li></ul>
+
+<p>Keywords <code>"google"</code>, <code>"openstreetmap"</code> force to use &quot;Google Static Map&quot; or &quot;OpenStreetMap static map images&quot; for basemap; the resulted projection has class <code>"+proj=merc"</code>.
+</p>
+</td></tr>
+</table>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>feature</code></td>
+<td>
+
+<p>Character. Appearance of visualization. If <code>"field"</code> then data of each field is plotted on separate panel (number of panels is equal to number of columns in attribute table). If <code>"geometry"</code> then each feature is plotted on separate panel (number of panels is equal to number of rows in attribute table). Default is <code>"auto"</code>; if intersects of features are found, then <code>"geometry"</code> is used, else <code>"field"</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>basemap.order</code></td>
+<td>
+
+<p>Character. The order of basemap layer rendering in the case of web-cartography basemap.If <code>"before"</code>, then basemap is plotted before object plot. If <code>"after"</code>, then basemap is plotted over object. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>basemap.alpha</code></td>
+<td>
+
+<p>Character. The saturation of basemap in the case of web-cartography basemap. Default is <code>NA</code>; <code>basemap.alpha=0.5</code> for <code>basemap.order="before"</code> and <code>basemap.alpha=0.35</code> for <code>basemap.order="after"</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>alpha</code></td>
+<td>
+
+<p>Character. The opacity of plotted object. Default is <code>NA</code>; 0.75 for <code>basemap.order="before"</code> in web-cartogrpaphy style, <code>1.00</code> - in all other cases.
+</p>
+</td></tr>
+<tr valign="top"><td><code>engine</code></td>
+<td>
+
+<p>Character keyword. Forcing to vector files processing by functions from package <span class="pkg">sp</span> (<code>engine="sp"</code>) or package <span class="pkg">sf</span> (<code>engine="sf"</code>, if <span class="pkg">sf</span> is installed). Default is <code>"native"</code>; if <code>dsn</code> is <code>Spatial</code> object or if <span class="pkg">sf</span> is not installed, then <code>"sp"</code> is used.
+</p>
+</td></tr>
+<tr valign="top"><td><code>geocode</code></td>
+<td>
+
+<p>Character. Keyword for geocode service. Valid values are <code>"google"</code>, <code>"nominatim"</code>. If <code>dsn</code> is character and file <code>dsn</code> not found, then trying to interpret <code>dsn</code> as a request to geocode service. The output is only basemap of web cartogrpaphy. Default is <code>""</code>; several services are considered in the case of failure. Is <code>style</code> is not specified, then &quot;Google Static Map&quot; is used for <code>geocode="google"</code>, and &quot;OpenStreetMap static map images&quot; for <code>geocode="nominatim"</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>place</code></td>
+<td>
+
+<p>Character. Type of geographical object (river, island) in the geocoding request. If <code>geocode</code> service is <code>"nominatim"</code>, then <code>place</code> is searched among attributes &quot;class&quot; and &quot;type&quot;. Default is <code>""</code>; any object is acceptable.
+</p>
+</td></tr>
+<tr valign="top"><td><code>area</code></td>
+<td>
+
+<p>Character. Keyword of spatial class of geocoded object. <code>"bounding"</code> is used for boundary box; <code>"point"</code> is used for point. Default value is extracted by <code>match.arg(area)</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>zoom</code></td>
+<td>
+
+<p>Positive integer or character. Zooming if web-cartography is applied for basemap. If integer, then value of zoom for tile services and staticmap. If character, then <code>"0"</code> means zoom by default (defined internally), <code>"+1"</code> means increment on 1 of default zoom, <code>"+2"</code> means zoom increment on 2, <code>"-1"</code> means zoom decrement on 1, <code>"-2"</code> means zoom decrement on 2, <em>etc</em>. Default is <code>NA</code>; zoom is defined internally.
+</p>
+</td></tr>
+<tr valign="top"><td><code>gdal_rasterize</code></td>
+<td>
+
+<p>Logical. If <code>TRUE</code> and GDAL utilities are in the system search path, then overlay for panels is formed via rastetization of vector file. GDAL utility &quot;gdal_rasterize&quot; is used. Note, that GDAL (system level) is optional for this package. Default is <code>FALSE</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>verbose</code></td>
+<td>
+
+<p>Logical. Logical. Value <code>TRUE</code> may provide some additional information on console. Default is <code>FALSE</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p><code>glance</code>: Arguments, which are passed to <code>.glance</code> or to <code><a href="../../ursa/html/display.html">display</a></code>.
+<br /><code>.glance</code>: Arguments, which are passed to static maps API, <code><a href="../../ursa/html/colorize.html">colorize</a></code>, <code><a href="../../ursa/html/display.html">display</a></code>, <em>etc</em>.
+</p>
+
+
+
+
+
+
+
+
+
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Command line usage implies set of arguments using pair: argument <em><code style="white-space: pre;">name</code></em> and argument <em><code style="white-space: pre;">value</code></em>. and values in the format &quot;<em><code style="white-space: pre;">[name1=]value1 [name2]=value2</code></em>&quot;. No spaces around <em><code style="white-space: pre;">=</code></em> (equal symbol). Argument <em><code style="white-space: pre;">name</code></em> can be omitted, symbol <em><code style="white-space: pre;">=</code></em> is omitted too. If argument <em><code style="white-space: pre;">value</code></em> has spaces, then argumetn value should be surrounded by double quotes (<code>fname="my test.shp"</code>). If argument <em><code style="white-space: pre;">value</code></em> is matched to <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> function, then such value should be surrounded by single quotes (<code>layer='density'</code>).
+</p>
+<p>Command line usage example: <code>Rscript -e ursa::glance() 'final_more_than_032.sqlite' attr="select" resetProj=TRUE expand=1.5</code>
+</p>
+<p>For OS Windows, bat-file can be created for raster and vector file association:
+<code>Rscript -e ursa::glance() %*</code>
+</p>
+<p>Command line usage implies external software for PNG view <code><a href="../../ursa/html/session.html">session_pngviewer</a>(TRUE)</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>glance</code> returns integer: <code>0L</code> - successful, <code>10L</code> - call without arguments.
+</p>
+
+
+<h3>Note</h3>
+
+<p>Package <span class="pkg">sf</span> is 'Suggested' for package <span class="pkg">ursa</span>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session_grid(NULL)
+f &lt;- system.file("vectors","scot_BNG.shp",package="rgdal")
+glance(f,style="merc",field="(NAME|COUNT)")
+cmd &lt;- paste("Rscript --vanilla -e ursa::glance()",paste0("\"",f,"\"")
+            ,"proj=\"merc\"","field=\"(lon|lat)\"")
+cat(" --------- Try in command line: -----------\n")
+message(cmd)
+cat(" ----------- end of quoting ---------------\n")
+## Not run: 
+   system(cmd)
+## End(Not run)
+
+## Not run: 
+   require(sp)
+   a &lt;- data.frame(lat=c(70.734,71.657),lon=c(178.577,-177.38),place="Wrangel Island")
+   coordinates(a) &lt;- ~lon+lat
+   proj4string(a) &lt;- "+init=epsg:4326"
+   glance(a,style="google color maptype=terrain")
+   glance(a,style="openstreetmap color")
+   glance(a,style="mapnik color tile")
+## End(Not run)
+
+## Not run: 
+   glance("Svalbard")
+## End(Not run)
+
+</pre>
+
+
+</body></html>

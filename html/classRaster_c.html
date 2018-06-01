@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Combine bands into raster brick.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for c"><tr><td>c</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Combine bands into raster brick.
+</h2>
+
+<h3>Description</h3>
+
+<p>This function is an instrument for appending bands or for reorganizing bands.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'rmapRaster'
+c(...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Objects of class <code>rmapRaster</code> or coerced to class <code>rmapRaster</code>. First argument should be the object of class <code>rmapRaster</code>. The objects in the sequence can be named.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>You may use this function to assign new bandname for single-band raster: <code>objDst &lt;- c('Relative density'=objSrc)</code>
+</p>
+<p>Use also 'Extract' operator <code><a href="../../rmap/html/classRaster.Extract.html">[ ]</a></code> to reorganize band sequence.
+</p>
+<p>The returned object can be interpreted as a <strong><em>brick</em></strong> in the notation of package <span class="pkg">raster</span>. To produce <strong><em>stack</em></strong> just call <code><a href="../../base/html/list.html">list</a></code> or <code><a href="../../rmap/html/classStack.html">rmap.stack</a></code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>rmapRaster</code> object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../rmap/html/classStack.html">rmap.brick</a></code> converts list of <code>rmapRaster</code> objects (<strong><em>stack</em></strong>) to a singe multiband <code>rmapRaster</code> object (<strong><em>brick</em></strong>).
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+session.grid(regrid(mul=1/16))
+a1 &lt;- rmap.dummy(nband=2)
+names(a1) &lt;-  weekdays(Sys.Date()+seq(length(a1))-1)
+a2 &lt;- rmap.dummy(nband=2)
+names(a2) &lt;- names(a1)
+print(a1)
+print(a2)
+a3 &lt;- a1[1]
+print(names(a3))
+a4 &lt;- c(today=a3)
+print(names(a4))
+print(b1 &lt;- c(a1,a2))
+print(b2 &lt;- c(a1=a1))
+print(b3 &lt;- c(a1=a1,a2=a2))
+print(b5 &lt;- c(a1=a1,a2=a2[1]))
+print(b4 &lt;- c(a1,'(tomorrow)'=a1[2])) ## raster append
+print(b6 &lt;- c(a1,50))
+</pre>
+
+
+</body></html>

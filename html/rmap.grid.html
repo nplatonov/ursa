@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Extract and assign spatial paramaters of raster images.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for rmap.grid"><tr><td>rmap.grid</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Extract and assign spatial paramaters of raster images.
+</h2>
+
+<h3>Description</h3>
+
+<p>Raster image (<code>rmapRaster</code>) contains embedded spatial parameters (<code><a href="../../rmap/html/classGrid.html">rmapGrid</a></code>) in item <code>$grid</code>. These functions manipulate with item <code>$grid</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+rmap.grid(obj)
+rmap.grid(obj) &lt;- value
+
+rmap.ncol(obj)
+rmap.nrow(obj)
+rmap.columns(obj)
+rmap.rows(obj)
+rmap.samples(obj)
+rmap.lines(obj)
+
+rmap.extent(obj)
+rmap.bbox(obj)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+
+<p><code>rmapRaster</code> object. For <code>rmap.grid</code> function <code><a href="../../base/html/list.html">list</a></code> of <code>rmapRaster</code> objects is allowed
+</p>
+</td></tr>
+<tr valign="top"><td><code>value</code></td>
+<td>
+
+<p><code><a href="../../rmap/html/classGrid.html">rmapGrid</a></code> object
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p><code>rmap.grid&lt;-</code> may used to minor corrections of spatial parameters. Howevert, it seems that this function is not claimed in practice.
+</p>
+<p><code>rmap.ncol</code>, <code>rmap.columns</code>, <code>rmap.samples</code> are synonyms for extracting number of columns/samples.
+</p>
+<p><code>rmap.nrow</code>, <code>rmap.rows</code>, <code>rmap.lines</code> are synonyms for extracting number of rows/lines.
+</p>
+<p><code>rmap.extent</code>, <code>rmap.bbox</code>, are synonyms for extracting boundary box (spatial extent).
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>rmap.grid</code> return value of <code>$grid</code> item of <code>rmapRaster</code> object.
+</p>
+<p><code>rmap.grid&lt;-</code> return <code>rmapRaster</code> with modified <code>$grid</code> item.
+</p>
+<p><code>rmap.ncol</code>, <code>rmap.columns</code>, <code>rmap.samples</code> return integer of length 1.
+</p>
+<p><code>rmap.nrow</code>, <code>rmap.rows</code>, <code>rmap.lines</code> return integer of length 1.
+</p>
+<p><code>rmap.extent</code>, <code>rmap.bbox</code> return numeric of length 4 (xmin, ymin, xmax, ymax).
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+a &lt;- pixelsize()
+print(rmap.grid(a))
+rmap.grid(a)$proj4 &lt;- gsub("\\.0+","",rmap.grid(a)$proj4)
+print(rmap.grid(a))
+</pre>
+
+
+</body></html>

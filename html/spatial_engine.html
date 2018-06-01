@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Wrapper functions for manipulation with non-raster objects</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for spatial_engine"><tr><td>spatial_engine</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Wrapper functions for manipulation with non-raster objects
+</h2>
+
+<h3>Description</h3>
+
+<p>These wrappers return iniform properties or do consimilar manipulations for spatial objects of different types: simple features (package <span class="pkg">sf</span>) and abstract class Spatial (package <span class="pkg">sp</span>). Appropriate functionality (<em>&ldquo;engine&rdquo;</em>) of respective packages is used. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+spatial_engine(obj, verbose = FALSE)
+
+spatial_crs(obj, verbose = FALSE)
+spatial_proj4(obj, verbose = FALSE)
+
+spatial_crs(obj, verbose = FALSE) &lt;- value
+spatial_proj4(obj, verbose = FALSE) &lt;- value
+
+spatial_bbox(obj, verbose = FALSE)
+spatial_bbox(obj, verbose = FALSE) &lt;- value
+
+spatial_data(obj, subset= ".+", drop = NA, verbose = FALSE)
+spatial_data(obj, verbose = FALSE) &lt;- value
+
+spatial_geometry(obj, verbose = FALSE)
+spatial_geometry(obj, verbose = FALSE) &lt;- value
+
+spatial_geotype(obj, verbose = FALSE)
+
+spatial_transform(obj, crs, verbose = FALSE, ...)
+
+spatial_coordinates(obj, verbose = FALSE)
+
+spatial_fields(obj, verbose = FALSE)
+spatial_colnames(obj, verbose = FALSE)
+
+spatial_fields(obj, verbose = FALSE) &lt;- value
+spatial_colnames(obj, verbose = FALSE) &lt;- value
+
+spatial_area(obj, verbose = FALSE)
+
+spatial_dim(obj, verbose = FALSE)
+
+spatial_count(obj, verbose = FALSE)
+
+spatial_nrow(obj, verbose = FALSE)
+spatial_ncol(obj, verbose = FALSE)
+
+spatial_filelist(path = ".", pattern = NA, full.names = TRUE, recursive = FALSE)
+
+is_spatial(obj, verbose = FALSE)
+
+is_spatial_points(obj, verbose = FALSE)
+is_spatial_lines(obj, verbose = FALSE)
+is_spatial_polygons(obj, verbose = FALSE)
+
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+
+<p>Simple feature (package <span class="pkg">sf</span>) or Spatial abstract class (package <span class="pkg">sp</span>) for all functions, excepting <code>spatial_geometry&lt;-</code>. Data frame for <em>Replace</em> function <code>spatial_geometry&lt;-</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>crs</code></td>
+<td>
+
+<p>Projection EPSG code or projection PROJ.4 string.
+</p>
+</td></tr>
+<tr valign="top"><td><code>subset</code></td>
+<td>
+
+<p>Pattern to field names (colnames) of attribute table (data frame) for subbsetting using <code><a href="../../base/html/grep.html">regular expressions</a></code>. By default, all fields are secected.
+</p>
+</td></tr>
+<tr valign="top"><td><code>drop</code></td>
+<td>
+
+<p>Logical. Dropping column of data frame. If <code>TRUE</code>, then vector of data is returned. If <code>FALSE</code>, then structure of data is kept. Default is <code>NA</code>, which is interpreted as <code>TRUE</code> for single column and as <code>FALSE</code> for multiple columns.
+</p>
+</td></tr>
+<tr valign="top"><td><code>value</code></td>
+<td>
+
+<p>Value for property assignment in <em>replacement</em> functions. Either numeric EPSG code or character PROJ.4 string for <code>spatial_crs&lt;-</code> and <code>spatial_proj4&lt;-</code>. Spatial object or geometry of spatial object for <code>spatial_geometry&lt;-</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>path</code></td>
+<td>
+
+<p>See description of argument <code>path</code> in function <code><a href="../../base/html/list.files.html">dir</a></code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>pattern</code></td>
+<td>
+
+<p>See description of argument <code>pattern</code> in function <code><a href="../../base/html/list.files.html">dir</a></code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>full.names</code></td>
+<td>
+
+<p>See description of argument <code>full.names</code> in function <code><a href="../../base/html/list.files.html">dir</a></code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>recursive</code></td>
+<td>
+
+<p>See description of argument <code>full.names</code> in function <code><a href="../../base/html/list.files.html">dir</a></code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>verbose</code></td>
+<td>
+
+<p>Logical. Value <code>TRUE</code> provides information on console. Default is <code>FALSE</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Further arguments passed to <code>sf::st_transform</code> or to <code>sp::spTransform</code></p>
+</td></tr></table>
+<p>.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>spatial_engine</code> returns package name (character string <code>"sf"</code> or <code>"sp"</code>), which functionality is used for manipulation with spatial object <code>obj</code>.
+</p>
+<p><code>spatial_crs</code> and <code>spatial_proj4</code> are synonyms, The <em>Extract</em> functions return projection string in the PROJ.4 notation; the <em>Replace</em> functions change projection property of the object.
+</p>
+<p><code>spatial_bbox</code> (<em>Extract</em> function) returns numeric vector of length 4 with names &quot;xmin&quot;, &quot;ymin&quot;, &quot;xmax&quot; and &quot;ymax&quot;.
+</p>
+<p><code>spatial_bbox&lt;-</code> (<em>Replace</em> function) assigns boundary bbox to the object; it is valid only for objects of Spatial abstract class (package <span class="pkg">sp</span>).
+</p>
+<p><code>spatial_data</code> (<em>Extract</em> function) returns attribute table only, without geometry. Subsetting fields can be specified by argument <code>subset</code> using regular expressions. If <code>drop=TRUE</code> and selected single column then vector is returned instead of data frame.
+</p>
+<p><code>spatial_data&lt;-</code> (<em>Replace</em> function) addes spatial data to the object geomerty. Source data (if presents) are droped.
+</p>
+<p><code>spatial_geometry</code> (<em>Extract</em> function) returns only geometry, which format is depended on class of <code>obj</code>.
+</p>
+<p><code>spatial_geometry&lt;-</code> (<em>Replace</em> function) addes geometry to the object.
+</p>
+<p><code>spatial_transform</code> does a transformation of spatial coordinates to the new CRS and returns object of the same class as class of <code>obj</code>.
+</p>
+<p><code>spatial_geotype</code> returns type of spatial data: &quot;POINTS&quot;, &quot;LINESTRINGS&quot;, &quot;POLYGON&quot;, &quot;MULTIPOLYGON&quot;, ....
+</p>
+<p><code>spatial_coordinates</code> returns simpliefied matrix or list of coordinates of original object.
+</p>
+<p><em>Extract</em> functions <code>spatial_fields</code> and <code>spatial_columns</code> return column names of spatial attributive table. <code>spatial_columns</code> is synonym to <code>spatial_fields</code>.
+</p>
+<p><em>Replace</em> functions <code>spatial_fields&lt;-</code> and <code>spatial_columns&lt;-</code> change column names of spatial attributive table. <code>spatial_columns&lt;-</code> is synonym to <code>spatial_fields&lt;-</code>.
+</p>
+<p><code>spatial_area</code> is valid for polygonal geometry. It returns area of polygons.
+</p>
+<p><code>spatial_length</code> is valid for linear geometry. It returns length of lines.
+</p>
+<p><code>spatial_dim</code> gets dimension of spatial coordinates; it returns either <code>2L</code> (XY) or <code>3L</code> (XYZ).
+</p>
+<p><code>spatial_count</code> returns number of items of object geometry.
+</p>
+<p><code>spatial_nrow</code> and <code>spatial_ncol</code> return number of rows and number of columns of attributive table.
+</p>
+<p><code>spatial_filelist</code> returns list of files with file extensions, which are associated with certain GIS vector formats. The function's basis is <code><a href="../../base/html/list.files.html">dir</a></code>.
+</p>
+<p><code>is_spatial</code> returns logical value does the object belong to the class of spatial data.
+</p>
+<p><code>is_spatial_points</code> returns logical value does the object have point geometry.
+</p>
+<p><code>is_spatial_lines</code> returns logical value does the object have (multi)linestring geometry.
+</p>
+<p><code>is_spatial_polygons</code> returns logical value does the object have (multi)polygonal geometry.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>References</h3>
+
+
+<p>Classes and methods in packages <span class="pkg"><a href="../../sf/html/st.html">sf</a></span> and <span class="pkg"><a href="../../sp/html/00sp.html">sp</a></span> help.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session_grid(NULL)
+n &lt;- 1e2
+x &lt;- runif(n,min=25,max=65)
+y &lt;- runif(n,min=55,max=65)
+z &lt;- runif(n,min=1,max=10)
+da &lt;- data.frame(x=x,y=y,z=z)
+if (requireNamespace("sp")) {
+   da.sp &lt;- da
+   sp::coordinates(da.sp) &lt;- ~x+y
+   sp::proj4string(da.sp) &lt;- "+init=epsg:4326"
+   print(spatial_bbox(da.sp))
+   print(spatial_crs(da.sp))
+}
+if (requireNamespace("sf")) {
+   da.sf &lt;- sf::st_as_sf(da,coords=c("x","y"),crs=4326)
+   print(spatial_bbox(da.sf))
+   print(spatial_crs(da.sf))
+}
+</pre>
+
+
+</body></html>

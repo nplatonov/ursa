@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Generate &quot;cubehelix&quot; palette.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for cubehelix"><tr><td>cubehelix</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Generate &quot;cubehelix&quot; palette.
+</h2>
+
+<h3>Description</h3>
+
+<p><code>cubehelix</code> returs set of RGB colours, which are  screen display of intensity images
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+cubehelix(n, value = numeric(), weak = NA, rich = NA, rotate = NA, hue = NA, gamma = 1,
+          dark = NA, light = NA, inv = NA, verbose = NA)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>n</code></td>
+<td>
+
+<p>Positive integer. Length of returned color vector. If <code>n</code> is <a href="../../base/html/missing.html">missing</a> and length of <code>value</code> is positive, then length of <code>value</code>. If missing <code>n</code> and empty <code>value</code>, then <code>n=256</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>value</code></td>
+<td>
+
+<p>Numerice vector of values, which are associated with a palette. If both positive and negative values are in this vector, then divergence color palette is returned. Default in numeric of length zero (unspecified).
+</p>
+</td></tr>
+<tr valign="top"><td><code>weak</code></td>
+<td>
+
+<p>Numeric. The angle (in degrees) of the helix for color with <code>light</code> intensity. If both <code>rich</code> and <code>weak</code> are specified, the <code>rotate</code> is defined as difference between <code>rich</code> and <code>weak</code>. If all <code>weak</code>, <code>rich</code> and <code>rotate</code> are unspecified, then random values are used. Default is <code>NA</code> (unspecified).
+</p>
+</td></tr>
+<tr valign="top"><td><code>rich</code></td>
+<td>
+
+<p>Numeric. The angle (in degrees) of the helix for color with <code>dark</code> intensity. If both <code>rich</code> and <code>weak</code> are specified, the <code>rotate</code> is defined as difference between <code>rich</code> and <code>weak</code>. If all <code>weak</code>, <code>rich</code> and <code>rotate</code> are unspecified, then random values are used. Default is <code>NA</code> (unspecified).
+</p>
+</td></tr>
+<tr valign="top"><td><code>rotate</code></td>
+<td>
+
+<p>Numeric. The anlge of rotation (in degrees) of the helix over the scale; can be negative. If <code>rotate</code> and <code>weak</code> are specified, then <code>rich</code> is defined as sum of <code>weak</code> and <code>rotate</code>. If <code>rotate</code> and <code>rich</code> are specified, then <code>weak</code> is defined as difference between <code>rotate</code> and <code>weak</code>. If all <code>weak</code>, <code>rich</code> and <code>rotate</code> are unspecified, then random values are used. Default is <code>NA</code> (unspecified).
+</p>
+</td></tr>
+<tr valign="top"><td><code>hue</code></td>
+<td>
+
+<p>Non-negative numeric. Saturation of color. <code>hue=0</code> gives pure greyscale. If unspecified, then random value in interval [0.9, 1.5] is used. Default is <code>NA</code> (unspecified).
+</p>
+</td></tr>
+<tr valign="top"><td><code>gamma</code></td>
+<td>
+
+<p>Numeric. Power of intensity. Intensity is between <code>dark</code> and <code>light</code>, which are normalized to interval [0, 1]. <code>gamma</code> changes normalized intensity to intensity<code>^gamma</code>. Default is 1.
+</p>
+</td></tr>
+<tr valign="top"><td><code>dark</code></td>
+<td>
+
+<p>Positive numeric in interval between 0 and 255. The intensity of the darkest color in the palette. For light backgrounds default is 63. For dark backgrounds default is 14 (inverse order with <code>light</code>).
+</p>
+</td></tr>
+<tr valign="top"><td><code>light</code></td>
+<td>
+
+<p>Positive numeric in interval between 0 and 255. The intensity of the lightest color in the palette. For light backgrounds default is 241, for dark backgrounds default is 192 (inverse order with <code>dark</code>).
+</p>
+</td></tr>
+<tr valign="top"><td><code>inv</code></td>
+<td>
+
+<p>Logical. Inversion of color intensity. If <code>TRUE</code> then color vector is <a href="../../base/html/rev.html">reversed</a> before return. Default is <code>FALSE</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>verbose</code></td>
+<td>
+
+<p>Logical. Value <code>TRUE</code> provides information about cube helix on console. Default is <code>NA</code>, which is interpeted as <code>FALSE</code>.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>This is modified source code of function <code>cubeHelix</code> from package <span class="pkg">rje</span> under GPL&gt;=2 license.
+</p>
+<p>The palette design is oriented that figures can be printed on white paper. Under this assumption, light color is for small values, and dark color is for big values. In some computer vision and GIS software black background is used, and in this case light color for big values, and dark color of small values looks more naturally. For some thematic maps big values are light, and small values are small (for example, sea ice concentration: open water is blue, close ice is white). RGB and Grayscale remote sensing and photo imagery use light colors for strong signal, and dark colors for weak signal.
+</p>
+<p>Light background is default for figure (specified by argument <code>background</code> in function <code><a href="../../ursa/html/compose_open.html">compose_open</a></code>).
+
+</p>
+<p>The palette divergency can be defined only if <code>value</code> is specified. If all values are positive, or all values are negative, then returned palette is not drivergent. For divergent palettes the helix sequence is continuous.
+</p>
+<p>If <code>dark</code> and <code>lihgt</code> are unspecified, the color contrast bewteen <code>dark</code> and <code>light</code> drops on reducing number of colors in returned vector.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Vector of RGB color specification.
+</p>
+
+
+<h3>Acknowledgements</h3>
+
+<p>Dave Green, Robin Evans
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Dave Green
+</p>
+<p>Robin Evans 
+</p>
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>References</h3>
+
+<p><a href="http://www.mrao.cam.ac.uk/~dag/CUBEHELIX/">Dave Green's &lsquo;cubehelix&rsquo; colour scheme.</a>
+</p>
+<p>Green, D. A., 2011, &lsquo;A colour scheme for the display of astronomical intensity images&rsquo;, Bulletin of the Astronomical Society of India, 39, 289. http://astron-soc.in/bulletin/11June/289392011.pdf <a href="https://arxiv.org/pdf/1108.5083.pdf">(pre-print at 'arxiv.org')</a>
+</p>
+<p><span class="pkg">rje</span> at CRAN: <a href="https://CRAN.R-project.org/package=rje">https://CRAN.R-project.org/package=rje</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Original source code <code><a href="../../rje/html/cubeHelix.html">rje::cubeHelix</a></code> (clickable correctly if package <span class="pkg">rje</span> is installed), or see CRAN reference.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session_grid(NULL)
+set.seed(352)
+session_grid(regrid(mul=1/16))
+a &lt;- ursa_dummy(9,min=0,max=255)
+b4 &lt;- b3 &lt;- b2 &lt;- b1 &lt;- vector("list",length(a))
+for (i in seq_along(b1)) {
+   b1[[i]] &lt;- colorize(a[i],pal=cubehelix(11,weak=45*i,rotate=+270),ncolor=11)
+   b2[[i]] &lt;- colorize(a[i],pal=cubehelix(11,weak=45*i,rotate=-270),ncolor=11)
+   b3[[i]] &lt;- colorize(a[i]-127,pal=cubehelix)
+   hue &lt;- sample(seq(2)-1,1)
+   s &lt;- ifelse(hue==0,NA,runif(1,min=91,max=223))
+   b4[[i]] &lt;- colorize(a[i]-127,pal=cubehelix,pal.hue=hue,pal.dark=s,pal.light=s)
+}
+display(c(b1,b2),layout=c(2,NA),decor=FALSE)
+display(c(b3,b4),layout=c(2,NA),decor=FALSE)
+</pre>
+
+
+</body></html>

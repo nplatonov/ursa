@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Group Generic Functions for raster image</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for groupGeneric"><tr><td>groupGeneric</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Group Generic Functions for raster image
+</h2>
+
+<h3>Description</h3>
+
+<p>These functions implement arithmetical and logical operations, mathematical functions for objects of class <code>rmapRaster</code> as well as group generic functions from package <span class="pkg">base</span> do similar for S3 class. These are <strong><em>local</em></strong> operations in the raster algebra (map algebra).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'rmapRaster'
+Ops(e1, e2 = NULL)
+
+## S3 method for class 'rmapRaster'
+Math(x, ...)
+
+## S3 method for class 'rmapRaster'
+Complex(z)
+
+## S3 method for class 'rmapRaster'
+Summary(..., na.rm = FALSE)
+
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+<p><code>rmapRaster</code> object
+</p>
+</td></tr>
+<tr valign="top"><td><code>e1</code></td>
+<td>
+
+<p><code>rmapRaster</code> object
+</p>
+</td></tr>
+<tr valign="top"><td><code>e2</code></td>
+<td>
+
+<p>Numeric of length 1, matrix, array, or <code>rmapRaster</code> object.
+</p>
+</td></tr>
+<tr valign="top"><td><code>na.rm</code></td>
+<td>
+
+<p>Logical. If <code>na.rm=TRUE</code> then no-data values are omitted.
+</p>
+</td></tr>
+<tr valign="top"><td><code>z</code></td>
+<td>
+
+<p>Any.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>For group <em><a href="../../base/html/groupGeneric.html">Math</a></em> - further arguments passed to methods. See description for generic.
+</p>
+<p>For group <em><a href="../../base/html/groupGeneric.html">Summary</a></em> - set of argumetns, which are recognized via their names (using <a href="../../base/html/regex.html">regular expressions</a>), position and classes.
+</p>
+
+<dl>
+<dt>.*</dt><dd>
+<p>Position 1. Object of class <code>rmapRaster</code>.
+</p>
+</dd>
+<dt><code>cov|cvr</code></dt><dd>
+<p>Position &gt;1. Numeric between 0 and 1. If proportion of bands with no data for given location exceeds <code>cover</code> then output value is <code>NA</code> (no data). Default is <code>0.5-1e-3</code>.
+</p>
+</dd>
+<dt><code>w</code></dt><dd>
+<p>Position &gt;1. Numeric of length number of bands or <code>NULL</code>. Band weights for weighted mean. Default is <code>NULL</code>; all bands have equal weights.
+</p>
+</dd>
+<dt><code>name</code></dt><dd>
+<p>Position &gt;1. Character of length 1. Band name for output raster. Default is <code>""</code>; band name is assigned automatically.
+</p>
+</dd>
+<dt><code>verb(ose)*</code></dt><dd>
+<p>Position &gt;1. Logical. <code>verbose=TRUE</code> provides some additional information on console. Default is <code>FALSE</code>.
+</p>
+</dd>
+</dl>
+
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>The groups are <code style="white-space: pre;">'Summary'</code>, <code style="white-space: pre;">'Ops'</code>, <code style="white-space: pre;">'Math'</code>, and <code style="white-space: pre;">'Complex</code>'. See &ldquo;Details&rdquo; section in the <a href="../../base/html/groupGeneric.html">S3 Generic Functions</a> help page.
+</p>
+<p>The group <code style="white-space: pre;">'Complex'</code> is unsupported.
+</p>
+<p>The groups <code style="white-space: pre;">'Math'</code> and <code style="white-space: pre;">'Summary'</code> are implemented completely.
+</p>
+
+
+<p>The group <code style="white-space: pre;">'Ops'</code> has some features.
+</p>
+
+<ul>
+<li><p>Logical operators <code style="white-space: pre;">"&lt;"</code>, <code style="white-space: pre;">"&gt;"</code>, <code style="white-space: pre;">"&lt;="</code>, <code style="white-space: pre;">"&gt;="</code>, <code style="white-space: pre;">"=="</code>, <code style="white-space: pre;">\"!="</code> return <code>'NA'</code> for value <code>FALSE</code> and <code>'1'</code> for value <code>TRUE</code> to organize cells' masking.
+</p>
+</li>
+<li><p>Unary operator <code style="white-space: pre;">"!"</code> is equal to binary operator operators <code style="white-space: pre;">"!="</code>, where the second argument is scalar value <code>0</code> (zero).
+</p>
+</li></ul>
+
+<p>The operators of groups <code style="white-space: pre;">'Math'</code> and <code style="white-space: pre;">'Ops'</code> destroy <a href="../../rmap/html/classColorTable.html">color tables</a>.
+</p>
+<p>For group <code style="white-space: pre;">'Summary'</code> the realization of local operators of map algebra is possible via <code><a href="../../base/html/apply.html">apply</a></code> function:<br />
+<code>apply(rmap.value(obj),1,function(x) {y &lt;- sd(x)+1;y})</code><br />
+or<br />
+<code>as.rmap(apply(obj,1:2,function(x) {y &lt;- sd(x)+1;y}))</code>
+</p>
+
+
+<h3>Value</h3>
+
+<p>Operators of groups <code style="white-space: pre;">'Complex'</code> return <code><a href="../../base/html/stop.html">stop</a></code>
+<br />
+Operators of groups <code style="white-space: pre;">'Math'</code>, <code style="white-space: pre;">'Ops'</code>, <code style="white-space: pre;">'Summary'</code> return object of class <code>rmapRaster</code>
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other S3 generic function for local operations of map algebra are <code><a href="../../rmap/html/Ops.local.stat.html">mean</a></code>, <code><a href="../../rmap/html/Ops.local.stat.html">median</a></code>.
+<br />
+Standard deviation (local) and certain local operations can be extracted using <code><a href="../../rmap/html/Ops.local.stat.html">local.stat</a></code>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+session.grid(regrid(mul=1/4))
+a1 &lt;- rmap.dummy(nband=3,min=-5*pi,max=5*pi)
+print(a1)
+
+try(print(complex1 &lt;- Re(a1)))
+
+print(math1 &lt;- a2 &lt;- round(a1))
+print(math1 &lt;- sin(a1))
+print(math2 &lt;- floor(a1))
+print(math3 &lt;- ceiling(a1))
+print(math4 &lt;- cumsum(a1)) ## does this have a sense for rasters?
+
+print(ops1 &lt;- a1-2*rev(a1)+mean(a1))
+print(mean(ops1)) ## vanishing
+a2 &lt;- rmap.new(value=c(1,2,4),bandname=c("single","double","quadruple"))
+print(a2)
+print(ops2 &lt;- a2[1]==a2[2])
+print(ops3 &lt;- a2[1]==a2[2]/2)
+print(ops4 &lt;- a1&gt;0)
+print(a1[a1&gt;0])
+
+print(sum1 &lt;- sum(a1))
+print(sum2 &lt;- range(a1))
+</pre>
+
+
+</body></html>

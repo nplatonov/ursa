@@ -1,0 +1,17 @@
+invisible({
+   plutil::mysource(ursa)
+   session_grid(NULL)
+   a <- pixelsize()-350
+   print(a)
+   b1 <- colorize(a,ramp=FALSE)
+   print(ursa_colortable(b1))
+   b2 <- colorize(a,interval=1,stretch="positive",ramp=FALSE)
+   print(ursa_colortable(b2))
+   b3 <- colorize(a,interval=2,stretch="positive",ramp=FALSE)
+   print(ursa_colortable(b3))
+   b4 <- colorize(a,value=c(150,250),interval=1)
+   print(ursa_colortable(b4))
+   names(ursa_colortable(b4)) <- c("x<=150","150<x<=250","x>250")
+   print(ursa_colortable(b4))
+   display(b4)
+})

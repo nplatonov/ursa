@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Values of raster images.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for rmapValue"><tr><td>rmapValue</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Values of raster images.
+</h2>
+
+<h3>Description</h3>
+
+<p>Class <code>rmapValue</code> is a part of class <code>rmapRaster</code>. It contains values of image. In the case of numeric values, the exterior class is <code>rmapNumeric</code>. In the case of categorical values, the exterior class is <code>rmapCategory</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'rmapCategory'
+print(x, ...)
+
+## S3 method for class 'rmapNumeric'
+print(x, ...)
+
+rmap.value(obj, band)
+rmap.value(obj, band) &lt;- value
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+
+<p>Object of the one of classes <code>rmapNumeric</code> or <code>rmapCategory</code>
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Further arguments passed to generic functions <code><a href="../../base/html/print.html">print</a></code> and <code><a href="../../utils/html/str.html">str</a></code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>obj</code></td>
+<td>
+
+<p>Object of class <code>rmapRaster</code>
+</p>
+</td></tr>
+<tr valign="top"><td><code>band</code></td>
+<td>
+
+<p>Optional. Vector of band numbers (positive integer) or band names (character).
+</p>
+</td></tr>
+<tr valign="top"><td><code>value</code></td>
+<td>
+
+<p>Numeric or integer scalar, vector, or matrix. Coerced to dimenstion of <code>rmapValue</code>.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+
+
+
+<p>Try to use high-level assignment using replacement <code><a href="../../rmap/html/classRaster.Replace.html">[&lt;-</a></code> operator for class <code>rmapRaster</code>. However, if you don't get desired result, you can downgrade the level of your code.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Object of class <code>rmapNumeric</code> is a numerical matrix. Object of class <code>rmapCategory</code> is an integer matrix. Dimensions of this matrix:
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>dim(...)[1]</code></td>
+<td>
+<p>Spatial domain; the length is muliplications of lines (rows) and samples (columns)</p>
+</td></tr>
+<tr valign="top"><td><code>dim(...)[2]</code></td>
+<td>
+<p>Band or temporal domain; the length is number of bands</p>
+</td></tr>
+</table>
+<p>It is allowed to use scalar value <code>NA</code> in the case when values are not in memory. In this case the class is <code>rmapValue</code>.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Extract <code><a href="../../rmap/html/classRaster.Extract.html">[</a></code> and replacement <code><a href="../../rmap/html/classRaster.Replace.html">[&lt;-</a></code> methods for class <code>rmapRaster</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+session.grid(regrid(mul=1/4))
+a1 &lt;- envi.create("exam1.envi",bandname=c("today","tomorrow"))
+str(rmap.value(a1))
+close(a1)
+envi.remove("exam1")
+a2 &lt;- rmap.dummy(nband=4,min=1,max=99)
+str(rmap.value(a2),digits=3)
+a3 &lt;- as.integer(a2)
+str(rmap.value(a3))
+str(rmap.value(a3,2))
+print(rmap.value(a3))
+print(a3)
+rmap.value(a3,"Band 2") &lt;- 199
+rmap.value(a3)[,3] &lt;- 299
+a3[4] &lt;- 399
+print(a3)
+rmap.value(a3[1:3]) &lt;- rmap.value(a3[4])
+print(a3)
+rmap.value(a3[1:3]) &lt;- -c(1:3)
+print(a3)
+</pre>
+
+
+</body></html>

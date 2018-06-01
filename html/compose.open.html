@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Start displaying</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for compose.open"><tr><td>compose.open</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Start displaying
+</h2>
+
+<h3>Description</h3>
+
+<p><code>compose.open</code> create plot layout and open PNG graphic device.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+compose.open(...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Set of argumetns, which are recognized via their names and classes:
+</p>
+
+<dl>
+<dt><code>mosaic</code></dt><dd><p>Layout matrix or reference object to produce layout matrix. It is permitted to do not use name for this argument. Multiple types of argument are allowed: 1) object of class <code>rmapRaster</code>, 2) <code><a href="../../base/html/list.html">list</a></code> of <code>rmapRaster</code> objects (raster stack), 3) object of class <code>rmapLayout</code> from function <code><a href="../../rmap/html/compose.design.html">compose.design</a></code>, 4) character keyword or 5) missing. Default is <code>NA</code>.</p>
+</dd>
+<dt><code>fileout</code></dt><dd><p>Character. Name for created PNG file. If absent (<code>""</code>) then temporal file is created and removed in <code>wait</code> seconds after opening in the associated external viewer. Default is absent (<code>""</code>).</p>
+</dd>
+<dt><code>dpi</code></dt><dd><p>Positive integer. Dots (or pixels) per inch (DPI). The nominal resolution of created PNG file. Default is <code>96L</code>. The same as <code>res</code> argument in the <code><a href="../../grDevices/html/png.html">png</a></code> function.</p>
+</dd>
+<dt><code>pointsize</code></dt><dd><p>Positive integer. The pointsize of plotted text as it is applied in the <code><a href="../../grDevices/html/png.html">png</a></code> function. Default is <code>NA</code>. If <code>pointsize=NA</code> then it is taken value <code>16L</code> multiplied to relative DPI (<code>dpi/96</code>). In the case of unspecified <code>scale</code> and <code>pointsize</code> the size of text is defined internally.</p>
+</dd>
+<dt><code>scale</code></dt><dd><p>Positive numeric or character. The scale factor applied to dimensions of original raster. Default is <code>NA</code>. If <code>scale</code> is unspecified (<code>scale=NA</code>), then <code>scale</code> is defined internally for <em>intuitively</em> better fitting in HD, FHD displays (single-panelled layout 900x700). If <code>scale</code> is character (e.g., <code>"8000000"</code>, <code>"1:8000000"</code>) then dimensions of image panels are defined using &quot;one centimeter of map is corresponded to 8000000 centimeres of site&quot; rule.</p>
+</dd>
+<dt><code>width</code></dt><dd><p>Positive numeric or character. The desired width of each panel of multipanel layout. If <code>width</code> is numeric, then units are pixels. If <code>width</code> is character (e.g., <code>"12.5"</code>, <code>"12.5 cm"</code>, <code>"12.5cm"</code>) then units are centimeters in agreement with <code>dpi</code> argument. Default is <code>NA</code>. If <code>width</code> is unspecified (<code>width=NA</code>) then value <code>900</code> is used for single panelled layout.</p>
+</dd>
+<dt><code>height</code></dt><dd><p>Positive numeric or character. The desired height of each panel of multipanel layout. If <code>height</code> is numeric, then units are pixels. If <code>height</code> is character (e.g., <code>"9.6"</code>, <code>"9.6 cm"</code>, <code>"9.6cm"</code>) then units are centimeters in agreement with <code>dpi</code> argument. Default is <code>NA</code>. If <code>height</code> is unspecified (<code>height=NA</code>) then value <code>700</code> is used for single panelled layout.</p>
+</dd>
+<dt><code>colorbar</code> or <code>colorbarwidth</code></dt><dd><p>Positive numeric. Scale factor to increase (<code>colorbar&gt;1</code>) or decrease (<code>colorbar&lt;1</code>) width (the shortest dimension) of color bars (legends). Default value (<code>NA</code>) means 2.8% of image panel width.</p>
+</dd>
+<dt><code>indent</code> or <code>space</code> or <code>offset</code>.</dt><dd><p>Positive numeric. Scale factor to increase (<code>space&gt;1</code>) or decrease (<code>space&lt;1</code>) the white space between image panels and between image and color bar panels. Default value (<code>NA</code>) means 0.8% of image panel width.</p>
+</dd>
+<dt><code>box</code></dt><dd><p>Logical. If <code>TRUE</code> then boundary box is plotted around image panels and color bar panels. It is a transparent rectangle with black border. Default is <code>TRUE</code>.</p>
+</dd>
+<dt><code>delafter</code></dt><dd><p>Logical. If <code>TRUE</code> then created PNG file will be deleted after viewing. Default is <code>FALSE</code> for specified file names and <code>TRUE</code> for unspecidied (temporal) file names. It is implemented as file removing after opening in the external PNG viewer.</p>
+</dd>
+<dt><code>wait</code></dt><dd><p>Positive numeric. Seconds between PNG file opening in the associated program and file removing. It make sense only if <code>delafter=TRUE</code>. Default is <code>1.0</code> (one second).</p>
+</dd>
+<dt><code>device</code> or <code>type</code></dt><dd><p>Character keyword, either <code>"cairo"</code> or <code>"windows"</code>. Should be plotting be done using cairographics or Windows GDI? The same as <code>type</code> argument in the <code><a href="../../grDevices/html/png.html">png</a></code> function.  Default is <code>"cairo"</code>.</p>
+</dd>
+<dt><code>antialias</code></dt><dd><p>Characted keyword, either <code>"none"</code> or <code>"default"</code>. Defines the effect on fonts. The same as <code>antialias</code> argument in the <code><a href="../../grDevices/html/png.html">png</a></code> function. Default is <code>"default"</code>.</p>
+</dd>
+<dt><code>font</code> or <code>family</code></dt><dd><p>A length-one character vector. Specifies the font family. The same as <code>family</code> argument in the <code><a href="../../grDevices/html/png.html">png</a></code> function. Default is <code>"sans"</code> for <code>device="windows"</code> and <code>"Tahoma"</code> for <code>device="cairo"</code>.</p>
+</dd>
+<dt><code>bg</code> or <code>background</code></dt><dd><p>Character. The background color in PNG file. Passed as argument <code>bg</code> to <code><a href="../../grDevices/html/png.html">png</a></code> function. Default is <code>"white"</code></p>
+</dd>
+<dt><code>dev</code></dt><dd><p>Logical. If <code>TRUE</code> then this <strong>dev</strong>eloper tool shows created layout without any the followed plot functions from this package are ignored. Default is <code>FALSE</code></p>
+</dd>
+<dt><code>verbose</code></dt><dd><p>Logical. Shows additional output information in console. Default is <code>FALSE</code>.</p>
+</dd>
+<dt><code>...</code></dt><dd><p>Arguments, which can be passed to <code><a href="../../rmap/html/compose.design.html">compose.design</a></code> function.</p>
+</dd>
+</dl>
+
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Other usage of <code>compose.open(...,dev=TRUE)</code> is </p>
+<pre>
+   compose.open(...,dev=FALSE)
+   compose.close()</pre>
+<p>The reason to use <code><a href="../../rmap/html/compose.design.html">compose.design</a></code> function  before <code>compose.open</code> is to reduce number of arguments in the case of complicated layout matrix and non-standard settings.
+</p>
+<p><code>compose.open</code> passes arguments to <code><a href="../../grDevices/html/png.html">png</a></code> function.
+</p>
+<p>If character values are specified for arguments <code>width</code>, <code>height</code> or <code>scale</code>, then layout development is oriented to produce PNG file, which will be used as a paper copy. Character values for <code>width</code> and <code>height</code> are in centimeters. Character value <em><code style="white-space: pre;">V</code></em> or <code style="white-space: pre;">1:</code><em><code style="white-space: pre;">V</code></em> of <code>scale</code> defines scale <code style="white-space: pre;">1/</code><em><code style="white-space: pre;">V</code></em>.
+</p>
+<p>The Cairo device (<code>device="cairo"</code>) is more quick on MS Windows computers. However Windows GDI may produce less depth of colors (even 8 BPP) in the case of no font antialiasing. Usage of Windows GDI (<code>device="windows"</code>) is a way to produce illustations for scientific journals with strict requirements of mininal line width, font size, <em>etc</em>.
+</p>
+<p>The PNG layout reserves extra margins for captions of color bars. These margins are filled by white spaces. The cropping of layout applies to created PNG file using read-write functions of package <span class="pkg">png</span>. Only white (<code>"white"</code>, <code>"#FFFFFF"</code>) or transparent (<code>"transparent"</code>) colors are regognized as white spaces. Therefore, specification of <code>bg!="white"</code> or <code>bg!="transparent"</code> breaks PNG image cropping.
+</p>
+<p>It is noted that Cyrillics is supported on Windows GDI (<code>device="windows"</code>) and is not supported on Cairo (<code>device="cairo"</code>) types of PNG device on MS Windows platform.
+
+</p>
+
+
+<h3>Value</h3>
+
+<p>Name of created PNG file.
+</p>
+<p>If <code>dev=TRUE</code> then output on console is layout matrix.
+</p>
+<p>The set of required parameters for plotting are kept until function <code><a href="../../rmap/html/compose.close.html">compose.close</a></code> call via <code><a href="../../base/html/options.html">options</a></code>.
+
+
+
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>rmapPngAuto</code></td>
+<td>
+<p>For developers. Indicator of high-level functions for internal use (manual set; value is <code>TRUE</code>). Or, can be missed.</p>
+</td></tr>
+<tr valign="top"><td><code>rmapPngBox</code></td>
+<td>
+<p>Argument <code>box</code>. If TRUE then <code><a href="../../graphics/html/box.html">box</a></code> is called for each panel of layout at the end of plotting.</p>
+</td></tr>
+<tr valign="top"><td><code>rmapPngDelafter</code></td>
+<td>
+<p>Argument <code>delafter</code>. Applied in the function <code><a href="../../rmap/html/compose.close.html">compose.close</a></code>.</p>
+</td></tr>
+<tr valign="top"><td><code>rmapPngDevice</code></td>
+<td>
+<p>Argument <code>device</code>. Appied for effective plottting of rasters and checking the ability for final reducing color depth from 24 to 8 bpp.</p>
+</td></tr>
+<tr valign="top"><td><code>rmapPngDpi</code></td>
+<td>
+<p>Argument <code>dpi</code>. Currently used for verbose only.</p>
+</td></tr>
+<tr valign="top"><td><code>rmapPngFamily</code></td>
+<td>
+<p>Applied for text plotting in annotations and legends.</p>
+</td></tr>
+<tr valign="top"><td><code>rmapPngFigure</code></td>
+<td>
+<p>Set <code>0L</code>. Specifies number of current panel in layout matrix. Used to detect term for applying <code>$rmapPngBox</code> option.</p>
+</td></tr>
+<tr valign="top"><td><code>rmapPngFileout</code></td>
+<td>
+<p>Name of created PNG file.</p>
+</td></tr>
+<tr valign="top"><td><code>rmapPngLayout</code></td>
+<td>
+<p>Layout matrix, the object of class <code><a href="../../rmap/html/compose.design.html">rmapLayout</a></code>.</p>
+</td></tr>
+<tr valign="top"><td><code>rmapPngPaperScale</code></td>
+<td>
+<p>Numeric. Used for scalebar representation on the paper-based maps. If value <code>0</code>, then scalebar is display-based. If value is greater <code>0</code> then the scale is exact. If value is <code>-1</code> then the resonable rounding is used for scale displaying.</p>
+</td></tr>
+<tr valign="top"><td><code>rmapPngPlot</code></td>
+<td>
+<p>The opposite to argument <code>dev</code>. If <code>$rmapPngPlot</code> is <code>FALSE</code> then any plotting functions of this package are ignored.</p>
+</td></tr>
+<tr valign="top"><td><code>rmapPngScale</code></td>
+<td>
+<p>The actual value of argument <code>scale</code>, specified during function call or stated internally.</p>
+</td></tr>
+<tr valign="top"><td><code>rmapPngShadow</code></td>
+<td>
+<p>Set <code>""</code>. Used for shadowing of the part of color bars in the case of semi-trasparent land or ocean filling mask in the <code><a href="../../rmap/html/panel.coastline.html">panel.coastline</a></code> function.</p>
+</td></tr>
+<tr valign="top"><td><code>rmapPngSkipLegend</code></td>
+<td>
+<p>Integer vector of non-negative length. Defines list of images panels, for which the color bars are not displayed.</p>
+</td></tr>
+<tr valign="top"><td><code>rmapPngWaitBeforeRemove</code></td>
+<td>
+<p>Argument <code>wait</code>. Applied in the function <code><a href="../../rmap/html/compose.close.html">compose.close</a></code> for temporal PNG file.</p>
+</td></tr>
+</table>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+
+b &lt;- rmap.dummy(nband=7,min=0,max=50,mul=1/16)
+p &lt;- list(colorize(b[1:4],pal.rich=240,pal.r=0)
+         ,colorize(sqrt(b[5:7]),pal.rich=-15,pal.r=0,stretch="equal"))
+
+## exam #01
+rmap:::.rmapOptions()
+compose.open()
+panel.new()
+rmap:::.rmapOptions()
+compose.close()
+rmap:::.rmapOptions()
+   
+## exam #02
+compose.open(height=400,legend=NULL,dev=TRUE)
+
+## exam #03
+compose.open(width=950,dpi=150,pointsize=16,legend=NULL,dev=TRUE)
+
+## exam #04
+a &lt;- pixelsize()
+compose.open(pointsize=8,dpi=150,scale="1:130000000")
+compose.plot(colorize(a),scalebar=TRUE)
+compose.close()
+
+## exam #05
+cl &lt;- compose.design(layout=c(2,4)
+                    ,legend=list(list("top","full"),list("bottom",1:3)))
+compose.open(cl,dev=TRUE)
+
+## exam #06
+cl &lt;- compose.design(p,layout=c(3,3),skip=c(4,6))
+compose.open(cl,dev=TRUE)
+
+## Not run: display(p)
+
+## exam #07
+cl &lt;- compose.design(p,side=3)
+compose.open(cl,dev=FALSE,bg="transparent");compose.close()
+</pre>
+
+
+</body></html>

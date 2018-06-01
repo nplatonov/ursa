@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: ENVI File Manipulation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for envi.files"><tr><td>envi.files</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+ENVI File Manipulation 
+</h2>
+
+<h3>Description</h3>
+
+<p>Management of ENVI files similar to functions of OS file manager.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+envi.exists(pattern = ".+", path = ".", all.files = FALSE, full.names = TRUE,
+           recursive = FALSE, ignore.case = TRUE, exact = FALSE)
+envi.list(pattern = ".+", path = ".", all.files = FALSE, full.names = FALSE,
+          recursive = FALSE, ignore.case = TRUE, exact = FALSE)
+envi.remove(pattern = ".+", path = ".", all.files = FALSE, full.names = FALSE,
+            recursive = FALSE, ignore.case = TRUE, verbose = FALSE)
+envi.copy(src, dst, overwrite = TRUE)
+envi.rename(src, dst, overwrite = TRUE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>pattern</code></td>
+<td>
+
+<p>Either filename (like <code><a href="../../base/html/basename.html">basename</a></code> function) or mask in format of regular expressions or full path name.
+</p>
+</td></tr>
+<tr valign="top"><td><code>path</code></td>
+<td>
+
+<p>Either path name (like <code><a href="../../base/html/basename.html">dirname</a></code> function) or ignored if <code>pattern</code> describes full path.
+
+</p>
+</td></tr>
+<tr valign="top"><td><code>all.files</code></td>
+<td>
+
+<p>A logical value. If FALSE, only the names of visible files are returned. If TRUE, all file names will be returned. Similar to <code>all.files</code> argument in <code><a href="../../base/html/list.files.html">list.files</a></code> function
+</p>
+</td></tr>
+<tr valign="top"><td><code>full.names</code></td>
+<td>
+
+<p>A logical value. If TRUE, the directory path is prepended to the file names to give a relative file path. If FALSE, the file names (rather than paths) are returned. Similar to <code>full.names</code> argument in <code><a href="../../base/html/list.files.html">list.files</a></code> function
+</p>
+</td></tr>
+<tr valign="top"><td><code>recursive</code></td>
+<td>
+
+<p>Logical. Should the listing recurse into directories? Similar to <code>recursive</code> argument in <code><a href="../../base/html/list.files.html">list.files</a></code> function
+</p>
+</td></tr>
+<tr valign="top"><td><code>ignore.case</code></td>
+<td>
+
+<p>Logical. Should pattern-matching be case-insensitive? Similar to <code>ignore.case</code> argument in <code><a href="../../base/html/list.files.html">list.files</a></code> function
+</p>
+</td></tr>
+<tr valign="top"><td><code>exact</code></td>
+<td>
+
+<p>Logical. Attempt to cancel regular expressions.
+</p>
+</td></tr>
+<tr valign="top"><td><code>verbose</code></td>
+<td>
+
+<p>Logical. <code>TRUE</code> provides some additional information on console.
+</p>
+</td></tr>
+<tr valign="top"><td><code>src</code></td>
+<td>
+
+<p>Strings of length 1 or more. Name or directory name or path of source ENVI files.
+</p>
+</td></tr>
+<tr valign="top"><td><code>dst</code></td>
+<td>
+
+<p>Strings of length 1 or more. Name or directory name path of destination ENVI files. Length is assuming to be equal to length of <code>src</code>
+</p>
+</td></tr>
+<tr valign="top"><td><code>overwrite</code></td>
+<td>
+
+<p>Logical. <code>TRUE</code> overwrites destinations ENVI files. <code>FALSE</code> does nothing if destinaton ENVI file exists.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Functions do not view content of any files. The major identifier of ENVI files in file system is ENVI header (*.hdr) file. Binary file is searching along 1) original *.envi, *.bin, *.img, *.dat extensions, 2) externally packing *.gz. *.bz2, *.xz extensions, or 3) packed by this package *.envigz, *.bingz extensions. Functions <code>envi.copy()</code> and <code>envi.rename()</code> keeps original extension of ENVI binary file; use <code><a href="../../base/html/files.html">file.rename</a></code> to rename ENVI binary file.
+</p>
+
+
+<h3>Value</h3>
+
+<p><code>envi.exists()</code> returns integer number of found ENVI files.
+</p>
+<p><code>envi.list()</code> returns character vector of found ENVI files.
+</p>
+<p><code>envi.remove()</code> returns character vector of deleted ENVI files.
+</p>
+<p><code>envi.copy()</code> returns 0L.
+</p>
+<p><code>envi.rename()</code> returns value of <code><a href="../../base/html/files.html">file.rename</a></code>, which is applied to objects in file system.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a></p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+a1 &lt;- envi.create("tmp1.envi")
+a2 &lt;- envi.create("tmp2.")
+close(a1,a2)
+envi.list()
+envi.copy("tmp1","tmp3")
+envi.copy("tmp2","tmp4")
+envi.list()
+envi.rename("tmp3","tmp5")
+envi.list()
+envi.exists("nofilewithsuchname")
+envi.exists("tmp[34]")
+envi.remove(".+")
+envi.list()
+</pre>
+
+
+</body></html>

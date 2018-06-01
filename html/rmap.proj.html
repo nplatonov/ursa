@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Extract and assign projection of raster images.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for rmap.proj"><tr><td>rmap.proj</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Extract and assign projection of raster images.
+
+</h2>
+
+<h3>Description</h3>
+
+<p>Functions manipulate with <code>$proj4</code> item of the <code><a href="../../rmap/html/classGrid.html">rmapGrid</a></code> object, which is embedded in the <code><a href="../../rmap/html/classRaster.html">rmapRaster</a></code> object (obj$grid$proj4). Projection is specified in PROJ.4 notation.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+rmap.proj(obj)
+rmap.proj(obj, keepGrid = FALSE) &lt;- value
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+
+<p><code>rmapRaster</code> object. It is allowed <code>rmapGrid</code> object for <code>rmap.proj</code> <em>(Extract)</em> function.
+</p>
+</td></tr>
+<tr valign="top"><td><code>keepGrid</code></td>
+<td>
+
+<p>Logical. Should sessional grid be changed after assignment. Default is <code>FALSE</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>value</code></td>
+<td>
+
+<p>Character sting in PROJ.4 format.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p><em>Extract</em> function <code>rmap.proj</code> returns character value of <code>$grid$proj4</code> item of <code>rmapRaster</code> object.
+</p>
+<p><em>Replace</em> function <code>rmap.proj&lt;-</code> returns <code>rmapRaster</code> with modified <code>$grid$proj4</code> item.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+a &lt;- rmap.dummy(nband=1)
+print(rmap.proj(a))
+p4s &lt;- "+init=epsg:3576"
+rmap.proj(a) &lt;- p4s
+print(rmap.proj(a))
+fname &lt;- tempfile()
+envi.write(a,fname)
+a2 &lt;- envi.read(fname,resetGrid=TRUE)
+print(rmap.proj(a2))
+print(rgdal::CRSargs(sp::CRS(p4s)))
+envi.remove(fname)
+</pre>
+
+
+</body></html>

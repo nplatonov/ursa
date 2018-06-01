@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Crop 'no data' margins.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="file:///C:/Software/R/doc/html/R.css" />
+</head><body>
+
+<table width="100%" summary="page for rmap.crop"><tr><td>rmap.crop</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Crop 'no data' margins.
+</h2>
+
+<h3>Description</h3>
+
+<p>Function <code>rmap.crop</code>
+
+makes such spatial subset of source raster image, where margins of 'no data' values are absent or have specified width.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+
+
+rmap.crop(obj, condition, border = 0, resetGrid = TRUE, verbose = FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+
+<p>Object of class <code>rmapRaster</code>
+</p>
+</td></tr>
+<tr valign="top"><td><code>condition</code></td>
+<td>
+
+<p>Object of class <code>rmapRaster</code> or <code><a href="../../base/html/missing.html">missing</a></code>. The condition for cutting. If &lsquo;missing&rsquo; then condition is defined from <code>obj</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>border</code></td>
+<td>
+
+<p>Integer of length 1 or 4. Desired margins for geographical subset. Units are cells (pixels).
+</p>
+</td></tr>
+<tr valign="top"><td><code>resetGrid</code></td>
+<td>
+
+<p>Logical. If <code>resetGrid=TRUE</code> then sessional grid paramaters is established from grid parameters of created raster. If <code>resetGrid=FALSE</code> then sessional grid parameters keep without change. Defailu is <code>TRUE</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>verbose</code></td>
+<td>
+
+<p>Logical. <code>TRUE</code> provides some additional information on console.
+</p>
+</td></tr>
+</table>
+
+
+
+
+
+
+
+
+<h3>Details</h3>
+
+
+<p>This function calls <code><a href="../../rmap/html/regrid.html">regrid</a></code> with passing values of arguments <code>resetGrid</code> and <code>verbose</code> without changes.
+</p>
+<p>This function is an instrument for data compression for spatial matrices with wide margins of 'no data' value. It keeps spatial structure (pixel's neighborhood) in the internal data storage. Otherwise, <code><a href="../../rmap/html/codec.html">compress</a></code> reduces object size using spatial indexing with dropping of spatial structure.
+</p>
+
+
+<h3>Value</h3>
+
+<p>Object of class <code>rmapRaster</code>
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nikita Platonov <a href="mailto:platonov@sevin.ru">platonov@sevin.ru</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+session.grid(NULL)
+'printCR' &lt;- function(obj) print(with(rmap.grid(obj),c(c=columns,r=rows)))
+g0 &lt;- session.grid()
+a &lt;- pixelsize()
+th &lt;- with(rmap.grid(a),resx*resy*1e-6)
+a0 &lt;- a[a&gt;th*0.9]
+print(session.grid())
+printCR(a0)
+print(a0)
+a1 &lt;- subset(a0,resetGrid=TRUE)
+print(session.grid())
+printCR(a1)
+print(a1)
+a2 &lt;- subset(a0,resetGrid=FALSE)
+print(session.grid())
+printCR(a2)
+print(a2)
+a3 &lt;- a[a&gt;=th*0.85 &amp; a&lt;=th*1.01]
+b1 &lt;- rmap.dummy(nband=3,min=0,max=255)
+print(b1)
+b2 &lt;- subset(b1[a3&gt;0],border=10)
+print(b2)
+printCR(b2)
+## Not run: 
+   b2[is.na(b2)] &lt;- 255
+   display.rgb(b2)
+## End(Not run)
+b3 &lt;- subset(b1,a3,border=0)
+print(b3)
+printCR(b3)
+</pre>
+
+
+</body></html>
