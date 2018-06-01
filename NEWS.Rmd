@@ -14,10 +14,6 @@ date: "`r format(Sys.Date(), format = '%Y-%m-%d')`"
    }
 </style>
 
-### version 3.8.8
-
-+ Ongoing...
-
 ### version 3.8.7
 
 + In suggestion, sf (>= 0.6-1)
