@@ -1,4 +1,4 @@
-2018-05-31
+2018-06-01
 
 <style>
    code,
@@ -12,11 +12,16 @@
    }
 </style>
 
+### version 3.8.8
+
+  - Ongoing…
+
 ### version 3.8.7
 
   - In suggestion, sf (\>= 0.6-1)
 
-  - Support importing of 3-dimensional ‘stars’ arrays
+  - Support importing of 3-dimensional
+    ‘[stars](https://github.com/r-spatial/stars)’ arrays
 
   - Improvement of character encoding for attributes of spatial objects
 
