@@ -3337,52 +3337,59 @@ void internalMargin(double *x,int *dim,int *indr,int *indc)
    free(res);
    return;
 }
-void areaIncrement(double *x,int *dim,double *res,double *out) {
+double calcAreaIncrement(double *x,int *dim,double *res,int adr0,int c, int r
+                        ,int r1,int c1,int r2,int c2,int r3,int c3,int verbose) {
+   int adr1,adr2,adr3;
    int samples=dim[0];
    int lines=dim[1];
-   int bands=dim[2];
+   double y1,y2,y3,z0,z1,z2,z3,ret;
    double resx=0.25*res[0]*res[0];
    double resy=0.25*res[1]*res[1];
    double resz=resx+resy;
    double resw=res[0]*res[1];
    double retw=1.0/resw;
-   int verbose=0;
-   int c,r,t;
-   int adr,adr0,adr1,adr2,adr3;
-   double y1,y2,y3,z0,z1,z2,z3,val,ret;
-   double calc(int r1,int c1,int r2,int c2,int r3,int c3) {
-      if ((r+r1<0)||(r+r2<0)||(r+r3<0)||
-          (r+r1>=lines)||(r+r2>=lines)||(r+r3>=lines)||
-          (c+c1<0)||(c+c2<0)||(c+c3<0)||
-          (c+c1>=samples)||(c+c2>=samples)||(c+c3>=samples))
-      {
-         if (verbose)
-            Rprintf(" %.3f",ret);
-         return(0.125);
-      }
-      adr1=adr0+(r+r1)*samples+(c+c1);
-     // if (adr1>150000)
-     //    Rprintf(" %d",adr1);
-      adr2=adr0+(r+r2)*samples+(c+c2);
-      adr3=adr0+(r+r3)*samples+(c+c3);
-      if ((ISNA(x[adr1]))||(ISNA(x[adr2]))||(ISNA(x[adr3])))
-      {
-         if (verbose)
-            Rprintf(" %.3f",ret);
-         return(0.125);
-      }
-      y1=x[adr1]-x[adr2];
-      y2=x[adr2]-x[adr3];
-      y3=x[adr3]-x[adr1];
-      z1=sqrt(resz+y1*y1);
-      z2=sqrt(resx+y2*y2);
-      z3=sqrt(resy+y3*y3);
-      z0=0.5*(z1+z2+z3);
-      ret=sqrt(z0*(z0-z1)*(z0-z2)*(z0-z3))*retw;
+   if ((r+r1<0)||(r+r2<0)||(r+r3<0)||
+       (r+r1>=lines)||(r+r2>=lines)||(r+r3>=lines)||
+       (c+c1<0)||(c+c2<0)||(c+c3<0)||
+       (c+c1>=samples)||(c+c2>=samples)||(c+c3>=samples))
+   {
+      ret=0.125;
       if (verbose)
          Rprintf(" %.3f",ret);
       return(ret);
    }
+   adr1=adr0+(r+r1)*samples+(c+c1);
+  // if (adr1>150000)
+  //    Rprintf(" %d",adr1);
+   adr2=adr0+(r+r2)*samples+(c+c2);
+   adr3=adr0+(r+r3)*samples+(c+c3);
+   if ((ISNA(x[adr1]))||(ISNA(x[adr2]))||(ISNA(x[adr3])))
+   {
+      ret=0.125;
+      if (verbose)
+         Rprintf(" %.3f",ret);
+      return(ret);
+   }
+   y1=x[adr1]-x[adr2];
+   y2=x[adr2]-x[adr3];
+   y3=x[adr3]-x[adr1];
+   z1=sqrt(resz+y1*y1);
+   z2=sqrt(resx+y2*y2);
+   z3=sqrt(resy+y3*y3);
+   z0=0.5*(z1+z2+z3);
+   ret=sqrt(z0*(z0-z1)*(z0-z2)*(z0-z3))*retw;
+   if (verbose)
+      Rprintf(" %.3f",ret);
+   return(ret);
+}
+void areaIncrement(double *x,int *dim,double *res,double *out) {
+   int samples=dim[0];
+   int lines=dim[1];
+   int bands=dim[2];
+   int verbose=0;
+   int c,r,t;
+   int adr,adr0;
+   double val;
    for (t=0;t<bands;t++) {
       adr0=t*lines*samples;
      // Rprintf("adr0=%d\n",adr0);
@@ -3390,14 +3397,14 @@ void areaIncrement(double *x,int *dim,double *res,double *out) {
          for (c=0;c<samples;c++) {
             adr=adr0+r*samples+c;
            // Rprintf(" %d",adr);
-            val=calc( 0, 0,-1,-1,-1, 0)+
-                calc( 0, 0,-1, 1,-1, 0)+
-                calc(-1, 1, 0, 0, 0, 1)+
-                calc( 1, 1, 0, 0, 0, 1)+
-                calc( 0, 0, 1, 1, 1, 0)+
-                calc( 0, 0, 1,-1, 1, 0)+
-                calc( 1,-1, 0, 0, 0,-1)+
-                calc(-1,-1, 0, 0, 0,-1);
+            val=calcAreaIncrement(x,dim,res,adr,c,r, 0, 0,-1,-1,-1, 0,verbose)+
+                calcAreaIncrement(x,dim,res,adr,c,r, 0, 0,-1, 1,-1, 0,verbose)+
+                calcAreaIncrement(x,dim,res,adr,c,r,-1, 1, 0, 0, 0, 1,verbose)+
+                calcAreaIncrement(x,dim,res,adr,c,r, 1, 1, 0, 0, 0, 1,verbose)+
+                calcAreaIncrement(x,dim,res,adr,c,r, 0, 0, 1, 1, 1, 0,verbose)+
+                calcAreaIncrement(x,dim,res,adr,c,r, 0, 0, 1,-1, 1, 0,verbose)+
+                calcAreaIncrement(x,dim,res,adr,c,r, 1,-1, 0, 0, 0,-1,verbose)+
+                calcAreaIncrement(x,dim,res,adr,c,r,-1,-1, 0, 0, 0,-1,verbose);
             if (ISNA(x[adr]))
                out[adr]=NA_REAL;
             else

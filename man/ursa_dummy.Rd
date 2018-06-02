@@ -62,13 +62,13 @@ Nikita Platonov \email{platonov@sevin.ru}
 %%~ }
 \examples{
 session_grid(NULL)
-a1 <- as.integer(ursa_dummy(nband=1,elements=1e3))  ## white noise
+a1 <- as.integer(ursa_dummy(nband=1,mul=1/16,elements=1e3))  ## white noise
 display(a1,legend=NULL)
 a2 <- ursa_dummy()
 print(a2)
-display_brick(a2)
-display_stack(a2)
-display_rgb(a2)
+display_brick(a2,decor=FALSE)
+display_stack(a2,decor=FALSE)
+display_rgb(a2,decor=FALSE)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

@@ -74,7 +74,7 @@ ref <- colorize(a,breakvalue=refval,pal.rich=45,pal.rotate=0)
 p1 <- colorize(a,breakvalue=val,pal.rich=135,pal.rotate=0)
 p2 <- colorize(a,breakvalue=val,pal.rich=-15,pal.rotate=0)
 p3 <- colorize(a,value=refval)
-if (exam1 <- TRUE) {
+if (exam1 <- FALSE) { ## to avoid 'Examples with CPU or elapsed time > 10s' 
    compose_open(legend=list(list(1,"left"),list(1,"right")),scale=2)
    panel_new()
   # ct1 <- panel_raster(ref)

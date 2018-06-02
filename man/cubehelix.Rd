@@ -90,7 +90,7 @@ Original source code \code{\link[rje:cubeHelix]{rje::cubeHelix}} (clickable corr
 session_grid(NULL)
 set.seed(352)
 session_grid(regrid(mul=1/16))
-a <- ursa_dummy(9,min=0,max=255)
+a <- ursa_dummy(3,min=0,max=255)
 b4 <- b3 <- b2 <- b1 <- vector("list",length(a))
 for (i in seq_along(b1)) {
    b1[[i]] <- colorize(a[i],pal=cubehelix(11,weak=45*i,rotate=+270),ncolor=11)

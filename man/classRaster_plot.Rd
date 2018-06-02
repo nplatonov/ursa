@@ -54,7 +54,7 @@ session_grid(NULL)
 a <- pixelsize()
 plot(a,asp=1)
 image(a,asp=1)
-b <- colorize(a)
+b <- colorize(a,ncolor=15)
 plot(b,asp=1)
 image(b,asp=1)
 }

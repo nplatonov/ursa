@@ -95,8 +95,8 @@ Function name in style \emph{camelCase} for consistence with other progress bar 
 \examples{
 session_grid(NULL)
 n1 <- 3
-n2 <- 283
-p <- 0.0051
+n2 <- 83
+p <- 0.0011
 #require(tcltk)
 pb <- ursaProgressBar(min=0,max=n1,title="first")
 for (i in seq(n1)) {

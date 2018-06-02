@@ -1,5 +1,6 @@
 2018-06-02
 
+<!--
 <style>
    code,
    kbd,
@@ -11,10 +12,7 @@
      background-color: #E6F1FF;
    }
 </style>
-
-### version 3.8.8
-
-  - Ongoing…
+-->
 
 ### version 3.8.7
 
