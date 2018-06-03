@@ -1,0 +1,30 @@
+\name{ursa_cache}
+\alias{ursa_cache}
+\title{
+Cache management of ursa package
+}
+\description{
+This help topic is about how cache is managed in the package.
+}
+\usage{
+ursa_cache()
+}  
+\details{
+Users, who want to keep cache files between R sessions, should define \link[base:options]{option} with name \code{ursaCacheDir} and value of the path for storage of cache files. This setting can be specified if \code{~/.Rprofile} file, or be in your code. Do not specify permanent cache directory as sub-directory of \code{\link[base:tempfile]{tempdir()}}, becase it will be removed after finishing of R session.
+}
+\value{
+NULL
+}
+\author{
+Nikita Platonov \email{platonov@sevin.ru}
+}
+\note{
+There is no neccessary to call this function. It just defines this help topic.
+}
+
+\examples{
+\dontrun{
+options(ursaCacheDir=file.path(".",".ursaCacheDir"))
+glance("Mount Eden",place="park")}
+}
+\keyword{environment}

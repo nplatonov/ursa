@@ -1,4 +1,4 @@
-2018-06-02
+2018-06-03
 
 <!--
 <style>
@@ -15,6 +15,9 @@
 -->
 
 ### version 3.8.7
+
+  - In adopting to CRAN policy: reduced time of examples, fixed some
+    features
 
   - In suggestion, sf (\>= 0.6-1)
 

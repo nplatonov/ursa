@@ -11,9 +11,9 @@
    rm(p)
   # session_pngviewer()
    session_tempdir()
-   fpath <- getOption("ursaCacheDir")
+   fpath <- getOption("ursaCacheDir") ## e.g., from ~/.Rprofile
    if ((is.null(fpath))||(!file.exists(fpath)))
-       try(options(ursaCacheDir=file.path(dirname(tempdir()),"RtmpUrsaCache")))
+       try(options(ursaCacheDir=tempdir())) ##=file.path(dirname(tempdir()),"RtmpUrsaCache")))
    .ursaCacheDirClear()
   # if ((FALSE)&&(interactive()))
   #    print(data.frame(pngviewer=session_pngviewer()
@@ -22,7 +22,7 @@
   # welcome2 <- .elapsedTime("ursa -- onload 1111",toPrint=FALSE)
   # fpath <- file.path(chartr("\\","/",Sys.getenv("R_USER")),"template.idr")
    fpath0 <- system.file("requisite",package="ursa")
-   fpath <- getOption("ursaRequisite") ## e.g., from .Rprofile
+   fpath <- getOption("ursaRequisite") ## e.g., from ~/.Rprofile
    if ((!is.null(fpath))&&(file.exists(fpath))) {
      # ok <- try(Sys.setenv(R_RMAP_TEMPLATE=fpath))
       ok <- try(options(ursaRequisite=fpath))
