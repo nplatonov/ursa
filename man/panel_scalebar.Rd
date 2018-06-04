@@ -103,7 +103,7 @@ session_grid(NULL)
    compose_close(bpp=8)
 
 # example no.4 -- length distortion in the Transverse Mercator projection
-\dontrun{
+\donttest{ ## internet connection is required; namespace of package 'ggmap' is required
 if (requireNamespace("ggmap")) {
   # m2 <- ggmap::get_openstreetmap(bbox=c(left=42,bottom=70,right=70,top=82)
   #                               ,format="png",messaging=TRUE

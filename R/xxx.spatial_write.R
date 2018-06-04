@@ -185,7 +185,7 @@
       return(invisible(0L))
    }
    appendlayer <- getOption("ursaSpatialMultiLayer")
-   appendlayer <- ifelse(is.null(appendlayer),FALSE,appendlayer>0)
+   appendlayer <- ifelse(is.null(appendlayer),FALSE,appendlayer>1)
    if ((ogr2ogr)&&(driver %in% "zzzSQLite")) { ## sf>=0.6.3 great improvement
       interim <- TRUE
       driver0 <- driver
@@ -361,7 +361,6 @@
                   ,.dQuote(fname0),.dQuote(fname),"-nln",lname)
       if (verbose)
          message(cmd)
-      q()
       keepHDR <- length(envi_list(lname))
       if (keepHDR) {
          fhdr2 <- tempfile()

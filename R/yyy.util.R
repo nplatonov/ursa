@@ -176,6 +176,9 @@
 '.is.integer' <- function(x,tolerance=1e-11) {
    if (inherits(x,c("Date","POSIXt")))
       return(FALSE)
+   hasNA <- anyNA(x)
+   if (hasNA)
+      x <- x[!is.na(x)]
    if (is.ursa(x))
       x <- c(x$value)
    else if ((is.character(x))||(is.factor(x))) {
@@ -185,7 +188,8 @@
    }
    if (any(abs(x)>1e9))
       return(FALSE)
-   y <- abs(x-round(x)) ## # y <- abs(x-as.integer(round(x)))
+   y <- abs(x-round(x)) ## ++ 20180531
+  # y <- abs(x-as.integer(round(x))) ## -- 20180531
    if (all(x>100)) {
       y <- y/x
    }

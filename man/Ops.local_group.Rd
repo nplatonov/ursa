@@ -91,16 +91,16 @@ Mean value for each band \code{\link[ursa:Ops.band_group]{band_mean}}
 }
 \examples{
 session_grid(NULL)
-b <- ursa_dummy(nband=7,min=0,max=100)
+b <- ursa_dummy(nband=7,min=0,max=100,mul=1/16)
 b[b<40] <- NA
 print(b)
 res <- c('mean'=mean(b),'local_mean'=local_mean(b)
         ,'sum0'=local_sum(b,cover=0),'sum1'=local_sum(b,cover=1))
 print(res)
 
-\dontrun{
 display(b)
-display(res)}
+display(res)
+
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

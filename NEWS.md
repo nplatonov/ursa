@@ -1,4 +1,4 @@
-2018-06-03
+2018-06-04
 
 <!--
 <style>
@@ -14,12 +14,23 @@
 </style>
 -->
 
+### version 3.8.8
+
+  - Coastline is updated to version 2018-06-03 09:34
+
+  - Package `IRdisplay` is added as ‘Suggested’.
+
+  - In adopting to CRAN policy and reviews of CRAN members:
+    
+      - Reduced time of examples, fixed some features.
+    
+      - Changed cache management (after Uwe Ligges code review).
+    
+      - In \*.Rd files ‘\\{dontrun}’ is replaced to ‘\\{donttest}’
+        (after Swetlana Herbrandt review). Packages `caTools`, `ggmap`
+        are added as ‘Suggested’ for running of examples.
+
 ### version 3.8.7
-
-  - In adopting to CRAN policy: reduced time of examples, fixed some
-    features
-
-  - In suggestion, sf (\>= 0.6-1)
 
   - Support importing of 3-dimensional
     ‘[stars](https://github.com/r-spatial/stars)’ arrays

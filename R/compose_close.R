@@ -162,8 +162,8 @@
       }
       if (.isJupyter()) {
          execute <- FALSE
-        # return(invisible(IRdisplay::display_png(file=fileout)))
-         return(invisible(do.call("IRdisplay::display_png",list(file=fileout))))
+         return(invisible(IRdisplay::display_png(file=fileout)))
+        # return(invisible(do.call("IRdisplay::display_png",list(file=fileout))))
         # retK <- IRdisplay::display_png(file=fileout)
         # return(invisible(retK))
       }

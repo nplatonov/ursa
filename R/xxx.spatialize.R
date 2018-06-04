@@ -592,8 +592,8 @@
             }
          }
          else if (TRUE) {
-           # isInt <- .is.integer(na.omit(da))
-            isInt <- .is.integer(da)
+            isInt <- .is.integer(na.omit(da))
+           # isInt <- .is.integer(da)
             if (isInt) { # &&(!is.integer(da))
                da <- as.integer(round(da))
                if (isSF)

@@ -82,13 +82,10 @@ gr2 <- c(group2=colorize(a,nbreak=6))#+0
 mgr <- list(gr,gr2)
 da2 <- aggregate(val[1],mgr,table=TRUE,mean)
 print(da2)
-
-\dontrun{
-   da3 <- aggregate(val,mgr,table=TRUE,mean)
-   print(da3)
-   ra3 <- aggregate(val,mgr,table=FALSE,mean)
-   print(ra3)
-   display(ra3)}
+da3 <- aggregate(val,mgr,table=TRUE,mean)
+print(da3)
+ra3 <- aggregate(val,mgr,table=FALSE,mean) ## not implemented for rasters
+print(ra3)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

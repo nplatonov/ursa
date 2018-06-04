@@ -23,7 +23,7 @@ There is no neccessary to call this function. It just defines this help topic.
 }
 
 \examples{
-\dontrun{
+\donttest{ ## internet connection is required
 options(ursaCacheDir=file.path(".",".ursaCacheDir"))
 glance("Mount Eden",place="park")}
 }

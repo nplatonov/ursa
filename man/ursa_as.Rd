@@ -143,14 +143,15 @@ b6 <- as.ursa(system.file("pictures/erdas_spnad83.tif",package="rgdal"))
 print(b6)
 display(b6,coast=FALSE,col="orange")
 
-\dontrun{
-require(raster)
-r <- brick(system.file("external/rlogo.gri",package="raster"))
-print(r)
-b7 <- as.ursa(r)
-ursa_proj(b7) <- ""
-print(b7)
-display_rgb(b7)}
+\donttest{
+if (requireNamespace("raster")) {
+   r <- raster::brick(system.file("external/rlogo.gri",package="raster"))
+   print(r)
+   b7 <- as.ursa(r)
+   ursa_proj(b7) <- ""
+   print(b7)
+   display_rgb(b7)}
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

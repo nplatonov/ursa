@@ -159,7 +159,7 @@
    if ((nband(b)==4)&&(global_min(b[4])==255)&&(global_max(b[4])==255))
       b <- b[-4]
    attr(b,"copyright") <- "Global Imagery Browse Services, NASA/GSFC/ESDIS"
-   cond1 <- .grep("\\+proj=merc\\s",g1$proj4) & .grep("\\+proj=merc\\s",g4$proj4)
+   cond1 <- .lgrep("\\+proj=merc\\s",g1$proj4) & .lgrep("\\+proj=merc\\s",g4$proj4)
    cond2 <- g1$columns==g4$columns & g1$rows==g4$rows &
             .is.near(g1$miny,g4$miny) & .is.near(g1$maxy,g4$maxy) &
             .is.near(g1$resx,g4$resx) & .is.near(g1$resy,g4$resy) &

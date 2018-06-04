@@ -159,21 +159,27 @@ cmd <- paste("Rscript --vanilla -e ursa::glance()",paste0("\"",f,"\"")
 cat(" --------- Try in command line: -----------\n")
 message(cmd)
 cat(" ----------- end of quoting ---------------\n")
-\dontrun{
-   system(cmd)}
+\donttest{ ## windows: figure will be opened using *.png file association 
+system(cmd)
+}
 
-\dontrun{
-   require(sp)
-   a <- data.frame(lat=c(70.734,71.657),lon=c(178.577,-177.38),place="Wrangel Island")
-   coordinates(a) <- ~lon+lat
-   proj4string(a) <- "+init=epsg:4326"
-   glance(a,style="google color maptype=terrain")
-   glance(a,style="openstreetmap color")
-   glance(a,style="mapnik color tile")}
+require(sp)
+a <- data.frame(lat=c(70.734,71.657),lon=c(178.577,-177.38),place="Wrangel Island")
+coordinates(a) <- ~lon+lat
+proj4string(a) <- "+init=epsg:4326"
 
-\dontrun{
-   glance("Svalbard")}
-
+\donttest{ ## internet connection is required
+glance(a,style="google color maptype=terrain")
+}
+\donttest{ ## internet connection is required
+glance(a,style="openstreetmap color")
+}
+\donttest{ ## internet connection is required
+glance(a,style="mapnik color tile")
+}
+\donttest{ ## internet connection is required
+glance("Svalbard")
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

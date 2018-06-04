@@ -122,9 +122,7 @@ Nikita Platonov \email{platonov@sevin.ru}
 }
 \examples{
 session_grid(NULL)
-\dontrun{print(methods(class="ursaConnection"))}
-
-\dontrun{print(ursa:::.con.skeleton())}
+print(methods(class="ursaConnection"))
 
 a <- pixelsize()
 write_envi(rep(a,5),"tmp1",compress=FALSE)

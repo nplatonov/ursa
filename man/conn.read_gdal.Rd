@@ -64,11 +64,12 @@ Nikita Platonov \email{platonov@sevin.ru}
 }
 \examples{
 session_grid(NULL)
-\dontrun{rgdal::gdalDrivers()}
+
+rgdal::gdalDrivers()
 Fin1 <- system.file("pictures/Rlogo.jpg",package="rgdal")
 a1 <- read_gdal(Fin1)
 print(a1)
-\dontrun{display(a1)}
+display(a1)
 
 Fin2 <- system.file("pictures/test_envi_class.envi",package="rgdal")
 b1 <- read_gdal(Fin2)
@@ -78,7 +79,7 @@ print(identical(ursa_value(b1),ursa_value(b2)))
 print(identical(ursa_colortable(b1),ursa_colortable(b2)))
 print(ursa_colortable(b1))
 print(as.table(b1))
-\dontrun{display(b1,detail="l")}
+display(b1,detail="l")
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

@@ -69,8 +69,7 @@ str(ursa_value(a[2]))
 str(as.matrix(a[2]))
 b1 <- a[[2]]
 str(b1)
-\dontrun{
-image(b1,asp=1)}
+image(b1,asp=1)
 b2 <- as.matrix(a[2:3],coords=TRUE)
 print(c('theSame?'=identical(b1,b2)))
 a2 <- as.ursa(b2)

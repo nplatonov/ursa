@@ -92,13 +92,13 @@ If colors are specified as \R color names, then slow down may appear.
 }
 \examples{
 session_grid(NULL)
-\dontrun{print(methods(class="ursaColorTable"))}
+print(methods(class="ursaColorTable"))
 
 a <- pixelsize()
 print(a)
 b1 <- colorize(a,value=c(400,500,600,700),interval=FALSE)
 b2 <- colorize(a,value=c(450,550,650)    ,interval=TRUE)
-\dontrun{display(list(b1,b2))}
+display(list(b1,b2))
 print(is.ursa(a,"colortable"))
 print(is.ursa(b1,"colortable"))
 print(is.ursa(b2,"colortable"))
@@ -112,7 +112,7 @@ ursa_colortable(b2) <- c("Low"="darkolivegreen1"
 print(ursa_colortable(b2))
 names(ursa_colortable(b2))[4] <- "Polar"
 print(ursa_colortable(b2))
-\dontrun{display(b2)}
+display(b2)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

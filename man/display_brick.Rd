@@ -69,10 +69,10 @@ session_grid(NULL)
 a <- ursa_dummy(nband=3,min=0,max=250)
 a[2] <- -a[1]
 a[3] <- sqrt(a[1])
-\dontrun{ a <- ursa_stack(a)} # all the same, further coercion to 'brick'
-print(a)
-\dontrun{display(a) # likely 'display_stack' will be called }
-display_brick(a,stretch="eq",labels=c(-150,-100,0,10,12,20,100,150))
+a2 <- ursa_stack(a) 
+print(a2)
+display(a2) # likely 'display_stack' will be called
+display_brick(a2,stretch="eq",labels=c(-150,-100,0,10,12,20,100,150))
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

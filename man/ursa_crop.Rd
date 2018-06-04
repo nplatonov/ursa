@@ -87,9 +87,8 @@ print(b1)
 b2 <- ursa_crop(b1[a3>0],border=10)
 print(b2)
 printCR(b2)
-\dontrun{
-   b2[is.na(b2)] <- 255
-   display_rgb(b2)}
+b2[is.na(b2)] <- 255
+display_rgb(b2)
 b3 <- ursa_crop(b1,a3,border=0)
 print(b3)
 printCR(b3)

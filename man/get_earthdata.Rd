@@ -57,7 +57,7 @@ Argunet \code{method="libcurl"} is used in function \code{\link[utils:download.f
 
 Valid zoom values (e. g., specified via \code{res} argument) are 3:6 for EPSG:3413 and 0:8 for EPSG:3587.
 
-Longitude 180 degrees has a seam in EPSG:3857 (e.g., see \code{bbox=c(170,68,-170,73)} and {bbox=c(-1600000,1308000,-1370000,1570000)} for Wrangel Island. If region crosses longitude 180 degrees in EPSG:3857, then the prior day is taken for Western Hemisphere.
+Longitude 180 degrees has a seam in EPSG:3857 (e.g., see \code{bbox=c(170,68,-170,73)} and \code{bbox=c(-1600000,1308000,-1370000,1570000)} for Wrangel Island. If region crosses longitude 180 degrees in EPSG:3857, then the prior day is taken for Western Hemisphere.
 
 }
 \value{
@@ -85,14 +85,17 @@ Nikita Platonov \email{platonov@sevin.ru}
 %%~ }
 \examples{
 session_grid(NULL)
-pr <- get_earthdata(bbox=NULL)
+pr <- get_earthdata()
 print(pr,quote=FALSE)
 
-\dontrun{
-   a1 <- get_earthdata()
-   display(a1)
-   a2 <- get_earthdata(product=2,date=Sys.Date()-7L,res=7,bbox=c(57.8,69.4,62.3,70.8))
-   display(a2)}
+\donttest{ ## internet connection is required
+a1 <- get_earthdata(bbox=c(2000000,400000,2300000,700000))
+display(a1)
+}
+\donttest{ ## internet connection is required
+a2 <- get_earthdata(product=2,date=Sys.Date()-7L,res=7,bbox=c(57.8,69.4,62.3,70.8))
+display(a2)
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

@@ -90,7 +90,7 @@ Nikita Platonov \email{platonov@sevin.ru}
 }
 \examples{
 session_grid(NULL)
-\dontrun{print(methods(class="ursaGrid"))}
+print(methods(class="ursaGrid"))
 
 a <- pixelsize()
 g <- ursa_grid(a)

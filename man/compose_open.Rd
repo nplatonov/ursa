@@ -116,15 +116,7 @@ b <- ursa_dummy(nband=2,min=0,max=50,mul=1/16)
 p <- list(colorize(b[1:2],pal.rich=240,pal.rotate=0)
          ,colorize(sqrt(b[3:4]),pal.rich=-15,pal.rotate=0,stretch="equal"))
 
-\dontrun{
-   ## exam #01
-   ursa:::.ursaOptions()
-   compose_open()
-   panel_new()
-   ursa:::.ursaOptions()
-   compose_close()
-   ursa:::.ursaOptions()}
-   
+  
 ## exam #02
 compose_open(height=400,legend=NULL,dev=TRUE)
 
@@ -145,12 +137,12 @@ compose_open(cl,dev=TRUE)
 cl <- compose_design(p,layout=c(2,3),skip=c(2,4,6))
 compose_open(cl,dev=TRUE)
 
-\dontrun{display(p)}
+display(p)
 
-\dontrun{
-   ## exam #07
-   cl <- compose_design(p,side=3)
-   compose_open(cl,dev=FALSE,bg="transparent");compose_close()}
+## exam #07
+cl <- compose_design(p,side=3)
+compose_open(cl,dev=FALSE,bg="transparent")
+compose_close()
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

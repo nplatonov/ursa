@@ -653,6 +653,7 @@
       if (verbose)
          close(pb)
       a180 <- subset(a,FID %in% cross180)
+      sf::st_agr(a180) <- "constant"
       c180 <- sf::st_transform(sf::st_centroid(a180),crs=4326)
       g180 <- do.call("rbind",lapply(lapply(sf::st_geometry(c180),unclass)
                                     ,matrix,ncol=2))

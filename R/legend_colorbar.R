@@ -289,7 +289,7 @@
                label <- keepIrreg
           # print(c(have=(length(label)+1)*height,lim=mheight))
          }
-         if ((!isRegular)&&(is.numeric(label))) {
+         if ((!isRegular)&&(is.numeric(label))&&(!isSpecified)) {
             y <- as.numeric(label)
             uniy <- unique(diff(y))
             if (length(uniy)==1)
