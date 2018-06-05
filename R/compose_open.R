@@ -188,13 +188,16 @@
    if (verbose)
       print(c(png_width=png_width,png_height=png_height
              ,scale=scale,autoscale=autoscale,pointsize=pointsize,dpi=dpi))
+   if (.isJupyter())
+      options(jupyter.plot_mimetypes = 'image/png')
    a <- try(png(filename=fileout,width=png_width,height=png_height,res=dpi
            ,bg=background,pointsize=pointsize
            ,type=device,antialias=antialias,family=font))
    if (inherits(a,"try-error")) { ## 20180117 patch for conda without cairo
+      device <- "windows"
       png(filename=fileout,width=png_width,height=png_height,res=dpi
          ,bg=background,pointsize=pointsize
-         ,antialias=antialias,family=font)
+         ,type=device,antialias=antialias,family=font)
    }
      # ,family=c("Tahoma","Verdana","Georgia","Calibri","sans")[1]
    nf <- layout(panel,widths=lcm(sizec)

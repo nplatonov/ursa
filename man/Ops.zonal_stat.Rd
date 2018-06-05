@@ -66,6 +66,7 @@ Nikita Platonov \email{platonov@sevin.ru}
 %%~ }
 \examples{
 session_grid(NULL)
+session_grid(regrid(mul=1/2))
 a <- pixelsize()
 val <- c(normal=a,half=a/2)
 gr <- c(group=colorize(a,nbreak=1))#+0

@@ -136,12 +136,12 @@ Nikita Platonov \email{platonov@sevin.ru}
 %%~ }
 \examples{
 session_grid(NULL)
-session_grid(regrid(mul=1/4))
-a <- ursa_dummy(nband=5,min=1,max=200)
+a <- ursa_dummy(nband=5,min=1,max=200,mul=1/8)
 b <- list(colorize(a[1:3],pal.rich=240,pal.rotate=0)
-         ,colorize(sqrt(a[4:5]),pal.rich=-15,pal.rotate=0))
+         ,colorize(sqrt(a[4:5]),pal.rich=-15,pal.rotate=0,stretch="equal"))
+
 cl1 <- compose_design(layout=c(2,3),byrow=TRUE,legend=NULL)
-print(cl1$layout)
+print(cl1)
 compose_open(cl1)
 compose_close()
 
@@ -151,21 +151,23 @@ compose_open(cl2)
 compose_close()
 
 cl3 <- compose_design(a,side=2)
-print(cl3$layout)
+print(cl3)
 compose_open(cl3)
 compose_close()
 
 cl4 <- compose_design(b)
-print(cl4$layout)
-compose_open(cl4)
-compose_close()
+print(cl4)
+\donttest{ ## to avoid over-time during example check -- begin
+   compose_open(cl4)
+   compose_plot(b,decor=FALSE,las=2)
+   compose_close("nocrop")
+} ## to avoid over-time during example check -- end
 
 cl5 <- compose_design(b,byrow=FALSE,skip=3
                      ,legend=list(list("full","left"),list(1:2,"right")))
-print(cl5)
 compose_open(cl5)
-compose_plot(b)
-compose_close()
+compose_plot(b,decor=FALSE)
+compose_close("nocrop")
 
 leg <- list(list(1,0),list(2,"left")
            ,list("full","right"),list("top","full")
@@ -173,8 +175,8 @@ leg <- list(list(1,0),list(2,"left")
 str(leg)
 cl6 <- compose_design(layout=c(2,3),skip=NA,legend=leg)
 print(cl6)
-compose_open(cl6)
-compose_close()
+compose_open(cl6,scale=3,pointsize=16)
+compose_close("nocrop")
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

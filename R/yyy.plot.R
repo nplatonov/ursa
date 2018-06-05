@@ -195,6 +195,8 @@
 }
 '.panel_attribution' <- function(pos=ifelse(vertical,"bottomright","bottomright")
                                 ,vertical=TRUE) {
+   if (isWindows <- getOption("ursaPngDevice")=="windows")
+      windowsFonts('Arial Narrow'=windowsFont("TT Arial Narrow"))
    ann <- paste0("",paste(unique(getOption("ursaPngCopyright")),collapse=" | "))
   # ann <- paste(c(getOption("ursaPngCopyright")),collapse="\n")
    if (nchar(ann))
