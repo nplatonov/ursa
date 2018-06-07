@@ -19,7 +19,7 @@
          fname0 <- paste0(fname,".bz2")
       fname <- tempfile()
      # on.exit(file.remove(fname))
-      system2("gzip",c("-f -d -c",.dQuote(fname0)),stdout=fname)
+      system2("gzip",c("-f -d -c",.dQuote(fname0)),stdout=fname,stderr=FALSE)
    }
    else if ((nchar(Sys.which("gzip")))&&
             (isZip <- (isZip1 <- .lgrep("\\.gz$",fname)>0)||
@@ -30,7 +30,7 @@
          fname0 <- paste0(fname,".bz2")
       fname <- tempfile()
      # on.exit(file.remove(fname))
-      system2("bzip2",c("-f -d -c",.dQuote(fname0)),stdout=fname)
+      system2("bzip2",c("-f -d -c",.dQuote(fname0)),stdout=fname,stderr=FALSE)
    }
    else if (.lgrep("^(https|http|ftp)\\://",fname)) {
       fname <- .ursaCacheDownload(fname,quiet=FALSE,mode="wb")
@@ -149,12 +149,12 @@
       else if ((nchar(Sys.which("gzip")))&&(isZip <- .lgrep("\\.gz$",fname)>0)) {
          fname0 <- fname
          fname <- tempfile();on.exit(file.remove(fname))
-         system2("gzip",c("-f -d -c",.dQuote(fname0)),stdout=fname)
+         system2("gzip",c("-f -d -c",.dQuote(fname0)),stdout=fname,stderr=FALSE)
       }
       else if ((nchar(Sys.which("bzip2")))&&(isZip <- .lgrep("\\.bz2$",fname)>0)) {
          fname0 <- fname
          fname <- tempfile();on.exit(file.remove(fname))
-         system2("bzip2",c("-f -d -k",.dQuote(fname0)),stdout=fname)
+         system2("bzip2",c("-f -d -k",.dQuote(fname0)),stdout=fname,stderr=FALSE)
       }
       else if (.lgrep("^(http|https|ftp)://",fname)) {
          fname <- .ursaCacheDownload(fname,mode="wb")

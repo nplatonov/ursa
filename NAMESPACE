@@ -16,6 +16,7 @@ importFrom("utils", "str", "download.file", "head", "tail", "methods",
 export(".onAttach")
 export(".onDetach")
 export(".onLoad")
+export(".onLoad.blank")
 export(".onUnload")
 export("allocate")
 export("as.Raster")

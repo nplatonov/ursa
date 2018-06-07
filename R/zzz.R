@@ -3,6 +3,9 @@
 #     file.path(chartr("\\","/",Sys.getenv("R_USER")),"template.idr")))
 # try(Sys.setenv(R_PLASTER_TEMPLATE=system.file("inst","template",package="ursa")
 
+.onLoad.blank <- function(lib, pkg) {
+   invisible(0L)
+}
 .onLoad <- function(lib, pkg) {
    compiler::enableJIT(0) ## speed up if 'ByteCompile: no' in "DESCRIPTION"
   # print("ursa -- .onLoad")

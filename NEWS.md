@@ -1,4 +1,4 @@
-2018-06-04
+2018-06-07
 
 <!--
 <style>
@@ -14,7 +14,17 @@
 </style>
 -->
 
+### version 3.8.9
+
+  - Fixed ignoring of `stdout` in `system2` for `interactive()` (tested
+    on Gui for Windows)
+
+  - Added possibily to use visualization in shiny
+    (`imageOutput`/`renderImage`)
+
 ### version 3.8.8
+
+  - Initial submission to CRAN
 
   - Coastline is updated to version 2018-06-03 09:34
 

@@ -401,7 +401,7 @@
             file.rename(fname,con$fname)
          }
          else  ## without "-k" key
-            system2("gzip",c("-f -d -c",.dQuote(fname.gz)),stdout=con$fname)
+            system2("gzip",c("-f -d -c",.dQuote(fname.gz)),stdout=con$fname,stderr=FALSE)
          con$compress <- -1L
       }
       fname.aux <- paste0(fname,".aux.xml")
@@ -421,8 +421,15 @@
          else if (decompress) {
             if (verbose)
                message("local unpack")
-            con$fname <- paste0(fname,".unpacked",.maketmp(),"~")
-            system2("gzip",c("-f -d -c",.dQuote(fname.envigz)),stdout=con$fname)
+            fbase <- .maketmp()
+           # print(fbase)
+           # con$fname <- paste0(fname,".unpacked",.maketmp(),"~")
+           # print(con$fname)
+            con$fname <- file.path(dirname(fbase)
+                                  ,paste0(fname,".unpacked",basename(fbase),"~"))
+           # print(con$fname)
+           # q()
+            system2("gzip",c("-f -d -c",.dQuote(fname.envigz)),stdout=con$fname,stderr=FALSE)
             solved <- !is.null(con$fname)
          }
          if (solved) {
@@ -458,7 +465,7 @@
             file.rename(fname.bin,con$fname)
          }
          else ## without "-k" key
-            system2("gzip",c("-f -d -c",.dQuote(fname.bingz)),stdout=con$fname)
+            system2("gzip",c("-f -d -c",.dQuote(fname.bingz)),stdout=con$fname,stderr=FALSE)
          con$compress <- -1L
       }
       fname.aux <- paste0(fname.bin,".aux.xml")
@@ -526,8 +533,11 @@
    metadata <- if ((!is.na(fname.aux)&&(file.exists(fname.aux))))
       readLines(fname.aux,warn=FALSE) else NULL
   # md <- xml2::as_list(xml2::read_xml(fname.aux))
-   if (!is.na(con$connection))
-      con$handle <- do.call(con$connection,list(con$fname,"r+b"))
+   if (!is.na(con$connection)) {
+      con$handle <- try(do.call(con$connection,list(con$fname,"r+b")),silent=TRUE)
+      if (inherits(con$handle,"try-error")) ## read-only
+         con$handle <- do.call(con$connection,list(con$fname,"rb"))
+   }
    if (("bzfile" %in% class(con$handle))||("xzfile" %in% class(con$handle)))
       con$seek <- FALSE
    else
@@ -568,14 +578,21 @@
      # (!("package:rgdal" %in% search()))) { 
       if ((nchar(Sys.which("gdalsrsinfo")))&&
           (!any(c("rgdal","sf") %in% loadedNamespaces()))) {
-         tmp <- .maketmp()
-         wktin <- paste0(tmp,".prj~")
-         writeLines(wkt,wktin)
-         wktout <- paste0(tmp,".wkt~")
-         system2("gdalsrsinfo",list("-o proj4",wktin),stdout=wktout)
-         grid$proj4 <- .gsub("\'","",readLines(wktout,warn=FALSE))
-         file.remove(wktout)
-         file.remove(wktin)
+         if (lverbose)
+            message("'gdalsrsinfo' engine (read)")
+         if (FALSE) ## slow
+            grid$proj4 <- .gsub("\'","",system2("gdalsrsinfo"
+                                               ,c("-o proj4",wkt),stdout=TRUE,stderr=FALSE))
+         else {
+            tmp <- .maketmp()
+            wktin <- paste0(tmp,".prj~")
+            writeLines(wkt,wktin)
+            wktout <- paste0(tmp,".wkt~")
+            system2("gdalsrsinfo",c("-o proj4",wktin),stdout=wktout,stderr=FALSE)
+            grid$proj4 <- .gsub("\'","",readLines(wktout,warn=FALSE))
+            file.remove(wktout)
+            file.remove(wktin)
+         }
       }
       else if (!("sf" %in% loadedNamespaces())) {
          if (lverbose)

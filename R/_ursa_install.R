@@ -109,17 +109,34 @@
 '.buildAndInstall' <- function() {
    wd <- setwd("C:/platt/R/ursa-package")
    if (requireNamespace("ursa"))
-   stopifnot(!.generate_namespace(verbose=FALSE))
+      stopifnot(!.generate_namespace(verbose=FALSE))
    patt <- "^ursa_.*\\.tar\\.gz$"
-   a <- file.remove(dir(pattern=patt))
+   nul <- file.remove(dir(pattern=patt))
    system("R --vanilla CMD build ursa")
    pkg <- tail(plutil::filelist(patt))
    if (length(pkg)==1) {
       opt1 <- "--fake" ## --no-multiarch
       opt2 <- "--no-html"
       opt3 <- "--no-html --build"
-      system(paste("R --vanilla CMD INSTALL",opt2,pkg)) 
-      file.remove(pkg)
+      if (TRUE) {
+         src <- file.path(Sys.getenv("HOME"),".R","Makevars")
+         a <- readLines(src)
+         a <- a[nchar(a)>0]
+         ind <- regexpr("#",a)
+         ind[ind<0] <- 32767
+         a <- substr(a,1,ind-1)
+         a <- a[nchar(a)>0]
+         a <- strsplit(a,"\\s*=\\s*")
+         prm <- lapply(a,function(x) x[2])
+         names(prm) <- lapply(a,function(x) x[1])
+         do.call("Sys.setenv",prm)
+         prm <- lapply(prm,function(x) "")
+         install.packages(pkg,INSTALL_opts=opt2,lib=.libPaths()[1],repos=NULL)
+         do.call("Sys.setenv",prm)
+      }
+      else
+         system2("R",c("--vanilla","CMD","INSTALL",opt2,pkg))
+     # file.remove(pkg)
    }
    setwd(wd)
    NULL

@@ -28,9 +28,14 @@
       return(invisible(NULL))
    }
    inventory <- .ursaCacheInventory()
-   if (!file.exists(inventory))
+   if (!file.exists(inventory)) {
       return(.ursaCacheDirClear(completely=TRUE)) ## RECURSIVE
-   was <- utils::read.table(inventory,sep=",")
+   }
+   was <- try(utils::read.table(inventory,sep=","))
+   if (inherits(was,"try-error")) {
+      message("cache was removed completely due to damaged structure")
+      return(.ursaCacheDirClear(completely=TRUE)) ## RECURSIVE
+   }
    colnames(was) <- c("time","stamp","visits","size","src","dst")
    was <- was[rev(seq(nrow(was))),]
    was0 <- was
@@ -148,7 +153,7 @@
       if (is.null(dst)) {
          dst <- .ursaCacheFile()
          if (unpack=="gzip") {
-            system2("gzip",c("-f -d -c",.dQuote(src)),stdout=dst)
+            system2("gzip",c("-f -d -c",.dQuote(src)),stdout=dst,stderr=FALSE)
             file.copy(paste0(envi_list(src,exact=TRUE),".hdr")
                      ,paste0(dst,".hdr"),copy.date=TRUE)
          }

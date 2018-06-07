@@ -67,7 +67,10 @@
    }
    if (!nchar(fileout))
    {
-      if ((!.isRscript())||(!session_pngviewer())||(.isKnitr()))
+     # print(c(batch=.isRscript()))
+     # print(commandArgs(FALSE))
+     # print(c(tempdir=session_tempdir()))
+      if ((FALSE)&&((!.isRscript())||(!session_pngviewer())||(.isKnitr())))
          fileout <- file.path(tempdir(),.maketmp()) ## CRAN Repository Policy
       else
          fileout <- .maketmp()

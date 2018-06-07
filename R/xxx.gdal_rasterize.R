@@ -80,12 +80,12 @@
    else if ((cond4)&&(nchar(Sys.which("gzip")))) {
       dsn0 <- dsn
       dsn <- tempfile();on.exit(file.remove(dsn))
-      system2("gzip",c("-f -d -c",.dQuote(dsn0)),stdout=dsn)
+      system2("gzip",c("-f -d -c",.dQuote(dsn0)),stdout=dsn,stderr=FALSE)
    }
    else if ((cond5)&&(nchar(Sys.which("bzip2")))) {
       dsn0 <- dsn
       dsn <- tempfile();on.exit(file.remove(dsn))
-      system2("bzip2",c("-f -d -c",.dQuote(dsn0)),stdout=dsn)
+      system2("bzip2",c("-f -d -c",.dQuote(dsn0)),stdout=dsn,stderr=FALSE)
    }
    else
       dsn <- NA
@@ -119,7 +119,7 @@
    else if ((nchar(Sys.which("gzip")))&&(isZip <- .lgrep("\\.gz$",dsn)>0)) {
       dsn0 <- dsn
       dsn <- tempfile();on.exit(file.remove(dsn))
-      system2("gzip",c("-f -d -c",.dQuote(dsn0)),stdout=dsn)
+      system2("gzip",c("-f -d -c",.dQuote(dsn0)),stdout=dsn,stderr=FALSE)
    }
    cmd <- paste("gdalsrsinfo -o proj4",.dQuote(dsn))
    if (verbose)

@@ -1,6 +1,7 @@
 '.metadata' <- function(...) .syn('ursa_info',0,...) ## raster::metadata
 # 'ursa_info' <- function(obj,detail=NA,digits=3,...) {
 'ursa_info' <- function(obj,detail=NA,...) {
+   toClose <- FALSE
    isList <- .is.ursa_stack(obj)
    if (isList) { ## recursive!!!
       rel <- as.list(match.call())
@@ -17,6 +18,14 @@
       }
      # names(res) <- oname
       return(res)
+   }
+   if (is.character(obj)) {
+      list1 <- envi_list(obj)
+      if (length(list1)==1)
+         obj <- open_envi(list1)
+      else
+         obj <- open_gdal(list1)
+      toClose <- TRUE
    }
    if (!is.ursa(obj))
       return(NULL)
@@ -38,5 +47,7 @@
    if (.is.colortable(obj$colortable))
       res$colortable <- obj$colortable
    class(res) <- "ursaMetadata"
+   if (toClose)
+      close(obj)
    str(res,...)
 }

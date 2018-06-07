@@ -871,14 +871,19 @@
       if ((nchar(Sys.which("gdalsrsinfo")))&&
           (!(any(c("rgdal","sf") %in% loadedNamespaces())))) {
          if (lverbose)
-            message("'gdalsrsinfo' engine")
-         wktout <- paste0(.maketmp(),".wkt~")
-        # shell(paste("gdalsrsinfo -o wkt",paste0("\"",proj4,"\""),"1>",wktout))
-        # 20170319 dQuote() returns non-symmetrical quotes in interactive() 
-         system2("gdalsrsinfo",list("-o wkt",.dQuote(proj4))
-                ,stdout=wktout)
-         wkt <- readLines(wktout,warn=FALSE)
-         file.remove(wktout)
+            message("'gdalsrsinfo' engine (write)")
+         if (FALSE) 
+            wkt <- system2("gdalsrsinfo",c("-o wkt",.dQuote(proj4))
+                   ,stdout=TRUE)
+         else {
+            wktout <- paste0(.maketmp(),".wkt~")
+           # shell(paste("gdalsrsinfo -o wkt",paste0("\"",proj4,"\""),"1>",wktout))
+           # 20170319 dQuote() returns non-symmetrical quotes in interactive() 
+            system2("gdalsrsinfo",c("-o wkt",.dQuote(proj4))
+                   ,stdout=wktout,stderr=FALSE)
+            wkt <- readLines(wktout,warn=FALSE)
+            file.remove(wktout)
+         }
       }
       else if (!("sf" %in% loadedNamespaces())) {
          if (lverbose)

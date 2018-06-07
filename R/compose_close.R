@@ -6,7 +6,7 @@
    border <- .getPrm(arglist,name="(border|frame)",default=5L)
    bpp <- .getPrm(arglist,name="bpp",valid=c(8L,24L)
               ,default=switch(getOption("ursaPngDevice"),windows=8L,cairo=24L))
-   execute <- .getPrm(arglist,name="(execute|view|open)",default=TRUE)
+   execute <- .getPrm(arglist,name="(execute|view|open|render)",default=!.isShiny())
    verbose <- .getPrm(arglist,name="verb(ose)*",kwd="close",default=FALSE)
   # wait_new <- .getPrm(arglist,name="wait",default=)
    .compose_close(kind=kind,border=border,bpp=bpp,execute=execute,verbose=verbose)
@@ -67,6 +67,21 @@
         # str(par())
         # plot(ann,add=TRUE)
          grDevices::dev.off()
+         if (proposed <- TRUE) {
+           # print(c(knitr=.isKnitr(),shiny=.isShiny(),jupyter=.isJupyter()))
+            if (.isShiny()) {  ## in 'imageOutput'/'renderImage'
+               return(if (execute) list(src=fileout) else fileout)
+            }
+            if ((execute)&&(.isKnitr())) {
+               execute <- FALSE
+               retK <- knitr::include_graphics(fileout,dpi=getOption("ursaPngDpi"))
+               return(retK)
+            }
+            if (.isJupyter()) {
+               execute <- FALSE
+               return(invisible(IRdisplay::display_png(file=fileout)))
+            }
+         }
          if (execute) {
             if (!toOpen) {
                op <- par(mar=c(0,0,0,0))
@@ -80,7 +95,7 @@
                par(op)
             }
             else {
-               system2("R",list("CMD","open",.dQuote(fileout)),wait=!.isRscript())
+               system2("R",c("CMD","open",.dQuote(fileout)),wait=!.isRscript())
               # system2("open",list(fileout),wait=!.isRscript()) ## wait=syswait
               # stop("How to implement file association in Unix-like systems?")
             }
@@ -155,6 +170,9 @@
       }
    }
    if (proposed <- TRUE) {
+      if (.isShiny()) {  ## in 'imageOutput'/'renderImage'
+         return(if (execute) list(src=fileout) else fileout)
+      }
       if ((execute)&&(.isKnitr())) {
          execute <- FALSE
          retK <- knitr::include_graphics(fileout,dpi=getOption("ursaPngDpi"))
@@ -183,7 +201,7 @@
          par(op)
       }
       else {
-         system2("R",list("CMD","open",.dQuote(fileout)),wait=TRUE)
+         system2("R",c("CMD","open",.dQuote(fileout)),wait=TRUE)
         # system2("R cmd open",list(,fileout),wait=TRUE) #!.isRscript()) ## wait=syswait
         # stop("How to implement file association in Unix-like systems?")
       }

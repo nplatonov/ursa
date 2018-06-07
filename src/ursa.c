@@ -217,8 +217,8 @@ void focalMean(double *x,double *bg,int *dim,double *W,double *cvr,int *Z,int *E
             }
             else
             {
-              // Iout.line[c]=background;  //­¥ ¡ë«® ¤® 11 ­®ï¡àï 2003 £.
-              // Iout.line[c]=Iin.line[c]; //£«îª¨ á«ãç¨«¨áì 16 ¤¥ª ¡àï 2003 £.
+              // Iout.line[c]=background;  //Ð½Ðµ Ð±Ñ‹Ð»Ð¾ Ð´Ð¾ 11 Ð½Ð¾ÑÐ±Ñ€Ñ 2003 Ð³.
+              // Iout.line[c]=Iin.line[c]; //Ð³Ð»ÑŽÐºÐ¸ ÑÐ»ÑƒÑ‡Ð¸Ð»Ð¸ÑÑŒ 16 Ð´ÐµÐºÐ°Ð±Ñ€Ñ 2003 Ð³.
                if (nout>0.0)
                   res[adr2]=background;
                else
@@ -379,8 +379,8 @@ void focalMeanWithNA(double *x,int *dim,double *W,double *cvr,int *Z,int *verbos
             }
             else
             {
-              // Iout.line[c]=background;  //­¥ ¡ë«® ¤® 11 ­®ï¡àï 2003 £.
-              // Iout.line[c]=Iin.line[c]; //£«îª¨ á«ãç¨«¨áì 16 ¤¥ª ¡àï 2003 £.
+              // Iout.line[c]=background;  //Ð½Ðµ Ð±Ñ‹Ð»Ð¾ Ð´Ð¾ 11 Ð½Ð¾ÑÐ±Ñ€Ñ 2003 Ð³.
+              // Iout.line[c]=Iin.line[c]; //Ð³Ð»ÑŽÐºÐ¸ ÑÐ»ÑƒÑ‡Ð¸Ð»Ð¸ÑÑŒ 16 Ð´ÐµÐºÐ°Ð±Ñ€Ñ 2003 Ð³.
                if (nout>0.0)
                   res[adr2]=NA_REAL;
                else
@@ -627,6 +627,8 @@ void optimalDatatypeDouble(double *x,int *n,int *res)
    int i,len=*n;
    memset(val,0,sizeof(short)*32);
    double eps,eps2;
+   double pos=(double)2147483647;
+   double neg=(double)(-2147483647);
    for (i=0;i<len;i++)
    {
       if (ISNA(x[i]))
@@ -650,9 +652,9 @@ void optimalDatatypeDouble(double *x,int *n,int *res)
          val[12]=12;
      // else if ((!val[3])&&(!((val[1])||(val[2])||(val[12]))))
      //    val[3]=3;
-      else if ((x[i]>=-2147483648)&&(x[i]<=2147483647))
+      else if ((x[i]>=neg)&&(x[i]<=pos))
          val[3]=3;
-      else if ((x[i]<2147483648)||(x[i]>2147483647)) {
+      else if ((x[i]<neg)||(x[i]>pos)) {
          val[4]=4;
          break;
       }
@@ -3249,7 +3251,7 @@ void resampl4(double *obj1,double *bg,int *dim1,int *dim2,double *lim1
                      Rprintf(" %.0f",obj1[adr1]);
                   if (w>0.0)
                      n++;
-                  if ((!resample)&&(abs(w-1.0)>1e-6)&&(abs(w-0.5)>1e-6)&&(abs(w-0.25)>1e-6))
+                  if ((!resample)&&(fabs(w-1.0)>1e-6)&&(fabs(w-0.5)>1e-6)&&(fabs(w-0.25)>1e-6))
                      Rprintf("only resize but w=%f\n",w);
                   if ((!resample)&&(n))
                      break;
@@ -3295,7 +3297,7 @@ void internalMargin(double *x,int *dim,int *indr,int *indc)
    int c,r,s,t;
    double S;
    int l=lines*samples;
-   double *res=(double *)malloc(samples*lines*sizeof(double));
+   double *res=(double *)malloc(l*sizeof(double));
   // Rprintf("dim=c(%d,%d,%d)\n",samples,lines,bands);
    for (s=0;s<l;s++)
    {
@@ -3433,7 +3435,8 @@ void groupSummary(double *x,int *dim,double *_cover,double *weight,int *_fun
    if ((fun==1001)||(fun==1002)) // how to process NA in 'all', 'any'?
       cover=0.0;
   // Rprintf("dim=c(%d,%d) cover=%f fun=%d\n",spatial,temporal,cover,fun);
-   double *content=(double *)malloc(temporal*sizeof(double));
+   double *content;
+   content=(double *)malloc(temporal*sizeof(double));
    for (c=0;c<spatial;c++)
    {
       Mx=Sx=w=Vx=0.0;

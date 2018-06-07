@@ -6,6 +6,7 @@
   # vec <- list(x=vec$x,y=vec$y,conc=vec$conc,speed=vec$speed)
    fun <- match.arg(fun)
    kind <- switch(fun,mean=1L,sum=2L,n=4L,0L)
+   onlyGrid <- FALSE
    if (is.character(vec)) {
      # vec <- .shp.read(vec)
       vec <- spatialize(vec,engine="sp")
@@ -61,8 +62,10 @@
          stop("unable to detect 'x' and 'y' coordinates")
       lname <- .grep(attr,mname[-ind],value=TRUE)
       if (!length(lname)) {
-         lname <- "<location>"
-         z <- data.frame(z=rep(1,nrow(vec)))
+        # lname <- "<location>"
+        # z <- data.frame(z=rep(1,nrow(vec)))
+         z <- data.frame(z=numeric())
+         onlyGrid <- TRUE
       }
       else {
         # z <- vec[,-ind,drop=FALSE] ## remove 20160505
@@ -178,6 +181,8 @@
      # g0 <- regrid(setbound=)
       session_grid(g0)
    }
+   if (onlyGrid)
+      return(session_grid())
    res <- ursa_new(bandname=lname,ignorevalue=nodata)
    z <- as.matrix(z)
    z[is.na(z)] <- nodata
