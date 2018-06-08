@@ -1,4 +1,4 @@
-2018-06-07
+2018-06-08
 
 <!--
 <style>
@@ -16,10 +16,12 @@
 
 ### version 3.8.9
 
-  - Fixed ignoring of `stdout` in `system2` for `interactive()` (tested
-    on Gui for Windows)
+  - Fixed opening ENVI .hdr Labelled Rasters for Read-only file systems
 
-  - Added possibily to use visualization in shiny
+  - Fixed ignoring of `stdout` in `system2` for `interactive()`
+    (appeared on Gui for Windows)
+
+  - Added recipe to use visualization in **shiny**
     (`imageOutput`/`renderImage`)
 
 ### version 3.8.8
