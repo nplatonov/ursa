@@ -114,7 +114,7 @@
                crsNow <- ursa_proj(dsn)
             isCRS <- ((!is.na(crsNow))&&(nchar(crsNow)))
             if (!((is.character(coords))&&(length(coords)==2))) {
-               coords <- .maketmp(2)
+               coords <- basename(.maketmp(2))
                colnames(obj)[1:2] <- coords
             }
             if (isSF) {

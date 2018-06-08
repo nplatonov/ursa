@@ -89,16 +89,19 @@
    invisible(opA)
 }
 'session_tempdir' <- function(dst=character()) {
-   opD <- getOption("ursaTempDir")
    if ((is.character(dst))&&(length(dst))) {
-      if ((file.exists(dst))&&(file.info(dst)$isdir)) {
-         options(ursaTempDir=dst)
-         return(invisible(dst))
+      if (!dir.exists(dst)) {
+         opW <- options(warn=2)
+         dir.create(dst)
+         options(opW)
       }
+      options(ursaTempDir=dst)
+      return(invisible(dst))
    }
+   opD <- getOption("ursaTempDir")
    if (length(opD))
       return(opD)
-   dst <- ifelse(.isRscript(),getwd(),tempdir())
+   dst <- ifelse(.isRscript(),getwd(),tempdir()) ## "." <-> 'getwd()'
    options(ursaTempDir=dst)
    return(dst)
 }

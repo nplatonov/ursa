@@ -17,7 +17,7 @@ compose_graticule(...)
 # non-public
 .compose_graticule(panel = 0L, col = "grey70", border = "grey70", lon = NA, lat = NA,
                 lwd = 0.5, lty = 2, marginalia = rep(FALSE, 4), trim = FALSE,
-                language = NA, cex = 0.75, verbose = FALSE)
+                language = NA_character_, cex = 0.75, verbose = FALSE)
 
 # non-public
 .panel_graticule(obj, marginalia = rep(TRUE, 4), verbose = FALSE)

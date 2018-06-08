@@ -95,7 +95,7 @@
    invisible(NULL)
 }
 # '.paste' <- function(...,sep="",collapse=NULL) paste(...,sep=sep,collapse=collapse)
-'.maketmp' <- function(n=1,ext="",prefix="") 
+'.maketmp' <- function(n=1,ext="",prefix="")
 {
    if (!nchar(prefix)) {
       prefix <- basename(tempfile("","."))
@@ -118,7 +118,7 @@
    }
    options(ursaTempFileCount=tcount+n)
    res <- paste0("___",list1)
-   if ((!TRUE)||(!.isRscript()))
+   if ((TRUE)||(!.isRscript()))
       res <- file.path(getOption("ursaTempDir"),res)
    res
 }

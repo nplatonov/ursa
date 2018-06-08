@@ -34,7 +34,7 @@
    else
       pb <- utils::txtProgressBar(title=title,label=label,min=min,max=max
                           ,initial=initial,width=width,style=style)
-   pb$optionName <- paste0("ursaProgressBar",.maketmp())
+   pb$optionName <- paste0("ursaProgressBar",basename(.maketmp()))
    op <- list(st)
    names(op) <- pb$optionName
    options(op)

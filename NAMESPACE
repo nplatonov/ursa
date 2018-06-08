@@ -1,7 +1,7 @@
 useDynLib(ursa)
 
 importFrom("grDevices", "col2rgb", "colorRampPalette", "rgb", "png",
-           "graphics.off", "as.raster")
+           "graphics.off", "as.raster","windowsFont","windowsFonts")
 importFrom("graphics", "abline", "axTicks", "axis", "contour",
            "filled.contour", "hist", "image", "mtext", "plot",
            "polygon", "rect", "strheight", "strwidth", "text", 

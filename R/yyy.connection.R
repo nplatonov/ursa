@@ -876,7 +876,7 @@
             wkt <- system2("gdalsrsinfo",c("-o wkt",.dQuote(proj4))
                    ,stdout=TRUE)
          else {
-            wktout <- paste0(.maketmp(),".wkt~")
+            wktout <- .maketmp(ext=".wkt~")
            # shell(paste("gdalsrsinfo -o wkt",paste0("\"",proj4,"\""),"1>",wktout))
            # 20170319 dQuote() returns non-symmetrical quotes in interactive() 
             system2("gdalsrsinfo",c("-o wkt",.dQuote(proj4))

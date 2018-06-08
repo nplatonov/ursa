@@ -48,17 +48,23 @@
    }
   # else
   #    panel <- 0L
+   a <- list(col=col,lon=lon,lat=lat,lwd=lwd,lty=lty,panel=panel
+            ,marginalia=marginalia,trim=trim,cex=cex)
    if (verbose)
       str(list(col=col,lon=lon,lat=lat,col=col,lwd=lwd,lty=lty,panel=panel
               ,marginalia=marginalia,trim=trim,cex=cex))
-   .compose_graticule(panel=panel,col=col,border=border,lon=lon,lat=lat,lwd=lwd,lty=lty
-                    ,marginalia=marginalia,trim=trim,language=language,cex=cex
-                    ,verbose=verbose)
+   opStrangeWarn <- options(warn=-1) ## strings not representable in native encoding will be translated to UTF-8
+   ret <- .compose_graticule(panel=panel,col=col,border=border
+                            ,lon=lon,lat=lat,lwd=lwd,lty=lty
+                            ,marginalia=marginalia,trim=trim
+                            ,language=language,cex=cex,verbose=verbose)
+   options(opStrangeWarn)
+   ret
 }
 '.compose_graticule' <- function(panel=0L,col="grey70",border="grey70",lon=NA,lat=NA
                               ,lwd=0.5,lty=2,marginalia=rep(FALSE,4),trim=FALSE
-                              ,language=NA,cex=0.75,verbose=FALSE) {
-  # verbose <- TRUE
+                              ,language=NA_character_,cex=0.75,verbose=FALSE) {
+# verbose <- TRUE
    if (is.na(language)) {
       if (TRUE) {
          ctype <- Sys.getlocale("LC_TIME")

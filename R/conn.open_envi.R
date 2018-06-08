@@ -395,7 +395,10 @@
       {
          con$connection <- "file"
         # con$fname <- paste0(fname,".unpacked~")
-         con$fname <- paste0(fname,".unpacked",.maketmp(),"~")
+         fbase <- .maketmp()
+         con$fname <- file.path(dirname(fbase)
+                               ,paste0(basename(fname)
+                                      ,".unpacked",basename(fbase),"~"))
          if (FALSE) {
             system(paste("gzip -f -d -k",fname.gz))
             file.rename(fname,con$fname)
@@ -421,12 +424,11 @@
          else if (decompress) {
             if (verbose)
                message("local unpack")
-            fbase <- .maketmp()
-           # print(fbase)
            # con$fname <- paste0(fname,".unpacked",.maketmp(),"~")
-           # print(con$fname)
+            fbase <- .maketmp()
             con$fname <- file.path(dirname(fbase)
-                                  ,paste0(fname,".unpacked",basename(fbase),"~"))
+                                  ,paste0(basename(fname)
+                                         ,".unpacked",basename(fbase),"~"))
            # print(con$fname)
            # q()
             system2("gzip",c("-f -d -c",.dQuote(fname.envigz)),stdout=con$fname,stderr=FALSE)
@@ -459,7 +461,11 @@
       {
          con$connection <- "file"
         # con$fname <- paste0(fname,".unpacked~")
-         con$fname <- paste0(fname,".unpacked",.maketmp(),"~")
+        # con$fname <- paste0(fname,".unpacked",basename(.maketmp()),"~")
+         fbase <- .maketmp()
+         con$fname <- file.path(dirname(fbase)
+                               ,paste0(basename(fname)
+                                      ,".unpacked",basename(fbase),"~"))
          if (FALSE) {
             system(paste("gzip -f -d -k -Sgz",fname.bingz))
             file.rename(fname.bin,con$fname)
@@ -481,7 +487,11 @@
       {
          con$connection <- "file"
         # con$fname <- paste0(fname,".unpacked~")
-         con$fname <- paste0(fname,".unpacked",.maketmp(),"~")
+        # con$fname <- paste0(fname,".unpacked",basename(.maketmp()),"~")
+         fbase <- .maketmp()
+         con$fname <- file.path(dirname(fbase)
+                               ,paste0(basename(fname)
+                                      ,".unpacked",basename(fbase),"~"))
          if (FALSE) ## should be obsolete
             shell(paste("bzip2 -d -c",fname.bz,"1>",con$fname))
          else {
@@ -503,7 +513,11 @@
       {
          con$connection <- "file"
         # con$fname <- paste0(fname,".unpacked~")
-         con$fname <- paste0(fname,".unpacked",.maketmp(),"~")
+        # con$fname <- paste0(fname,".unpacked",basename(.maketmp()),"~")
+         fbase <- .maketmp()
+         con$fname <- file.path(dirname(fbase)
+                               ,paste0(basename(fname)
+                                      ,".unpacked",basename(fbase),"~"))
          if (FALSE) ## should be obsolete
             shell(paste("xz -d -c",fname.xz,"1>",con$fname))
          else {

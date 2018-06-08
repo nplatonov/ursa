@@ -50,21 +50,26 @@ Nikita Platonov \email{platonov@sevin.ru}
 }
 \examples{
 session_grid(NULL)
-list1a <- envi_list(tempdir())
+dir.create(tmpWD <- file.path(tempdir(),"certain"))
+wd <- setwd(tmpWD)
+print(c('temp dir'=session_tempdir(),'working dir'=getwd()))
+list1a <- envi_list(session_tempdir())
 list1b <- envi_list()
-fname <- tempfile()
+fname <- tempfile(tmpdir=".")
 a <- ursa_dummy()
 bandname(a) <- c("first","second","third")
 write_envi(a)
 write_envi(a,fname)
-list2a <- envi_list(tempdir())
+list2a <- envi_list(session_tempdir())
 list2b <- envi_list()
 fname1 <- list2a[!(list2a \%in\% list1a)]
 fname2 <- list2b[!(list2b \%in\% list1b)]
+print(c('in temp dir'=fname1,'in working dir'=fname2))
 a2 <- open_envi(fname1)
 print(a2)
 close(a2)
 envi_remove(c(fname1,fname2))
+setwd(wd)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

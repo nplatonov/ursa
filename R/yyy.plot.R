@@ -8,7 +8,7 @@
          string <- "\\.(unpacked(.*)~|bin|bingz|envi|enviz)$"
          if (.lgrep(string,f))
             f <- .gsub(string,"",f)
-         fileout <- paste0(basename(f),.maketmp(),".png")
+         fileout <- paste0(basename(f),basename(.maketmp()),".png")
          rm(f)
       }
       else
