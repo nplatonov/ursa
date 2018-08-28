@@ -12,7 +12,7 @@
    frame <- .getPrm(arglist,name="((frame|strip)(height)*|colorbar$)",default=NA_real_)
    box <- .getPrm(arglist,name="box",default=TRUE)
    delafter <- .getPrm(arglist,name="(del|remove)after",default=NA)
-   wait <- .getPrm(arglist,name="wait",default=1)
+   wait <- .getPrm(arglist,name="wait",default=switch(.Platform$OS.type,windows=1,3))
    dtype <- if (.Platform$OS.type=="windows") c("cairo","windows")
             else c("cairo","cairo-png","Xlib","quartz")
    device <- .getPrm(arglist,name="^(device|type)",valid=c("cairo","windows"))
@@ -28,6 +28,7 @@
       if ((is.character(cr))&&(nchar(cr)>1)) {
          mosaic <- compose_design(layout=c(1,1),legend=NULL)
          options(ursaPngWebCartography=TRUE)
+         print("WEB")
          scale <- 1
       }
    }
@@ -196,7 +197,7 @@
    a <- try(png(filename=fileout,width=png_width,height=png_height,res=dpi
            ,bg=background,pointsize=pointsize
            ,type=device,antialias=antialias,family=font))
-   if (inherits(a,"try-error")) { ## 20180117 patch for conda without cairo
+   if ((inherits(a,"try-error"))&&(.Platform$OS.type=="windows")) { ## 20180117 patch for conda without cairo
       device <- "windows"
       png(filename=fileout,width=png_width,height=png_height,res=dpi
          ,bg=background,pointsize=pointsize

@@ -8,11 +8,13 @@
               ,default=switch(getOption("ursaPngDevice"),windows=8L,cairo=24L))
    execute <- .getPrm(arglist,name="(execute|view|open|render)",default=!.isShiny())
    verbose <- .getPrm(arglist,name="verb(ose)*",kwd="close",default=FALSE)
-  # wait_new <- .getPrm(arglist,name="wait",default=)
-   .compose_close(kind=kind,border=border,bpp=bpp,execute=execute,verbose=verbose)
+  # wait <- .getPrm(arglist,name="wait",default=NA_real_)
+   .compose_close(kind=kind,border=border,bpp=bpp,execute=execute#,wait=wait
+                 ,verbose=verbose)
 }
 '.compose_close' <- function(kind=c("crop2","crop","nocrop")
-                            ,border=5,bpp=0,execute=TRUE,verbose=FALSE){
+                            ,border=5,bpp=0,execute=TRUE#,wait=NA
+                            ,verbose=FALSE){
    if (verbose)
       str(list(kind=kind,border=border,bpp=bpp,execute=execute,verbose=verbose))
    toOpen <- session_pngviewer()
@@ -53,9 +55,10 @@
    }
    if (!toOpen) {
       if (delafter)
-         delafter <- dirname(fileout)==tempdir()
+         delafter <- .normalizePath(dirname(fileout))!=.normalizePath(tempdir())
       message(paste("Use",.sQuote("session_pngviewer(TRUE)")
-             ,"\nto open",.sQuote(fileout),"in external software."))
+             ,"\nto open",.sQuote(.normalizePath(fileout))
+             ,"in external software."))
    }
    if (getOption("ursaPngFigure")==0L) ## plot layout only
    {
@@ -95,7 +98,12 @@
                par(op)
             }
             else {
-               system2("R",c("CMD","open",.dQuote(fileout)),wait=!.isRscript())
+               if (TRUE)
+                  browseURL(normalizePath(fileout))
+               else if (.Platform$OS.type=="unix")
+                  system2("xdg-open",c(.dQuote(fileout)),wait=!.isRscript())
+               else
+                  system2("R",c("CMD","open",.dQuote(fileout)),wait=!.isRscript())
               # system2("open",list(fileout),wait=!.isRscript()) ## wait=syswait
               # stop("How to implement file association in Unix-like systems?")
             }
@@ -201,7 +209,12 @@
          par(op)
       }
       else {
-         system2("R",c("CMD","open",.dQuote(fileout)),wait=TRUE)
+         if (TRUE)
+            browseURL(normalizePath(fileout))
+         else if (.Platform$OS.type=="unix")
+            system2("xdg-open",c(.dQuote(fileout)),wait=!.isRscript())
+         else
+            system2("R",c("CMD","open",.dQuote(fileout)),wait=TRUE)
         # system2("R cmd open",list(,fileout),wait=TRUE) #!.isRscript()) ## wait=syswait
         # stop("How to implement file association in Unix-like systems?")
       }

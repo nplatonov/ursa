@@ -195,12 +195,17 @@
 }
 '.panel_attribution' <- function(pos=ifelse(vertical,"bottomright","bottomright")
                                 ,vertical=TRUE) {
-   if (isWindows <- getOption("ursaPngDevice")=="windows")
-      windowsFonts('Arial Narrow'=windowsFont("TT Arial Narrow"))
+   isWindows <- (.Platform$OS.type=="ZZZwindows")&&(getOption("ursaPngDevice")=="ZZZwindows")
+   if (isWindows) {
+      wf <- do.call("grDevices::windowsFont",list("TT Arial Narrow"))
+      do.call("grDevices::windowsFonts",list('Arial Narrow'=wf))
+   }
    ann <- paste0("",paste(unique(getOption("ursaPngCopyright")),collapse=" | "))
   # ann <- paste(c(getOption("ursaPngCopyright")),collapse="\n")
    if (nchar(ann))
-      panel_annotation(ann,pos=pos,cex=0.7,font="Arial Narrow"
+      panel_annotation(ann,pos=pos,cex=0.7
+                      ,font=ifelse(getOption("ursaPngDevice")=="windows"
+                                  ,par("family"),"Arial Narrow")
                       ,fg=sprintf("#000000%s","4F"),vertical=vertical)
    options(ursaPngCopyright=NULL)
 }

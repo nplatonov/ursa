@@ -63,6 +63,8 @@
    }
    if (!((is.character(dsn))&&(length(dsn)==1))) {
       nextCheck <- TRUE
+      if ((resetProj)&&(((.isSF(dsn))||(.isSP(dsn)))))
+         session_grid(NULL)
       if (FALSE) { ## 20180125--
          spcl <- paste0("Spatial",c("Points","Lines","Polygons"))
          spcl <- c(spcl,paste0(spcl,"DataFrame"))
@@ -330,7 +332,8 @@
          }
          else if (.lgrep("\\.(gpkg|tab|kml|json|geojson|mif|sqlite|shp|osm)(\\.(zip|gz|bz2))*$"
                  ,basename(dsn))) {
-            message("#40. It seems that specified non-existent file name rather than geocode request.")
+            message(paste("#40. It seems that specified non-existent file name"
+                         ,sQuote(dsn),"rather than geocode request."))
             return(NULL)
          }
          else {
@@ -546,30 +549,54 @@
             da <- methods::slot(obj,"data")[,dname[i],drop=TRUE]
          }
          if (is.character(da)) {
+           # str(dname[i])
             isDateTime <- FALSE
-            if ((dev <- TRUE)&&(.lgrep("\\d{4}.*\\d{2}.*\\d{2}",da))) {
-               a <- as.POSIXct(as.POSIXlt(da,format="%Y-%m-%dT%H:%M:%SZ",tz="UTC"))
-               if (all(is.na(a))) {
-                  a <- as.POSIXct(da,tz="",format="%Y-%m-%d %H:%M")
+            skipParse <- TRUE
+           # if (dname[i]=="time")
+           #    str(da)
+            if ((dev <- TRUE)&&(length(unique(nchar(na.omit(da))))==1)&&
+                  (.lgrep("\\d{4}.*\\d{2}.*\\d{2}",da))) {
+               nNA <- length(which(is.na(da)))
+               s <- sapply(gregexpr("(-|\\.|/)",da),length)
+               if (all(s>=2)) {
+                  s <- sapply(gregexpr("(-|\\.|/)",da),function(x) diff(x)[1])
+                  if (all(s==3))
+                     da <- .gsub(".*(\\d{4})(.?)(\\d{2})(.?)(\\d{2})(.*)"
+                                ,"\\1-\\3-\\5\\6",da)
                }
-               if (all(is.na(a))) {
-                  a <- as.POSIXct(da,tz="",format="%Y-%m-%dT%H:%M")
+               else if (length(grep("(\\d{8})($|\\D.*$)",da))==length(da)) {
+                     da <- .gsub(".*(\\d{4})(.?)(\\d{2})(.?)(\\d{2})(.*)"
+                                ,"\\1-\\3-\\5\\6",da)
                }
-               if (all(is.na(a))) {
-                  a <- as.Date(da,format="%Y-%m-%d")
-               }
-               if (all(is.na(a))) {
-                  a <- as.Date(da,format="%Y/%m/%d")
-               }
-               if (!all(is.na(a))) {
-                  da <- a
-                  rm(a)
-                  if (nchar(tz <- Sys.getenv("TZ"))) {
-                     da <- as.POSIXct(as.POSIXlt(da,tz=tz))
+               else
+                  skipParse <- TRUE
+               if (!skipParse) {
+                 # da <- .gsub(".*(\\d{4})(.?)(\\d{2})(.?)(\\d{2})(.*)","\\1-\\3-\\5\\6",da)
+                  a <- as.POSIXct(as.POSIXlt(da,format="%Y-%m-%dT%H:%M:%SZ",tz="UTC"))
+                  if (all(is.na(a))) {
+                     a <- as.POSIXct(da,tz="",format="%Y-%m-%d %H:%M:%S")
                   }
-                  isDateTime <- TRUE
+                  if (all(is.na(a))) {
+                     a <- as.POSIXct(da,tz="",format="%Y-%m-%d %H:%M")
+                  }
+                  if (all(is.na(a))) {
+                     a <- as.POSIXct(da,tz="",format="%Y-%m-%dT%H:%M")
+                  }
+                  if (all(is.na(a))) {
+                     a <- as.Date(da,format="%Y-%m-%d")
+                  }
+                  if (length(which(is.na(a)))==length(which(is.na(da)))) {
+                     da <- a
+                     rm(a)
+                     if (nchar(tz <- Sys.getenv("TZ"))) {
+                        da <- as.POSIXct(as.POSIXlt(da,tz=tz))
+                     }
+                     isDateTime <- TRUE
+                  }
                }
             }
+           # if (dname[i]=="time")
+           #    str(da)
             if (!isDateTime) {
               # da <- iconv(da,to="UTF-8")
               # Encoding(da) <- "UTF-8"
@@ -592,7 +619,7 @@
             }
          }
          else if (TRUE) {
-            isInt <- .is.integer(na.omit(da))
+            isInt <- !is.factor(da) && .is.integer(na.omit(da))
            # isInt <- .is.integer(da)
             if (isInt) { # &&(!is.integer(da))
                da <- as.integer(round(da))
@@ -696,7 +723,7 @@
    }
   # canTile <- .lgrep(art,eval(as.list(args(".tileService"))$server))>0
    canTile <- .lgrep(art,.tileService())>0
-   isTile <- .lgrep("tile",style)>0 & canTile
+   isTile <- .lgrep("(tile|polarmap)",style)>0 & canTile
    if ((!isStatic)&&(!isTile)) {
       if (art %in% staticMap)
          isStatic <- TRUE
@@ -707,7 +734,9 @@
    }
    tpat <- unlist(gregexpr("\\{[xyz]\\}",style))
    tpat <- length(tpat[tpat>0])
-   toZoom <- (isTile)||(isStatic)||(style=="web")||(tpat==3)
+   toZoom <- (isTile)||(isStatic)||(style=="web")||.lgrep("^tile",style)||
+             (style=="polarmap")||
+             (tpat==3)
   # isColor <- .lgrep("colo(u)*r",style)>0
    isWeb <- .lgrep(tilePatt,art)
    if (verbose)
@@ -792,8 +821,15 @@
                rm(asp2,asp2_geom)
             }
          }
-         if (is.list(xy))
-            xy <- matrix(c(unlist(xy)),ncol=2,byrow=TRUE)
+         if (is.list(xy)) {
+            xy <- unlist(xy)
+            if (is.null(xy)) {
+               if (verbose)
+                  cat("Spatial object is NULL")
+               return(NULL)
+            }
+            xy <- matrix(c(xy),ncol=2,byrow=TRUE)
+         }
          if (verbose)
             print(summary(xy))
          lon2 <- xy[,1]
@@ -876,6 +912,10 @@
             if (("web" %in% style)||(tpat==3))
            # if (style=="web")
                proj <- "merc"
+            else if (.lgrep("tile3857",style))
+               proj <- "merc"
+            else if (.lgrep("(polarmap|tile357[123456])",style))
+               proj <- "laea"
             else if ((any(lat2<0))&&(any(lat2>0)))
                proj <- "merc"
             else if (isEPSG)

@@ -1,6 +1,8 @@
 ## http://leaflet-extras.github.io/leaflet-providers/preview/index.html
 'glance' <- function(...) {
    arglist <- list(...)
+   execute <- .getPrm(arglist,name="(execute|view|open|render)",default=!.isShiny())
+   plotKnitr <- .isKnitr() & execute
    if (!length(arglist)) {
       viewer <- session_pngviewer(TRUE)
       on.exit(session_pngviewer(viewer))
@@ -47,7 +49,7 @@
    }
    if (!is.character(arglist[[1]])) {
       a <- do.call(".glance",arglist)
-      if (.isKnitr())
+      if (plotKnitr)
          return(a)
       return(invisible(a))
    }
@@ -69,7 +71,7 @@
       else if (.lgrep("\\.(gpkg|tab|kml|json|geojson|mif|sqlite|shp|osm)(\\.(zip|gz|bz2))*$"
                      ,arglist[[1]])) {
          ret <- do.call(".glance",arglist)
-         if (.isKnitr())
+         if (plotKnitr)
             return(ret)
          return(invisible(ret))
       }
@@ -137,7 +139,7 @@
          else {
            # message("Cannot complete without suggested package 'sf'.")
             ret <- do.call(".glance",arglist)
-            if (.isKnitr())
+            if (plotKnitr)
                return(ret)
             return(invisible(ret))
          }
@@ -181,6 +183,7 @@
   # obj <- spatialize(dsn)
    if (missing(dsn)) {
       dsn <- if (style!="auto") .geomap(style=style) else .geomap()
+      return(display(dsn,...)) ## ++20180617
    }
    toUnloadMethods <- !("methods" %in% .loaded())
    S4 <- isS4(dsn)
@@ -194,7 +197,6 @@
                    ,expand=expand,border=0
                    ,lat0=lat0,lon0=lon0,resetProj=resetProj,style=style#,zoom=NA
                    ,verbose=verbose)
-   
    if (inherits(obj,"NULL"))
       return(invisible(NULL))
    isSF <- inherits(obj,c("sfc","sf"))
@@ -648,8 +650,17 @@
      # but namespace "methods" is not unloaded, because namespace "sp" is loaded
      # 'as' is not found now
    }
-   if (.isKnitr())
-      return(ret)
+   if (.isKnitr()) {
+      return(invisible(ret))
+      if (proposed <- FALSE) {
+         render <- .getPrm(arglist,name="(open|render|execute|view)",default=TRUE)
+         print(c(render=render))
+         if (render)
+            return(ret)
+         else
+            return(invisible(ret))
+      }
+   }
    invisible(ret)
 }
 '.cmd.glance' <- function() {

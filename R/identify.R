@@ -51,6 +51,7 @@
       res["r",] <- (ind-1L)%/%n+1L
       res["c",] <- (ind-1L)%%n+1L
    }
+   str(res)
    res
 }
 'coord_cr' <- function(obj,...)

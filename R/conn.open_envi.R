@@ -576,9 +576,12 @@
    if (!is.null(metadata))
    {
       a <- .grep("NoDataValue",metadata,value=TRUE)
-      if (length(a))
+      if (length(a)) {
          con$nodata <- as.numeric(.gsub2("<NoDataValue.*>(.+)</NoDataValue>"
                                           ,"\\1",a[1]))
+         if (is.infinite(con$nodata)) ## "-1.79769313486232Ee308"
+            con$nodata <- sign(con$nodata)*1.7976931348623e+308
+      }
    }
    if (is.null(grid$proj4))
       grid$proj4 <- ""

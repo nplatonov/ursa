@@ -36,7 +36,7 @@
                ,paste("\uA9 Openstreetmap France",osmCr))
    s$transport <- c("http://{abc}.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png"
                    ,osmCr)
-  # copyright["transport"] <- paste0("Maps \xA9 Thunderforest, Data ",osmCr)
+  # copyright["transport"] <- paste0("Maps \uA9 Thunderforest, Data ",osmCr)
    s$mapsurfer <- c("http://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}"
                    ,paste0(osmCr,", GIScience Research Group @ Heidelberg University")
                    ,"png")
@@ -93,6 +93,8 @@
                         ,"jpg")
    s$opentopomap <- c("http://{abc}.tile.opentopomap.org/{z}/{x}/{y}.png"
                      ,paste0(osmCr,", \uA9 OpenTopoMap"))
+   s$polarmap <- c("http://{abc}.tiles.arcticconnect.org/osm_{l}/{z}/{x}/{y}.png"
+                  ,paste0("Map \uA9 ArcticConnect. Data ",osmCr))
   # http://a.maps.owm.io/map/precipitation_new/6/37/19?appid=b1b15e88fa797225412429c1c50c122a1   
    if (!sum(nchar(server)))
      return(names(s))
@@ -171,7 +173,8 @@
    tile
 }
 '.tileGet' <- function(z=4,x=10,y=3,minx=-2e7,miny=-2e7,maxx=2e7,maxy=2e7
-                      ,w=256,h=256,url,fileext,ursa=FALSE,verbose=FALSE) {
+                      ,w=256,h=256,url,fileext,ursa=FALSE,cache=TRUE
+                      ,verbose=FALSE) {
    tile <- .gsub("{z}",z,.gsub("{y}",y,.gsub("{x}",x,url)))
    tile <- .gsub("{h}",h,.gsub("{w}",w,tile))
    tile <- .gsub("{maxy}",maxy,.gsub("{maxx}",maxx
@@ -196,9 +199,9 @@
    }
   # fname <- tempfile(fileext=".tile")
   # print(tile)
-   a <- try(fname <- .ursaCacheDownload(tile,mode="wb",quiet=!verbose))
-   if (inherits(a,"try-error")) {
-      return(a)
+   fname <- .ursaCacheDownload(tile,mode="wb",cache=cache,quiet=!verbose)
+   if (inherits(fname,"try-error")) {
+      return(fname)
      # message(a)
      # stop()
    }
@@ -221,6 +224,17 @@
          isPNG <- !inherits(a,"try-error")
    }
    if (inherits(a,"try-error")) {
+      if (FALSE) {
+         isPNG <- FALSE
+         isJPEG <- FALSE
+         a <- try(255*png::readPNG(fname),silent=!verbose)
+         if (inherits(a,"try-error"))
+            a <- try(255*jpeg::readJPEG(fname),silent=!verbose)
+         if ((inherits(a,"try-error"))&&
+             (requireNamespace("caTools",quietly=.isPackageInUse()))) {
+            stop("caTools")
+         }
+      }
       cat(geterrmessage())
       return(a)
    }
@@ -259,7 +273,7 @@
                ,columns=dima[2],rows=dima[1],proj4=epsg3857)
    b <- as.integer(255/255*as.ursa(a,aperm=TRUE,flip=TRUE))
    ursa(b,"grid") <- g1
-   attr(b,"copyright") <- "Only for personal use"
+   attr(b,"copyright") <- "For personal use only"
   # session_grid(b)
   # display(b,scale=1,coast=FALSE)
    b

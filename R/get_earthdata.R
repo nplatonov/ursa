@@ -18,9 +18,10 @@
    if ((length(bbox)==1)&&(is.na(bbox))) {
       g0 <- session_grid()
       if (.lgrep("\\+proj=merc",g0$proj4)) {
-        # stop("A")
          ll <- with(g0,.project(cbind(c(minx,maxx),c(miny,maxy)),proj4,inv=TRUE))
-         bbox <- c(min(ll[,1]),min(ll[,2]),max(ll[,1]),max(ll[,2]))
+        # bbox <- c(min(ll[,1]),min(ll[,2]),max(ll[,1]),max(ll[,2]))
+         bbox <- c(ll[1,1],ll[1,2],ll[2,1],ll[2,2])
+        # stop("A")
       }
       else if (.gsub("(^\\s|\\s$)","\\1",g0$proj4)==.gsub("(^\\s|\\s$)","\\1",epsg3413)) {
         # stop("B")
@@ -164,6 +165,9 @@
             .is.near(g1$miny,g4$miny) & .is.near(g1$maxy,g4$maxy) &
             .is.near(g1$resx,g4$resx) & .is.near(g1$resy,g4$resy) &
             TRUE
+  # print(c(cond1=cond1,cond2=cond2))
+  # print(g1)
+  # print(g4)
    if (cond1 & cond2)
       ursa(b,"grid") <- g4
    session_grid(b)

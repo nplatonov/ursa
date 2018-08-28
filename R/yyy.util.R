@@ -244,13 +244,24 @@
    }
    d1 <- dim(src)
    d2 <- dim(dst)
+   if ((is.null(colnames(src)))&&(d1[2]>=2)) {
+      colnames(src) <- .maketmp(d1[2])
+      colnames(src)[1:2] <- c("x","y")
+   }
+   if ((is.null(colnames(dst)))&&(d2[2]>=2)) {
+      colnames(dst) <- .maketmp(d2[2])
+      colnames(dst)[1:2] <- c("x","y")
+   }
    if ((length(d1)<2)||(d1[2]<2)||(length(d2)<2)||(d2[2]<2))
       return(NULL)
+   if ((anyNA(dst[,"x"]))||(anyNA(dst[,"y"]))||
+       (anyNA(src[,"x"]))||(anyNA(src[,"y"])))
+      stop("NA values are not applicable")
    b1 <- .Cursa("dist2dist",x1=as.numeric(dst[,"x"]),y1=as.numeric(dst[,"y"])
-                       ,x2=as.numeric(src[,"x"]),y2=as.numeric(src[,"y"])
-                       ,nxy=nrow(dst),ndf=nrow(src),positive=as.integer(positive)
-                       ,verb=as.integer(verbose)
-                       ,dist=numeric(nrow(src)),ind=integer(nrow(src)))
+                           ,x2=as.numeric(src[,"x"]),y2=as.numeric(src[,"y"])
+               ,nxy=nrow(dst),ndf=nrow(src),positive=as.integer(positive)
+               ,verb=as.integer(verbose)
+               ,dist=numeric(nrow(src)),ind=integer(nrow(src)))
    b1 <- data.frame(ind=b1$ind+1L,dist=b1$dist)
    if (summarize)
    {
@@ -263,10 +274,18 @@
    b1
 }
 '.is.eq' <- function(x,value) {
-   if (abs(value)<1)
-      abs(x-value)<1e-27
+   if (isAll <- missing(value)) {
+      value <- mean(x,na.omit=TRUE)
+   }
+   if (abs(value)<1e-16)
+      res <- abs(x-value)<1e-27
+   else if (abs(value)<1e-6)
+      res <- abs(x-value)<1e-11
    else
-      abs(x/value-1)<1e-6
+      res <- abs(x/value-1)<1e-6
+   if (isAll)
+      return(all(res))
+   res
 }
 '.is.ge' <- function(x,value) x>value | .is.eq(x,value)
 '.is.le' <- function(x,value) x<value | .is.eq(x,value)
@@ -391,16 +410,30 @@
    (("shiny" %in% loadedNamespaces())&&(length(shiny::shinyOptions())>0))
 }
 '.open' <- function(...) {
-   arglist <- lapply(list(...), function(x) {
-      if (!file.exists(x)) {
-         if (.lgrep("\\%(\\d)*d",x))
-            x <- sprintf(x,1L)
-         else
-            x <- NULL
-      }
-      x
-   })
-   system2("R",c("CMD","open",arglist))
+   if (FALSE) {
+      arglist <- lapply(list(...), function(x) {
+         if (!file.exists(x)) {
+            if (.lgrep("\\%(\\d)*d",x))
+               x <- sprintf(x,1L)
+            else
+               x <- NULL
+         }
+         x
+      })
+      ret <- system2("R",c("CMD","open",arglist))
+   }
+   else {
+      ret <- lapply(list(...),function(fname) {
+         if (!file.exists(fname)) {
+            fname <- head(dir(path=dirname(fname)
+                             ,pattern=gsub("\\%(\\d+)*d","\\\\d+",fname)
+                             ,full.names=TRUE),1)
+         }
+         browseURL(normalizePath(fname))
+      })
+   }
+  # browseURL("R",c("CMD","open",arglist))
+   ret
 }
 '.isSF' <- function(obj) inherits(obj,c("sf","sfc"))
 '.isSP' <- function(obj) {

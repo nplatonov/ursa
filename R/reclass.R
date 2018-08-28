@@ -134,8 +134,9 @@
       args <- as.list(match.call())
       args$obj <- quote(obj)
       args$src <- seq_along(ct)-1
-      if (length(val)==length(ct)) ## categoral
+      if (length(val)==length(ct)) { ## categoral
          args$dst <- as.numeric(val)
+      }
       else { ## interval
          v1 <- as.numeric(val)
          if (length(v1)<4) {
@@ -171,8 +172,15 @@
             rm(v1,x1,x12,m1,v12,v3)
          }
       }
-      if (identical(args$src,args$dst))
+      if (identical(args$src,args$dst)) {
+         if (TRUE) { ## ++ 20180706
+            if (inherits(obj$value,"ursaCategory"))
+               class(obj$value) <- "ursaNumeric"
+            else if (inherits(obj$value,"ursaNumeric"))
+               class(obj$value) <- "ursaCategory"
+         }
          return(obj)
+      }
       if (onlyCT)
          return(args$dst)
       if (any(is.na(args$dst))) {

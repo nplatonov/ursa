@@ -9,9 +9,16 @@
    if (!is.ursa(obj)) {
       if ((is.character(obj))&&(!is.matrix(obj)))
          obj <- if (envi_exists(obj)) read_envi(obj,...) else read_gdal(obj,...)
+      if ((is.character(obj))||(is.factor(obj))) {
+         stop("histogram of categories is not implemented yet")
+      }
+      if ((is.numeric(obj))&&(is.null(dim(obj)))) {
+         g1 <- getOption("ursaSessionGrid")
+         dim(obj) <- c(length(obj),1)
+      }
       if(!.try(obj <- as.ursa(obj)))
          return(NULL)
-      obj <- as.ursa(obj)
+     # obj <- as.ursa(obj)
    }
    rel[["obj"]] <- obj
    if (length(ind <- (.grep("verbose",names(rel)))))
@@ -41,7 +48,14 @@
    ##~ }
    ##~ if (TRUE)
       ##~ breaks <- c(0,seq(length(ct)))
-   if (TRUE)
+   adjy <- as.numeric(names(ta))
+   dify <- diff(adjy)
+   toDensity <- .is.eq(dify)
+   if (toDensity) {
+      rngy <- range(adjy)+c(-1,1)*mean(dify)/2
+      breaks <- seq(rngy[1],rngy[2],by=mean(dify))
+   }
+   else
       breaks <- c(0,seq(length(ta)))
    mids <- breaks[-1]-d/2
    counts <- as.integer(ta)
@@ -76,17 +90,30 @@
       val <- .deintervale(ct)
       isChar <- is.character(val)
    }
-   if (FALSE) { ## many bugs
+   if (toDensity) { ## carefully
       if (!((isCT)&&(!isChar)&&(sd(diff(ct))>0.1))) {
          if (isCT)
-            z <- density(na.omit(reclass(obj)$value),n=2048)
+            z <- try(density(na.omit(reclass(obj)$value),n=2^11,...))
          else {
-            z <- density(na.omit(obj$value),n=2048)
+            if (FALSE) {
+               arglist1 <- as.list(args(density.default))
+               str(arglist1)
+               arglist2 <- list(...)
+               str(arglist2)
+               q()
+            }
+            opW <- options(warn=-10)
+            z <- try(density(na.omit(c(obj$value)),n=2^11,...))
+            options(opW)
          }
-         z$x <- c(min(z$x),z$x,max(z$x))
-         z$y <- c(-1,z$y,-1)
-         z$y <- 0.95*z$y*max(histValue$density)/max(z$y)
-         panel_polygon(z,lwd=3,lty=5,border="grey20") #border=tail(myBrewer("Spectral"),1)
+         if (!inherits(z,"try-error")) {
+            z$x <- c(min(z$x),z$x,max(z$x))
+            z$y <- c(-1,z$y,-1)
+            z$y <- 0.95*z$y*max(histValue$density)/max(z$y)
+            panel_polygon(z,lwd=3,lty=5,border="grey20") #border=tail(myBrewer("Spectral"),1)
+         }
+         else
+            cat("density was not defined")
       }
    }
    arglist <- list(...)

@@ -139,7 +139,10 @@
 '.shp.remove' <- function(fname) {
    if (.lgrep("\\.shp$",fname))
       fname <- .gsub("\\.shp$","",fname)
-   file.remove(.dir(paste0("^",fname,"\\.(cpg|dbf|prj|shp|shx)$")))
+   list1 <- .dir(path=dirname(fname)
+                ,patt=paste0("^",basename(fname),"\\.(cpg|dbf|prj|shp|shx)$")
+                ,full.names=TRUE)
+   file.remove(list1)
 }
 '.sf.read' <- function(fname,reproject=TRUE,encoding="1251",verbose=0L,...)
 {

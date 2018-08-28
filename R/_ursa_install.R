@@ -118,7 +118,7 @@
       opt1 <- "--fake" ## --no-multiarch
       opt2 <- "--no-html"
       opt3 <- "--no-html --build"
-      if (TRUE) {
+      if (!TRUE) {
          src <- file.path(Sys.getenv("HOME"),".R","Makevars")
          a <- readLines(src)
          a <- a[nchar(a)>0]
@@ -134,8 +134,10 @@
          install.packages(pkg,INSTALL_opts=opt2,lib=.libPaths()[1],repos=NULL)
          do.call("Sys.setenv",prm)
       }
-      else
-         system2("R",c("--vanilla","CMD","INSTALL",opt2,pkg))
+      else {
+         system2("R",c("--vanilla","CMD","INSTALL",opt2,pkg)[-1])
+        # system(paste("R","--vanilla","CMD","INSTALL",opt2,pkg))
+      }
      # file.remove(pkg)
    }
    setwd(wd)

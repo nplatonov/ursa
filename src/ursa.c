@@ -683,7 +683,7 @@ void optimalDatatypeDouble(double *x,int *n,int *res)
 void conTest(int *adr,int *res)
 {
   // char buftmp[12];
-  // fread(buftmp,1,4,adr);
+  // if (fread(buftmp,1,4,adr)) {};
    Rprintf("adr=%d\n",*adr);
    return;
 }
@@ -714,7 +714,7 @@ void readBsqLineInteger(char **fname,int *dim,int *index,int *nindex,int *dtype
    for (i=0;i<bands;i++)
    {
       fseek(Fin,(i*lines+index[0]-1)*samples*datasize,SEEK_SET);
-      fread(buf1,datasize,n,Fin);
+      if (fread(buf1,datasize,n,Fin)) {};
       for (j=0;j<samples*count;j++)
       {
          adr=i*samples*count+j;
@@ -801,7 +801,7 @@ void readBsqLineDouble(char **fname,int *dim,int *index,int *nindex,int *dtype
    for (i=0;i<bands;i++)
    {
       fseek(Fin,(i*lines+index[0]-1)*samples*datasize,SEEK_SET);
-      fread(buf1,datasize,n,Fin);
+      if (fread(buf1,datasize,n,Fin)) {};
       for (j=0;j<samples*count;j++)
       {
          adr=i*samples*count+j;
@@ -880,7 +880,7 @@ void readBsqBandInteger(char **fname,int *dim,int *index,int *nindex,int *dtype
    {
      // printf(" %d",index[i]);
       fseek(Fin,(index[i]-1)*lines*samples*datasize,SEEK_SET);
-      fread(buf1,datasize,n,Fin);
+      if (fread(buf1,datasize,n,Fin)) {};
       for (j=0;j<samples*lines;j++)
       {
          adr=i*samples*lines+j;
@@ -969,7 +969,7 @@ void readBsqBandDouble(char **fname,int *dim,int *index,int *nindex,int *dtype
    {
      // printf(" %d",index[i]);
       fseek(Fin,(index[i]-1)*lines*samples*datasize,SEEK_SET);
-      fread(buf1,datasize,n,Fin);
+      if (fread(buf1,datasize,n,Fin)) {};
       for (j=0;j<samples*lines;j++)
       {
          adr=i*samples*lines+j;
@@ -1047,7 +1047,7 @@ void readBilLineInteger(char **fname,int *dim,int *index,int *nindex,int *dtype
    {
      // printf("seek=%d(%d)\n",(index[i]-1)*bands*samples*datasize,index[i]);
       fseek(Fin,(index[i]-1)*bands*samples*datasize,SEEK_SET);
-      fread(buf1,datasize,n,Fin);
+      if (fread(buf1,datasize,n,Fin)) {};
       for (j=0;j<samples*bands;j++)
       {
          adr=i*samples*bands+j;
@@ -1137,7 +1137,7 @@ void readBilLineInteger2(char **fname,int *dim,int *index,int *nindex,int *dtype
    {
      // printf("seek=%d(%d)\n",(index[i]-1)*bands*samples*datasize,index[i]);
       fseek(Fin,(index[l]-1)*bands*samples*datasize,SEEK_SET);
-      fread(buf1,datasize,bs,Fin);
+      if (fread(buf1,datasize,bs,Fin)) {};
       for (b=0;b<bands;b++)
       {
          for (s=0;s<samples;s++)
@@ -1228,7 +1228,7 @@ void readBilLineDouble(char **fname,int *dim,int *index,int *nindex,int *dtype
    for (i=0;i<count;i++)
    {
       fseek(Fin,(index[i]-1)*bands*samples*datasize,SEEK_SET);
-      fread(buf1,datasize,n,Fin);
+      if (fread(buf1,datasize,n,Fin)) {};
       for (j=0;j<samples*bands;j++)
       {
          adr=i*samples*bands+j;
@@ -1302,7 +1302,7 @@ void readBilLineDouble2(char **fname,int *dim,int *index,int *nindex,int *dtype
    for (l=0;l<count;l++)
    {
       fseek(Fin,(index[l]-1)*bands*samples*datasize,SEEK_SET);
-      fread(buf1,datasize,bs,Fin);
+      if (fread(buf1,datasize,bs,Fin)) {};
       for (b=0;b<bands;b++)
       {
          for (s=0;s<samples;s++)
@@ -1384,7 +1384,7 @@ void readBilBandInteger(char **fname,int *dim,int *index,int *nindex,int *dtype
       for (k=0;k<count;k++)
       {
          fseek(Fin,(i*bands+index[k]-1)*samples*datasize,SEEK_SET);
-         fread(buf1,datasize,samples,Fin);
+         if (fread(buf1,datasize,samples,Fin)) {};
          for (j=0;j<samples;j++)
          {
             adr=i*samples*count+k*samples+j;
@@ -1473,7 +1473,7 @@ void readBilBandDouble(char **fname,int *dim,int *index,int *nindex,int *dtype
       for (k=0;k<count;k++)
       {
          fseek(Fin,(i*bands+index[k]-1)*samples*datasize,SEEK_SET);
-         fread(buf1,datasize,samples,Fin);
+         if (fread(buf1,datasize,samples,Fin)) {};
          for (j=0;j<samples;j++)
          {
             adr=i*samples*count+k*samples+j;
@@ -3170,6 +3170,8 @@ void resampl4(double *obj1,double *bg,int *dim1,int *dim2,double *lim1
    int t,c2,r2,c1,r1,c,r,n;
    double x1,y1,x2,y2;
    double W,W2,w,val,L,R,T,B;
+   double val2=background;
+   double w2=0.0;
    for (adr=0;adr<samples2*lines2*bands;adr++)
       obj2[adr]=background;
    for (t=0;t<bands;t++) // get band
@@ -3245,22 +3247,37 @@ void resampl4(double *obj1,double *bg,int *dim1,int *dim2,double *lim1
                   adr1=t*lines1*samples1+r*samples1+c;
                   if (fabs(obj1[adr1]-background)<eps)
                      continue;
+                  if ((!resample)&&(w>0.0)) {
+                     if ((n==0)||(w>w2)) {
+                        w2=w;
+                        val2=obj1[adr1];
+                     }
+                     n++;
+                  }
                   W+=w;
                   val+=w*obj1[adr1];
                   if (0)
                      Rprintf(" %.0f",obj1[adr1]);
-                  if (w>0.0)
-                     n++;
-                  if ((!resample)&&(fabs(w-1.0)>1e-6)&&(fabs(w-0.5)>1e-6)&&(fabs(w-0.25)>1e-6))
-                     Rprintf("only resize but w=%f\n",w);
-                  if ((!resample)&&(n))
+                 // if (fabs(w-1.0)>1e-6)
+                 //    Rprintf("%.3f\n",w);
+                  if ((verbose)&&(!resample)&&(fabs(w-1.0)>1e-6)&&
+                                       (fabs(w-0.5)>1e-6)&&(fabs(w-0.25)>1e-6))
+                     Rprintf("only resize but w=%f (c2=%d r2=%d c=%d r=%d)\n"
+                            ,w,c2,r2,c,r);
+                  if ((n)&&(w2>=cover))
                      break;
                }
-               if ((!resample)&&(n))
+               if ((n)&&(w2>=cover))
                   break;
             }
-            if ((W>0)&&((W/W2)>=cover))
-               obj2[adr2]=val/W;
+            if ((W>0)&&((W/W2)>=cover)) {
+               if (resample)
+                  obj2[adr2]=val/W;
+               else if (n) {
+                 // Rprintf("w2=%f\n",w2);
+                  obj2[adr2]=val2;
+               }
+            }
          }
       }
    }

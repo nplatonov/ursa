@@ -48,9 +48,9 @@
    }
    else
       panel <- 0L
-   .compose_coastline(obj=obj,panel=panel,col=col,fill=fill,detail=detail
+   invisible(.compose_coastline(obj=obj,panel=panel,col=col,fill=fill,detail=detail
                      ,density=density,angle=angle
-                     ,land=land,lwd=lwd,lty=lty,fail180=fail180,verbose=verbose)
+                     ,land=land,lwd=lwd,lty=lty,fail180=fail180,verbose=verbose))
 }
 '.compose_coastline' <- function(obj=NULL,panel=0,col=NA,fill="transparent"
                                 ,detail=NA,density=NA,angle=NA,land=FALSE
@@ -285,7 +285,8 @@
       fail180 <- (isMerc || isLongLat)
    if ((fail180)||(isLongLat || isMerc)) {
       if (!isLongLat) {
-         B <- mean(abs(.project(rbind(cbind(-180+1e-9,-45),cbind(+180-1e-9,+45))
+         lon0 <- as.numeric(.gsub(".*\\+lon_0=(\\S+)\\s*.*","\\1",proj4))
+         B <- mean(abs(.project(rbind(cbind(lon0-180+1e-9,-45),cbind(lon0+180-1e-9,+45))
                                ,proj4)[,1]))
       }
       else

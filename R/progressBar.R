@@ -6,10 +6,13 @@
   # if (.isKnitr())
   #    return(NULL)
    kind <- match.arg(kind)
-   if ((kind=="tk")&&
-       ((!requireNamespace("tcltk",quietly=.isPackageInUse()))||
-        (!capabilities("tcltk"))))
-      kind <- "txt"
+   if (kind=="tk") {
+      if ((.Platform$OS.type=="unix")&&(!nchar(Sys.getenv("DISPLAY"))))
+         kind <- "txt"
+      else if ((!requireNamespace("tcltk",quietly=.isPackageInUse()))||
+        (!capabilities("tcltk")))
+         kind <- "txt"
+   }
    if ((!is.na(title))&&(!nchar(title)))
       title <- "'ursa' package"
    t1 <- proc.time()[3]

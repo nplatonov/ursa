@@ -186,7 +186,7 @@
    }
    appendlayer <- getOption("ursaSpatialMultiLayer")
    appendlayer <- ifelse(is.null(appendlayer),FALSE,appendlayer>1)
-   if ((ogr2ogr)&&(driver %in% "zzzSQLite")) { ## sf>=0.6.3 great improvement
+   if ((ogr2ogr)&&(interimExt!="sqlite")&&(driver %in% "SQLite")) { ## sf>=0.6.3 great improvement
       interim <- TRUE
       driver0 <- driver
       fext0 <- fext
@@ -390,11 +390,11 @@
    if (!nchar(compress))
       return(invisible(NULL))
    if ((.lgrep("gz",compress))&&(nchar(Sys.which("gzip"))))
-      system2("gzip",c(fname))
+      system2("gzip",c("-f",fname))
    else if (.lgrep("bz(ip)*2",compress)&&(nchar(Sys.which("bzip2"))))
-      system2("bzip2",c(fname))
+      system2("bzip2",c("-f",fname))
    else if (.lgrep("xz",compress)&&(nchar(Sys.which("xz"))))
-      system2("xz",c(fname))
+      system2("xz",c("-f",fname))
    else if (compress=="zip") {
       f <- .dir(path=dname
                ,pattern=paste0("^",lname,"\\.",ext,"$")

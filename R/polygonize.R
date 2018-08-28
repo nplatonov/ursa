@@ -76,7 +76,7 @@
       if (!onlyGeometry) {
          b <- b[,3:ncol(b),drop=FALSE]
          for (i in seq(ncol(b))) {
-            if (.is.integer(na.omit(b[,i])))
+            if ((!is.factor(b[,i]))&&(.is.integer(na.omit(b[,i]))))
                b[,i] <- as.integer(b[,i])
          }
       }
@@ -131,7 +131,7 @@
       if (!onlyGeometry) {
          b <- b[,3:ncol(b),drop=FALSE]
          for (i in seq(ncol(b)))
-            if (.is.integer(na.omit(b[,i])))
+            if ((!is.factor(b[,i]))&&(.is.integer(na.omit(b[,i]))))
                b[,i] <- as.integer(b[,i])
          sa <- sp::SpatialPolygonsDataFrame(sa,data=b,match.ID=FALSE)
       }

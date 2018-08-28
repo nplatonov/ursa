@@ -4,10 +4,13 @@
       k <- length(x$con$posZ)
    else
       k <- x$dim[2]
-   m <- if (n>k) k else n
-   if (m==0)
-      m <- 1
-   x[1:m]
+   if (FALSE) {
+      m <- if (n>k) k else n
+      if (m==0)
+         m <- 1
+      x[1:m]
+   }
+   x[head(seq_len(k),n)]
 }
 'tail.ursaRaster' <- function(x,n=3L,...)
 {
@@ -15,12 +18,15 @@
       k <- length(x$con$posZ)
    else
       k <- x$dim[2]
-   m <- if (n>k) k else n
-   if (m==0)
-      m <- 1
-  # str(x)
-  # print(k-(m:1)+1)
-   x[k-(m:1)+1]
+   if (FALSE) {
+      m <- if (n>k) k else n
+      if (m==0)
+         m <- 1
+     # str(x)
+     # print(k-(m:1)+1)
+      x[k-(m:1)+1]
+   }
+   x[tail(seq_len(k),n)]
 }
 'series' <- function(x,n=3L,s=170,...)
 {
@@ -33,6 +39,14 @@
            # return(lapply(x[ind],series,n)) ## RECURSIVE
          }
          objAttr <- attributes(x)
+         if ((FALSE)&&(is.null(objAttr))) {
+            dim(x) <- c(length(x),1)
+            rownames(x) <- seq(nrow(x))
+            colnames(x) <- "<vector>"
+            ind <- seq(dim(x)[1])
+            ind <- sort(unique(c(head(ind,n),tail(ind,n))))
+            return(x[ind,,drop=FALSE])
+         }
          ret <- c(head(x,n),tail(x,n))
          attributes(ret) <- objAttr
          return(ret)

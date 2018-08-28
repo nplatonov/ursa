@@ -23,7 +23,8 @@ compose_close(...)
       \cr \code{(^$|crop|kind)} \tab \code{kind}
       \cr \code{(border|frame)} \tab \code{border}
       \cr \code{bpp} \tab \code{bpp}
-      \cr \code{(execute|view|open)} \tab \code{execute}
+      \cr \code{(render|execute|view|open)} \tab \code{execute}
+%%~       \cr \code{wait} \tab \code{wait}
       \cr \code{verb(ose)*} \tab \code{verbose}
       }
    }
@@ -31,6 +32,7 @@ compose_close(...)
    \item{border}{Non-negative integer. Number of pixels for margins, which are not cropped. Default is \code{5L}.}
    \item{bpp}{Integer. Bits per pixel for output PNG file. Valid values are \code{0L}, \code{8L}, \code{24L}. If \code{bpp=0L}, then \code{8} bpp is used for \code{"windows"} type of PNG device, and \code{24} bpp is used for  \code{"cairo"} type of PNG device. The type of device is specified in \code{\link[ursa]{compose_open}} function.}
    \item{execute}{Logical. Should created PNG file be opened in the associated external program for viewing graphical files? Default is \code{TRUE}.}
+%%~    \item{wait}{Non-negative numeric. Pause in seconds for executing in the case that PNG will be removed after opening. Default is \code{NA}: duration of waiting is defined by value of \code{wait} in \code{\link[ursa:compose_open]{compose_open}}.}
    \item{verbose}{Logical. Value \code{TRUE} provides some additional information on console. Default is \code{FALSE}.}
 }
 \details{
@@ -38,7 +40,7 @@ The cut manipulations (\code{crop="crop"} or \code{crop="crop2"}) are implemente
 
 Function \code{compose_close} clears all internal graphical options, specified during \code{\link[ursa]{compose_open}} executing.
 
-Some parameters are specified in \code{\link[ursa]{compose_open}}: wether output PNG file is deleted after opening (logical \code{delafter}), or what is the time of waiting for file opening and next removing (numerical \code{wait} in seconds).
+Some parameters are specified in \code{\link[ursa]{compose_open}}: weather output PNG file will be removed after opening (logical \code{delafter}), or what is the time of waiting for file opening and next removing (numerical \code{wait} in seconds).
 }
 \value{
 Function returns \code{NULL} value.

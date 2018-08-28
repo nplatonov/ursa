@@ -23,6 +23,8 @@
    if (is.null(myname))
       myname <- rep("",length(link))
    if (nchar(kwd)) {
+      if (.lgrep("\\$$",kwd))
+         kwd <- substr(kwd,1,nchar(kwd)-1)
       name <- c(paste0(name,"\\.",kwd),paste0(kwd,"\\.",name)
                ,paste0("^",name,"$"))[2:3]
       if (.lgrep("\\^\\$",name))

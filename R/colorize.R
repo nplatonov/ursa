@@ -106,6 +106,7 @@
          isOrdered <- is.ordered(obj)
          isChar <- is.character(obj) | is.factor(obj)
          g1 <- getOption("ursaSessionGrid")
+         ctname <- .grep("colortable",names(rel),value=TRUE)
          if (.is.grid(g1))
             session_grid(NULL)
          if ((isDate)||(isTime))
@@ -121,6 +122,8 @@
          res <- ursa_new(matrix(rev(obj),nrow=1),flip=FALSE,permute=FALSE) ## rev()?
          if ((isChar)&&(!isOrdered)) {
             res <- reclass(res,src=seq_along(oname),dst=oname)
+            if (length(ctname))
+               ursa(res,"value") <- match(oname,names(rel[[ctname]]))-1L
          }
          rel[["obj"]] <- quote(res)
          if (length(ind <- .grep("lazy",names(rel))))
@@ -147,7 +150,23 @@
             }
             rel[["name"]] <- levname
          }
+         if ((TRUE)&&(length(ctname))) {
+           # rel$value <- seq_along(rel[[ctname]])-1L
+           # rel$name <- names(rel[[ctname]])
+           # rel$pal <- unclass(unname(rel[[ctname]]))
+            rel$stretch <- "category"
+           # rel[[ctname]] <- NULL
+           # print(c(ursa(res,"value")))
+           # str(rel)
+         }
          img <- do.call(fun,rel[-1]) ## RECURSIVE!
+         if (length(ctname)) {
+            img$colortable <- rel[[ctname]]
+         }
+        # if (length(ctname)) {
+        #    str(img)
+        #    q()
+        # }
          if (isOrdered) { ## TODO avoid this double coloring
             levvalue <- .deintervale(levname)
             if ((is.numeric(levvalue))&&(length(levvalue)+1==length(levname))) {
@@ -234,12 +253,14 @@
    }
    if (.is.colortable(colortable)) {
       ct <- ursa_colortable(colortable)
-      value <- names(ct)
       val <- .deintervale(ct,verbose=TRUE)
       interval <- as.integer(length(val)!=length(ct))
       isChar <- is.character(val)
       name <- if (isChar) val else NULL
+      value <- names(ct)
       pal <- as.character(ct)
+      if (isChar)
+         val <- seq_along(val)-1L
       arglist <- list(obj=quote(obj),interval=interval,value=val,name=name
                      ,pal=pal,lazyload=lazyload)
       res <- do.call("colorize",arglist) ## recursive!!!

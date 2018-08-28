@@ -10,27 +10,38 @@
       fname <- .grep("\\.(nc)$",ziplist,value=TRUE)
    }
    else if ((nchar(Sys.which("gzip")))&&
-            (isZip <- (isZip1 <- .lgrep("\\.gz$",fname)>0)||
+            (isZip <- (isZip1 <- .lgrep("\\.gz$",fname)>0) ||
                       (isZip2 <- file.exists(paste0(fname,".gz"))))) {
-      stop("A")
+     # print(c(isZip1=isZip1,isZip2=isZip2))
+     # stop("A")
       if (isZip1)
          fname0 <- fname
       else if (isZip2)
-         fname0 <- paste0(fname,".bz2")
-      fname <- tempfile()
-     # on.exit(file.remove(fname))
-      system2("gzip",c("-f -d -c",.dQuote(fname0)),stdout=fname,stderr=FALSE)
+         fname0 <- paste0(fname,".gz")
+      if (FALSE) {
+         fname <- tempfile()
+        # on.exit(file.remove(fname))
+         system2("gzip",c("-f -d -c",.dQuote(fname0)),stdout=fname,stderr=FALSE)
+      }
+      else {
+         fname <- .ursaCacheRaster(fname0,unpack="gzip")
+      }
    }
-   else if ((nchar(Sys.which("gzip")))&&
-            (isZip <- (isZip1 <- .lgrep("\\.gz$",fname)>0)||
-                      (isZip2 <- file.exists(paste0(fname,".gz"))))) {
+   else if ((nchar(Sys.which("bzip2")))&&
+            (isZip <- (isZip1 <- .lgrep("\\.bz2$",fname)>0)||
+                      (isZip2 <- file.exists(paste0(fname,".bz2"))))) {
       if (isZip1)
          fname0 <- fname
       else if (isZip2)
          fname0 <- paste0(fname,".bz2")
-      fname <- tempfile()
-     # on.exit(file.remove(fname))
-      system2("bzip2",c("-f -d -c",.dQuote(fname0)),stdout=fname,stderr=FALSE)
+      if (FALSE) {
+         fname <- tempfile()
+        # on.exit(file.remove(fname))
+         system2("bzip2",c("-f -d -c",.dQuote(fname0)),stdout=fname,stderr=FALSE)
+      }
+      else {
+         fname <- .ursaCacheRaster(fname0,unpack="bzip2")
+      }
    }
    else if (.lgrep("^(https|http|ftp)\\://",fname)) {
       fname <- .ursaCacheDownload(fname,quiet=FALSE,mode="wb")
@@ -42,8 +53,8 @@
    }
    on.exit({
       ncdf4::nc_close(nc)
-      if (isZip)
-         file.remove(fname)
+     # if (isZip)
+     #    file.remove(fname)
    })
    level0 <- level
    var0 <- var

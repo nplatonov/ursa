@@ -566,6 +566,7 @@
             gridline[[i]] <- cbind(NA,NA)
          else {
             ll <- cbind(lon,rep(lat,length(lon)))
+           # print(series(ll,3))
            # gridline[[i]] <- if (isProj & !isLonLat) proj4::project(t(ll),g1$proj4) else ll
             if (isProj & !isLonLat) {
                ll <- .project(ll,g1$proj4)
@@ -575,8 +576,8 @@
                   ll[nrow(ll),1] <- ll[nrow(ll),1]+1e8
                }
                ind <- which(diff(ll[,1])<0)
-               if (length(ind)==2) {
-                  ll <- ll[(ind[1]+1):ind[2],]
+               if ((length(ind)==2)&&(ind[1]+1!=ind[2])) {
+                  ll <- ll[(ind[1]+1):ind[2],,drop=FALSE]
                }
             }
             gridline[[i]] <- ll
@@ -587,8 +588,8 @@
       for (i in seq(along=gridline))
       {
          xy <- gridline[[i]]
-        # if (all(is.na(xy)))
-        #    next
+         if (all(is.na(xy)))
+            next
          if (marginalia[2]) {
             e1 <- which(diff((xy[,1]-minx)>0)!=0)
             for (j in seq_along(e1)) {
@@ -659,8 +660,12 @@
       if (length(ind <- outframe$v<=(-180)))
          outframe$v[ind] <- outframe$v[ind]+360
       outframe$lab <- NA
-      suffNS <- switch(language,ru=c("\xF1.\xF8.","\xFE.\xF8."),c("N","S"))
-      suffEW <- switch(language,ru=c("\xE2.\xE4.","\xE7.\xE4."),c("E","W"))
+     # suffNS <- c("N","S")
+     # suffEW <- c("E","W")
+      suffNS <- switch(language,ru=c("\u0441.\u0448.","\u044E.\u0448."),c("N","S"))
+      suffEW <- switch(language,ru=c("\u0432.\u0434.","\u0437.\u0434."),c("E","W"))
+     # suffNS <- switch(language,ru=c("\xF1.\xF8.","\xFE.\xF8."),c("N","S"))
+     # suffEW <- switch(language,ru=c("\xE2.\xE4.","\xE7.\xE4."),c("E","W"))
       ind <- (outframe$kind==2)
       outframe$lab[ind] <- .degminsec(outframe$v[ind],suffNS)
       ind <- (outframe$kind==1)

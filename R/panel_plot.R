@@ -76,7 +76,7 @@
         # message("===========")
         # str(arglist2)
         # message("===========")
-         if ((TRUE)&&(.lgrep("^col",names(arglist2)))) {
+         if ((TRUE)&&(.lgrep("^col(o(u)*r)*$",names(arglist2)))) {
            # stop("I")
             if (is.numeric(col)) {
                ct <- colorize(col)
@@ -126,8 +126,17 @@
                   col <- NULL
                }
             }
-            else
+            else {
                col <- arglist2$col
+               if (length(spatial_fields(obj))==1) {
+                  if (.is.colortable(arglist2$col)) {
+                     ct <- ursa_colortable(arglist2$col)
+                     ind <- match(obj[[1]],names(ct))
+                     if (all(!anyNA(ind)))
+                        col <- unname(ct)[ind]
+                  }
+               }
+            }
             if (!is.null(col))
                arglist2$col <- unclass(col)
          }

@@ -180,13 +180,16 @@
       coord[4] <- maxy-ifelse(isE,height,0)
       coord[2] <- coord[4]-height
    }
-  # rect(coord[1],coord[2],coord[3],coord[4],col="blue")
+  # rect(coord[1],coord[2],coord[3],coord[4],col="#0000FF50")
    if (isPicture) {
       graphics::rasterImage(grDevices::as.raster(label,max=1)
                            ,coord[1],coord[2],coord[3],coord[4]
                            ,interpolate=interpolate)
       par(opt)
       return(invisible(NULL))
+   }
+   if (TRUE) { ## 20180625
+      adjust <- (adjust-0.5)*width/height+0.5 
    }
   # print(c(scale=scale,cex=mycex))
    x <- 0.5*(coord[1]+coord[3])

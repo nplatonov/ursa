@@ -161,15 +161,15 @@
       }
       else if (w<1e-3) {
          w0 <- w*1e6
-         un <- switch(language,ru="\xEC\xEC","mm")
+         un <- switch(language,ru="\u043C\u043C","mm")
       }
       else if (w<1) {
          w0 <- w*1000
-         un <- switch(language,ru="\xEC","m")
+         un <- switch(language,ru="\u043C","m")
       }
       else {
          w0 <- w
-         un <- switch(language,ru="\xEA\xEC","km")
+         un <- switch(language,ru="\u043A\u043C","km")
       }
    }
    else
@@ -195,7 +195,7 @@
             message(paste("Composer: figure width for"
                           ,sprintf("1:%.0f",w0*100/paperScale[2]),"scale is"
                           ,pw*(w1/paperScale[2])/(w0),"cm"))
-            un <- switch(language,ru="\xEC","m")
+            un <- switch(language,ru="\u043C","m")
          }
          else {
             if (paperScale[1]>0)
@@ -206,7 +206,7 @@
             message(paste("Composer: figure width for"
                          ,sprintf("1:%.0f",w0*100000/paperScale[2]),"scale is"
                          ,pw*(w1/paperScale[2])/(1000*w0),"cm"))
-            un <- switch(language,ru="\xEA\xEC","km")
+            un <- switch(language,ru="\u043A\u043C","km")
          }
          w <- w1/1000
         # print(w)
