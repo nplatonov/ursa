@@ -72,8 +72,11 @@
         # z <- subset(vec,select=lname) ## add 20150505
          if (inherits(vec,"data.table"))
             z <- vec[,lname,with=FALSE]
-         else
+         else {
             z <- vec[,lname,drop=FALSE] ## modified 20170128
+            if (inherits(z,"data.frame"))
+               z <- as.data.frame(lapply(z,c))
+         }
       }
       if (inherits(vec,"data.table"))
          vec <- vec[,ind,with=FALSE]
