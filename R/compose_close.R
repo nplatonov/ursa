@@ -108,13 +108,15 @@
               # stop("How to implement file association in Unix-like systems?")
             }
          }
-         if (delafter)
-         {
+         if (delafter) {
             if (execute) {
                wait <- getOption("ursaPngWaitBeforeRemove")
-               Sys.sleep(wait)
+              # Sys.sleep(wait)
+               cmd <- paste0("Sys.sleep(",wait,");","file.remove(",sQuote(fileout),")")
+               system2("Rscript",c("-e",dQuote(cmd)),wait=FALSE,stdout=NULL)
             }
-            file.remove(fileout)
+            else
+               file.remove(fileout)
          }
       }
       else { ## original
@@ -219,7 +221,8 @@
         # stop("How to implement file association in Unix-like systems?")
       }
       wait <- getOption("ursaPngWaitBeforeRemove")
-      if (delafter)
+     # print(wait)
+      if ((FALSE)&&(delafter))
          Sys.sleep(wait)
    }
    if (delafter) {
@@ -236,8 +239,13 @@
             }
          }
       }
-      else
+      else if (FALSE) {
          file.remove(fileout)
+      }
+      else {
+         cmd <- paste0("Sys.sleep(",wait,");","file.remove(",sQuote(fileout),")")
+         system2("Rscript",c("-e",dQuote(cmd)),wait=FALSE,stdout=NULL)
+      }
    }
    if (file.exists(fileout)) {
       return(invisible(fileout))

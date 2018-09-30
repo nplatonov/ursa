@@ -11,3 +11,8 @@
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf
+src/*.dll
+src/*.dll
+R/FarMenu.ini
+R/SciTE.properties
+

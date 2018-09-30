@@ -914,8 +914,11 @@
             mc$lab <- as.Date(mc$at,origin=origin)
          else if (stretch=="time")
             mc$lab <- as.POSIXct(mc$at,origin=origin)
-         if ((nchar(format))&&(stretch %in% c("date","time","julian")))
+         if ((nchar(format))&&(stretch %in% c("date","time","julian"))) {
+            if (stretch %in% "julian")
+               mc$lab <- as.Date(paste0("2018",mc$lab),format="%Y%j")
             mc$lab <- format(mc$lab,format)
+         }
          names(value) <- mc$lab
       }
    }

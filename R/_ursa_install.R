@@ -110,7 +110,7 @@
    wd <- setwd("C:/platt/R/ursa-package")
    if (requireNamespace("ursa"))
       stopifnot(!.generate_namespace(verbose=FALSE))
-   patt <- "^ursa_.*\\.tar\\.gz$"
+   patt <- "^ursa_.*(\\.tar\\.gz|\\.zip)$"
    nul <- file.remove(dir(pattern=patt))
    system("R --vanilla CMD build ursa")
    pkg <- tail(plutil::filelist(patt))
@@ -135,7 +135,7 @@
          do.call("Sys.setenv",prm)
       }
       else {
-         system2("R",c("--vanilla","CMD","INSTALL",opt2,pkg)[-1])
+         system2("R",c("--vanilla","CMD","INSTALL",opt3,pkg)[-1])
         # system(paste("R","--vanilla","CMD","INSTALL",opt2,pkg))
       }
      # file.remove(pkg)

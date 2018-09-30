@@ -566,7 +566,11 @@
      # php <- switch(art,google="http://maps.googleapis.com/maps/api/staticmap"
      #        ,openstreetmap="http://staticmap.openstreetmap.de/staticmap.php")
       isOSM <- .lgrep("openstreetmap",art)
-      isGoogle <- .lgrep("google",art)
+      if ((isGoogle <- .lgrep("google",art))&&(proposed <- TRUE)) {
+         apiKey <- getOption("googleMaps")
+         if (is.character(apiKey))
+            php <- paste0(php,"&key=",apiKey)
+      }
       adv <- paste(.grep("=",unlist(strsplit(style,split="\\s+")),value=TRUE)
                   ,collapse="&")
       if ((isOSM)&&(cross180)) {

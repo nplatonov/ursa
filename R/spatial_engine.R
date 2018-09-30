@@ -187,9 +187,10 @@
    if (isSF) {
       if (inherits(obj,"sfc"))
          return(NULL)
-      res <- obj
-      sf::st_geometry(res) <- NULL
-      attributes(res) <- attributes(res)[c("names","row.names","class")]
+     # res <- obj
+     # sf::st_geometry(res) <- NULL
+     # attributes(res) <- attributes(res)[c("names","row.names","class")]
+      res <- sf::st_set_geometry(obj,NULL)
    }
    else if (isSP) {
       if (!methods::.hasSlot(obj,"data"))

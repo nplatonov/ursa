@@ -12,7 +12,7 @@
    frame <- .getPrm(arglist,name="((frame|strip)(height)*|colorbar$)",default=NA_real_)
    box <- .getPrm(arglist,name="box",default=TRUE)
    delafter <- .getPrm(arglist,name="(del|remove)after",default=NA)
-   wait <- .getPrm(arglist,name="wait",default=switch(.Platform$OS.type,windows=1,3))
+   wait <- .getPrm(arglist,name="wait",default=switch(.Platform$OS.type,windows=5,5))
    dtype <- if (.Platform$OS.type=="windows") c("cairo","windows")
             else c("cairo","cairo-png","Xlib","quartz")
    device <- .getPrm(arglist,name="^(device|type)",valid=c("cairo","windows"))
@@ -54,7 +54,7 @@
 }
 '.compose_open' <- function(mosaic=NULL,fileout="",dpi=NA,pointsize=NA,scale=NA
                           ,width=NA,height=NA
-                          ,indent=NA,frame=NA,box=TRUE,delafter=NA,wait=1
+                          ,indent=NA,frame=NA,box=TRUE,delafter=NA,wait=5
                           ,device=NA,antialias=NA,font=NA,background="white"
                           ,dev=FALSE,verbose=FALSE) {
   # session_pngviewer()

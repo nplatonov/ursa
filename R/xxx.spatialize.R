@@ -466,7 +466,9 @@
             obj <- sf::st_read(dsn,layer=layer,quiet=TRUE)
          }
          else {
-            obj <- rgdal::readOGR(dsn,layer,pointDropZ=TRUE,verbose=FALSE)
+            enc <- if (.lgrep("\\.shp$",dsn)) NULL else "UTF-8"
+            obj <- rgdal::readOGR(dsn,layer,pointDropZ=TRUE,encoding=enc
+                                 ,use_iconv=!is.null(enc),verbose=FALSE)
             if ((length(names(obj))==1)&&(names(obj)=="FID")) {
                info <- rgdal::ogrInfo(dsn,layer)
                if (info$nitems==0)
