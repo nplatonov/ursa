@@ -12,7 +12,7 @@
 vignettes/*.html
 vignettes/*.pdf
 src/*.dll
-src/*.dll
+src/*.o
 R/FarMenu.ini
 R/SciTE.properties
 
