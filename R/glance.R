@@ -202,7 +202,9 @@
    isSF <- inherits(obj,c("sfc","sf"))
    isSP <- !isSF
    g0 <- attr(obj,"grid")
-   g1 <- getOption("ursaSessionGrid")
+   if (is.null(g0))
+      g0 <- session_grid()
+  # g1 <- getOption("ursaSessionGrid")
   # if (identical(g0,g1))
   #    border <- 0
    if ((FALSE)&&(expand!=1)) {
@@ -300,8 +302,9 @@
    }
    else
       basemap <- NULL
-   if ((is.null(basemap))&&(border>0))
+   if ((is.null(basemap))&&(border>0)) {
       g0 <- regrid(g0,border=border)
+   }
    attr(obj,"grid") <- g0
    session_grid(g0)
   # xy <- with(g0,.project(rbind(c(minx,miny),c(maxx,maxy)),proj4,inv=TRUE))

@@ -28,6 +28,9 @@
 \alias{is_spatial_points}
 \alias{is_spatial_lines}
 \alias{is_spatial_polygons}
+\alias{spatial_intersection}
+\alias{spatial_symdifference}
+\alias{spatial_buffer}
 \title{
 Wrapper functions for manipulation with non-raster objects
 }
@@ -82,11 +85,18 @@ is_spatial_points(obj, verbose = FALSE)
 is_spatial_lines(obj, verbose = FALSE)
 is_spatial_polygons(obj, verbose = FALSE)
 
+spatial_intersection(x, y, verbose = FALSE)
+spatial_symdifference(x, y, verbose = FALSE)
+spatial_buffer(obj, dist = 0, quadsegs = 30L, verbose = FALSE)
+
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{obj}{
 Simple feature (package \pkg{sf}) or Spatial abstract class (package \pkg{sp}) for all functions, excepting \code{spatial_geometry<-}. Data frame for \emph{Replace} function \code{spatial_geometry<-}.
+}
+  \item{x, y}{
+Objects of simple feature (package \pkg{sf}) class or Spatial abstract class (package \pkg{sp}).
 }
   \item{crs}{
 Projection EPSG code or projection PROJ.4 string.
@@ -111,6 +121,12 @@ See description of argument \code{full.names} in function \code{\link[base:list.
 }
   \item{recursive}{
 See description of argument \code{full.names} in function \code{\link[base:list.files]{dir}}.
+}
+  \item{quadsegs}{
+Integer. Number of segments per quadrant (fourth of a circle), for all or per-feature. See description for \code{quadsegs} argument of \code{\link[rgeos:misc-gBuffer]{gBuffer}} and for \code{nQuadSegs} argument of \code{\link[sf:geos_unary]{st_buffer}}.
+}
+  \item{dist}{
+Numeric. buffer distance for all, or for each of the elements. See description for \code{width} argument of \code{\link[rgeos:misc-gBuffer]{gBuffer}} and for \code{dist} argument of \code{\link[sf:geos_unary]{st_buffer}}.
 }
   \item{verbose}{
 Logical. Value \code{TRUE} provides information on console. Default is \code{FALSE}.
@@ -165,6 +181,12 @@ Further arguments passed to \code{sf::st_transform} or to \code{sp::spTransform}
 \code{is_spatial_lines} returns logical value does the object have (multi)linestring geometry.
 
 \code{is_spatial_polygons} returns logical value does the object have (multi)polygonal geometry.
+
+\code{spatial_intersection} returns intersection of two spatial objects.
+
+\code{spatial_symdifference} returns difference of two spatial objects.
+
+\code{spatial_buffer} returns buffered spatial object.
 
 }
 \references{

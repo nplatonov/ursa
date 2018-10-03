@@ -141,7 +141,7 @@
       else
          lon_0 <- round(180*mean(x)/B,6)
       if (art=="polarmap") {
-        # 180°W, 150°W, 100°W, 40°W, 10°E, and 90° E.
+        # 180\{deg}W, 150\{deg}W, 100\{deg}W, 40\{deg}W, 10\{deg}E, and 90\{deg}E.
          lon_0[lon_0<(-165) || lon_0>=(+135)] <- -180
          lon_0[lon_0>=(-165) && lon_0<(-125)] <- -150
          lon_0[lon_0>=(-125) && lon_0<(-70)] <- -100

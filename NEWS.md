@@ -1,4 +1,8 @@
-2018-09-25
+2018-10-01
+
+### version 3.8.11
+
+-   Added `spatial_intersection` function.
 
 ### version 3.8.10
 
@@ -8,7 +12,7 @@
     `Sys.which()`
 
 -   Accepting `sf::st_set_geometry(x,NULL)` for extracting
-    `spatial_data` of `sf` objects
+    `spatial_data()` of `sf` objects
 
 ### version 3.8.9
 

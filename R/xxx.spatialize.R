@@ -6,6 +6,7 @@
                          ,lat0=NA,lon0=NA,resetProj=FALSE,style="auto"#,zoom=NA
                          ,subset="",verbose=FALSE,...) {
    engine <- match.arg(engine)
+   toResetGrid <- 0L
   # print(c(expand=expand,border=border))
   # geocode <- match.arg(geocode)
    geocodeStatus <- FALSE
@@ -63,8 +64,10 @@
    }
    if (!((is.character(dsn))&&(length(dsn)==1))) {
       nextCheck <- TRUE
-      if ((resetProj)&&(((.isSF(dsn))||(.isSP(dsn)))))
-         session_grid(NULL)
+      if ((.isSF(dsn))||(.isSP(dsn))) {
+         if ((resetProj)||(length(as.list(match.call())[-1])==1))
+            session_grid(NULL)
+      }
       if (FALSE) { ## 20180125--
          spcl <- paste0("Spatial",c("Points","Lines","Polygons"))
          spcl <- c(spcl,paste0(spcl,"DataFrame"))
@@ -443,7 +446,7 @@
          }
       }
       if ((!hasOpened)&&((!geocodeStatus)||(file.exists(dsn)))) {
-         opW <- options(warn=0)
+         opW <- options(warn=ifelse(isSP,-1,0))
          if (isSF)
             lname <- try(sf::st_layers(dsn)$name)
          else {
@@ -464,6 +467,8 @@
          }
          if (isSF) {
             obj <- sf::st_read(dsn,layer=layer,quiet=TRUE)
+            if (TRUE)
+               obj <- sf::st_zm(obj,drop=TRUE)
          }
          else {
             enc <- if (.lgrep("\\.shp$",dsn)) NULL else "UTF-8"
@@ -1085,14 +1090,16 @@
    }
    if (is.null(g2))
       session_grid(g0)
-   attr(obj,"grid") <- g0
-   attr(obj,"toUnloadMethods") <- toUnloadMethods
-   attr(obj,"colnames") <- dname
-   attr(obj,"style") <- style
-   attr(obj,"geocodeStatus") <- geocodeStatus
-  # attr(obj,"engine") <- ifelse(isSF,"sf","sp")
-   if (exists("dsn"))
-      attr(obj,"dsn") <- dsn
+   if (how_to_cancel_it <- !FALSE) {
+      attr(obj,"grid") <- g0
+      attr(obj,"toUnloadMethods") <- toUnloadMethods
+      attr(obj,"colnames") <- dname
+      attr(obj,"style") <- style
+      attr(obj,"geocodeStatus") <- geocodeStatus
+     # attr(obj,"engine") <- ifelse(isSF,"sf","sp")
+      if (exists("dsn"))
+         attr(obj,"dsn") <- dsn
+   }
   # class(obj) <- c(class(obj),"ursaVectorExternal")
    obj
 }

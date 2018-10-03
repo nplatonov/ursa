@@ -1,3 +1,5 @@
 ## ursa
 
-Check binary at https://r-forge.r-project.org/projects/ursa. That is near real-time version.
+Actual sources are at https://github.com/nplatonov/ursa
+
+Check [binary](https://r-forge.r-project.org/R/?group_id=2263) at https://r-forge.r-project.org/projects/ursa from near real-time version.

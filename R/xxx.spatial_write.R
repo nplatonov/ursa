@@ -277,6 +277,9 @@
          colnames(methods::slot(obj,"data")) <- iname <- sprintf("fld%03d",seq_along(colnames(methods::slot(obj,"data"))))
       }
       lch <- getOption("encoding")
+      if (!inherits(obj,c("SpatialPointsDataFrame","SpatialLinesDataFrame"
+                         ,"SpatialPolygonsDataFrame")))
+         spatial_data(obj) <- data.frame(dummy=seq_len(spatial_count(obj)))
       rgdal::writeOGR(obj,dsn=fname,layer=lname,driver=driver
                      ,dataset_options=dopt,layer_options=lopt
                      ,encoding=if (lch=="UTF-8") NULL else localeToCharset()

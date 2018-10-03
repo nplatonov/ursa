@@ -58,7 +58,7 @@
    if (isSF) {
       if (!.isSF(obj)) {# lost geometry colname
          cname <- colnames(obj)
-         obj <- sf::st_sf(obj,geom=spatial_geometry(value))
+         obj <- sf::st_sf(obj,geometry=spatial_geometry(value))
          spatial_fields(obj) <- cname
       }
       else {
@@ -353,12 +353,18 @@
             stop(paste("Unimplemented MULTILINESTRING (sp)"))
       }
       if (geoType=="POLYGON") {
-         ulen <- sort(unique(sapply(methods::slot(obj,"polygons"),function(x) length(methods::slot(x,"Polygons")))))
+         ulen <- sort(unique(sapply(methods::slot(obj,"polygons")
+                             ,function(x) length(methods::slot(x,"Polygons")))))
         # ret <- vector("list",length(ulen))
          ret <- lapply(methods::slot(obj,"polygons"),function(x1) {
             x2 <- methods::slot(x1,"Polygons")
             hole <- sapply(x2,function(x3) methods::slot(x3,"hole"))
             if (TRUE) {# if (any(hole)) {
+               if ((any(hole))&&(hole[1])) {
+                  ind <- order(hole)
+                  x2 <- x2[ind]
+                  hole <- hole[ind]
+               }
                indF <- which(!hole)
                ret2 <- vector("list",length(indF))
                jF <- 1L
@@ -376,26 +382,31 @@
                               h2 <- length(hole2)
                            else
                               h2 <- indE[1]
-                           print(h2)
+                          # print(h2)
                         }
                         else
                            h2 <- 0
                      }
                      if (!h2) {
-                        ret2[[jF]] <- list(sp::coordinates(x2[[i]]))
+                        ret2[[jF]] <- list(unname(sp::coordinates(x2[[i]])))
                         jF <- jF+1L
                         next
                      }
                      h2 <- h2+1
                      ret3 <- vector("list",h2)
-                     ret3[[1]] <- sp::coordinates(x2[[i]])
+                     ret3[[1]] <- unname(sp::coordinates(x2[[i]]))
                      jH <- 2L
                   }
                   else {
-                     ret3[[jH]] <- sp::coordinates(x2[[i]])
+                     if (!exists("ret3")) {
+                        str(x2)
+                        str(hole)
+                        q()
+                     }
+                     ret3[[jH]] <- unname(sp::coordinates(x2[[i]]))
                      jH <- jH+1L
                      if (jH>h2) {
-                        ret2[[jF]] <-ret3
+                        ret2[[jF]] <- ret3
                         jF <- jF+1L
                      }
                   }
@@ -499,6 +510,56 @@
    }
    NULL
 }
+'spatial_dim<-' <- function(obj,verbose=FALSE,value) {
+   'redim' <- function(x) {
+      d <- dim(x)[2]
+      if (d==value)
+         return(x)
+      if (d<value) {
+         res <- cbind(x,0)
+         class(res) <- c("XYZ",grep("^XY$",class(x),value=TRUE))
+         return(res)
+      }
+      res <- x[,seq_len(value)]
+      class(res) <- c("XY",grep("^XY[MTZ]$",class(x),value=TRUE))
+      res
+    }
+   isSF <- .isSF(obj)
+   isSP <- .isSP(obj)
+   if (verbose)
+      print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
+   if (isSP)
+      return(obj)
+   if (isSF) {
+      res0 <- spatial_geometry(obj)
+      res <- lapply(res0,function(g1) {
+         if (is.list(g1)) {
+            res1 <- lapply(g1,function(g2) {
+               if (is.list(g2)) {
+                  res2 <- lapply(g2,redim)
+                  class(res2) <- class(g2)
+               }
+               else
+                  res2 <- redim(g2)
+               res2
+            })
+         }
+         else
+            res1 <- redim(g1)
+         class(res1) <- class(g1)
+         res1
+      })
+      attributes(res) <- attributes(res0)
+      ##~ cat("----------------\n")
+      ##~ str(unclass(res))
+      ##~ cat("----------------\n")
+      ##~ str(unclass(res0))
+      ##~ cat("----------------\n")
+      spatial_geometry(obj) <- res0
+      return(obj)
+   }
+   NULL
+}
 'is_spatial_points' <- function(obj,verbose=FALSE) {
    res <- .lgrep("POINT",spatial_geotype(obj,verbose=verbose))>0
 }
@@ -592,25 +653,63 @@
    }
    obj
 }
-'.spatial_intersection' <- function(x,y,verbose=FALSE) {
+'spatial_intersection' <- function(x,y,verbose=FALSE) {
    isSF <- .isSF(x) & .isSF(y)
    isSP <- .isSP(x) & .isSP(y)
    if (verbose)
       print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
    if (isSF) {
-      sf::st_agr(x) <- "constant"
-      sf::st_agr(y) <- "constant"
+      if (inherits(x,"sf"))
+         sf::st_agr(x) <- "constant"
+      if (inherits(y,"sf"))
+         sf::st_agr(y) <- "constant"
       res <- sf::st_intersection(x,y)
+      if (TRUE) {
+         if (FALSE) {
+           # spatial_geometry(res) <- sf:::st_cast_sfc_default(spatial_geometry(res))
+         }
+         else {
+            geotype <- spatial_geotype(res)
+            if ("GEOMETRYCOLLECTION" %in% geotype) {
+               if (length(grep("POLYGON",geotype)))
+                  res <- sf::st_collection_extract(res,"POLYGON")
+            }
+            else if (length(match(geotype,c("POLYGON","MULTIPOLYGON")))==2)
+               res <- sf::st_cast(res,"MULTIPOLYGON")
+         }
+      }
       return(res)
    }
-   if (isSP) {
-      stop("unimplemented for 'sp' objects")
-     # requireNamespace("rgeos",quietly=.isPackageInUse())
-     # res <- rgeos::gIntersection(x,y,byid=TRUE,drop_lower_td=TRUE
-     #                            ,unaryUnion_if_byid_false=FALSE)
-     # res2 <- names(sp::over(spatial_geometry(x),spatial_geometry(y),returnList=TRUE))
-     # res2 <- grep("NA",res2,invert=TRUE,value=TRUE)
-     # str(res2)
+   else if (isSP) {
+      if (!requireNamespace("raster",quietly=.isPackageInUse()))
+         stop("suggested package is required for this operation")
+     # opW <- options(warn=-1)
+      res <- try(raster::intersect(x,y))
+     # options(opW)
+      if (inherits(res,"try-error")) {
+         res <- raster::intersect(spatial_buffer(x),spatial_buffer(y))
+      }
+      if (is.null(res))
+         return(res)
+      if (spatial_geotype(res) %in% "POLYGON") {
+         k <- 0
+         res@polygons <- lapply(res@polygons,function(x) {
+            k <<- k+1
+            x@ID <- as.character(k)
+            x
+         })
+         rm(k)
+      }
+      return(res)
+   }
+   else if (implement_by_rgeos <- FALSE) {
+     # stop("unimplemented for 'sp' objects")
+      requireNamespace("rgeos",quietly=.isPackageInUse())
+      res <- rgeos::gIntersection(x,y,byid=TRUE,drop_lower_td=TRUE
+                                 ,unaryUnion_if_byid_false=FALSE)
+      res2 <- names(sp::over(spatial_geometry(x),spatial_geometry(y),returnList=TRUE))
+      res2 <- grep("NA",res2,invert=TRUE,value=TRUE)
+      str(res2)
      # q()
      # spatial_data(res) <- data.frame(I=rep(1L,spatial_nrow(res)))
      # spatial_write(res,"res1.shp")
@@ -618,4 +717,201 @@
      # return(res)
    }
    NULL
+}
+'spatial_difference' <- function(x,y,verbose=FALSE) {
+   isSF <- .isSF(x) & .isSF(y)
+   isSP <- .isSP(x) & .isSP(y)
+   if (verbose)
+      print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
+   if (isSF) {
+      if (inherits(x,"sf"))
+         sf::st_agr(x) <- "constant"
+      if (inherits(y,"sf"))
+         sf::st_agr(y) <- "constant"
+      res <- sf::st_difference(x,y)
+      return(res)
+   }
+   else if (isSP) {
+      if (!requireNamespace("rgeos",quietly=.isPackageInUse()))
+         stop("suggested package is required for this operation")
+     # opW <- options(warn=-1)
+      res <- try(rgeos::gDifference(x,y,byid=TRUE))
+     # options(opW)
+      if (inherits(res,"try-error"))
+         res <- try(rgeos::gDifference(spatial_buffer(x),spatial_buffer(y),byid=TRUE))
+      return(res)
+   }
+   else if (dev <- FALSE) {
+   }
+   NULL
+}
+'spatial_symdifference' <- function(x,y,verbose=FALSE) {
+   isSF <- .isSF(x) & .isSF(y)
+   isSP <- .isSP(x) & .isSP(y)
+   if (verbose)
+      print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
+   if (isSF) {
+      if (inherits(x,"sf"))
+         sf::st_agr(x) <- "constant"
+      if (inherits(y,"sf"))
+         sf::st_agr(y) <- "constant"
+      res <- sf::st_sym_difference(x,y)
+      return(res)
+   }
+   else if (isSP) {
+      if (!requireNamespace("rgeos",quietly=.isPackageInUse()))
+         stop("suggested package is required for this operation")
+     # opW <- options(warn=-1)
+      res <- try(rgeos::gSymdifference(x,y,byid=TRUE))
+     # options(opW)
+      if (inherits(res,"try-error"))
+         res <- try(rgeos::gSymdifference(spatial_buffer(x),spatial_buffer(y),byid=TRUE))
+      return(res)
+   }
+   else if (dev <- FALSE) {
+   }
+   NULL
+}
+'spatial_buffer' <- function(obj,dist=0,quadsegs=30L,verbose=FALSE) {
+   isSF <- .isSF(obj)
+   isSP <- .isSP(obj)
+   if (verbose)
+      print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
+   if (isSF) {
+      res <- sf::st_buffer(obj,dist=dist,nQuadSegs=quadsegs)
+      return(res)
+   }
+   else if (isSP) {
+      if (!requireNamespace("rgeos",quietly=.isPackageInUse()))
+         stop("suggested package is required for this operation")
+     # opW <- options(warn=-1)
+      res <- rgeos::gBuffer(obj,byid=TRUE,width=dist,quadsegs=quadsegs)
+     # options(opW)
+      return(res)
+   }
+   else if (dev <- FALSE) {
+   }
+   NULL
+}
+'spatial_union' <- function(x,y,byid=NA,verbose=FALSE) {
+   if (missing(y)) {
+      isSF <- .isSF(x)
+      isSP <- .isSP(x)
+      if (is.na(byid))
+         byid <- FALSE
+   }
+   else {
+      isSF <- .isSF(x) & .isSF(y)
+      isSP <- .isSP(x) & .isSP(y)
+      if (is.na(byid))
+         byid <- TRUE
+   }
+   if (verbose)
+      print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
+   if (isSF) {
+     # message("first run: 'spatial_union' for 'sf' object(s)")
+     # sf::st_agr(x) <- "constant"
+     # sf::st_agr(y) <- "constant"
+      res <- sf::st_union(x,y,by_feature=byid)
+      return(res)
+   }
+   else if (isSP) {
+      if (!requireNamespace("rgeos",quietly=.isPackageInUse()))
+         stop("suggested package is required for this operation")
+      if (missing(y)) {
+         res <- try(rgeos::gUnaryUnion(x,id=NULL))
+         if (inherits(res,"try-error")) {
+            res <- rgeos::gUnaryUnion(.spatial_repair(x),id=NULL)
+         }
+         return(res)
+      }
+      res <- rgeos::gUnion(x,y,byid=byid)
+      return(res)
+   }
+   else if (dev <- FALSE) {
+   }
+   NULL
+}
+'spatial_simplify' <- function(obj,tol,topologyPreserve=TRUE,verbose=FALSE) {
+   isSF <- .isSF(obj)
+   isSP <- .isSP(obj)
+   if (verbose)
+      print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
+   if (isSF) {
+      res <- sf::st_simlify(obj,preserveTopology=topologyPreserve,dTolerance=tol)
+      return(res)
+   }
+   else if (isSP) {
+      if (!requireNamespace("rgeos",quietly=.isPackageInUse()))
+         stop("suggested package is required for this operation")
+     # opW <- options(warn=-1)
+      res <- rgeos::gSimplify(obj,tol=tol,topologyPreserve=topologyPreserve)
+     # options(opW)
+      return(res)
+   }
+   else if (dev <- FALSE) {
+   }
+   NULL
+}
+'.spatial_repair' <- function(obj,verbose=FALSE) {
+   isSF <- .isSF(obj)
+   isSP <- .isSP(obj)
+   if (verbose)
+      print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
+   if (isSF) {
+      valid <- try(sg::st_is_valid(obj,NA_on_exception=TRUE,reason=verbose))
+   }
+   else if (isSP) {
+      if (!requireNamespace("rgeos",quietly=.isPackageInUse()))
+         stop("suggested package is required for this operation")
+      valid <- try(rgeos::gIsValid(obj,reason=verbose))
+   }
+   else
+      return(NULL)
+   if ((inherits(valid,"try-error"))||(!valid)) {
+      obj <- spatial_buffer(obj)
+   }
+   obj
+}
+'spatial_bind' <- function(...) {
+   arglist <- list(...)
+   res <- arglist[[1]]
+   isSF <- .isSF(res)
+   isSP <- .isSP(res)
+   if (!is.null(spatial_data(res))) {
+      if (isSP)
+         return(do.call("rbind",arglist))
+      if (isSF) {
+         geom <- unique(sapply(arglist,function(x) attr(x,"sf_column")))
+         if (length(unique(geom))==1)
+            return(do.call("rbind",arglist))
+         if (TRUE) { ## fixed st_column name 'geometry'
+            for (i in seq_along(arglist))
+               arglist[[i]] <- sf::st_sf(spatial_data(arglist[[i]])
+                                        ,geometry=spatial_geometry(arglist[[i]]))
+         }
+         else { ## repeeat st_column name for first argument
+            for (i in tail(seq_along(arglist),-1)) {
+               res <- arglist[[i]]
+               ind <- match(attr(res,"sf_column"),colnames(res))
+               colnames(res)[ind] <- geom[1]
+               attr(res,"sf_column") <- geom[1]
+               arglist[[i]] <- res
+            }
+         }
+         return(do.call("rbind",arglist))
+      }
+   }
+   if (isSF)
+      return(do.call("c",arglist))
+   geoType <- spatial_geotype(res)
+   coerce <- switch(geoType
+                   ,POLYGON="SpatialPolygonsDataFrame"
+                   ,LINESTRING="SpatialLinesDataFrame"
+                   ,POINT="SpatialPointsDataFrame"
+                   ,stop("geoType"))
+   for (i in seq_along(arglist))
+      arglist[[i]] <- methods::as(arglist[[i]],coerce)
+   res <- spatial_geometry(do.call("rbind",arglist))
+   res
 }

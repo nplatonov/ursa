@@ -140,7 +140,7 @@
    if (.lgrep("\\.shp$",fname))
       fname <- .gsub("\\.shp$","",fname)
    list1 <- .dir(path=dirname(fname)
-                ,patt=paste0("^",basename(fname),"\\.(cpg|dbf|prj|shp|shx)$")
+                ,pattern=paste0("^",basename(fname),"\\.(cpg|dbf|prj|shp|shx)$")
                 ,full.names=TRUE)
    file.remove(list1)
 }

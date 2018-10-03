@@ -242,7 +242,11 @@
          ret$fill <- ret$bg
       }
    }
-   if (nchar(geoType)) {
+   if (length(geoType)>1) {
+      print(geoType)
+     # spatial_write(obj,"res1.sqlite")
+   }
+   if (any(nchar(geoType)>0)) {
       opR <- getOption("ursaPngLegend")
       options(ursaPngLegend=if (is.null(opR)) list(ret) else c(opR,list(ret)))
    }
