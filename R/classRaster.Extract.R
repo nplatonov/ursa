@@ -1,6 +1,6 @@
 '[.ursaRaster' <- function(x,i,j,...,drop=FALSE)
 {
-   verbose <- FALSE
+   verbose <- isTRUE(getOption("ursaDevel"))
    if (verbose)
       print(match.call())
    dimx <- dim(x$value)
@@ -138,6 +138,9 @@
       }
       missingJ <- TRUE
       missingI <- FALSE
+   }
+   if ((!missingI)&&(is.logical(i))) {
+      i <- which(i)
    }
    if ((!missingI)&&(all(i<0)))
    {

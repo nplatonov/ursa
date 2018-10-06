@@ -1,8 +1,8 @@
 '[<-.ursaRaster' <- function(x,i,j,...,value)
 {
-   verbose <- FALSE
-   if (verbose)
-      str(match.call())
+   verbose <- isTRUE(getOption("ursaDevel"))
+  # if (verbose)
+  #    str(match.call())
    dimx <- dim(x$value)
    con <- x$con
    if (!.is.con(con))
@@ -39,7 +39,18 @@
          else
          {
             ind <- !is.na(i$value)
-            obj$value[ind] <- value$value[ind]
+            if (proposed <- TRUE) {
+               if ((length(obj)>1)&&(length(obj)==length(i))) {
+                  k <- rep(seq_along(value),length.out=length(obj))
+                  for (m in seq_along(k))
+                     obj$value[ind[,m],m] <- value$value[ind[,m],k[m]]
+               }
+               else ## common
+                  obj$value[ind] <- value$value[ind]
+            }
+            else {
+               obj$value[ind] <- value$value[ind]
+            }
          }
          if (debug)
          {

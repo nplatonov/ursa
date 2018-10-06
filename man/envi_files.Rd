@@ -16,7 +16,7 @@ envi_exists(pattern = ".+", path = ".", all.files = FALSE, full.names = TRUE,
            recursive = FALSE, ignore.case = TRUE, exact = FALSE)
 envi_list(pattern = ".+", path = ".", all.files = FALSE, full.names = FALSE,
           recursive = FALSE, ignore.case = TRUE, exact = FALSE)
-envi_remove(pattern = ".+", path = ".", all.files = FALSE, full.names = FALSE,
+envi_remove(pattern = ".+", path = ".", all.files = FALSE, full.names = recursive,
             recursive = FALSE, ignore.case = TRUE, verbose = FALSE)
 envi_copy(src, dst, overwrite = TRUE)
 envi_rename(src, dst, overwrite = TRUE)

@@ -38,6 +38,28 @@
    }
    if (isRaster)
       res[] <- obj
+  # str(res$con)
+   nameGDAL <- sapply(arglist,function(x) {
+      y <- .grep("\\.(tif|tiff)$",x,value=TRUE)
+      if (!length(y))
+         return("")
+      y
+   })
+   nameGDAL <- nameGDAL[nchar(nameGDAL)>0]
+   reGDAL <- length(nameGDAL)==1 & unname(nchar(Sys.which("gdal_translate")))>0
+   if (reGDAL)
+      res$con$compress <- 0
    close(res)
+   if (reGDAL) {
+      a <- .maketmp()
+      if (.grep("\\.(tif|tiff)$",nameGDAL))
+         system2("gdal_translate",c("-q","-of","GTiff"
+                                   ,"-co",dQuote("COMPRESS=DEFLATE")
+                                   ,"-co",dQuote("PREDICTOR=2")
+                                   ,"-co",dQuote("TILED=NO")
+                                   ,res$con$fname,a))
+      envi_remove(res$con$fname)
+      file.rename(a,nameGDAL)
+   }
    return(invisible(res$con$datatype))
 }

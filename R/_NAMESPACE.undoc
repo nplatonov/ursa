@@ -6,6 +6,5 @@ spatial_difference
 spatial_dim<-
 spatial_read
 spatial_simplify
-spatial_union
 spatial_write
 spatialize

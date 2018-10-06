@@ -332,8 +332,9 @@
       message(paste("Filename is assigned automatically:",fname))
    }
    myDir <- .dirname(fname)
-   if (!file.exists(myDir))
-      dir.create(myDir)
+   if (!file.exists(myDir)) {
+      dir.create(myDir,recursive=TRUE)
+   }
    con$fname <- file.path(chartr("\\","/",normalizePath(.dirname(fname)))
                           ,.basename(fname))
    if (!is.null(connection))

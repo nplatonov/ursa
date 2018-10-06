@@ -30,9 +30,10 @@
 \alias{is_spatial_polygons}
 \alias{spatial_intersection}
 \alias{spatial_symdifference}
+\alias{spatial_union}
 \alias{spatial_buffer}
 \title{
-Wrapper functions for manipulation with non-raster objects
+Wrapper functions for manipulation with non-raster spatial objects
 }
 \description{
 These wrappers return iniform properties or do consimilar manipulations for spatial objects of different types: simple features (package \pkg{sf}) and abstract class Spatial (package \pkg{sp}). Appropriate functionality (\emph{\dQuote{engine}}) of respective packages is used. 
@@ -87,6 +88,8 @@ is_spatial_polygons(obj, verbose = FALSE)
 
 spatial_intersection(x, y, verbose = FALSE)
 spatial_symdifference(x, y, verbose = FALSE)
+spatial_union(x, y, byid=NA, verbose = FALSE)
+
 spatial_buffer(obj, dist = 0, quadsegs = 30L, verbose = FALSE)
 
 }
@@ -126,7 +129,10 @@ See description of argument \code{full.names} in function \code{\link[base:list.
 Integer. Number of segments per quadrant (fourth of a circle), for all or per-feature. See description for \code{quadsegs} argument of \code{\link[rgeos:misc-gBuffer]{gBuffer}} and for \code{nQuadSegs} argument of \code{\link[sf:geos_unary]{st_buffer}}.
 }
   \item{dist}{
-Numeric. buffer distance for all, or for each of the elements. See description for \code{width} argument of \code{\link[rgeos:misc-gBuffer]{gBuffer}} and for \code{dist} argument of \code{\link[sf:geos_unary]{st_buffer}}.
+Numeric. Buffer distance for all, or for each of the elements. See description for \code{width} argument of \code{\link[rgeos:misc-gBuffer]{gBuffer}} and for \code{dist} argument of \code{\link[sf:geos_unary]{st_buffer}}.
+}
+  \item{byid}{
+Logical. For \code{spatial_union} function, \code{TRUE} does unite of each feature; \code{FALSE} returns a single feature that is the geometric union of the set of features; default \code{NA} is coerced to \code{FALSE} for unary operation (missing \code{y}) and to \code{TRUE} for binary operation.
 }
   \item{verbose}{
 Logical. Value \code{TRUE} provides information on console. Default is \code{FALSE}.
@@ -187,6 +193,8 @@ Further arguments passed to \code{sf::st_transform} or to \code{sp::spTransform}
 \code{spatial_symdifference} returns difference of two spatial objects.
 
 \code{spatial_buffer} returns buffered spatial object.
+
+\code{spatial_union} returns combined geometry without internal boundaries.
 
 }
 \references{
