@@ -145,8 +145,9 @@
       dim3 <- c(dim1[1]*dim1[2],dim1[3])
       if ((is.null(dim(value)))&&(length(value)==bands))
          result$value <- array(rep(value,each=dim3[1]),dim=dim3)
-      else
+      else {
          result$value <- array(value,dim=dim3)
+      }
       result$dim <- dim3
    }
   # result$name <- sprintf(sprintf("%s%%0%dd","tmp"
@@ -164,9 +165,10 @@
                                        ,NA_integer_)
    }
    ##~ if ((is.null(bname))||(length(bname)!=result$dim[2]))
-   if (is.null(bname))
+   if (is.null(bname)) {
       result$name <- sprintf(sprintf("%s%%0%dd"
-                                    ,"Band ",nchar(bands)),seq(bands))
+                                    ,"Band ",nchar(bands)),seq_len(bands))
+   }
    else {
       bname <- rep(bname,length=bands)
       result$name <- bname

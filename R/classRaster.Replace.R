@@ -1,6 +1,10 @@
 '[<-.ursaRaster' <- function(x,i,j,...,value)
 {
    verbose <- isTRUE(getOption("ursaDevel"))
+   if (verbose) {
+      cat("----------\n")
+      on.exit(cat("==========\n"))
+   }
   # if (verbose)
   #    str(match.call())
    dimx <- dim(x$value)
@@ -86,6 +90,18 @@
          bg <- ignorevalue(x)
          if (!is.na(bg))
             value[.is.eq(value,bg)] <- NA
+      }
+      if (verbose) {
+         str(value)
+         print(is.null(value))
+         print(dim(value))
+         print(length(value))
+      }
+      if (missingJ) {
+         if (is.null(value))
+            return(obj[-i])
+         if ((is.null(dim(value)))&&(!length(value)))
+            return(obj[-i])
       }
       if (is.array(value))
       {

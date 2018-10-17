@@ -7,6 +7,15 @@
    print(summary(x,...))
 }
 'ursa_value' <- function(obj,band) {
+   if (inherits(obj,c("ursaNumeric","ursaCategory"))) {
+      if (missing(band))
+         return(obj)
+      if (is.character(band))
+         stop("unable get band index from band name")
+      val <- obj[,band,drop=FALSE]
+      class(val) <- class(obj)
+      return(val)
+   }
    if (!is.ursa(obj))
       return(NULL)
    if (missing(band))
@@ -29,13 +38,18 @@
          class(obj$value) <- cl
       }
       if (is.array(value)) {
-         if (dima[1]==dim(value)[1]) {
+         dimb <- dim(value)
+         if (dima[1]==dimb[1]) {
             obj$value[] <- value
          }
-         else if (dima[1]==prod(dim(value)))
+         else if (dima[1]==prod(dimb))
             obj$value[] <- value
          else {
-            obj$value[] <- rep(value,length=prod(dima))
+            if ((.is.sparse(value))&&(dima[2]==dimb[2])) {
+               obj$value <- value
+            }
+            else
+               obj$value[] <- rep(value,length=prod(dima))
          }
       }
       else if ((is.numeric(value))||((length(value)==1)&&(is.na(value)))) {

@@ -8,9 +8,9 @@
      # print(class(con))
       if (!.is.con(con))
          next
-      if (inherits(con$handle,"connection"))
-      {
-         close(con$handle)
+      if (inherits(con$handle,"connection")) {
+         if (con$fname %in% showConnections()[,"description"])
+            close(con$handle)
          con$handle <- NA
          if (con$compress==-1L)
             file.remove(con$fname)
@@ -28,10 +28,22 @@
          }
          else if (con$compress==1L)
          {
+           # .elapsedTime("CLOSE 1")
             if (file.exists(ftmp <- paste0(con$fname,".gz")))
                file.remove(ftmp)
-            if (nchar(Sys.which("gzip")))
-               system(paste("gzip","-f -Sgz",con$fname)) ##keep
+            if (nchar(Sys.which("gzip"))) {
+               for (i in seq(10)) {
+                  break
+                  s <- file.size(con$fname)
+                  print(c(i=i,s=s))
+                  if (s)
+                     break
+                  Sys.sleep(7)
+               }
+               a <- system(paste("gzip","-f -Sgz",con$fname)) ##keep
+              # str(a)
+            }
+           # .elapsedTime("PASSED")
            # src <- paste0(con$fname,"gz")
            # dst <- file.path(dirname(src),.gsub("\\.bin",".gz",basename(con$fname)))
            # file.rename(src,dst)

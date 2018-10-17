@@ -12,12 +12,12 @@
    if (isList) {
      # p <- colorize(obj,...)
      # p <- lapply(obj,colorize,...)
-      p <- lapply(obj,function(x) colorize(x,...))
+      p <- lapply(obj,function(x) colorize(decompress(x),...))
    }
    else {
      # p <- colorize(ursa_stack(obj),...)
      # p <- lapply(ursa_stack(obj),colorize,...)
-      p <- lapply(ursa_stack(obj),function(x) do.call("colorize",list(x,...)))
+      p <- lapply(ursa_stack(decompress(obj)),function(x) do.call("colorize",list(x,...)))
    }
   # cl <- .compose_design.stack(p,oneside=oneside
   #                           ,horizontal=horizontal,vertical=vertical,ratio=ratio)

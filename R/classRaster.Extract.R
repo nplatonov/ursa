@@ -1,8 +1,17 @@
 '[.ursaRaster' <- function(x,i,j,...,drop=FALSE)
 {
    verbose <- isTRUE(getOption("ursaDevel"))
-   if (verbose)
+   if (verbose) {
+      cat("----------\n")
+      on.exit(cat("==========\n"))
       print(match.call())
+      ##~ a <- as.list(match.call())$i
+      ##~ print(class(a))
+      ##~ print(is.symbol(a))
+      ##~ print(is.language(a))
+      ##~ print(is.call(a))
+      ##~ q()
+   }
    dimx <- dim(x$value)
    clValue <- class(x$value)
    res <- x
@@ -111,8 +120,10 @@
       else
          res$name <- res$name[i]
       cl <- class(res$value)
+      sp <- attr(res$value,"sparse")
       res$value <- res$value[j,i,drop=drop]
       class(res$value) <- cl
+      attr(res$value,"sparse") <- sp
       res$dim <- dim(res$value)
       return(res)
    }

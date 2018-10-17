@@ -13,7 +13,7 @@
       }
       return(res)
    }
-   x <- args[[1]]
+   x <- decompress(args[[1]])
    xname <- names(args[1])
    z <- x$con$posZ
    ##~ if (((length(x$name)==1)||(!is.na(z[1]))&&(length(z)==1))&&(!is.null(xname)))
@@ -56,6 +56,8 @@
          else if (is.numeric(y))
             y <- ursa_new(value=y)
       }
+      else
+         y <- decompress(y)
       isDiskY <- is.null(dim(y$value))
       if (isDiskY)
          next

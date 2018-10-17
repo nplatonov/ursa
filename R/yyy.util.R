@@ -292,6 +292,7 @@
 '.is.gt' <- function(x,value) x>value
 '.is.lt' <- function(x,value) x<value
 '.is.near' <- function(x1,x2,verbose=FALSE) {
+  # https://stackoverflow.com/questions/9508518/why-are-these-numbers-not-equal
    m1 <- match(x1,x2)
    if (all(!is.na(m1))) { ## 20161222 add 'all', removed 'any'
       if (verbose)
@@ -458,6 +459,11 @@
    sprj2 <- .gsub("(^\\s|\\s$)","",sprj2)
    ret <- identical(oprj2,sprj2)
    ret
+}
+'.sample' <- function(x,n) {
+   if (length(x)<=1)
+      return(x)
+   sample(x,n)
 }
 '.system2.patch' <- function(...) {
   ## in 3.5.0 failure for 'interactive()' & 'system2(...,wait=TRUE)'

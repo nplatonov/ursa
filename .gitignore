@@ -15,4 +15,4 @@ src/*.dll
 src/*.o
 R/FarMenu.ini
 R/SciTE.properties
-
+R/_md5

@@ -14,7 +14,8 @@
 }
 '.compose_close' <- function(kind=c("crop2","crop","nocrop")
                             ,border=5,bpp=0,execute=TRUE#,wait=NA
-                            ,verbose=FALSE){
+                            ,verbose=FALSE) {
+   sysRemove <- !FALSE
    if (verbose)
       str(list(kind=kind,border=border,bpp=bpp,execute=execute,verbose=verbose))
    toOpen <- session_pngviewer()
@@ -32,24 +33,32 @@
          options(lapply(op[ind],function(x) NULL))
       NULL
    })
-   syswait <- FALSE
-   if ((FALSE)&&(execute)) { ## patch for "shell" 
+   if (sysRemove & execute) { ## patch for "shell" 
+      sysWait <- FALSE
       con <- showConnections(all=TRUE)
       ind <- which(!is.na(match(con[,"class"],"file")))
-      if (length(ind)) {
-         con <- con[ind,,drop=FALSE]
-         unable <- grep("\\.unpacked(.*)\\~$",con[,"description"])
-         if (length(unable)) {
-            opW <- options(warn=1)
-            w <- paste0("Detected opened connection(s): "
-                       ,paste(.dQuote(basename(con[unable,"description"]))
-                             ,collapse=", ")
-                       ,".")
-            warning(w)
-            w <- "Script is suspended until close of image viewer."
-            message(w)
-            options(opW)
-            syswait <- TRUE
+      if (length(ind)) { ## FAILURES with connections: 1) unpacked, 2) being to pack
+         if (tryToRepair <- FALSE) {
+            con <- con[ind,,drop=FALSE]
+            print(con)
+            unable <- grep("\\.unpacked(.*)\\~$",con[,"description"])
+            if (length(unable)) {
+               opW <- options(warn=1)
+               w <- paste0("Detected opened connection(s): "
+                          ,paste(.dQuote(basename(con[unable,"description"]))
+                                ,collapse=", ")
+                          ,".")
+               warning(w)
+               w <- "Script is suspended until close of image viewer."
+               message(w)
+               options(opW)
+               sysWait <- TRUE
+            }
+         }
+         else if (FALSE) {
+            if (delafter & execute & !.isPackageInUse())
+               cat("Info: required pausing due to opened connection(s)\n")
+            sysRemove <- FALSE
          }
       }
    }
@@ -104,18 +113,23 @@
                   system2("xdg-open",c(.dQuote(fileout)),wait=!.isRscript())
                else
                   system2("R",c("CMD","open",.dQuote(fileout)),wait=!.isRscript())
-              # system2("open",list(fileout),wait=!.isRscript()) ## wait=syswait
+              # system2("open",list(fileout),wait=!.isRscript()) ## wait=sysWait
               # stop("How to implement file association in Unix-like systems?")
             }
          }
          if (delafter) {
             if (execute) {
                wait <- getOption("ursaPngWaitBeforeRemove")
-              # Sys.sleep(wait)
-               cmd <- paste0("Sys.sleep(",wait,");","file.remove(",sQuote(fileout),")")
-               system2("Rscript",c("-e",dQuote(cmd)),wait=FALSE,stdout=NULL)
+               if (!sysRemove)
+                  Sys.sleep(wait)
+               else {
+                  if (wait<5)
+                     wait <- 5
+                  cmd <- paste0("Sys.sleep(",wait,");","file.remove(",sQuote(fileout),")")
+                  system2("Rscript",c("-e",dQuote(cmd)),wait=FALSE,stdout=NULL)
+               }
             }
-            else
+            else if (!sysRemove)
                file.remove(fileout)
          }
       }
@@ -217,12 +231,12 @@
             system2("xdg-open",c(.dQuote(fileout)),wait=!.isRscript())
          else
             system2("R",c("CMD","open",.dQuote(fileout)),wait=TRUE)
-        # system2("R cmd open",list(,fileout),wait=TRUE) #!.isRscript()) ## wait=syswait
+        # system2("R cmd open",list(,fileout),wait=TRUE) #!.isRscript()) ## wait=sysWait
         # stop("How to implement file association in Unix-like systems?")
       }
       wait <- getOption("ursaPngWaitBeforeRemove")
      # print(wait)
-      if ((FALSE)&&(delafter))
+      if ((!sysRemove)&&(delafter))
          Sys.sleep(wait)
    }
    if (delafter) {
@@ -239,10 +253,12 @@
             }
          }
       }
-      else if (FALSE) {
+      else if (!sysRemove) {
          file.remove(fileout)
       }
       else {
+         if (wait<5)
+            wait <- 5
          cmd <- paste0("Sys.sleep(",wait,");","file.remove(",sQuote(fileout),")")
          system2("Rscript",c("-e",dQuote(cmd)),wait=FALSE,stdout=NULL)
       }

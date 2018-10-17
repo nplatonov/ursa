@@ -326,6 +326,9 @@
    isArray <- !is.null(dim(obj)) ## 20170327 replaced 'isArray <- !is.null(dim)'
    if ((!isArray)&&(is.numeric(obj))) {
      # print("NOT-ARRAY")
+      if (!length(obj)) {
+         return(session_grid())
+      }
       res <- ursa_new(obj,...)
       return(res)
    }

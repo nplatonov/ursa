@@ -14,7 +14,7 @@ Management of ENVI files similar to functions of OS file manager.
 \usage{
 envi_exists(pattern = ".+", path = ".", all.files = FALSE, full.names = TRUE,
            recursive = FALSE, ignore.case = TRUE, exact = FALSE)
-envi_list(pattern = ".+", path = ".", all.files = FALSE, full.names = FALSE,
+envi_list(pattern = ".+", path = ".", all.files = FALSE, full.names = recursive,
           recursive = FALSE, ignore.case = TRUE, exact = FALSE)
 envi_remove(pattern = ".+", path = ".", all.files = FALSE, full.names = recursive,
             recursive = FALSE, ignore.case = TRUE, verbose = FALSE)

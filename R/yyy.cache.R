@@ -1,3 +1,4 @@
+## ?fastdigest::fastdigest
 '.ursaCacheDir' <- function() {
    fpath <- getOption("ursaCacheDir")
    if (!dir.exists(fpath))

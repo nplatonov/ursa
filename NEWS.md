@@ -1,8 +1,25 @@
-2018-10-01
+2018-10-17
 
 ### version 3.8.11
 
--   Added `spatial_intersection` function.
+-   Package **tools** is added as *Suggested* for MD5 manipulations.
+
+-   Selective improvement of compressed raster matrices in `c`,
+    `display`. Still far for full support.
+
+-   `obj[2] <- NULL` removes second band of raster object `obj`.
+
+-   Package **rgeos** is added as *Suggested* for geometry operations
+    with `sp` objects.
+
+-   Added `spatial_intersection`, `spatial_symdifference`, and other
+    functions for operations with geometries of spatial objects.
+
+-   Added **Author@R** field in `DESCRIPTION`.
+
+-   Changed behaviour for opening of visualization for `interactive()`
+    session. Now, figures are opened outsize of GUI, by default. Use
+    `session_pngviewer(FALSE)` for restoring of previous behaviour.
 
 ### version 3.8.10
 

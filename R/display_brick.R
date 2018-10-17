@@ -8,6 +8,8 @@
    ind <- .grep("decor",names(arglist))
    if (!length(ind))
       arglist$decor <- TRUE
+   if (.is.sparse(obj))
+      obj <- decompress(obj)
    compose_open(obj,...)
   # do.call("compose_plot",c(quote(obj),arglist))
    compose_plot(obj,...)

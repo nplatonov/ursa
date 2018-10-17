@@ -107,7 +107,27 @@
    0L
 }
 '.buildAndInstall' <- function() {
-   wd <- setwd("C:/platt/R/ursa-package")
+   wd <- setwd("C:/platt/R/ursa-package");on.exit(setwd(wd))
+   if (requireNamespace("tools")) {
+      toWrite <- TRUE
+      md5fname <- "ursa/R/_md5"
+      new <- tools::md5sum(dir(path="ursa"
+                             # ,pattern="(^NAMESPACE|^DESCRIPTION|\\.(R|c|md))$"
+                              ,recursive=TRUE,full.names=TRUE))
+      new <- data.frame(md5=unname(new),file=names(new))
+      new <- new[new$file!=md5fname,]
+      if (file.exists(md5fname)) {
+         old <- read.table(md5fname,header=FALSE)
+         colnames(old) <- colnames(new)
+         if ((identical(new$file,old$file))&&(identical(new$md5,old$md5)))
+            toWrite <- FALSE
+      }
+      if (toWrite)
+         write.table(new,md5fname,quote=FALSE
+                    ,col.names=FALSE,row.names=FALSE)
+      else
+         return(NULL)
+   }
    if (requireNamespace("ursa"))
       stopifnot(!.generate_namespace(verbose=FALSE))
    patt <- "^ursa_.*(\\.tar\\.gz|\\.zip)$"
@@ -140,7 +160,6 @@
       }
      # file.remove(pkg)
    }
-   setwd(wd)
    NULL
 }
 invisible({

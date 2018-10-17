@@ -42,7 +42,7 @@
       file.copy(list1[i],list2[i],overwrite=overwrite,copy.date=TRUE)
    invisible(0L)
 }
-'envi_remove' <- function(pattern=".+",path=".",all.files=FALSE,full.names=FALSE
+'envi_remove' <- function(pattern=".+",path=".",all.files=FALSE,full.names=recursive
                          ,recursive=FALSE,ignore.case=TRUE,verbose=FALSE)
 {
    list2 <- NULL

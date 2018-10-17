@@ -12,8 +12,9 @@
       obj <- obj[[1]]
       res <- vector("list",nband(obj))
      # names(res) <- bandname(obj)
-      for (i in seq_along(res))
+      for (i in seq_along(res)) {
          res[[i]] <- obj[i]
+      }
       names(res) <- names(obj)
       class(res) <- "ursaStack"
       return(res)

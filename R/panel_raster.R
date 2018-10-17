@@ -141,7 +141,7 @@
       arglist[[1]] <- quote(obj)
       obj <- do.call("colorize",arglist)
    }
-   if (!is.na(alpha)) {
+   if (!is.na(alpha)) { ## ?adjustcolor
       if ((is.numeric(alpha))&&(alpha>=0)&&(alpha<=1))
          alpha <- paste0(toupper(sprintf("%x",round(alpha*255))))
       else if ((is.numeric(alpha))&&(alpha>=0)&&(alpha<=255))

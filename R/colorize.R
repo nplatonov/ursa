@@ -38,6 +38,15 @@
             res <- eval.parent(rel[[i]])
             if (is.null(res))
                j <- c(j,i)
+            else if (is.language(res)) {
+               res <- eval.parent(res)
+               if (!is.language(res)) {
+                  assign(rname[i],res)
+                  rel[[i]] <- res
+               }
+               else
+                  stop("unable to evaluate agrument ",.sQuote(rname[i]))
+            }
             else
                rel[[i]] <- res 
          }
@@ -47,6 +56,7 @@
      # .elapsedTime("===")
    }
    if (is.numeric(alpha)) {
+     ## ?adjustcolor 
       if (all(alpha<=1))
          alpha <- round(alpha*255)
       alpha[alpha<0] <- 0

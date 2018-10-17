@@ -181,7 +181,8 @@
   # if ((length(value))&&(nneg>npos))
   #    return(rev(out))
    if (is.na(inv)) {
-      inv <- bg<128
+      cond1 <- !length(value[value>0]) & length(value[value<0])>2
+      inv <- bg<128 | cond1
    }
    if (inv)
       return(rev(out))
