@@ -210,6 +210,8 @@
         # return(invisible(retK))
       }
    }
+   if (execute | delafter)
+      wait <- getOption("ursaPngWaitBeforeRemove")
    if (execute)
    {
       if (!toOpen) {
@@ -234,7 +236,6 @@
         # system2("R cmd open",list(,fileout),wait=TRUE) #!.isRscript()) ## wait=sysWait
         # stop("How to implement file association in Unix-like systems?")
       }
-      wait <- getOption("ursaPngWaitBeforeRemove")
      # print(wait)
       if ((!sysRemove)&&(delafter))
          Sys.sleep(wait)
