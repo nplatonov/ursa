@@ -80,13 +80,15 @@
    }
    else if (is.na(delafter))
       delafter <- FALSE
-   if (!.lgrep("\\.png$",fileout))
+   fileext <- if (.lgrep("\\.(jpeg|jpg)$",fileout)) "jpeg" else "png"
+   isJPEG <- fileext %in% "jpeg"
+   if ((!isJPEG)&&(!.lgrep("\\.png$",fileout)))
       fileout <- paste0(fileout,".png")
    g1 <- session_grid()
   # scale1 <- (18.5*96)/(g1$rows*2.54)
   # scale2 <- (23.7*96)/(g1$columns*2.54)
    paperScale <- 0
-   if (is.character(scale)){
+   if (is.character(scale)) {
       patt <- "\\D*((\\d+(\\.\\d+)*)(\\:))*(\\d+(\\.\\d+)*)\\D*"
       .s0 <- .gsub(patt,"\\2",scale)
       .s <- as.numeric(.gsub(patt,"\\5",scale))
@@ -119,7 +121,7 @@
       if (is.character(height)) {
          .h <- as.numeric(.gsub("\\D*(\\d+(\\.\\d+)*)\\D*","\\1",height))
          height <- dpi*.h/2.54
-         paperScale <- c(1,1) # TRUE
+         paperScale <- c(-1,1) # TRUE
       }
       width <- 1e6
    }
@@ -193,15 +195,25 @@
       print(c(png_width=png_width,png_height=png_height
              ,scale=scale,autoscale=autoscale,pointsize=pointsize,dpi=dpi))
    if (.isJupyter())
-      options(jupyter.plot_mimetypes = 'image/png')
-   a <- try(png(filename=fileout,width=png_width,height=png_height,res=dpi
-           ,bg=background,pointsize=pointsize
-           ,type=device,antialias=antialias,family=font))
+      options(jupyter.plot_mimetypes=ifelse(isJPEG,'image/jpeg','image/png'))
+   if (isJPEG)
+      a <- try(png(filename=fileout,width=png_width,height=png_height,res=dpi
+              ,bg=background,pointsize=pointsize
+              ,type=device,antialias=antialias,family=font))
+   else
+      a <- try(png(filename=fileout,width=png_width,height=png_height,res=dpi
+              ,bg=background,pointsize=pointsize
+              ,type=device,antialias=antialias,family=font))
    if ((inherits(a,"try-error"))&&(.Platform$OS.type=="windows")) { ## 20180117 patch for conda without cairo
       device <- "windows"
-      png(filename=fileout,width=png_width,height=png_height,res=dpi
-         ,bg=background,pointsize=pointsize
-         ,type=device,antialias=antialias,family=font)
+      if (isJPEG)
+         png(filename=fileout,width=png_width,height=png_height,res=dpi
+            ,bg=background,pointsize=pointsize
+            ,type=device,antialias=antialias,family=font)
+      else
+         png(filename=fileout,width=png_width,height=png_height,res=dpi
+            ,bg=background,pointsize=pointsize
+            ,type=device,antialias=antialias,family=font)
    }
      # ,family=c("Tahoma","Verdana","Georgia","Calibri","sans")[1]
    nf <- layout(panel,widths=lcm(sizec)

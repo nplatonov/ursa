@@ -1,6 +1,9 @@
 '.crop' <- function(fileout,border=5,verbose=FALSE) {
+   isJPEG <- .lgrep("(jpg|jpeg)",gsub(".*\\.(.+$)","\\1",fileout))>0
    frame <- as.integer(round(border))
    requireNamespace("png",quietly=.isPackageInUse())
+   if (isJPEG)
+      requireNamespace("jpeg",quietly=.isPackageInUse())
    x <- png::readPNG(fileout,native=FALSE,info=TRUE)
    dimx <- dim(x)
    b <- .Cursa("internalMargin",x=as.numeric(x),dim=as.integer(dimx)
@@ -24,14 +27,20 @@
       s2 <- c(s2,length(b$indr))
    indr <- c(indentr,s1[1]:s2[length(s2)],indentc)
    att <- attr(x,"info")
-   png::writePNG(x[indr,indc,],fileout,dpi=att$dpi,text=c(source=R.version.string))
+   if (isJPEG)
+      jpeg::writeJPEG(x[indr,indc,],fileout)
+   else
+      png::writePNG(x[indr,indc,],fileout,dpi=att$dpi,text=c(source=R.version.string))
    0L
 }
 '.crop2' <- function(fileout,border=5,verbose=FALSE) {
    if (verbose)
       .elapsedTime("crop2:start")
    frame <- as.integer(round(border))
+   isJPEG <- .lgrep("(jpg|jpeg)",gsub(".*\\.(.+$)","\\1",fileout))>0
    requireNamespace("png",quietly=.isPackageInUse())
+   if (isJPEG)
+      requireNamespace("jpeg",quietly=.isPackageInUse())
    x <- png::readPNG(fileout,native=FALSE,info=TRUE)
    dimx <- dim(x)
    b <- .Cursa("internalMargin",x=as.numeric(x),dim=as.integer(dimx)
@@ -67,9 +76,20 @@
    for (i in seq_along(s1))
       indr <- c(indr,s1[i]:s2[i],indentr)
    att <- attr(x,"info")
-   png::writePNG(x[indr,indc,],fileout,dpi=att$dpi,text=c(source=R.version.string))
+   if (isJPEG)
+      jpeg::writeJPEG(x[indr,indc,],fileout)
+   else
+      png::writePNG(x[indr,indc,],fileout,dpi=att$dpi,text=c(source=R.version.string))
    if (verbose)
       .elapsedTime("crop2:finish")
    0L
 }
-'.nocrop' <- function(fileout,border,verbose) NULL
+'.nocrop' <- function(fileout,border,verbose) {
+   isJPEG <- .lgrep("(jpg|jpeg)",gsub(".*\\.(.+$)","\\1",fileout))>0
+   if (!isJPEG)
+      return(NULL)
+   requireNamespace("png",quietly=.isPackageInUse())
+   requireNamespace("jpeg",quietly=.isPackageInUse())
+   jpeg::writeJPEG(png::readPNG(fileout,native=FALSE,info=TRUE),fileout)
+   NULL
+}

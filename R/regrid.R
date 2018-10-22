@@ -341,10 +341,10 @@
    step2 <- FALSE
    if ((!is.na(bbox[1]))&&(length(bbox)==4))
    {
-      g$minx <- bbox[1]
-      g$miny <- bbox[2]
-      g$maxx <- bbox[3]
-      g$maxy <- bbox[4]
+      g$minx <- unname(bbox[1])
+      g$miny <- unname(bbox[2])
+      g$maxx <- unname(bbox[3])
+      g$maxy <- unname(bbox[4])
       step2 <- TRUE
    }
    else if (!is.na(cut[1])) {

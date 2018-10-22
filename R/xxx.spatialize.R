@@ -497,7 +497,7 @@
       obj <- do.call("subset",list(obj,parse(text=subset)))
    }
    if ((geocodeStatus)&&(style=="auto")) {
-      style <- switch(geocode,nominatim="openstreetmap color"
+      style <- switch(geocode,nominatim=c("mapnik","openstreetmap color")[1]
                              ,google="google terrain color")
    }
    if ((toUnloadMethods)&&("package:methods" %in% search())) {
@@ -696,7 +696,7 @@
       else
          border <- 27L
    }
-   if (!.lgrep("auto",style))
+   if (!.lgrep("(none|auto)",style))
       resetProj <- TRUE
    if (isEPSG)
       resetProj <- FALSE
