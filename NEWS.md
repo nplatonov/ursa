@@ -1,4 +1,17 @@
-2018-10-17
+2018-11-17
+
+### version 3.8.12
+
+-   Default style for web basemaps is OSM Mapnik tiles insead of OSM
+    static map due to
+    [limitations](http://staticmap.openstreetmap.de/staticmap.php).
+
+-   Parsing of metadata from object of package **stars** (&gt;=0.2).
+
+-   Domain changed from “arcticconnect.org” to “arcticconnect.ca” for
+    `style=polarmap` in `glance()`
+
+-   Coastline is updated to version 2018-11-17 09:50
 
 ### version 3.8.11
 

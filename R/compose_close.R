@@ -34,7 +34,7 @@
          options(lapply(op[ind],function(x) NULL))
       NULL
    })
-   if (sysRemove & execute) { ## patch for "shell" 
+   if (sysRemove & execute) { ## patch for "shell"
       sysWait <- FALSE
       con <- showConnections(all=TRUE)
       ind <- which(!is.na(match(con[,"class"],"file")))
@@ -248,6 +248,8 @@
         # system2("R cmd open",list(,fileout),wait=TRUE) #!.isRscript()) ## wait=sysWait
         # stop("How to implement file association in Unix-like systems?")
       }
+      if (normalizePath(tempdir())==normalizePath(dirname(fileout)))
+         sysRemove=FALSE
      # print(wait)
       if ((!sysRemove)&&(delafter))
          Sys.sleep(wait)

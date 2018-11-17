@@ -73,6 +73,8 @@
      # print(c(tempdir=session_tempdir()))
       if ((FALSE)&&((!.isRscript())||(!session_pngviewer())||(.isKnitr())))
          fileout <- file.path(tempdir(),.maketmp()) ## CRAN Repository Policy
+      else if (!TRUE)
+         fileout <- file.path(tempdir(),basename(.maketmp()))
       else
          fileout <- .maketmp()
       if (is.na(delafter))
