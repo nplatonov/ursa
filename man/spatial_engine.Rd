@@ -24,6 +24,8 @@
 \alias{spatial_nrow}
 \alias{spatial_ncol}
 \alias{spatial_filelist}
+\alias{spatial_dir}
+\alias{spatial_basename}
 \alias{is_spatial}
 \alias{is_spatial_points}
 \alias{is_spatial_lines}
@@ -79,6 +81,9 @@ spatial_nrow(obj, verbose = FALSE)
 spatial_ncol(obj, verbose = FALSE)
 
 spatial_filelist(path = ".", pattern = NA, full.names = TRUE, recursive = FALSE)
+spatial_dir(path = ".", pattern = NA, full.names = TRUE, recursive = FALSE)
+
+spatial_basename(fname)
 
 is_spatial(obj, verbose = FALSE)
 
@@ -134,6 +139,9 @@ Numeric. Buffer distance for all, or for each of the elements. See description f
   \item{byid}{
 Logical. For \code{spatial_union} function, \code{TRUE} does unite of each feature; \code{FALSE} returns a single feature that is the geometric union of the set of features; default \code{NA} is coerced to \code{FALSE} for unary operation (missing \code{y}) and to \code{TRUE} for binary operation.
 }
+  \item{fname}{
+Character. Filename (source or packed) of spatial data.
+}
   \item{verbose}{
 Logical. Value \code{TRUE} provides information on console. Default is \code{FALSE}.
 }
@@ -178,7 +186,9 @@ Further arguments passed to \code{sf::st_transform} or to \code{sp::spTransform}
 
 \code{spatial_nrow} and \code{spatial_ncol} return number of rows and number of columns of attributive table.
 
-\code{spatial_filelist} returns list of files with file extensions, which are associated with certain GIS vector formats. The function's basis is \code{\link[base:list.files]{dir}}.
+\code{spatial_filelist} and its synonym \code{spatial_dir} return list of files with file extensions, which are associated with certain GIS vector formats. The function's basis is \code{\link[base:list.files]{dir}}.
+
+\code{spatial_basename} returns basename (without extension) of file \code{fname} of spatial object.
 
 \code{is_spatial} returns logical value does the object belong to the class of spatial data.
 

@@ -5,7 +5,7 @@
    kind <- .getPrm(arglist,name="(^$|crop|kind)",valid=c("crop","crop2","nocrop"))
    border <- .getPrm(arglist,name="(border|frame)",default=5L)
    bpp <- .getPrm(arglist,name="bpp",valid=c(8L,24L)
-              ,default=switch(getOption("ursaPngDevice"),windows=8L,cairo=24L))
+              ,default=switch(getOption("ursaPngDevice"),windows=8L,cairo=24L,24L))
    execute <- .getPrm(arglist,name="(execute|view|open|render)",default=!.isShiny())
    verbose <- .getPrm(arglist,name="verb(ose)*",kwd="close",default=FALSE)
   # wait <- .getPrm(arglist,name="wait",default=NA_real_)
@@ -27,7 +27,7 @@
    fileout <- getOption("ursaPngFileout")
    isJPEG <- .lgrep("(jpg|jpeg)",gsub(".*\\.(.+$)","\\1",fileout))>0
    if (!(bpp %in% c(8,24)))
-      bpp <- switch(getOption("ursaPngDevice"),windows=ifelse(isJPEG,24,8),cairo=24)
+      bpp <- switch(getOption("ursaPngDevice"),windows=ifelse(isJPEG,24L,8L),cairo=24L,24L)
    on.exit({
       op <- options()
       if (length(ind <- .grep("^ursaPng.+",names(op))))

@@ -1,11 +1,14 @@
-'spatial_read' <-
 'spatialize' <- function(dsn,engine=c("native","sp","sf")
                          ,layer=".*",field=".+",coords=c("x","y"),crs=character()
                          ,geocode="",place="",area=c("bounding","point")
                          ,grid=NULL,size=NA,cell=NA,expand=1,border=NA
-                         ,lat0=NA,lon0=NA,resetProj=FALSE,style="auto"#,zoom=NA
+                         ,lat0=NA,lon0=NA,resetProj=FALSE,resetGrid=FALSE
+                         ,style="auto" ## auto none internal keep
+                        # ,zoom=NA
                          ,subset="",verbose=FALSE,...) {
    engine <- match.arg(engine)
+   if (resetGrid)
+      session_grid(NULL)
    toResetGrid <- 0L
   # print(c(expand=expand,border=border))
   # geocode <- match.arg(geocode)
@@ -228,6 +231,15 @@
             dsn <- class(obj)
          }
          else {
+            if ((TRUE)&&(inherits(dsn,"list"))&&(inherits(dsn,"data.frame"))) {
+               if (length(unique(sapply(dsn,length)))==1)
+                  dsn <- as.data.frame(dsn)
+               cl <- sapply(dsn,function(x) {
+                  if (!inherits(x,c("integer","numeric","character","factor"
+                                   ,"Date","POSIXt")))
+                     stop("TODO #38")
+               })
+            }
             obj <- try(sf::st_as_sf(dsn,coords=coords))
             if (inherits(obj,"try-error")) {
                cat(geterrmessage())
@@ -491,6 +503,13 @@
          }
       }
    }
+   if (style=="keep") {
+      crs <- spatial_crs(obj)
+     # style <- crs
+     # print(data.frame(style=style,crs=crs,isEPSG=isEPSG,isPROJ4=isPROJ4))
+     # print(resetProj)
+   }
+  # resetProj <- FALSE
    if (verbose)
       print(c('engine.sf'=isSF,'engine.sp'=isSP))
    if (nchar(subset)) {
@@ -572,8 +591,8 @@
                                 ,"\\1-\\3-\\5\\6",da)
                }
                else if (length(grep("(\\d{8})($|\\D.*$)",da))==length(da)) {
-                     da <- .gsub(".*(\\d{4})(.?)(\\d{2})(.?)(\\d{2})(.*)"
-                                ,"\\1-\\3-\\5\\6",da)
+                  da <- .gsub(".*(\\d{4})(.?)(\\d{2})(.?)(\\d{2})(.+)*"
+                             ,"\\1-\\3-\\5\\6 6='\\6' 7='\\7'",da)
                }
                else
                   skipParse <- TRUE
@@ -696,10 +715,11 @@
       else
          border <- 27L
    }
-   if (!.lgrep("(none|auto)",style))
+   if (!.lgrep("(none|auto|keep)",style))
       resetProj <- TRUE
    if (isEPSG)
       resetProj <- FALSE
+  # q()
   # if ((proj=="internal")&&(!is.na(keepProj))) {
   #    g2 <- NULL
   # }
@@ -764,13 +784,12 @@
          proj4 <- style
         # isPROJ4 <- FALSE
       }
-      if ((proj4=="")&&(!(proj %in% c("auto","internal")))) {
+      if ((proj4=="")&&(!(proj %in% c("auto","internal","keep")))) {
          resetProj <- TRUE
          proj4 <- "auto"
       }
-     # if (is.na(proj4))
       isLonLat <- .lgrep("(\\+proj=longlat|epsg:4326)",proj4)>0
-      if ((proj %in% c("auto"))&&(isLonLat)&&(!isEPSG)) { ## added 2016-08-09
+      if ((proj %in% c("auto"))&&(isLonLat)&&(!isEPSG)&&(style!="keep")) { ## added 2016-08-09
          resetProj <- TRUE
          proj4 <- "auto"
       }

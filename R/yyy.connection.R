@@ -557,6 +557,8 @@
 }
 '.optimal.datatype' <- function(x,nodata=NULL)
 {
+   if (is.ursa(x))
+      x <- x$value
    if (TRUE)
    {
       isInt <- is.integer(x)
@@ -880,7 +882,7 @@
             wktout <- .maketmp(ext=".wkt~")
            # shell(paste("gdalsrsinfo -o wkt",paste0("\"",proj4,"\""),"1>",wktout))
            # 20170319 dQuote() returns non-symmetrical quotes in interactive() 
-            system2("gdalsrsinfo",c("-o wkt",.dQuote(proj4))
+            system2("gdalsrsinfo",c("-o wkt_esri",.dQuote(proj4))
                    ,stdout=wktout,stderr=FALSE)
             wkt <- readLines(wktout,warn=FALSE)
             file.remove(wktout)
@@ -889,14 +891,16 @@
       else if (!("sf" %in% loadedNamespaces())) {
          if (lverbose)
             message("'rgdal' engine")
-         if (!.try(wkt <- rgdal::showWKT(proj4,morphToESRI=FALSE)))
+         if (!.try(wkt <- rgdal::showWKT(proj4,morphToESRI=TRUE)))
             wkt <- NULL
       }
-      else {
+      else { ## 'sf' in namespace; 'OGC_WKT' ONLY. 
          if (lverbose)
             message("'sf' engine")
-         if (!.try(wkt <- sf::st_as_text(sf::st_crs(proj4))))
+         if (!.try(wkt <- sf::st_as_text(sf::st_crs(proj4),EWKT=TRUE)))
             wkt <- NULL
+        # print(proj4)
+        # message(wkt)
       }
       if (lverbose)
          .elapsedTime("proj4 -> wkt finish")

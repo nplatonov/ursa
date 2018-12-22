@@ -398,7 +398,10 @@
             val <- iconv(val,"UTF-8","1251")
         # print(all(is.na(val)))
         # print(obj[,dname[i],drop=TRUE][,1])
-         ct[[i]] <- colorize(val,alpha=alpha,...)
+         if (all(is.na(val)))
+            ct[[i]] <- colorize("(all values are NA)")
+         else 
+            ct[[i]] <- colorize(val,alpha=alpha,...)
         # print(names(ct[[i]]$colortable),quote=FALSE)
         # print(ct[[i]])
         # print("-----------------------------------------")
@@ -458,7 +461,10 @@
                bg.polygon[ind] <- "#0000002F"
             }
             if (.lgrep("polygon",geoType)) {
-               lwd <- 0.1
+               if ((T)&&(spatial_count(obj)>1000)&&(sd(spatial_area(obj))<0.05))
+                  lwd <- 1e-6
+               else
+                  lwd <- 0.1
                if (length(ind <- .grep("plot\\.lwd",names(arglist))))
                   lwd <- arglist[[ind]]
                if (lwd==0)

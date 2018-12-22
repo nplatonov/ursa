@@ -967,7 +967,7 @@ void readBsqBandDouble(char **fname,int *dim,int *index,int *nindex,int *dtype
   // printf("file=%s datatype=%d n=%d count=%d\n",fname[0],datatype,n,count);
    for (i=0;i<count;i++)
    {
-     // printf(" %d",index[i]);
+     // Rprintf(" %d",index[i]);
       fseek(Fin,(index[i]-1)*lines*samples*datasize,SEEK_SET);
       if (fread(buf1,datasize,n,Fin)) {};
       for (j=0;j<samples*lines;j++)
@@ -1015,6 +1015,7 @@ void readBsqBandDouble(char **fname,int *dim,int *index,int *nindex,int *dtype
          }
       }
    }
+  // Rprintf("\n");
    free(buf1);
    fclose(Fin);
    return;

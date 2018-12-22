@@ -13,8 +13,8 @@
    if (!FALSE) {
      ## '\\.spatialize' --> 'spatialize'
      ## 'ursa:::spatialize' --> 'spatialize'
-      src <- "open_ncdf"
-      dst <- "open_nc"
+      src <- "spatial_filename"
+      dst <- "spatial_basename"
       toWrite <- FALSE
       ind <- as.character(c(1,2,3,4,5,6,7,8,9,10,11,12))
       dpath1 <- c('1'="C:/platt/R/ursa-package/ursa/R"

@@ -4,6 +4,7 @@
          stop(paste("Package",sQuote(pkg),"is required for this operation"))
   # if (is.character(obj))
    obj <- spatialize(obj,engine="sf")
+  # print(spatial_crs(obj))
    if (is.null(by)) {
       by <- spatial_fields(obj)
       if (!length(by)) {

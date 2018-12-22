@@ -17,7 +17,13 @@
 }
 '.ursaCacheInventory' <- function() file.path(.ursaCacheDir(),"_inventory.txt")
 '.ursaCacheVisits' <- function() file.path(.ursaCacheDir(),"_visits.txt")
-'.ursaCacheDirClear' <- function(size=16,count=10000,age=7,completely=FALSE) {
+'.ursaCacheDirClear' <- function(size=getOption("ursaCacheSize")
+                                ,age=getOption("ursaCacheAge")
+                                ,count=10000,completely=FALSE) {
+   if (!is.numeric(size))
+      size <- 16
+   if (!is.numeric(age))
+      age <- 7
    fpath <- .ursaCacheDir()
    if (!file.exists(fpath))
       return(invisible(NULL))
@@ -54,6 +60,9 @@
       return(.ursaCacheDirClear(completely=TRUE)) ## RECURSIVE
    }
    dst <- file.path(fpath,was0$dst[ind])
+   dst <- dst[file.exists(dst)]
+   file.remove(dst)
+   dst <- paste0(dst,".hdr")
    dst <- dst[file.exists(dst)]
    file.remove(dst)
    was0 <- was0[-ind,]

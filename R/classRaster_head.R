@@ -48,6 +48,8 @@
             return(x[ind,,drop=FALSE])
          }
          ret <- c(head(x,n),tail(x,n))
+         if (length(ret)>length(x))
+            return(x)
          attributes(ret) <- objAttr
          return(ret)
       }

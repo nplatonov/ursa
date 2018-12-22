@@ -26,10 +26,13 @@
                           ,n=rep(NA,0),nNA=rep(NA,0),stringsAsFactors=FALSE)
       return(result)
    }
-   else
+   else {
+      
+      id0 <- if (length(id)==length(unique(id))) id else make.unique(id,sep=".")
       result <- data.frame(name=myname,mean=NA,sd=NA,sum=NA
-                          ,min=NA,max=NA,n=NA,nNA=NA,row.names=id
+                          ,min=NA,max=NA,n=NA,nNA=NA,row.names=id0
                           ,stringsAsFactors=FALSE)
+   }
    if ((TRUE)&&(!sum(nchar(myname)))) {
      # result <- subset(result,select=-c(name))
       result <- result[,-c("name")]

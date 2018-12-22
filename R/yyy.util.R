@@ -242,6 +242,16 @@
          try(res <- x[which.max(predict(locfit::locfit(~x),newdata=x))])
       res
    }
+   if (is_spatial(src)) {
+      src <- switch(spatial_geotype(src)
+                   ,POINT=spatial_coordinates(src)
+                   ,stop("'src': unimplemented for ",spatial_geotype(src)))
+   }
+   if (is_spatial(dst)) {
+      dst <- switch(spatial_geotype(dst)
+                   ,POINT=spatial_coordinates(dst)
+                   ,stop("'dst': unimplemented for ",spatial_geotype(dst)))
+   }
    d1 <- dim(src)
    d2 <- dim(dst)
    if ((is.null(colnames(src)))&&(d1[2]>=2)) {

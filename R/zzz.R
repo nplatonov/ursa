@@ -13,7 +13,6 @@
    options(ursaTimeStart=p,ursaTimeDelta=p)
    rm(p)
   # session_pngviewer()
-   session_tempdir()
    fpath <- getOption("ursaCacheDir") ## e.g., from ~/.Rprofile
    if (is.null(fpath))
       try(options(ursaCacheDir=tempdir())) 
@@ -22,6 +21,7 @@
          dir.create(fpath)
   ## ursaCacheDir=file.path(dirname(tempdir()),"RtmpUrsaCache") ## out of CRAN policy
    .ursaCacheDirClear()
+   session_tempdir()
   # if ((FALSE)&&(interactive()))
   #    print(data.frame(pngviewer=session_pngviewer()
   #                    ,tempdir=session_tempdir()

@@ -48,7 +48,9 @@
       return(invisible(g1))
    }
    if (is.character(obj)) {
+      opW <- options(warn=2)
       a <- try(open_envi(obj,resetGrid=TRUE,decompress=FALSE))
+      options(opW)
       if (inherits(a,"try-error")) {
          a <- open_gdal(obj)
       }
@@ -101,7 +103,7 @@
    opD <- getOption("ursaTempDir")
    if (length(opD))
       return(opD)
-   dst <- ifelse(.isRscript(),getwd(),tempdir()) ## "." <-> 'getwd()'
+   dst <- ifelse(.isRscript(),ifelse(T,.ursaCacheDir(),getwd()),tempdir()) ## "." <-> 'getwd()'
    options(ursaTempDir=dst)
    return(dst)
 }

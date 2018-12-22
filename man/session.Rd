@@ -38,7 +38,7 @@ session_use_experimental_functions()
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{obj}{Either missing, or \code{NULL}, or file name, or object of class \code{ursaRaster}, or object of class \code{\link[ursa:classGrid]{ursaGrid}}.}
+  \item{obj}{Either missing, or \code{NULL}, or file name, or object of class \code{ursaRaster}, or object of class \code{\link[ursa:classGrid]{ursaGrid}}, or spatial object (simple features (\pkg{sf}), spatial abstracts (\pkg{sp})).}
   \item{allow}{Logical. If \code{TRUE} then it is allowed to use external software for viewing PNG files. \code{NA} is interpreted as \code{TRUE} in the case of "Rscript" usage, and intepreted as \code{FALSE} in the case of interactive session or "R CMD BATCH" usage. Default is \code{NA}.}
   \item{dst}{Character. Directory name for temporal files. Empty character or non-character is interpreted as \code{\link[base:getwd]{getwd()}} in the case of "Rscript" usage, and intepreted as \code{\link[base:tempfile]{tempdir()}} in the case of interactive session or "R CMD BATCH" usage. Default is \code{character()} (empty character).}
 }

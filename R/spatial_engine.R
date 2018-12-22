@@ -323,6 +323,14 @@
          names(ret) <- seq_along(ret)
          return(ret)
       }
+      if (geoType=="MULTILINESTRING") {
+         ret <- lapply(sf::st_geometry(obj),unclass) ## Holes are not ignored
+         nseg <- unique(sapply(ret,length))
+         if ((FALSE)&&(length(nseg)==1)&&(nseg==1)) ## consistence with 'sp'
+            ret <- lapply(ret,function(x) x[[1]])
+         names(ret) <- seq_along(ret)
+         return(ret)
+      }
      # ret <- lapply(sf::st_geometry(obj),unclass) ## dummy
       stop(paste("Unimplemented for geometry (sf): "
                 ,paste(geoType,collapse=", ")))
@@ -583,8 +591,8 @@
       print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
    isSF | isSP
 }
-'spatial_filelist' <- function(path=".",pattern=NA,full.names=TRUE
-                              ,recursive=FALSE) {
+'spatial_filelist' <- 'spatial_dir' <- function(path=".",pattern=NA,full.names=TRUE
+                                               ,recursive=FALSE) {
    if (!is.character(pattern))
       pattern <- "\\.(gpkg|tab|kml|json|geojson|mif|sqlite|shp|osm)(\\.(zip|gz|bz2))*$"
    res <- dir(path=path,pattern=pattern,full.names=full.names,recursive=recursive)
@@ -914,4 +922,7 @@
       arglist[[i]] <- methods::as(arglist[[i]],coerce)
    res <- spatial_geometry(do.call("rbind",arglist))
    res
+}
+'spatial_basename' <- function(fname) {
+   gsub("\\..+(\\.(gz|bz2|zip|rar))*$","",basename(fname),ignore.case=TRUE)
 }

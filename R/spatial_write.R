@@ -1,9 +1,11 @@
 'spatial_write' <- function(obj,fname,layer,driver=NA,compress=""
                         ,ogr2ogr=nchar(Sys.which("ogr2ogr"))>0
-                        ,transform=NA,verbose=FALSE) {
+                        ,verbose=FALSE) {
   # obj <- head(obj,100)
    bname <- basename(fname)
    dname <- dirname(fname)
+   if ((dname!=".")&&(!dir.exists(dname)))
+      dir.create(dname,recursive=TRUE)
    fext <- .gsub("^.+\\.(.+)$","\\1",bname)
    wait <- 60
    interimExt <- c("gpkg","geojson","shp","sqlite")[4]
@@ -285,7 +287,7 @@
                      ,encoding=if (lch=="UTF-8") NULL else localeToCharset()
                      ,overwrite_layer=TRUE,morphToESRI=FALSE
                      ,verbose=verbose)
-      if ((TRUE)&&(driver=="ESRI Shapefile")) {
+      if ((FALSE)&&(driver=="ESRI Shapefile")) { ## replace "OGC ESRI" by "OGC WKT" 
          prj <- sp::proj4string(obj)
          prj1 <- rgdal::showWKT(prj,morphToESRI=TRUE)
          prj2 <- rgdal::showWKT(prj,morphToESRI=FALSE)
@@ -324,7 +326,7 @@
                   ,delete_dsn=file.exists(fname) & !appendlayer
                   ,update=appendlayer
                   ,quiet=!verbose)
-      if ((TRUE)&&(driver %in% "ESRI Shapefile")) {
+      if ((FALSE)&&(driver %in% "ESRI Shapefile")) { ## replace "OGC ESRI" by "OGC WKT" 
          prjname <- gsub("\\.shp$",".prj",fname)
          wkt1 <- readLines(prjname,warn=FALSE)
          wkt2 <- sf::st_as_text(sf::st_crs(spatial_crs(obj)))

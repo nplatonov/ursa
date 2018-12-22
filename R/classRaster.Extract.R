@@ -130,9 +130,11 @@
    res$con$compress <- 0L
    grid <- res$grid
    con <- res$con
-   internalReading <- con$connection %in% c("gzfile")
+   opW <- options(warn=-1)
+   intOverflow <- is.na(with(con,samples*lines*bands*sizeof))
+   options(opW)
+   internalReading <- intOverflow | con$connection %in% c("gzfile")
    externalReading <- !internalReading
-  # print(c(externalReading=externalReading))
    if ((1)&&(!missingJ)&&(is.character(j)))
       stop("TODO: is.character(j)")
    if ((1)&&(!missingI)&&(is.character(i)))

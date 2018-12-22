@@ -4,7 +4,5 @@ spatial_centroid
 spatial_clip
 spatial_difference
 spatial_dim<-
-spatial_read
 spatial_simplify
-spatial_write
 spatialize

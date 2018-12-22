@@ -274,6 +274,8 @@
      # print(c(j=all(j %in% seq(dimx[1])),i=all(i %in% seq(dimx[2]))))
       if ((length(j)<dimx[1])&&(all(j %in% seq(dimx[1])))) ## write lines
       {
+         if (verbose)
+            print("write lines")
          toSeek <- toSeek %in% c(1,3)
          if (any(is.na(value$con$posR)))
             nl <- as.integer(dimy[1]/con$samples)
@@ -380,6 +382,8 @@
       }
       else if ((length(i)<dimx[2])&&(all(i %in% seq(dimx[2])))) ## write bands
       {
+         if (verbose)
+            print("write bands")
          toSeek <- (toSeek %in% c(1,2)) ## c(2,3) 2012-08-27
          sparse <- attr(value$value,"sparse")
          if ((!is.null(sparse))&&(any(sparse!=0)))
@@ -531,6 +535,8 @@
       }
       else if ((length(j)==dimx[1])&&(length(i)==dimx[2])) ## write full
       {
+         if (verbose)
+            print("write full")
         # .writeall(data=value$value,con=con,split=TRUE,con$handle)
          if (!is.na(con$nodata))
          {
