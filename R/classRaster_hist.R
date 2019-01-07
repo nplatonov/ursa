@@ -50,7 +50,7 @@
       ##~ breaks <- c(0,seq(length(ct)))
    adjy <- as.numeric(names(ta))
    dify <- diff(adjy)
-   toDensity <- .is.eq(dify)
+   toDensity <- .is.eq(dify) & length(dify)>32
    if (toDensity) {
       rngy <- range(adjy)+c(-1,1)*mean(dify)/2
       breaks <- seq(rngy[1],rngy[2],by=mean(dify))

@@ -1,4 +1,4 @@
-'.compose_basemap' <- function(style="google") {
+'.compose_basemap' <- function(style="mapnik") {
    if (.skipPlot(TRUE))
       return(NULL)
    sc <- getOption("ursaPngScale")
@@ -7,7 +7,7 @@
    print(sc)
    invisible(NULL)
 }
-'.panel_basemap' <- function(style="google") {
+'.panel_basemap' <- function(style="mapnik") {
    if (.skipPlot(TRUE))
       return(NULL)
    sc <- getOption("ursaPngScale")

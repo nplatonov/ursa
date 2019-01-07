@@ -221,8 +221,9 @@
          a <- FALSE
       if (!a) {
          ind <- which(nchar(iconv(label,to="UTF-8"))>abbrev)
-         label <- substr(label,1,abbrev)
+         label[ind] <- substr(label[ind],1,abbrev)
          substr(label[ind],abbrev,abbrev) <- ">"
+         label[ind] <- substr(label[ind],1,abbrev)
       }
    }
    if (isTick)

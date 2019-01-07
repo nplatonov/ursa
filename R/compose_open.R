@@ -82,9 +82,12 @@
    }
    else if (is.na(delafter))
       delafter <- FALSE
-   fileext <- if (.lgrep("\\.(jpeg|jpg)$",fileout)) "jpeg" else "png"
+   fileext <- if (.lgrep("\\.(jpeg|jpg)$",fileout)) "jpeg" 
+              else if (.lgrep("\\.(webp)$",fileout)) "webp"
+              else "png"
    isJPEG <- fileext %in% "jpeg"
-   if ((!isJPEG)&&(!.lgrep("\\.png$",fileout)))
+   isWEBP <- fileext %in% "webp"
+   if ((!isJPEG)&&(!isWEBP)&&(!.lgrep("\\.png$",fileout)))
       fileout <- paste0(fileout,".png")
    g1 <- session_grid()
   # scale1 <- (18.5*96)/(g1$rows*2.54)

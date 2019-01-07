@@ -238,7 +238,7 @@
             Sys.sleep(1)
          }
          options(op)
-         if (!first) {
+         if (!first)  {
             if (i==wait)
                cat(" FAILURE!\n")
             else

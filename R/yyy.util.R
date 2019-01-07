@@ -473,6 +473,10 @@
 '.sample' <- function(x,n) {
    if (length(x)<=1)
       return(x)
+   if (missing(n))
+      return(sample(x))
+   if (n>=length(x))
+      return(sample(x))
    sample(x,n)
 }
 '.system2.patch' <- function(...) {

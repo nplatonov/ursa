@@ -21,6 +21,23 @@
          session_grid(g1)
       return(res)
    }
+   if ((is.character(obj))&&(file.exists(obj))&&
+      (.lgrep("\\.(tif|tiff|img|dat|png|jpeg|jpg|bmp)$",basename(obj)))) {
+      g1 <- getOption("ursaSessionGrid")
+      session_grid(NULL)
+      a <- try(open_gdal(obj),silent=TRUE)
+      if (inherits(a,"try-error")) {
+         session_grid(g1)
+         return(NULL)
+      }
+      res <- a$grid
+      close(a)
+      if (is.null(g1))
+         session_grid(res)
+      else
+         session_grid(g1)
+      return(res)
+   }
    NULL
 }
 'ursa_grid<-' <- function(obj,value)

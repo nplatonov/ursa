@@ -472,7 +472,7 @@
       g$rows <- as.integer(round(g$rows))
    }
    if (!raster)
-      return(g)
+      return(invisible(g))
    session_grid(g)
    ursa_new()
 }

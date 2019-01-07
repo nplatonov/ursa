@@ -336,6 +336,11 @@
          dsn <- zname
       }
       if (!file.exists(dsn)) {
+         list1 <- spatial_dir(path=dirname(dsn),pattern=basename(dsn))
+         if (length(list1)==1)
+            dsn <- list1
+      }
+      if (!file.exists(dsn)) {
          aname <- paste0(dsn,".zip")
          if (isZip <- file.exists(aname)) {
             ziplist <- unzip(aname,exdir=tempdir());on.exit(file.remove(ziplist))
@@ -583,14 +588,14 @@
             if ((dev <- TRUE)&&(length(unique(nchar(na.omit(da))))==1)&&
                   (.lgrep("\\d{4}.*\\d{2}.*\\d{2}",da))) {
                nNA <- length(which(is.na(da)))
-               s <- sapply(gregexpr("(-|\\.|/)",da),length)
+               s <- sapply(gregexpr("(-|\\.|/)",da),function(x) length(x[x>=0]))
                if (all(s>=2)) {
                   s <- sapply(gregexpr("(-|\\.|/)",da),function(x) diff(x)[1])
                   if (all(s==3))
                      da <- .gsub(".*(\\d{4})(.?)(\\d{2})(.?)(\\d{2})(.*)"
                                 ,"\\1-\\3-\\5\\6",da)
                }
-               else if (length(grep("(\\d{8})($|\\D.*$)",da))==length(da)) {
+               else if (FALSE & length(grep("(\\d{8})($|\\D.*$)",da))==length(da)) {
                   da <- .gsub(".*(\\d{4})(.?)(\\d{2})(.?)(\\d{2})(.+)*"
                              ,"\\1-\\3-\\5\\6 6='\\6' 7='\\7'",da)
                }

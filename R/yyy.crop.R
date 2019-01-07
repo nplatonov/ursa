@@ -1,9 +1,12 @@
 '.crop' <- function(fileout,border=5,verbose=FALSE) {
    isJPEG <- .lgrep("(jpg|jpeg)",gsub(".*\\.(.+$)","\\1",fileout))>0
+   isWEBP <- .lgrep("(webp)",gsub(".*\\.(.+$)","\\1",fileout))>0
    frame <- as.integer(round(border))
    requireNamespace("png",quietly=.isPackageInUse())
    if (isJPEG)
       requireNamespace("jpeg",quietly=.isPackageInUse())
+   else if (isWEBP)
+      requireNamespace("webp",quietly=.isPackageInUse())
    x <- png::readPNG(fileout,native=FALSE,info=TRUE)
    dimx <- dim(x)
    b <- .Cursa("internalMargin",x=as.numeric(x),dim=as.integer(dimx)
@@ -29,6 +32,8 @@
    att <- attr(x,"info")
    if (isJPEG)
       jpeg::writeJPEG(x[indr,indc,],fileout)
+   else if (isWEBP)
+      webp::write_webp(x[indr,indc,],fileout)
    else
       png::writePNG(x[indr,indc,],fileout,dpi=att$dpi,text=c(source=R.version.string))
    0L
@@ -38,9 +43,12 @@
       .elapsedTime("crop2:start")
    frame <- as.integer(round(border))
    isJPEG <- .lgrep("(jpg|jpeg)",gsub(".*\\.(.+$)","\\1",fileout))>0
+   isWEBP <- .lgrep("(webp)",gsub(".*\\.(.+$)","\\1",fileout))>0
    requireNamespace("png",quietly=.isPackageInUse())
    if (isJPEG)
       requireNamespace("jpeg",quietly=.isPackageInUse())
+   if (isWEBP)
+      requireNamespace("webp",quietly=.isPackageInUse())
    x <- png::readPNG(fileout,native=FALSE,info=TRUE)
    dimx <- dim(x)
    b <- .Cursa("internalMargin",x=as.numeric(x),dim=as.integer(dimx)
@@ -78,6 +86,8 @@
    att <- attr(x,"info")
    if (isJPEG)
       jpeg::writeJPEG(x[indr,indc,],fileout)
+   else if (isWEBP)
+      jpeg::write_webp(x[indr,indc,],fileout)
    else
       png::writePNG(x[indr,indc,],fileout,dpi=att$dpi,text=c(source=R.version.string))
    if (verbose)

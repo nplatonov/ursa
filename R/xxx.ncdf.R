@@ -342,11 +342,14 @@
          dimnames(val6) <- list(as.character(b[[indY]]),as.character(b[[indX]]))
       }
       if (length(indT)) {
-         dimv <- dimnames(val6)
-         dima <- dim(val6)
-         val6 <- as.character(.ncdf_timeunits(val6,attr(b[[indT]],"units")))
-         dim(val6) <- dima
-         dimnames(val6) <- dimv
+         tu <- try(.ncdf_timeunits(val6,attr(b[[indT]],"units")))
+         if (!inherits(tu,"try-error")) {
+            dimv <- dimnames(val6)
+            dima <- dim(val6)
+            val6 <- as.character(tu)
+            dim(val6) <- dima
+            dimnames(val6) <- dimv
+         }
       }
      # if (length(indT))
      #    attr(val6,"time") <- b[[indT]]
