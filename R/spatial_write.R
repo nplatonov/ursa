@@ -276,15 +276,21 @@
       opW <- options(warn=1)
      # dsn <- if (driver %in% c("zzzESRI Shapefile")) dname else fname
       if ((interim)&&(interimExt=="shp")) {
-         colnames(methods::slot(obj,"data")) <- iname <- sprintf("fld%03d",seq_along(colnames(methods::slot(obj,"data"))))
+         colnames(methods::slot(obj,"data")) <- iname <- sprintf("fld%03d"
+                               ,seq_along(colnames(methods::slot(obj,"data"))))
       }
       lch <- getOption("encoding")
+      lcl <- localeToCharset()
+      if (length(lcl)>1)
+         lcl <- grep("UTF.*8",lcl,value=TRUE,invert=TRUE,ignore.case=TRUE)
+      if (length(lcl)>1)
+         lcl <- lcl[1]
       if (!inherits(obj,c("SpatialPointsDataFrame","SpatialLinesDataFrame"
                          ,"SpatialPolygonsDataFrame")))
          spatial_data(obj) <- data.frame(dummy=seq_len(spatial_count(obj)))
       rgdal::writeOGR(obj,dsn=fname,layer=lname,driver=driver
                      ,dataset_options=dopt,layer_options=lopt
-                     ,encoding=if (lch=="UTF-8") NULL else localeToCharset()
+                     ,encoding=if (lch=="UTF-8") NULL else lcl
                      ,overwrite_layer=TRUE,morphToESRI=FALSE
                      ,verbose=verbose)
       if ((FALSE)&&(driver=="ESRI Shapefile")) { ## replace "OGC ESRI" by "OGC WKT" 

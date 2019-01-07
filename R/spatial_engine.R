@@ -467,7 +467,7 @@
       print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
    if (isSF) {
       if (is_spatial_polygons(obj))
-         res <- sf::st_length(sf::st_cast(CF,"MULTILINESTRING"))
+         res <- sf::st_length(sf::st_cast(obj,"MULTILINESTRING"))
       else
          res <- sf::st_length(obj)
       if (TRUE) {

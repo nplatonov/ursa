@@ -1,4 +1,25 @@
-2018-11-17
+2019-01-07
+
+### version 3.8.13
+
+-   R function are used for reading of large binary files, if their size
+    overflows ‘long’ capacity.
+
+-   Duplicated band names are allowed now for `print()` of `ursa`
+    objects.
+
+-   Cancelled replacement “ESRI WKT” by “OGC WKT” format of projection
+    file when writting “ESRI Shapefile”.
+
+-   Connections (writting and simplified reading) are made public:
+    `spatial_write` and `spatial_read` functions.
+
+-   File extensions `.webp` (if **webp** is installed), `.jpg`, `.jpeg`
+    can be specified for attribute `fileout` for saving image file,
+    produced by `display`, `glance`, `compose_open`. Package **webp** is
+    added as suggested.
+
+-   Coastline is updated to version 2018-12-13 09:34.
 
 ### version 3.8.12
 
@@ -11,7 +32,7 @@
 -   Domain changed from “arcticconnect.org” to “arcticconnect.ca” for
     `style=polarmap` in `glance()`
 
--   Coastline is updated to version 2018-11-17 09:50
+-   Coastline is updated to version 2018-11-17 09:50.
 
 ### version 3.8.11
 

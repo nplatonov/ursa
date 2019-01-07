@@ -87,7 +87,7 @@
    if (isJPEG)
       jpeg::writeJPEG(x[indr,indc,],fileout)
    else if (isWEBP)
-      jpeg::write_webp(x[indr,indc,],fileout)
+      webp::write_webp(x[indr,indc,],fileout)
    else
       png::writePNG(x[indr,indc,],fileout,dpi=att$dpi,text=c(source=R.version.string))
    if (verbose)
