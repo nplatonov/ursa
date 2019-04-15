@@ -1,5 +1,6 @@
 'mean.ursaRaster' <- function(x,...) .syn('local_mean',0,x,...)
 'median.ursaRaster' <-  function(x,...) .syn('local_median',0,x,...)
+# 'sd.ursaRaster' <-  function(x,...) .syn('local_sd',0,x,...) ## (list) object cannot be coerced to type 'double'
 'local_mean' <- function(x,cover=0.5-1e-3,weight=NULL,verbose=FALSE,bandname="mean")
 {
    a <- .average(x=x,cover=cover,weight=weight,verbose=verbose,sum=FALSE)

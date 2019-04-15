@@ -10,10 +10,13 @@ Informative progress bars with dispaying elapsed and remained time.
 }
 \usage{
 ursaProgressBar(kind = c("tk", "txt"),title = .argv0(),
-                label = "", min = 0, max = 1, initial = min, width = NA, style = 1)
+                label = "", min = 0, max = 1, initial = min, width = NA,
+                style = 1, silent = FALSE)
 
 setUrsaProgressBar(pb, value, title = NULL, label = NULL)
 %%~ \method{close}{ursaProgressBar}(con, ...)
+\method{close}{ursaProgressBar}(con, ...)
+
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -28,6 +31,9 @@ Character. Type or progress bar. Valid values are \code{"tk"} to display progres
 }
 \item{title, label, min, max, initial, value, pb, \dots}{
    See description for the same arguments in \code{\link[tcltk:tkProgressBar]{tkProgressBar}} and \code{\link[utils:txtProgressBar]{txtProgressBar}}.
+}
+\item{silent}{
+   Logical. If \code{TRUE} then progress bar will not appear; it can be useful for conditional scripting. Default is \code{FALSE}.
 }
 %%~ \item{label}{
 %%~    See description for the same argument in \code{\link[tcltk:tkProgressBar]{tkProgressBar}} and \code{\link[utils:txtProgressBar]{txtProgressBar}}.
@@ -65,7 +71,7 @@ Wrapper to one of
 
 Visualization of progress bar is updates each 0.5 seconds, it is effective for multiple short-term iterations.
 
-Progress bars should be closed by calling of appropriate method of generic function \code{\link{close}} depending of class of reference progress bar.
+Progress bars should be closed by calling of appropriate method of generic function \code{\link[base:connections]{close}} depending of class of reference progress bar.
 }
 \value{
 %%  ~Describe the value returned

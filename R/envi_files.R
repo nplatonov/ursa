@@ -10,6 +10,9 @@
    patlist <- "(\\.(hdr|gz|bz2|xz|bin|bingz|envi|envigz|img|dat))*$"
    srcdir <- dirname(src)
    srcname <- basename(src)
+   n <- nchar(dst)
+   if (substr(dst,n,n)=="/")
+      dst <- substr(dst,1,n-1)
    if (missing(dst))
    {
       dstdir <- "."
@@ -153,8 +156,10 @@
    patt1 <- .gsub("(\\.)$","",patt1)
    patt1a <- patt1
    patt2 <- .gsub("\\.(bin|envi|img|dat|gz|bz2|xz|bingz|envigz)$","",patt1)
-   if (exact)
+   if (exact) {
       patt1 <- paste0("^",patt1,"$")
+      patt2 <- paste0("^",patt2,"$")
+   }
    list1 <- dir(path=path,pattern="\\.hdr$",all.files=all.files
                ,full.names=full.names,recursive=recursive
                ,ignore.case=ignore.case)

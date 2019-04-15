@@ -136,7 +136,7 @@
          x[1] <- x[1]-2*B
          lon_0 <- round(180*mean(x)/B,6)
       }
-      else if ((TRUE)&&(!is.null(g3))&&(.grep("\\+proj=merc",g0$proj4))) ## ++20180325
+      else if ((TRUE)&&(!is.null(g3))&&(.lgrep("\\+proj=(merc|laea)",g0$proj4))) ## ++20180325
          lon_0 <- as.numeric(.gsub(".*\\+lon_0=(\\S+)\\s.*","\\1",g0$proj4))
       else
          lon_0 <- round(180*mean(x)/B,6)

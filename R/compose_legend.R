@@ -107,8 +107,12 @@
       }
    }
   # str(obj,grid=FALSE)
-   if ((is.null(units))||(all(!nchar(units)))) {
-      units <- .getPrm(arglist,name="units",class=c("expression","character")
+   mUnits <- .getPrm(arglist,name="unit(s)*",class=c("expression","character")
+                    ,default=NA_character_)
+   if ((!is.na(mUnits)[1])&&(length(mUnits)==length(units)))
+      units <- mUnits
+   else if ((is.null(units))||(all(!nchar(units)))) {
+      units <- .getPrm(arglist,name="unit(s)*",class=c("expression","character")
                       ,default=NA_character_)
    }
    skip <- getOption("ursaPngSkipLegend")

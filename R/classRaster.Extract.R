@@ -133,6 +133,11 @@
    opW <- options(warn=-1)
    intOverflow <- is.na(with(con,samples*lines*bands*sizeof))
    options(opW)
+   if (verbose & intOverflow) {
+      print(c(intOverflow=with(con,as.double(samples)*as.double(lines)*
+                                          as.double(bands)*as.double(sizeof))))
+     # intOverflow <- FALSE
+   }
    internalReading <- intOverflow | con$connection %in% c("gzfile")
    externalReading <- !internalReading
    if ((1)&&(!missingJ)&&(is.character(j)))
@@ -343,12 +348,26 @@
             {
                n <- nb*con$samples
                val <- array(NA,dim=c(n,nline))
-               for (r in seq(nline))
-               {
-                  pos <- with(con,(minJ+bands*(r-1)+minI-1)*samples*sizeof)
-                  if (con$seek)
-                     seek(con,where=pos,origin="start",rw="r")
-                  val[,r] <- with(con,.readline(handle,datatype,n,endian))
+               conseq <- all(diff(sort(i))==1)
+               if (conseq) {
+                  for (r in seq(nline)) {
+                     pos <- with(con,(minJ+bands*(r-1)+minI-1)*samples*sizeof)
+                     if (con$seek)
+                        seek(con,where=pos,origin="start",rw="r")
+                     val[,r] <- with(con,.readline(handle,datatype,n,endian))
+                  }
+               }
+               else {
+                  for (r in seq(nline))
+                  {
+                     for (s in seq_along(i)) {
+                        pos <- with(con,(minJ+bands*(r-1)+i[s]-1)*samples*sizeof)
+                        if (con$seek)
+                           seek(con,where=pos,origin="start",rw="r")
+                        s2 <- seq((s-1)*con$samples+1,s*con$samples)
+                        val[s2,r] <- with(con,.readline(handle,datatype,con$samples,endian))
+                     }
+                  }
                }
             }
             if (toWarp) ## added 2013-06-14

@@ -26,6 +26,8 @@
             txt <- text
          }
       }
+      else if (is.expression(text))
+         txt <- text
       .try(mtext(txt,...))
    }
    if (.skipPlot(FALSE))

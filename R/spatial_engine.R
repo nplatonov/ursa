@@ -277,6 +277,7 @@
                        ,SpatialLines="LINESTRING")
       return(geoType)
    }
+  # print(class(obj))
    return(NULL)
 }
 'spatial_coordinates' <- function(obj,verbose=FALSE) {
@@ -286,7 +287,7 @@
       print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
    geoType <- spatial_geotype(obj)
    if (isSF) {
-      if (length(geoType)>1) {
+      if ((FALSE)&&(length(geoType)>1)) {
          if (("POLYGON" %in% geoType)&&("MULTIPOLYGON" %in% geoType)) {
             obj <- sf::st_cast(obj,"MULTIPOLYGON")
             geoType <- "MULTIPOLYGON"
@@ -295,14 +296,14 @@
             stop(paste("Unimplemented for multiple geometries (sf): "
                       ,paste(geoType,collapse=", ")))
       }
-      if (geoType=="POINT") {
+      if (all(geoType=="POINT")) {
         # ret <- do.call("rbind",lapply(sf::st_geometry(obj),unclass))
          ret <- t(sapply(sf::st_geometry(obj),unclass))
          rownames(ret) <- seq(nrow(ret))
          colnames(ret) <- c("x","y")
          return(ret)
       }
-      if (geoType=="LINESTRING") {
+      if (all(geoType=="LINESTRING")) {
          multi <- any(sapply(sf::st_geometry(obj),is.list))
          if (!multi) {
             ret <- lapply(sf::st_geometry(obj),unclass)
@@ -312,18 +313,39 @@
          else
             stop(paste("Unimplemented MULTILINESTRING (sf)"))
       }
-      if (geoType=="MULTIPOLYGON") {
+      if (all(geoType=="MULTIPOLYGON")) {
          ret <- lapply(sf::st_geometry(obj),unclass) ## Holes are not ignored
         # ret <- lapply(sf::st_geometry(obj),unlist,recursive=FALSE) ## ignore holes
          names(ret) <- seq_along(ret)
          return(ret)
       }
-      if (geoType=="POLYGON") {
+      else if (all(geoType=="POLYGON")) {
          ret <- lapply(sf::st_geometry(obj),unclass)
          names(ret) <- seq_along(ret)
          return(ret)
       }
-      if (geoType=="MULTILINESTRING") {
+      else if (("POLYGON" %in% geoType)&&("MULTIPOLYGON" %in% geoType)) {
+         if (FALSE) { ## make all multu
+            k <- 0
+            ret <- lapply(sf::st_geometry(obj),function(xy) {
+               str(xy)
+               k <<- k+1
+               ##~ if (k<=1442)
+                  ##~ return(NULL)
+               ##~ ret1 <- lapply(xy,function(xy1) {
+                  ##~ str(xy1)
+               ##~ })
+               NULL
+            })
+            rm(k)
+            q()
+         }
+         else
+            ret <- lapply(sf::st_geometry(obj),unclass)
+         names(ret) <- seq_along(ret)
+         return(ret)
+      }
+      if (all(geoType=="MULTILINESTRING")) {
          ret <- lapply(sf::st_geometry(obj),unclass) ## Holes are not ignored
          nseg <- unique(sapply(ret,length))
          if ((FALSE)&&(length(nseg)==1)&&(nseg==1)) ## consistence with 'sp'
@@ -606,7 +628,7 @@
    res <- dir(path=path,pattern=patt0,full.names=full.names,recursive=recursive)
    if ((!length(res))&&(is.na(pattern))) {
       if ((path==basename(path))&&(!dir.exists(path))) {
-         print("A")
+        # print("A")
          pattern <- path
          path <- "."
          res <- dir(path=path,pattern=patt0,full.names=full.names,recursive=recursive)
@@ -651,6 +673,7 @@
    if (verbose)
       print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
    if (isSF) {
+      sf::st_agr(obj) <- "constant"
       return(sf::st_centroid(obj))
    }
    if (isSP) {
@@ -913,7 +936,13 @@
    }
    else
       return(NULL)
+   if (verbose) {
+      print(valid)
+      valid <- FALSE
+   }
    if ((inherits(valid,"try-error"))||(!valid)) {
+      if (verbose)
+         print("repaired by buffering")
       obj <- spatial_buffer(obj)
    }
    obj

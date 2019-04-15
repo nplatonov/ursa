@@ -70,7 +70,7 @@
    dy <- g1$resy/2
    if (isSF) {
       if (verbose)
-         cat("create polygons from points...")
+         cat("1 of 3: create polygons from points...")
       xy <- cbind(b$x-dx,b$y-dy,b$x-dx,b$y+dy,b$x+dx,b$y+dy,b$x+dx,b$y-dy
                  ,b$x-dx,b$y-dy)
       if (!onlyGeometry) {
@@ -88,13 +88,13 @@
          res
       })
       if (verbose)
-         cat(" done!\ncreate geometry...")
+         cat(" done!\n2 of 3: create geometry...")
       sa <- sf::st_sfc(sa)
       if (verbose)
          cat(" done!\n")
       if (!onlyGeometry) {
          if (verbose)
-            cat("assign data to geometry...")
+            cat("3 of 3: assign data to geometry...")
          sa <- sf::st_sf(b,coords=sa,crs=g1$proj4)
          if (verbose)
             cat(" done!\n")

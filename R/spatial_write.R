@@ -257,8 +257,14 @@
    if (inherits(aname,"try-error"))
       aname <- character()
    for (a in aname) {
-      if (is.ordered(obj[[a]]))
-         obj[[a]] <-  factor(obj[[a]],ordered=FALSE)
+      if (is.ordered(obj[[a]])) {
+         if (.is.numeric(levels(obj[[a]])))
+            obj[[a]] <- as.numeric(as.character(obj[[a]]))
+         else
+            obj[[a]] <-  factor(obj[[a]],ordered=FALSE)
+      }
+      else if ((is.factor(obj[[a]]))&&(.is.numeric(levels(obj[[a]]))))
+         obj[[a]] <- as.numeric(as.character(obj[[a]]))
    }
    if (driver %in% c("ESRI Shapefile")) {
       for (a in aname) {
@@ -400,6 +406,8 @@
    }
    if (!nchar(compress))
       return(invisible(NULL))
+   if (verbose)
+      cat("pack...")
    if ((.lgrep("gz",compress))&&(nchar(Sys.which("gzip"))))
       system2("gzip",c("-f",fname))
    else if (.lgrep("bz(ip)*2",compress)&&(nchar(Sys.which("bzip2"))))
@@ -434,5 +442,7 @@
       options(opW)
       utils::zip(z,f,flags="-qm9j") ## verbose output ## 'myzip(z,f,keys="-m -9 -j")'
    }
+   if (verbose)
+      cat(" done!\n")
    invisible(NULL)
 }

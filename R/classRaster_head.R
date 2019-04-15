@@ -68,6 +68,6 @@
    m <- if (n>k) k else n
    if (m==0)
       m <- 1
-   m <- sort(unique(c(1:m,k-(m:1)+1)))
+   m <- sort(unique(c(1L:m,k-(m:1L)+1L)))
    x[m]
 }

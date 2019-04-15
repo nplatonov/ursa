@@ -1,3 +1,7 @@
+#if __WIN32__
+#define stat64 _stat64
+#endif
+
 void readBsqBandInteger(char **fname,int *dim,int *index,int *nindex,int *dtype
                        ,int *byteorder,int *res);
 void isNear(double *x1,double *x2,int *len1,int *len2,int *res);

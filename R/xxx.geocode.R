@@ -31,8 +31,8 @@
    }
    select <- match.arg(select)
    if (service=="nominatim") {
-       ## curl -H Accept-Language:de 'http://nominatim.openstreetmap.org......."
-      src <- paste0("http://nominatim.openstreetmap.org/search.php?q=",loc
+       ## curl -H Accept-Language:de 'https://nominatim.openstreetmap.org......."
+      src <- paste0("https://nominatim.openstreetmap.org/search.php?q=",loc
                   # ,"&polygon_text=1"
                    ,"&format=xml","&bounded=0","&accept-language=en-US,ru")
      # dst <- tempfile() # "nominatim.xml" # tempfile()
@@ -109,7 +109,7 @@
          if ((bounding[,"minx"]<=(-180+dg))&&(bounding[,"maxx"]>=(180-dg))) {
             if (verbose)
                .elapsedTime("correct bounds (180 degree) -- download")
-            src <- paste0("http://nominatim.openstreetmap.org/search.php?q=",loc
+            src <- paste0("https://nominatim.openstreetmap.org/search.php?q=",loc
                          ,"&polygon_text=1"
                          ,"&format=xml","&bounded=0","&accept-language=en-US,ru")
             dst <- .ursaCacheDownload(src,quiet=!verbose)

@@ -16,9 +16,9 @@ glance(...)
         border = 27, lat0 = NA, lon0 = NA, resetProj = FALSE, style = "auto",
         feature = c("auto", "field", "geometry"), alpha = NA,
         basemap.order = c("after", "before"), basemap.alpha = NA,
-        engine = c("native", "sp", "sf"), geocode = "",place="",
+        engine = c("native", "sp", "sf"), geocode = "", place="",
         area = c("bounding", "point"), zoom = NA, gdal_rasterize = FALSE,
-        verbose = FALSE, ...)
+        silent = FALSE, verbose = FALSE, ...)
 
 }
 %- maybe also 'usage' for other objects documented here.
@@ -103,6 +103,9 @@ Positive integer or character. Zooming if web-cartography is applied for basemap
 }
    \item{gdal_rasterize}{
 Logical. If \code{TRUE} and GDAL utilities are in the system search path, then overlay for panels is formed via rastetization of vector file. GDAL utility "gdal_rasterize" is used. Note, that GDAL (system level) is optional for this package. Default is \code{FALSE}.
+}
+  \item{silent}{
+Logical. Value \code{TRUE} cancels progress bar. Default is \code{FALSE}.
 }
   \item{verbose}{
 Logical. Logical. Value \code{TRUE} may provide some additional information on console. Default is \code{FALSE}.

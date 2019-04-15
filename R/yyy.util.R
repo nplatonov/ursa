@@ -174,7 +174,7 @@
    a
 }
 '.is.integer' <- function(x,tolerance=1e-11) {
-   if (inherits(x,c("Date","POSIXt")))
+   if (inherits(x,c("Date","POSIXt","list")))
       return(FALSE)
    hasNA <- anyNA(x)
    if (hasNA)
@@ -242,15 +242,23 @@
          try(res <- x[which.max(predict(locfit::locfit(~x),newdata=x))])
       res
    }
+   isUrsa <- FALSE
    if (is_spatial(src)) {
       src <- switch(spatial_geotype(src)
                    ,POINT=spatial_coordinates(src)
                    ,stop("'src': unimplemented for ",spatial_geotype(src)))
    }
+   else if (is_ursa(src)) {
+      src <- as.data.frame(src)[,1:2]
+      isUrsa <- TRUE
+   }
    if (is_spatial(dst)) {
       dst <- switch(spatial_geotype(dst)
                    ,POINT=spatial_coordinates(dst)
                    ,stop("'dst': unimplemented for ",spatial_geotype(dst)))
+   }
+   else if (is_ursa(dst)) {
+      dst <- as.data.frame(dst)[,1:2]
    }
    d1 <- dim(src)
    d2 <- dim(dst)
@@ -280,6 +288,9 @@
          m <- NA
       if (verbose)
          print(c(avg=mean(d),median=median(d),mode2=.modal2(d),mode3=m))
+   }
+   if (isUrsa) {
+      return(as.ursa(cbind(src,b1)))
    }
    b1
 }

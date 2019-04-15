@@ -2,10 +2,21 @@
                            # ,title=basename(strsplit(commandArgs(FALSE)[4],"=")[[1]][2])
                              ,title=.argv0()
                              ,label=""
-                             ,min=0,max=1,initial=min,width=NA,style=1) {
+                             ,min=0,max=1,initial=min,width=NA,style=1,silent=FALSE) {
+   if (silent) {
+      pb <- logical()
+      class(pb) <- "ursaProgressBar"
+      return(pb)
+   }
   # if (.isKnitr())
   #    return(NULL)
-   kind <- match.arg(kind)
+   if (!.try(kind0 <- match.arg(kind))) {
+      n <- length(kind)
+      max <- if ((n==1)&&(.is.integer(kind))) kind else n
+      kind <- head(eval(formals()$kind),1)
+   }
+   else
+      kind <- kind0
    if (kind=="tk") {
       if ((.Platform$OS.type=="unix")&&(!nchar(Sys.getenv("DISPLAY"))))
          kind <- "txt"
@@ -45,6 +56,8 @@
    pb
 }
 'setUrsaProgressBar' <- function(pb,value,title=NULL,label=NULL) {
+   if (inherits(pb,"ursaProgressBar"))
+      return(pb)
   # if (.isKnitr())
   #    return(pb)
    t2 <- unname(proc.time()[3])
@@ -131,5 +144,8 @@
    ##~ else if ((cl=="winProgressBar")&&(.Platform$OS.type=="windows"))
       ##~ return(utils::setWinProgressBar(pb,value,label=label))
    utils::setTxtProgressBar(pb,value,title=title,label=label)
+}
+'close.ursaProgressBar' <- function(con,...) {
+   invisible(NULL)
 }
 # 'close.ursaProgressBar' <- function(con,...) close(con,...)

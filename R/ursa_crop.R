@@ -17,6 +17,14 @@
          a <- as.data.frame(discolor(condition))
       }
    }
+   if (!nrow(a)) {
+      if (verbose) {
+         opW <- options(warn=0)
+         warning("Crop cannot be applied due to blank image. Return full spatial domain.")
+         options(opW)
+      }
+      return(obj)
+   }
    g1 <- g2 <- obj$grid
    g1$minx <- min(a$x)-g1$resx/2-border[1]*g1$resx
    g1$miny <- min(a$y)-g1$resy/2-border[2]*g1$resy

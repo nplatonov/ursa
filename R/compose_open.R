@@ -130,19 +130,21 @@
       }
       width <- 1e6
    }
+  # print(c(width=width,s=ifelse(is.na(width),900,width),r=ifelse(is.na(width),900,width)/g1$columns))
+  # print(c(height=height,s=ifelse(is.na(height),600,height),r=ifelse(is.na(height),600,height)/g1$rows))
    scale1 <- ifelse(is.na(height),600,height)/g1$rows
    scale2 <- ifelse(is.na(width),900,width)/g1$columns
    rescale <- mosaic$image^(0.1)
    autoscale <- min(scale1,scale2)
    if ((is.na(height))&&(is.na(width)))
       autoscale <- autoscale/mosaic$image^0.25
-  # print(c(v=scale1,h=scale2,autoscale=autoscale))
    if (is.na(scale))
       scale <- autoscale
   # dpiscale <- scale*(2.54/96.0) # 2.54cm per inch / 96 dpi screen
    dpiscale <- scale*(2.54/dpi)
    mainc <- g1$columns*dpiscale
    mainr <- g1$rows*dpiscale
+  # print(c(v=scale1,h=scale2,autoscale=autoscale,scale=scale,c=g1$columns,r=g1$rows))
    pointsize0 <- 12
    if (is.na(pointsize)) {
      # print(c(pointsize0=pointsize0,dpi=dpi,scale=scale,scale0=autoscale))

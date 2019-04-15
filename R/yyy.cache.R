@@ -8,15 +8,15 @@
   #    writeLines("ursa:::.ursaCacheDirClear(age=2,size=0.2,count=1e3)",fclear)
    fpath
 }
-'.ursaCacheFile' <- function(pattern="cache") {
+'.ursaCacheFile' <- function(pattern="ursaCache") {
   # fpath <- getOption("ursaCacheDir")
   # if (!dir.exists(fpath))
   #    dir.create(fpath)
   # tempfile(tmpdir=fpath,pattern=pattern)
    .normalizePath(tempfile(tmpdir=.ursaCacheDir(),pattern=pattern))
 }
-'.ursaCacheInventory' <- function() file.path(.ursaCacheDir(),"_inventory.txt")
-'.ursaCacheVisits' <- function() file.path(.ursaCacheDir(),"_visits.txt")
+'.ursaCacheInventory' <- function() file.path(.ursaCacheDir(),"ursaCache_inventory.txt")
+'.ursaCacheVisits' <- function() file.path(.ursaCacheDir(),"ursaCache_visits.txt")
 '.ursaCacheDirClear' <- function(size=getOption("ursaCacheSize")
                                 ,age=getOption("ursaCacheAge")
                                 ,count=10000,completely=FALSE) {
@@ -30,7 +30,8 @@
    if (completely) {
       if (!dir.exists(fpath))
          return(invisible(NULL))
-      file.remove(.dir(path=fpath,full.names=TRUE))
+      file.remove(.dir(path=fpath,pattern=as.list(args(.ursaCacheFile))$pattern
+                      ,full.names=TRUE))
       unlink(fpath)
       return(invisible(NULL))
    }
@@ -61,6 +62,12 @@
    }
    dst <- file.path(fpath,was0$dst[ind])
    dst <- dst[file.exists(dst)]
+   if (FALSE) {
+      print(was)
+      print(c(size=size,age=age,count=count))
+      print(c(toRemove=dst))
+      q()
+   }
    file.remove(dst)
    dst <- paste0(dst,".hdr")
    dst <- dst[file.exists(dst)]
@@ -180,6 +187,14 @@
                system2("gzip",c("-f -d -c",.dQuote(src)),stdout=dst,stderr=FALSE)
             else if (unpack=="bzip2")
                system2("bzip2",c("-f -d -c",.dQuote(src)),stdout=dst,stderr=FALSE)
+            if (debugExact <- F) {
+               str(src)
+               str(dst)
+               cat("------------\n")
+               str(envi_list(src,exact=TRUE))
+               cat("------------\n")
+               q()
+            }
             if (length(listE <- envi_list(src,exact=TRUE)))
                file.copy(paste0(listE,".hdr"),paste0(dst,".hdr"),copy.date=TRUE)
          }
@@ -199,7 +214,7 @@
    }
    dst
 }
-'.atOnceCacheRebuild' <- function() {
+'.atOnceCacheRebuildAndForget' <- function() {
    a <- utils::read.table("_inventory.txt",sep=",",dec=".")
    a <- data.frame(a[,1:2],B=0,a[,3:5])
    str(a)

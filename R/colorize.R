@@ -542,6 +542,11 @@
                   next
               # if ((i2<(9))&&(any(abs(v3-v2*(10^i2))>0.499)))
               #    next
+               if (TRUE) { ## 20190306 ++
+                  v4 <- na.omit(v3*10^(-i2)/v2)
+                  if ((length(v4))&&(any(abs(v4-1)>0.101)))
+                     next
+               }
                ok <- TRUE
                break
             }
@@ -780,7 +785,7 @@
          ncolor <- (maxb-minb)/byvalue
          rm(minb,maxb)
       }
-      if (is.na(tail)) {
+      if (any(is.na(tail))) {
          tail <- 0.11/ncolor
         # print(c(colors=ncolor,tail=tail))
       }

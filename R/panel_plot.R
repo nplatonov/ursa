@@ -75,14 +75,17 @@
         # ret <- .tryE(.panel_plot(obj,add=TRUE,...))
         # message("===========")
         # str(arglist2)
+        # str(.lgrep("^(plot\\.)*col(o(u)*r)*$",names(arglist2)))
         # message("===========")
          if ((TRUE)&&(.lgrep("^col(o(u)*r)*$",names(arglist2)))) {
            # stop("I")
             if (is.numeric(col)) {
+              # stop("G")
                ct <- colorize(col)
                col <- ct$colortable[ct$index]
             }
             else if ((is.character(arglist2$col))&&(length(spatial_fields(obj)))) {
+              # stop("H")
                if (!anyNA(match(arglist2$col,spatial_fields(obj)))) {
                  # stop("A")
                   ct <- colorize(spatial_data(obj,subset=col,drop=TRUE))
@@ -121,12 +124,31 @@
                  # stop("C")
                   col <- arglist2$col
                }
-               else {
+               else if ((.is.colortable(arglist2$col))&&
+                       (length(spatial_fields(obj))==1)) {
                  # stop("D")
+                  ct <- arglist2$col
+                 # str(ct)
+                  val <- spatial_data(obj)[,1,drop=TRUE]
+                  if (length(ct)==length(val)) {
+                     col <- unname(ct)
+                  }
+                  else {
+                    # str(val)
+                    # print(table(val))
+                     col <- colorize(val,colortable=ct)
+                     col <- unname(col$colortable[col$index])
+                  }
+                 # str(col)
+                 # print(table(col))
+               }
+               else {
+                 # stop("E")
                   col <- NULL
                }
             }
             else {
+              # stop("F")
                col <- arglist2$col
                if (length(spatial_fields(obj))==1) {
                   if (.is.colortable(arglist2$col)) {
@@ -242,9 +264,11 @@
          ret$fill <- ret$bg
       }
    }
-   if (length(geoType)>1) {
-      print(geoType)
-     # spatial_write(obj,"res1.sqlite")
+   if (FALSE) {
+      if (length(geoType)>1) {
+         print(geoType)
+        # spatial_write(obj,"res1.sqlite")
+      }
    }
    if (any(nchar(geoType)>0)) {
       opR <- getOption("ursaPngLegend")

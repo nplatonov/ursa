@@ -10,7 +10,7 @@
    ytile <- floor((1-log(tan(lat_rad)+(1/cos(lat_rad)))/pi)/2*n)
    if (TRUE)
       return(c(xtile,ytile))
-   osm <- paste0("http://",letters[sample(seq(3),1)],".tile.openstreetmap.org")
+   osm <- paste0("https://",letters[sample(seq(3),1)],".tile.openstreetmap.org")
    tile <- paste0(paste(osm,zoom,xtile,ytile,sep="/"),".png")
    message(tile)
   # fname <- "tile.png"
@@ -25,8 +25,9 @@
    optHERE <- getOption("HEREapp")
    TFkey <- getOption("ThunderforestApiKey")
    BingKey <- getOption("BingMapsKey")
+   mapsurferKey <- getOption("openrouteserviceToken")
    s <- list()
-   s$mapnik <- c("http://{abc}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+   s$mapnik <- c("https://{abc}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 ,osmCr) ## # http://{abc}.tile.osm.org/{z}/{x}/{y}.png
    s$osmbw <- c("http://{abc}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png"
                ,osmCr)
@@ -37,8 +38,12 @@
    s$transport <- c("http://{abc}.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png"
                    ,osmCr)
   # copyright["transport"] <- paste0("Maps \uA9 Thunderforest, Data ",osmCr)
-   s$mapsurfer <- c("http://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}"
-                   ,paste0(osmCr,", GIScience Research Group @ Heidelberg University")
+  # s$mapsurfer <- c("http://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}"
+  #                 ,paste0(osmCr,", GIScience Research Group @ Heidelberg University")
+  #                 ,"png")
+   s$mapsurfer <- c(paste0("https://api.openrouteservice.org/mapsurfer/{z}/{x}/{y}.png?api_key="
+                          ,mapsurferKey)
+                   ,paste0(osmCr,", powered by MapSurfer.NET")
                    ,"png")
    s$mapsurfer.grayscale <- c("http://korona.geog.uni-heidelberg.de/tiles/roadsg/x={x}&y={y}&z={z}"
                              ,paste0(osmCr,", GIScience Research Group @ Heidelberg University")
@@ -127,6 +132,8 @@
       message("'options(ThunderforestApiKey=<api_key>)' is required")
    if ((.lgrep("^Bing\\.",server))&&(is.null(BingKey)))
       message("'options(BingMapsKey=<api_key>)' is required")
+   if ((.lgrep("mapsurfer",server))&&(is.null(mapsurferKey)))
+      message("'options(openrouteserviceToken=<api_key>)' is required")
   # if (length(server)==1)
   #    style <- unlist(strsplit(server,split="\\s+"))
    tile <- list(name="custom",url="",copyright="   ",fileext="___")

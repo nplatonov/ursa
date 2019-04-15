@@ -4,3 +4,6 @@ goodpractice::gp()
 pkgdown::build_site()
 
 http://www.masalmon.eu/2017/06/17/automatictools/
+
+?diagram::curvedarrow
+https://stackoverflow.com/questions/54341898/plot-arrows-in-sf-polygon

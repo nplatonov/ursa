@@ -7,13 +7,14 @@ Plot raster images and decorations on the multipanel layout.
 \code{compose_panel} divides the multi-band raster image (\emph{brick}) or layers of raster images (\emph{stack}) on the sequence of single-band images and plots each image on the separate panel of layout. Panel plotting is finalized by adding of decoration (gridlines, coastline, annotation, scalebar).
 }
 \usage{
-compose_panel(...)
+compose_panel(..., silent = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
    \item{\dots}{Set of argumetns, which are passed to \code{\link[ursa:panel_new]{panel_new}}, \code{\link[ursa:panel_raster]{panel_raster}}, \code{\link[ursa:panel_coastline]{panel_coastline}}, \code{\link[ursa:panel_graticule]{panel_graticule}}, \code{\link[ursa:panel_annotation]{panel_annotation}}, \code{\link[ursa:panel_scalebar]{panel_scalebar}}.
    }
-
+     \item{silent}{Logical. Value \code{TRUE} cancels progress bar. Default is \code{FALSE}.
+   }
 }
 \details{
 For each panel of layout the sequence of called functions is permanent:\cr\code{\link[ursa:panel_new]{panel_new}} - - > \code{\link[ursa:panel_raster]{panel_raster}} - - > \code{\link[ursa:panel_coastline]{panel_coastline}} - - > \code{\link[ursa:panel_graticule]{panel_graticule}} - - > \code{\link[ursa:panel_annotation]{panel_annotation}} - -> \code{\link[ursa:panel_scalebar]{panel_scalebar}}.

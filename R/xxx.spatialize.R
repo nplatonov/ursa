@@ -144,6 +144,39 @@
       }
       if ((nextCheck)&&(is.data.frame(dsn))&&
           (is.character(coords))&&(length(coords)==2)) {
+         if (!all(coords %in% colnames(dsn))) {
+            mname <- colnames(dsn)
+            indX <- .grep("^coords.x1$",mname)
+            if (!length(indX))
+               indX <- .grep("^x$",mname)
+            if (!length(indX))
+               indX <- .grep("^lon",mname)
+            if (!length(indX))
+               indX <- .grep("^east",mname)
+            if (!length(indX))
+               indX <- .grep("^x1",mname)
+            indY <- .grep("^coords.x2$",mname)
+            if (!length(indY))
+               indY <- .grep("^y$",mname)
+            if (!length(indY))
+               indY <- .grep("^lat",mname)
+            if (!length(indY))
+               indY <- .grep("^north",mname)
+            if (!length(indY))
+               indY <- .grep("^x2",mname)
+            if ((!length(indX))&&(!length(indY))) {
+               indX <- .grep("^000x1$",mname)
+               indY <- .grep("^000x2$",mname)
+            }
+            if ((!length(indX))&&(!length(indY))) {
+               indX <- .grep(paste0("^",coords[1],"$"),mname)
+               indY <- .grep(paste0("^",coords[2],"$"),mname)
+            }
+            ind <- c(indX[1],indY[1])
+            if ((any(is.na(ind)))||(length(ind)!=2))
+               stop("unable to detect 'x' and 'y' coordinates")
+            coords <- mname[ind]
+         }
          #isCRS <- ((!is.na(crsNow))&&(nchar(crsNow)))
          if (style!="auto")
             crsNow <- style
@@ -488,9 +521,21 @@
                obj <- sf::st_zm(obj,drop=TRUE)
          }
          else {
-            enc <- if (.lgrep("\\.shp$",dsn)) NULL else "UTF-8"
-            obj <- rgdal::readOGR(dsn,layer,pointDropZ=TRUE,encoding=enc
-                                 ,use_iconv=!is.null(enc),verbose=FALSE)
+            if (isSHP <- .lgrep("\\.shp$",dsn)>0) {
+               cpgname <- .gsub("\\.shp$",".cpg",dsn)
+               if (file.exists(cpgname)) {
+                  cpg <- readLines(cpgname,warn=FALSE)
+               }
+               else
+                  cpg <- "UTF-8"
+            }
+            else {
+               cpg <- "UTF-8"
+            }
+            ##~ obj <- rgdal::readOGR(dsn,layer,pointDropZ=TRUE,encoding=enc
+                                 ##~ ,use_iconv=!is.null(enc),verbose=FALSE)
+            obj <- rgdal::readOGR(dsn,layer,pointDropZ=TRUE,encoding=cpg
+                                 ,use_iconv=!isSHP,verbose=FALSE)
             if ((length(names(obj))==1)&&(names(obj)=="FID")) {
                info <- rgdal::ogrInfo(dsn,layer)
                if (info$nitems==0)
@@ -498,14 +543,6 @@
             }
          }
          options(opW)
-      }
-      if (.lgrep("\\.shp$",dsn)) {
-         cpgname <- .gsub("\\.shp$",".cpg",dsn)
-         if (file.exists(cpgname)) {
-            cpg <- readLines(cpgname,warn=FALSE)
-            if (cpg=="UTF-8")
-               cpg <- NULL
-         }
       }
    }
    if (style=="keep") {
@@ -692,8 +729,9 @@
                        ,SpatialPoints="POINT"
                        ,SpatialLines="LINE")
    if (("POLYGON" %in% geoType)&&("MULTIPOLYGON" %in% geoType)) {
-      if (isSF)
-         obj <- sf::st_cast(obj,"MULTIPOLYGON")
+      if (isSF) {
+         ret <- .try(obj <- sf::st_cast(obj,"MULTIPOLYGON"))
+      }
       if (isSP) {
          stop("POLYGON to MULTIPOLYGON for 'Spatial' is not implemented")
       }
@@ -746,7 +784,7 @@
       art <- "none"
    else {
       art <- .gsub2(tilePatt,"\\1",style)
-      proj <- "merc"
+      proj <- "merc" #ifelse(art=="polarmap",art,"merc")
    }
    isStatic <- .lgrep("static",style)>0
    mlen <- switch(art,google=640,openstreetmap=960,sputnikmap=640)
@@ -939,7 +977,9 @@
          lat_0 <- if (lat_ts>=0) 90 else -90
          if (verbose)
             print(c(lon0=lon_0,lat0=lat_0,lat_ts=lat_ts))
-         if (proj=="auto") {
+         if ((!FALSE)&&(proj=="merc")&&(.lgrep("(polarmap|tile357[123456])",style)))
+            proj <- "laea"
+         else if (proj=="auto") {
             if (("web" %in% style)||(tpat==3))
            # if (style=="web")
                proj <- "merc"
@@ -964,6 +1004,14 @@
                           ,"+k=1","+x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs")
          }
          else if (proj=="laea") {
+            if (style=="polarmap") {
+               lon_0[lon_0<(-165) || lon_0>=(+135)] <- -180
+               lon_0[lon_0>=(-165) && lon_0<(-125)] <- -150
+               lon_0[lon_0>=(-125) && lon_0<(-70)] <- -100
+               lon_0[lon_0>=(-70) && lon_0<(-25)] <- -40
+               lon_0[lon_0>=(-25) && lon_0<(+50)] <- 10
+               lon_0[lon_0>=(50) && lon_0<(+135)] <- 90
+            }
             t_srs <- paste("","+proj=laea"
                           ,paste0("+lat_0=",lat_0)
                           ,paste0("+lon_0=",lon_0)

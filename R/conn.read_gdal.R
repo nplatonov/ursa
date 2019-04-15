@@ -2,7 +2,31 @@
    if (envi_exists(fname)) {
       return(read_envi(fname))
    }
-   .read_gdal(fname=fname,verbose=verbose)
+   if (!.lgrep("\\.zip$",fname))
+      return(.read_gdal(fname=fname,verbose=verbose))
+   list1 <- unzip(fname,exdir=tempdir());on.exit(file.remove(list1))
+   ind <- .grep("\\.tif(f)*$",list1)
+   if (length(ind)) {
+      aname <- .gsub("\\.tif(f)*","",basename(list1[ind]))
+      if (TRUE) {
+         res <- vector("list",length(aname))
+         names(res) <- aname
+         res <- lapply(list1[ind],.read_gdal,verbose=verbose)
+         names(res) <- aname
+         g <- lapply(res,ursa_grid)
+         if (all(sapply(head(g,-1),function(g2) all.equal(g[[1]],g2))))
+            res <- as.ursa(res)
+         return(res)
+      }
+      for (i in sample(seq_along(aname))) {
+         a <- .read_gdal(fname=list1[ind][i],verbose=verbose)
+         if (!exists("res"))
+            res <- ursa(bandname=aname)
+         res[i] <- a
+      }
+      return(res)
+   }
+   NULL
 }
 'read_gdal' <- function(fname,resetGrid=TRUE,band=NULL,verbose=FALSE,...) { ## ,...
    obj <- open_gdal(fname,verbose=verbose)

@@ -1378,13 +1378,36 @@ void readBilBandInteger(char **fname,int *dim,int *index,int *nindex,int *dtype
    else if ((datatype==3)||(datatype==13))
       datasize=4;
    int i,j,k,adr;
+  // Rprintf("malloc=%ld max=%ld\n",samples*count*datasize,MAX_INT);
    char *buf1=malloc(samples*count*datasize);
    char *buf2=malloc(8);
+   int ret;
+   __int64 offset,o1,o2;
+   int MAXINT=2147483647;
    for (i=0;i<lines;i++)
    {
       for (k=0;k<count;k++)
       {
-         fseek(Fin,(i*bands+index[k]-1)*samples*datasize,SEEK_SET);
+        // Rprintf("fseek=%d\n",(i*bands+index[k]-1)*samples*datasize-MAX_INT);
+         ret=fseek(Fin,(i*bands+index[k]-1)*samples*datasize,SEEK_SET);
+         if (ret) {
+            o1=(__int64)(i*bands+index[k]-1)*samples*datasize;
+            o2=(__int64)0;
+            ret=fseek(Fin,MAXINT,SEEK_SET);
+            offset=o1-MAXINT;
+            o2+=MAXINT;
+            Rprintf("fseek0[%04d][%04d]=%d o1=%lld o2=%lld\n",i,index[k],ret,o1,o2);
+            while (offset>MAXINT) {
+               ret=fseek(Fin,MAXINT,SEEK_CUR);
+               Rprintf("   fseekI=%d\n",ret);
+               offset-=MAXINT;
+            }
+            fseek(Fin,offset,SEEK_CUR);
+            o2+=offset;
+            Rprintf("      offset: %lld %lld %lld\n",o1,o2,o1-o2);
+         }
+        // Rprintf("fseek=%d\n",ret);
+        // fsetpos(Fin,(i*bands+index[k]-1)*samples*datasize);
          if (fread(buf1,datasize,samples,Fin)) {};
          for (j=0;j<samples;j++)
          {

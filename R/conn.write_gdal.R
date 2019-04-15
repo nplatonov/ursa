@@ -11,7 +11,10 @@
          write_gdal(obj[i],aname[i])
       if (!.is.colortable(obj))
          file.remove(dir(pattern="\\.aux\\.xml$"))
-      utils::zip(file.path(wd,fname),dir(),"-qmj9")
+      zname <- file.path(wd,fname)
+      if (file.exists(zname))
+         file.remove(zname)
+      utils::zip(zname,dir(),"-qmj9")
       setwd(wd)
       return(invisible(integer()))
    }

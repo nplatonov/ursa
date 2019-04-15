@@ -1,4 +1,4 @@
-'compose_panel' <- function(...)
+'compose_panel' <- function(...,silent=FALSE)
 {
    if (.skipPlot(TRUE))
       return(NULL)
@@ -126,7 +126,7 @@
       for (i in seq(nl))
       {
          if ((verbose)&&(k==0)) {
-            pb <- ursaProgressBar(min=0,max=ifelse(isRGB,nl,nb))
+            pb <- ursaProgressBar(min=0,max=ifelse(isRGB,nl,nb),silent=silent)
            # setUrsaProgressBar(pb,k)
          }
          k <- k+1L

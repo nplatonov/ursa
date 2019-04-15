@@ -155,7 +155,7 @@
                         ,engine=c("native","sp","sf")
                         ,geocode="",place="",area=c("bounding","point")
                         ,zoom=NA,gdal_rasterize=FALSE
-                        ,verbose=FALSE,...) {
+                        ,silent=FALSE,verbose=FALSE,...) {
    arglist <- list(...)
    a <- as.list(match.call())
   # feature <- "geometry"
@@ -425,7 +425,7 @@
       gline <- compose_graticule(...)
       if (toCoast)
          cline <- compose_coastline(...)
-      pb <- ursaProgressBar(min=0,max=length(res))
+      pb <- ursaProgressBar(min=0,max=length(res),silent=silent)
       for (i in seq_along(res)) {
          if (isWeb)
             panel_new(fill="transparent",...)
@@ -472,11 +472,16 @@
               # .elapsedTime("Z")
               # panel_plot(obj,col=col,border=bg.polygon,lwd=lwd)
               # str(col)
-              # .elapsedTime("P1")
-               panel_plot(obj,col=col,border=bg.polygon,lwd=lwd,lty="blank")
-              # .elapsedTime("P2")
-               panel_plot(obj,col="transparent",border=bg.polygon,lwd=lwd)
-              # .elapsedTime("P3")
+               if (FALSE) {
+                  .elapsedTime("P1")
+                  panel_plot(obj,col=col,border=bg.polygon,lwd=lwd,lty="blank")
+                  .elapsedTime("P2")
+                  panel_plot(obj,col="transparent",border=bg.polygon,lwd=lwd)
+                  .elapsedTime("P3")
+               }
+               else {
+                  panel_plot(obj,col=col,border=bg.polygon,lwd=lwd)
+               }
             }
             if (.lgrep("point",geoType)) {
                lwd <- 0.25
