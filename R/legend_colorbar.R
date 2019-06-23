@@ -77,6 +77,7 @@
                             ,useRaster=NA,trim=0L,abbrev=24L,opacity=NA
                             ,verbose=FALSE)
 {
+   devPrettyLab <- F | .isPackageInUse()
    if (.skipPlot(FALSE))
       return(NULL)
    if (!getOption("ursaPngLayout")$legend)
@@ -110,7 +111,7 @@
       label <- names(ct)
    family <- getOption("ursaPngFamily")
    side <- .getSide()
-   if ((length(ct)==1)&&(isChar))
+   if ((length(ct)==1)&&(isChar | !isChar))
       las <- 0
   # maxlabel <- ifelse(isChar || forceLabel,999,21) ## removed 2015-12-13
    maxlabel <- ifelse(forceLabel,999,21) ## added 2015-12-13
@@ -221,9 +222,14 @@
          a <- FALSE
       if (!a) {
          ind <- which(nchar(iconv(label,to="UTF-8"))>abbrev)
-         label[ind] <- substr(label[ind],1,abbrev)
-         substr(label[ind],abbrev,abbrev) <- ">"
-         label[ind] <- substr(label[ind],1,abbrev)
+         if (F) {
+            label[ind] <- substr(label[ind],1,abbrev)
+            substr(label[ind],abbrev,abbrev) <- ">"
+            a2 <- .try(label[ind] <- substr(label[ind],1,abbrev))
+         }
+         else {
+            label[ind] <- paste0(substr(label[ind],1,abbrev-1),"\u2026")
+         }
       }
    }
    if (isTick)
@@ -269,8 +275,33 @@
             else {
                mwidth <- max(par()$fin)
                repeat({
-                  if (!isChar)
+                  if (!isChar) {
                      label <- pretty(y,n=labels)
+                     if (F & devPrettyLab & !is.null(keepLabel)) {
+                        label <- label[label>0]
+                       # ct <- colorize(keepLabel,ncolor=length(label),tail=0)
+                       # label4 <- as.numeric(names(ursa_colortable(ct)))
+                       # print(c('L4:'=label4))
+                        label1 <- keepLabel[label]
+                        label2 <- pretty(label1,n=length(label))
+                        print(c('L1:'=label1))
+                        print(c('L2:'=label2))
+                        label3 <- sapply(label1,function(x) {
+                           dl <- abs(x-label2)
+                           ind <- which.min(dl)
+                           dl[ind]
+                          # label2[ind]
+                          # ind
+                        })
+                        print(c('L3:'=label3))
+                       # print(c(label=length(label),label1=length(label1)
+                       #        ,label2=length(label2),label3=length(label3)
+                       #        ,label4=length(label4),labels=labels))
+                       # print(keepLabel[label3])
+                       # label <- label+label3
+                       # label <- label[label>=1 & label<=max(y)]
+                     }
+                  }
                   else {
                      label <- .prettyLabel(y,ncol=labels)$at
                      if (!.is.integer(label)) {
@@ -386,8 +417,48 @@
             if (exists("ind2"))
                rm(ind2)
          }
-         if (!is.null(keepLabel))
-            label <- keepLabel[unique(as.integer(round(label)))]
+         if (!is.null(keepLabel)) {
+            if (!devPrettyLab | is.character(keepLabel)) {
+               label <- keepLabel[unique(as.integer(round(label)))]
+            }
+            else  {
+               label <- unique(as.integer(round(label)))
+              # print(label)
+               label1 <- keepLabel[label]
+               label2 <- pretty(label1,n=length(label))
+              # print(c('L1:'=label1))
+              # print(c('L2:'=label2))
+               label3 <- sapply(label1,function(x) {
+                  dl <- abs(x-label2)
+                  ind <- which.min(dl)
+                  dl[ind]
+                 # label2[ind]
+                 # ind
+               })
+              # print(c('L3:'=label3))
+               label <- label1+label3
+              # print(c('L:'=label))
+               if (F & is.numeric(keepLabel)) {
+                  label0 <- label
+                  dlab <- diff(unique(sort(label)))
+                  if (.is.integer(dlab))
+                     dlab <- as.integer(round(dlab))
+                  if (length(unique(dlab))==1) {
+                     ud1 <- unique(dlab)
+                     desired <- pretty(keepLabel,n=length(label))
+                     print(length(label)==length(desired))
+                     ud2 <- unique(diff(desired))
+                     if (ud1==ud2) {
+                        print(label0)
+                        label <- c(na.omit(match(desired,keepLabel)))
+                       # label <- keepLabel[label]
+                        print(label)
+                        q()
+                     }
+                  }
+               }
+            }
+         }
         # if ((!isChar)&&(!((side %in% c(1,3))&&(las %in% c(0,1)))))
         #    label <- format(label,trim=TRUE,scientific=FALSE)
          rm(x,y)

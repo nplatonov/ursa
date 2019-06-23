@@ -3675,6 +3675,21 @@ void isNear(double *x1,double *x2,int *len1,int *len2,int *res)
    }
    return;
 }
+void scatterplot(int *x,int *y,int *n,int *nbreakX,int *nbreakY
+                ,int *histX,int *histY,int *hist2d) {
+   int i,ndata=*n;
+  // int nx=*nbreakX;
+   int ny=*nbreakY;
+   int c,r;
+   for (i=0;i<ndata;i++) {
+      c=x[i];
+      r=y[i];
+      histX[c]+=1;
+      histY[r]+=1;
+      hist2d[ny*c+r]+=1;
+   }
+   return;
+}
 int main()
 {
    Rprintf("Compile and build as DLL\n");

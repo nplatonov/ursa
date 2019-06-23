@@ -11,6 +11,7 @@
 \alias{spatial_geometry}
 \alias{spatial_geometry<-}
 \alias{spatial_geotype}
+\alias{spatial_shape}
 \alias{spatial_transform}
 \alias{spatial_coordinates}
 \alias{spatial_fields}
@@ -26,6 +27,7 @@
 \alias{spatial_filelist}
 \alias{spatial_dir}
 \alias{spatial_basename}
+\alias{spatial_pattern}
 \alias{is_spatial}
 \alias{is_spatial_points}
 \alias{is_spatial_lines}
@@ -34,6 +36,7 @@
 \alias{spatial_symdifference}
 \alias{spatial_union}
 \alias{spatial_buffer}
+\alias{spatial_trim}
 \title{
 Wrapper functions for manipulation with non-raster spatial objects
 }
@@ -60,6 +63,7 @@ spatial_geometry(obj, verbose = FALSE)
 spatial_geometry(obj, verbose = FALSE) <- value
 
 spatial_geotype(obj, verbose = FALSE)
+spatial_shape(obj, verbose = FALSE)
 
 spatial_transform(obj, crs, verbose = FALSE, ...)
 
@@ -80,10 +84,11 @@ spatial_count(obj, verbose = FALSE)
 spatial_nrow(obj, verbose = FALSE)
 spatial_ncol(obj, verbose = FALSE)
 
-spatial_filelist(path = ".", pattern = NA, full.names = TRUE, recursive = FALSE)
-spatial_dir(path = ".", pattern = NA, full.names = TRUE, recursive = FALSE)
+spatial_filelist(path = ".", pattern = NA, full.names = TRUE, recursive = FALSE, ignore.case = TRUE)
+spatial_dir(path = ".", pattern = NA, full.names = TRUE, recursive = FALSE, ignore.case = TRUE)
 
 spatial_basename(fname)
+spatial_pattern(fname)
 
 is_spatial(obj, verbose = FALSE)
 
@@ -96,6 +101,8 @@ spatial_symdifference(x, y, verbose = FALSE)
 spatial_union(x, y, byid=NA, verbose = FALSE)
 
 spatial_buffer(obj, dist = 0, quadsegs = 30L, verbose = FALSE)
+
+spatial_trim(obj)
 
 }
 %- maybe also 'usage' for other objects documented here.
@@ -128,7 +135,10 @@ See description of argument \code{pattern} in function \code{\link[base:list.fil
 See description of argument \code{full.names} in function \code{\link[base:list.files]{dir}}.
 }
   \item{recursive}{
-See description of argument \code{full.names} in function \code{\link[base:list.files]{dir}}.
+See description of argument \code{recirsive} in function \code{\link[base:list.files]{dir}}.
+}
+  \item{ignore.case}{
+See description of argument \code{ignore.case} in function \code{\link[base:list.files]{dir}}.
 }
   \item{quadsegs}{
 Integer. Number of segments per quadrant (fourth of a circle), for all or per-feature. See description for \code{quadsegs} argument of \code{\link[rgeos:misc-gBuffer]{gBuffer}} and for \code{nQuadSegs} argument of \code{\link[sf:geos_unary]{st_buffer}}.
@@ -168,7 +178,7 @@ Further arguments passed to \code{sf::st_transform} or to \code{sp::spTransform}
 
 \code{spatial_transform} does a transformation of spatial coordinates to the new CRS and returns object of the same class as class of \code{obj}.
 
-\code{spatial_geotype} returns type of spatial data: "POINTS", "LINESTRINGS", "POLYGON", "MULTIPOLYGON", \dots.
+\code{spatial_geotype} and \code{spatial_shape} are synonyms; each returns type of spatial data: "POINT", "LINESTRING", "POLYGON", "MULTIPOLYGON", \dots.
 
 \code{spatial_coordinates} returns simpliefied matrix or list of coordinates of original object.
 
@@ -190,6 +200,8 @@ Further arguments passed to \code{sf::st_transform} or to \code{sp::spTransform}
 
 \code{spatial_basename} returns basename (without extension) of file \code{fname} of spatial object.
 
+\code{spatial_pattern} returns pattern of \code{spatial_basename} for using in \link[base:regex]{regular expressions}.
+
 \code{is_spatial} returns logical value does the object belong to the class of spatial data.
 
 \code{is_spatial_points} returns logical value does the object have point geometry.
@@ -205,6 +217,8 @@ Further arguments passed to \code{sf::st_transform} or to \code{sp::spTransform}
 \code{spatial_buffer} returns buffered spatial object.
 
 \code{spatial_union} returns combined geometry without internal boundaries.
+
+\code{spatial_trim} returns spatial object without extra attributes added by \pkg{ursa} package.
 
 }
 \references{

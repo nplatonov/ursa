@@ -64,6 +64,7 @@
 }
 'print.ursaRaster' <- function(x,digits=NA,grid=FALSE,raw=FALSE,...)
 {
+   ellipsis <- c(">","\u2026")[2]
    e <- band_stat(x,grid=grid,raw=raw)
    if (grid)
       return(format(e,digits=digits,...))
@@ -88,7 +89,7 @@
                ind <- which(nchar(ln)!=nchar(l))
                if (length(ind)) {
                   b <- nchar(l[ind])
-                  substr(l[ind],b,b) <- ">"
+                  substr(l[ind],b,b) <- ellispis
                }
                f$name <- format(l)
                return(print(f,quote=FALSE))
@@ -104,7 +105,7 @@
                ind <- which(nchar(ln)!=nchar(l))
                if (length(ind)) {
                   b <- nchar(l[ind])
-                  substr(l[ind],b,b) <- ">"
+                  substr(l[ind],b,b) <- ellipsis
                }
                f$name <- format(l)
                return(print(f,quote=FALSE))

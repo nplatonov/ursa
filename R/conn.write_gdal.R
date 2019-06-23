@@ -22,9 +22,9 @@
       ftmp <- .maketmp()
       ret <- write_envi(obj,paste0(ftmp,"."))
       system2("gdal_translate",c("-q","-of","GTiff"
-                                ,"-co",dQuote("COMPRESS=DEFLATE")
-                                ,"-co",dQuote("PREDICTOR=2")
-                                ,"-co",dQuote("TILED=NO")
+                                ,"-co",.dQuote("COMPRESS=DEFLATE")
+                                ,"-co",.dQuote("PREDICTOR=2")
+                                ,"-co",.dQuote("TILED=NO")
                                 ,ftmp,fname))
       envi_remove(ftmp)
       return(invisible(ret))

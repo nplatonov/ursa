@@ -166,7 +166,7 @@
    }
    if (bpp==8) {
       if (nchar(Sys.which("i_view32"))) {
-         FoutTmp <- ifelse(dirname(fileout)==".",fileout,normalizePath(fileout))
+         FoutTmp <- ifelse(dirname(fileout)==".",basename(fileout),normalizePath(fileout))
          cmd <- paste("i_view32",FoutTmp,"/bpp=8",paste0("/convert=",FoutTmp))
       }
       else if ((nchar(im <- Sys.getenv("R_IMAGEMAGICK"))>0)&&(file.exists(im))) {

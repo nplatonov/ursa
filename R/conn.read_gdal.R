@@ -47,11 +47,17 @@
       .elapsedTime("rgdal has been loaded")
   # print(geterrmessage())
    op <- options(warn=0-!verbose)
-   a <- rgdal::GDALinfo(fname,returnStats=FALSE,returnRAT=FALSE
-                ,returnColorTable=TRUE,returnCategoryNames=TRUE)
+   a <- try(rgdal::GDALinfo(fname,returnStats=FALSE,returnRAT=FALSE
+                ,returnColorTable=TRUE,returnCategoryNames=TRUE))
    options(op)
    if (verbose)
       str(a)
+   if (inherits(a,"try-error")) {
+      if (verbose)
+         message("It looks like file ",.dQuote(fname)
+                ," is not found or not GDAL-recognized")
+      return(NULL)
+   }
    a1 <- as.numeric(a)
    g1 <- regrid()
    g1$rows <- as.integer(a1[1])

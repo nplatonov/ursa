@@ -548,3 +548,55 @@
   # return(do.call("system",arg1))
    NULL
 }
+'.origin' <- function () as.Date(as.POSIXlt(Sys.time()-as.numeric(Sys.time()),tz="UTC")) ## "1970-01-01"
+'.evaluate' <- function(arglist,ref,verbose=F & .isPackageInUse()) {
+   if (F & !.isPackageInUse())
+      return(arglist)
+   verbal <- paste0("args evaluating (",paste(ref,collapse=", "),") --")
+   if (verbose)
+      .elapsedTime(paste(verbal,"started"))
+   argname <- character()
+   for (fun in ref)
+      argname <- c(argname,names(as.list(do.call("args",list(fun)))))
+   argname <- unique(argname)
+   rname <- names(arglist)
+   depth <- 1L+.isKnitr()
+  # print(c('as.character(arglist[[1]])'=as.character(arglist[[1]])))
+  # print(c(isPackageInUse=.isPackageInUse()))
+  # print(c('arglist[[1]]'=arglist[[1]]))
+  # try(print(c(a=head(names(as.list(args(arglist[[1]]))))),quote=FALSE))
+  # try(print(c(b=head(names(as.list(args(as.character(arglist[[1]])))))),quote=FALSE))
+  # try(print(c(c=head(names(as.list(args(colorize))))),quote=FALSE))
+  # try(print(c(d=head(names(as.list(args(ursa::colorize))))),quote=FALSE))
+   j <- integer()
+   for (i in seq_along(arglist)[-1]) {
+      if (rname[i]=="obj")
+         next
+      if (!is.language(arglist[[i]]))
+         next
+      if (inherits(try(match.arg(rname[i],argname),silent=TRUE),"try-error"))
+         next
+      res <- try(eval.parent(arglist[[i]],n=depth),silent=TRUE)
+      if (inherits(res,"try-error")) {
+         next
+      }
+      if (is.null(res))
+         j <- c(j,i)
+      else if (is.language(res)) {
+         res <- eval.parent(res,n=depth)
+         if (!is.language(res)) {
+            assign(rname[i],res)
+            arglist[[i]] <- res
+         }
+         else
+            stop("unable to evaluate agrument ",.sQuote(rname[i]))
+      }
+      else
+         arglist[[i]] <- res 
+   }
+   if (length(j))
+      arglist <- arglist[-j]
+   if (verbose)
+      .elapsedTime(paste(verbal,"finished"))
+   arglist
+}

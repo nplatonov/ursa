@@ -12,7 +12,7 @@
   #    return(NULL)
    if (!.try(kind0 <- match.arg(kind))) {
       n <- length(kind)
-      max <- if ((n==1)&&(.is.integer(kind))) kind else n
+      max <- if ((n==1)&&(is.numeric(kind))&&(.is.integer(kind))) kind else n
       kind <- head(eval(formals()$kind),1)
    }
    else
@@ -113,11 +113,11 @@
          stop("PROGRESSBAR")
       }
       if (d4h==0) {
-         d4f <- sprintf(" -%02d:%02d:%02d",d4h,d4m,d4s)
+         d4f <- sprintf("%02d:%02d:%02d",d4h,d4m,d4s)
          d5 <- format(Sys.time()+d6,"(%H:%M:%S)")
       }
       else {
-         d4f <- sprintf(" -%02dh%02dm",d4h,d4m)
+         d4f <- sprintf("%02dh%02dm",d4h,d4m)
          d5 <- format(Sys.time()+d6,"(%d%b %H:%M)")
       }
       d8s <- d8%%60
@@ -133,6 +133,9 @@
          d9 <- sprintf("%02d:%02d:%02d",d9h,d9m,d9s)
       else
          d9 <- sprintf("%02dh%02dm",d9h,d9m)
+      d8 <- paste0("+",d8)
+      d4f <- paste0("-",d4f)
+     # d9 <- paste0("=",d9)
       if ((TRUE)||((st[4]>1500)||(d1>0.05)))
          label <- sprintf("%5.0f%% %9s %9s %9s %12s",d1*100,d8,d4f,d9,d5)
       else

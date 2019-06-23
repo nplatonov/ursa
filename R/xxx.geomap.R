@@ -210,10 +210,17 @@
                         ,setbound=unname(bbox[c("xmin","ymin","xmax","ymax")]))
             g0 <- regrid(g0,border=border)
          }
+        # print(data.frame(res0=res0,res=res,i=i,border=border,notYetGrid=notYetGrid))
          if (!notYetGrid) {
             if (identical(res0,res)) {
                fixRes <- TRUE
                break
+            }
+            if (softmatching <- TRUE) {
+               if (abs(res/res0-1)<1*1e-5) {
+                  fixRes <- TRUE
+                  break
+               }
             }
          }
          else if ((g0$columns<=size[1])&&(g0$rows<=size[2]))

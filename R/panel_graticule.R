@@ -813,7 +813,8 @@
       return(NULL)
    obj <- .getPrm(arglist,class="ursaGridLine",default=NULL)
    g1 <- session_grid()
-   if ((!is.null(g1$labx))&&(!is.null(g1$laby))) {
+  # if ((!is.null(g1$labx))&&(!is.null(g1$laby))) {
+   if ((length(g1$seqx))&&(length(g1$seqy))) {
       .repairForScatterPlot()
       return(NULL)
    }
@@ -821,7 +822,7 @@
       obj <- compose_graticule(...)
    if (is.null(obj$gridline))
       return(NULL)
-   if ((!is.null(attr(g1$columns,"units"))&&(!is.null(attr(g1$rows,"units"))))) {
+   if ((!is.null(attr(g1$seqx,"units"))&&(!is.null(attr(g1$seqy,"units"))))) {
       if (is.null(g1$labx))
          g1$labx <- unique(obj$margin[obj$margin$kind==1,"at"])
       if (is.null(g1$laby))

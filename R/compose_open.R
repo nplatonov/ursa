@@ -27,15 +27,19 @@
       cr <- attr(mosaic,"copyright")
       if ((is.character(cr))&&(nchar(cr)>1)) {
          mosaic <- compose_design(layout=c(1,1),legend=NULL)
+        # print("WEB #1")
          options(ursaPngWebCartography=TRUE)
-         print("WEB")
          scale <- 1
       }
    }
    else if ((.lgrep("\\+proj=merc",session_proj4()))&&
            (!is.na(.is.near(session_cellsize(),2*6378137*pi/(2^(1:21+8)))))) {
-      options(ursaPngWebCartography=TRUE)
-      scale <- 1
+     # print("WEB #2")
+      arglist <- as.list(match.call())
+      if (!("scale" %in% names(arglist))) {
+         options(ursaPngWebCartography=TRUE)
+         scale <- 1
+      }
    }
    if ((is.character(mosaic))&&(mosaic=="rgb"))
       mosaic <- compose_design(layout=c(1,1),legend=NULL)

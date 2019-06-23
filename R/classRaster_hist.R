@@ -6,21 +6,34 @@
 'histogram' <- function(...) .syn('ursa_hist',0,...)
 'ursa_hist' <- function(obj,width=800,height=600,...) {
    rel <- as.list(match.call())
-   if (!is.ursa(obj)) {
-      if ((is.character(obj))&&(!is.matrix(obj)))
-         obj <- if (envi_exists(obj)) read_envi(obj,...) else read_gdal(obj,...)
-      if ((is.character(obj))||(is.factor(obj))) {
-         stop("histogram of categories is not implemented yet")
+   rel <- .evaluate(rel,c("colorize","ursa_hist")[1])
+   isFactor <- inherits(obj,c("character","factor","Date"))
+   if (F) {
+      if (!is.ursa(obj)) {
+         if ((is.character(obj))&&(!is.matrix(obj))&&(length(obj)==1))
+            obj <- if (envi_exists(obj)) read_envi(obj,...) else read_gdal(obj,...)
+         if (inherits(obj,c("character","factor","Date"))) {
+            objF <- factor(obj)
+            category <- levels(objF)
+            obj <- as.integer(objF)
+            isFactor <- TRUE
+            if (F & .isPackageInUse())
+               stop("histogram of categories is not implemented yet")
+         }
+         if ((is.numeric(obj))&&(is.null(dim(obj)))) {
+            g1 <- getOption("ursaSessionGrid")
+            dim(obj) <- c(length(obj),1)
+         }
+         if(!.try(obj <- as.ursa(obj)))
+            return(NULL)
+        # obj <- as.ursa(obj)
       }
-      if ((is.numeric(obj))&&(is.null(dim(obj)))) {
-         g1 <- getOption("ursaSessionGrid")
-         dim(obj) <- c(length(obj),1)
+      if (isFactor) {
+         obj <- obj-1L
+         rel[["name"]] <- category
       }
-      if(!.try(obj <- as.ursa(obj)))
-         return(NULL)
-     # obj <- as.ursa(obj)
    }
-   rel[["obj"]] <- obj
+   rel[["obj"]] <- obj # eval(rel[["obj"]]) failed for 'by <- sample(letters,100,replace=T);ursa_hist(by)'
    if (length(ind <- (.grep("verbose",names(rel)))))
       verbose <- eval(rel[[ind]])
    else
@@ -29,9 +42,26 @@
   #    rel$tail <- 0.001
   # p <- colorize(obj)
    p <- do.call("colorize",rel[-1],quote=TRUE)
+  # print(ursa(p,"table"))
    ct <- p$colortable
-   ta <- as.table(p)
-   va <- .deintervale(ct)
+   if (FALSE) {
+      str(rel)
+      str(obj)
+      str(p)
+      return(NULL)
+   }
+   if (is.ursa(obj))
+      ta <- as.table(p)
+   else {
+      ta <- ursa(p,"table")
+   }
+   manual <- which(unname(sapply(names(rel[-1]),function(aname) {
+      !inherits(try(match.arg(aname,"value"),silent=TRUE),"try-error")
+   })))
+   if (length(manual))
+      va <- rel[-1][[manual]]
+   else
+      va <- .deintervale(ct)
   # ind <- match(names(ta),seq_along(va)-1L)
   # if (any(is.na(ind)))
   #    ct <- rep(NA_character_,)
@@ -48,15 +78,22 @@
    ##~ }
    ##~ if (TRUE)
       ##~ breaks <- c(0,seq(length(ct)))
-   adjy <- as.numeric(names(ta))
-   dify <- diff(adjy)
-   toDensity <- .is.eq(dify) & length(dify)>32
-   if (toDensity) {
-      rngy <- range(adjy)+c(-1,1)*mean(dify)/2
-      breaks <- seq(rngy[1],rngy[2],by=mean(dify))
+   if (!isFactor) {
+      adjy <- va # as.numeric(names(ta))
+      dify <- diff(adjy)
+      toDensity <- .is.eq(dify) & length(dify)>32
+      if (toDensity) {
+         rngy <- range(adjy)+c(-1,1)*mean(dify)/2
+         breaks <- seq(rngy[1],rngy[2],by=mean(dify))
+        # breaks <- c(0,seq(length(ta)))
+      }
+      else
+         breaks <- c(0,seq(length(ta)))
    }
-   else
+   else {
+      toDensity <- TRUE
       breaks <- c(0,seq(length(ta)))
+   }
    mids <- breaks[-1]-d/2
    counts <- as.integer(ta)
    g0 <- session_grid()
@@ -78,6 +115,26 @@
                     ,zname="manual histogram"
                     ,equidist=TRUE)
    class(histValue) <- "histogram"
+   if (patchRemoveZero <- TRUE) {
+      cnt <- histValue$counts
+      ind <- which(cnt>0)
+      d <- diff(ind)
+      ud <- unique(d)/min(d)
+      if (min(ud)>1) {
+         if (all(ud %% min(ud) == 0)) {
+            str(histValue,digits=12)
+            print(min(d))
+            ind <- seq(min(ind),max(ind),by=min(d))
+            histValue$counts <- histValue$counts[ind]
+            histValue$intensities <- histValue$intensities[ind]
+            histValue$density <- histValue$density[ind]
+            histValue$mids <- histValue$mids[ind]
+            m <- diff(histValue$mids)
+            histValue$breaks <- with(histValue,c(mids[1]-0.5,mids+0.5))
+            str(histValue,digits=12)
+         }
+      }
+   }
    if (verbose)
       str(histValue,digits=12)
    options(ursaPngAuto=TRUE)
@@ -104,7 +161,13 @@
                q()
             }
             opW <- options(warn=-10)
-            z <- try(density(na.omit(c(obj$value)),n=2^11,...))
+            if (is.ursa(obj))
+               z <- try(density(na.omit(c(obj$value)),n=2^11,...))
+            else if (isFactor)
+               z <- try(density(p$index,n=2^11,...))
+            else {
+               z <- try(density(va[p$index],n=2^11,...))
+            }
             options(opW)
          }
          if (!inherits(z,"try-error")) {
@@ -114,7 +177,7 @@
             panel_polygon(z,lwd=3,lty=5,border="grey20") #border=tail(myBrewer("Spectral"),1)
          }
          else
-            cat("density was not defined")
+            cat("density was not defined\n")
       }
    }
    arglist <- list(...)
@@ -127,7 +190,9 @@
    xlab <- .getPrm(arglist,name="(^xlab.*|lab.*x$)",default="")
    ylab <- .getPrm(arglist,name="(^ylab.*|lab.*y$)",default="")
    if (!nchar(ylab)) {
-      do.call("legend_colorbar",list(ursa_colortable(p),units=xlab))
+      ct <- ursa_colortable(p)
+     # do.call("legend_colorbar",list(ct,units=xlab,las=2))
+      do.call("legend_colorbar",c(list(ct,units=xlab),arglist))
       do.call("legend_mtext",list(ylab))
      # leg <- c(list(p),arglist)
      # do.call("compose_legend",leg)
@@ -205,9 +270,8 @@
               ,line=ifelse(las %in% c(1,2),0.1+width/height,height+1.5))
       }
    }
-   compose_close(...)
    session_grid(g0)
-   0L
+   compose_close(...)
 }
 '.cmd.hist' <- function() {
    do.call("histogram",.args2list())

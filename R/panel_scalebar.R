@@ -16,7 +16,7 @@
    position <- .getPrm(arglist,name="pos(ition)*",kwd=kwd
                       ,class=list("character","numeric"),default="---")
    g0 <- session_grid()
-   canScale <- .lgrep("\\+proj=(merc|zzzzz)\\s",g0$proj4)>0
+   canScale <- .lgrep("(epsg:3857|\\+proj=(merc|zzzzz)\\s)",g0$proj4)>0
    if ((position=="---")&&(canScale)) {
       lat <- with(g0,.project(rbind(c(minx,miny),c(maxx,maxy)),proj4,inv=TRUE))[,2]
       sc <- sort(1/cos(lat*pi/180))
@@ -93,7 +93,7 @@
       return(invisible(NULL))
    dx <- with(g1,maxx-minx)
    dy <- with(g1,maxy-miny)
-   isMerc <- .lgrep("\\+proj=merc",g1$proj4)>0
+   isMerc <- .lgrep("(\\+proj=merc|epsg\\:3857)",g1$proj4)>0
    if (isMerc) {
       x3 <- pos[1]
       if (pos[1]<0.1)

@@ -418,6 +418,14 @@
       f <- .dir(path=dname
                ,pattern=paste0("^",lname,"\\.",ext,"$")
                ,full.names=TRUE)
+      if (!length(f)) {
+         s <- paste0("(",paste(paste0("\\",unlist(strsplit("|()[]{}^$*+?",split="+")))
+                              ,collapse="|"),")")
+         lname <- gsub(s,"\\\\\\1",lname)
+         f <- .dir(path=dname
+                  ,pattern=paste0("^",lname,"\\.",ext,"$")
+                  ,full.names=TRUE)
+      }
       z <- paste0(fname,".zip")
       opW <- options(warn=-1)
       first <- TRUE

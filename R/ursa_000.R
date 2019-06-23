@@ -51,8 +51,21 @@
          return(ursa_grid(obj)$rows)
       return(NULL)
    }
-   if (!is.ursa(obj))
+   if (!is.ursa(obj)) {
+      if (.lgrep("^table",attr)) {
+         if ((is.list(obj))&&(names(obj) %in% c("index","colorable"))) {
+            na <- names(obj$colortable)
+            ta <- table(with(obj,names(colortable[index])))
+            res <- rep(0L,length(na))
+            names(res) <- na
+            class(res) <- "table"
+            ind <- match(names(ta),na)
+            res[ind] <- as.integer(ta)
+            return(res)
+         }
+      }
       return(obj)
+   }
    if (.lgrep("^grid",attr))
       return(ursa_grid(obj))
    if (.lgrep("^con",attr))

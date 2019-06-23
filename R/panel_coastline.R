@@ -620,7 +620,8 @@
    }
    else
       toUnloadMethods <- FALSE
-   src <- "http://data.openstreetmapdata.com/simplified-land-polygons-complete-3857.zip"
+  # src <- "http://data.openstreetmapdata.com/simplified-land-polygons-complete-3857.zip" ## (depredated)
+   src <- "https://osmdata.openstreetmap.de/download/simplified-land-polygons-complete-3857.zip"
    dst <- .ursaCacheDownload(src,mode="wb",quiet=FALSE)
    list1 <- unzip(dst,exdir=tempdir())
    a <- sf::st_read(list1[.grep("\\.shp$",basename(list1))],quiet=TRUE)

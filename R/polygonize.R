@@ -146,11 +146,20 @@
    sa
 }
 '.vectorize' <- function(obj,fname,opt="") {
+   internal <- missing(fname)
+   if (internal) {
+      bname <- tempfile()
+      fname <- paste0(bname,".shp")
+   }
    Fout <- .maketmp()
    write_envi(obj,paste0(Fout,"."))
    cmd <- paste("python",Sys.which("gdal_polygonize.py")
                ,opt," -f \"ESRI Shapefile\"",Fout,".",fname)
    system(cmd)
    envi_remove(Fout)
-   0L
+   if (!internal)
+      return(0L)
+   ret <- spatialize(fname)
+   file.remove(dir(path=dirname(bname),pattern=paste0("^",basename(bname)),full.names=TRUE))
+   ret
 }

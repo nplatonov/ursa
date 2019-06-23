@@ -7,7 +7,7 @@
    list2 <- ls(envir=ns)
    unloadNamespace(ns)
    list2 <- grep("^[A-Za-z]",list2,value=TRUE)
-   list2 <- grep("\\.(ursa(Raster|Grid|ColorTable|Connection|Numeric|Category|Stack))"
+   list2 <- grep("\\.(ursa(Raster|Grid|ColorTable|Connection|Numeric|Category|Stack|ProgressBar))"
                 ,list2,value=TRUE,invert=TRUE)
    list2 <- grep("^(as\\.Raster|djqwotrhfndh)\\.",list2,value=TRUE,invert=TRUE)
    list2 <- list2[which(is.na(match(list2,list1)))]

@@ -1,7 +1,9 @@
 'spatial_read' <- function(dsn,engine=c("native","sp","sf")) {
    g0 <- getOption("ursaSessionGrid")
    res <- spatialize(dsn=dsn,engine=engine,style="keep")
-   if (TRUE) {
+   if (FALSE)
+      res <- spatial_trim(res)
+   else if (TRUE) {
       sapply(c("toUnloadMethods","colnames","style","geocodeStatus","dsn","grid")
             ,function(x) attr(res,x) <<- NULL)
    }

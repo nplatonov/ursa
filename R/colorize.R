@@ -19,7 +19,7 @@
 {
    rel <- as.list(match.call())
    fun <- "colorize" #"colorize" ## as.character(rel[1])
-   if (TRUE) { ## ++ 20170629
+   if (!FALSE) { ## ++ 20170629
      # .elapsedTime("---")
      # print(c('as.character(rel[[1]])'=as.character(rel[[1]])))
      # print(c(isPackageInUse=.isPackageInUse()))
@@ -31,6 +31,8 @@
       argname <- names(as.list(args(colorize)))
       rname <- names(rel)
       j <- NULL
+     # str(rel)
+     # print(argname)
       for (i in seq_along(rel)[-1]) {
          if (rname[i]=="obj")
             next
@@ -55,6 +57,8 @@
          rel <- rel[-j]
      # .elapsedTime("===")
    }
+   else if (TRUE)
+      rel <- .evaluate(rel,"colorize")
    if (is.numeric(alpha)) {
      ## ?adjustcolor 
       if (all(alpha<=1))
@@ -107,11 +111,20 @@
       return(res)
    }
    if (!is.ursa(obj)) {
+      daily <- integer()
       isTime <- inherits(obj,c("Date","POSIXct","POSIXlt")[2:3])
       isDate <- inherits(obj,c("Date","POSIXct","POSIXlt")[1])
      # print(c(isCharacter=is.character(obj),isTime=isTime,isDate=isDate))
-      if (inherits(obj,c("Date","POSIXct","POSIXlt")))
+      if (inherits(obj,c("Date","POSIXct","POSIXlt"))) {
+         obj <- sort(obj)
+         od <- sort(unique(diff(sort(unique(obj)))))
+         if (all(od %% min(od) == 0)) {
+            os <- seq(min(obj),max(obj),by=min(od))
+            daily <- match(obj,os)
+         }
+        # daily <- integer()
          obj <- if (nchar(format)) format(obj,format) else as.character(obj)
+      }
       if ((is.numeric(obj))||(is.character(obj))||(is.factor(obj))) {
          isOrdered <- is.ordered(obj)
          isChar <- is.character(obj) | is.factor(obj)
@@ -119,15 +132,21 @@
          ctname <- .grep("colortable",names(rel),value=TRUE)
          if (.is.grid(g1))
             session_grid(NULL)
-         if ((isDate)||(isTime))
-            obj <- sort(obj)
+        # if ((isDate)||(isTime))
+        #    obj <- sort(obj)
          if (isOrdered) {
             levname <- levels(obj)
             obj <- as.integer(obj)-1L
          }
          else if (isChar) {
-            oname <- as.character(obj)
-            obj <- seq_along(obj)
+            if (length(daily)) {
+               oname <- as.character(os)
+               obj <- seq_along(os)
+            }
+            else {
+               oname <- as.character(obj)
+               obj <- seq_along(obj)
+            }
          }
          res <- ursa_new(matrix(rev(obj),nrow=1),flip=FALSE,permute=FALSE) ## rev()?
          if ((isChar)&&(!isOrdered)) {
@@ -193,7 +212,9 @@
             session_grid(NULL)
          if (dropIndex)
             return(img$colortable)
-         return(list(index=c(img$value)+1L,colortable=img$colortable))
+         if (!length(daily))
+            return(list(index=c(img$value)+1L,colortable=img$colortable))
+         return(list(index=daily,colortable=img$colortable))
       }
       return(list(index=NA,colortable=NA))
    }
@@ -313,7 +334,21 @@
          stretch <- "category"
          if ((is.null(palname))&&(is.null(pal))) {
            # palname <- "Paired" ## "random"
-            pal <- cubehelix(value=uniqval)#,rotate=2.5)
+            if (dev <- T) {
+               arglist <- list(...)
+               myname <- names(arglist)
+               ind <- .grep("^pal\\.",myname)
+               if (length(ind)) {
+                  arglist <- arglist[ind]
+                  names(arglist) <- .gsub("(^pal\\.)","",myname[ind])
+                  arglist <- c(list(value=uniqval),arglist)
+                  pal <- do.call("cubehelix",arglist)
+               }
+               else
+                  pal <- cubehelix(value=uniqval)#,rotate=2.5)
+            }
+            else
+               pal <- cubehelix(value=uniqval)#,rotate=2.5)
             inv <- FALSE
          }
       }
@@ -725,8 +760,9 @@
             th <- th[-c(1,length(th))]
          }
          value <- unique(val[round(length(val)*th)])
-         if (length(value) >= ncolor)
+         if (length(value) >= ncolor) {
             break
+         }
       }
       ok <- FALSE
       for (i2 in -6:+6) ## -4:+4
@@ -745,11 +781,18 @@
      # ok <- FALSE
       if (!ok)
       {
+         event <- FALSE
          for (i2 in 1:3)
          {
             label <- format(value,trim=TRUE,digits=i2)
-            if (length(unique(label))==length(value))
+            if (length(unique(label))==length(value)) {
+               event <- TRUE ## added 20190619
                break
+            }
+         }
+         if (!event) {
+            label <- unique(label)
+            value <- as.numeric(label)
          }
       }
       else

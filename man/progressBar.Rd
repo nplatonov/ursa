@@ -14,8 +14,8 @@ ursaProgressBar(kind = c("tk", "txt"),title = .argv0(),
                 style = 1, silent = FALSE)
 
 setUrsaProgressBar(pb, value, title = NULL, label = NULL)
-%%~ \method{close}{ursaProgressBar}(con, ...)
 \method{close}{ursaProgressBar}(con, ...)
+
 
 }
 %- maybe also 'usage' for other objects documented here.

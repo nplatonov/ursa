@@ -43,6 +43,7 @@
       }
       res <- ursa(fasterize::fasterize(sf=obj,raster=as.Raster()
                  ,field=by,by=NULL,fun=fun))
+     # res <- fasterize::fasterize(sf=obj,raster=as.Raster(),field=by,by=NULL,fun=fun)
       if (isList) {
          src <- as.integer(names(ursa(res,"table")))
          res <- lapply(bname,function(x) {

@@ -59,7 +59,7 @@
    isNative <- engine=="native"
    if (is.character(dsn)) {
       if (length(dsn)>1) {
-         pattern <- "\\.(gpkg|tab|kml|json|geojson|mif|sqlite|shp|osm)(\\.(zip|gz|bz2))*$"
+         pattern <- "\\.(gpkg|tab|kml|json|geojson|mif|sqlite|shp|osm)(\\.(zip|rar|gz|bz2))*$"
          dsn <- dsn[.grep(pattern,basename(dsn))]
          if (length(dsn)!=1)
             stop("Either filename is not recognized or multiple files")
@@ -466,6 +466,30 @@
             dsn <- tempfile();on.exit(file.remove(dsn))
             system2("bzip2",c("-f -d -c",.dQuote(dsn0)),stdout=dsn,stderr=FALSE)
          }
+         else if ((T)&&(nchar(Sys.which("7z")))&&(isZip <- .lgrep("\\.rar$",dsn)>0)) {
+            stop(dsn,": this archive type is not supported")
+            ziplist <- system(paste("7z","l","-scsUTF-8",dsn),intern=TRUE)
+            ind <- .grep("-{19}\\s",ziplist)
+            ziplist <- ziplist[(ind[1]+1):(ind[2]-1)]
+            ziplist <- substr(ziplist,54L,nchar(ziplist))
+            ziplist <- .gsub("\\\\","/",ziplist)
+            dir1 <- dir(path=tempdir())
+           # print(dir1)
+            system(paste("7z","e","-aos",.dQuote(dsn),paste0("-o",tempdir())))
+            dir2 <- dir(path=tempdir())
+           # print(dir2)
+            print(ziplist)
+            q()
+            print(dir(path=tempdir()))
+            file.remove(ziplist)
+            q()
+            rarlist <- system(paste("rar","lb",.dQuote(dsn)),intern=TRUE)
+            print(rarlist)
+            system2("rar",c("e -o+",.dQuote(dsn),tempdir()),stdout=NULL)
+           # print(rarlist)
+           # file.remove(rarlist)
+            stop("RAR")
+         }
          if (isCDF <- .lgrep("\\.(nc|hdf)$",dsn)>0) {
             obj <- .read_nc(dsn,".+")
             if (!inherits(obj,"data.frame"))
@@ -516,7 +540,11 @@
             return(NULL)
          }
          if (isSF) {
+           # opW2 <- options(warn=0)
             obj <- sf::st_read(dsn,layer=layer,quiet=TRUE)
+           # options(opW2)
+            if (!spatial_count(obj))
+               return(obj)
             if (TRUE)
                obj <- sf::st_zm(obj,drop=TRUE)
          }
@@ -622,7 +650,13 @@
             skipParse <- TRUE
            # if (dname[i]=="time")
            #    str(da)
-            if ((dev <- TRUE)&&(length(unique(nchar(na.omit(da))))==1)&&
+            nc <- try(nchar(na.omit(da)))
+            if (inherits(nc,"try-error")) {
+               message("Data field ",.sQuote(dname[i])," has problem:")
+               str(da)
+               warning("Check specified encoding for input data table")
+            }
+            if ((dev <- TRUE)&&(length(unique(nc))==1)&&
                   (.lgrep("\\d{4}.*\\d{2}.*\\d{2}",da))) {
                nNA <- length(which(is.na(da)))
                s <- sapply(gregexpr("(-|\\.|/)",da),function(x) length(x[x>=0]))

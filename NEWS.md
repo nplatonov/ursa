@@ -1,4 +1,11 @@
-2019-01-07
+2019-06-14
+
+### version 3.8.14
+
+-   Changed interface to ‘mapnik’ (https instead of http) and
+    ‘mapsurfer’ (Tokenized Openroute service) tile services.
+
+-   Improved formatting of numeric labels in `legend_colorbar()`
 
 ### version 3.8.13
 

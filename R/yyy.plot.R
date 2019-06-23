@@ -26,26 +26,34 @@
       x <- seq(g1,"x")
       y <- seq(g1,"y")
       img <- list(x=x,y=y)
-      if (!is.null(g1$labx)) {
-         if (length(g1$seqx)!=g1$columns)
+      labx0 <- attr(g1$seqx,"lab")
+      laby0 <- attr(g1$seqy,"lab")
+      if (!is.null(labx0)) {
+         if (length(g1$seqx)!=g1$columns) {
+            attrx <- attributes(g1$seqx)
             g1$seqx <- seq(g1,"x")
+            attributes(g1$seqx) <- attrx
+         }
       }
-      if (!is.null(g1$laby)) {
-         if (length(g1$seqy)!=g1$rows)
+      if (!is.null(laby0)) {
+         if (length(g1$seqy)!=g1$rows) {
+            attry <- attributes(g1$seqy)
             g1$seqy <- seq(g1,"y")
+            attributes(g1$seqy) <- attry
+         }
       }
       if ((!is.null(g1$seqx))&&(length(g1$seqx)))
       {
-         if (length(g1$labx))
+         if (length(labx0))
          {
-            if (length(names(g1$labx))==length(g1$labx))
-               xlab <- names(g1$labx)
+            if (length(names(labx0))==length(labx0))
+               xlab <- names(labx0)
             else
-               xlab <- g1$labx
+               xlab <- labx0
             xo <- data.frame(at=NA,lab=xlab,stringsAsFactors=FALSE)
             for (i in seq(nrow(xo)))
             {
-               v <- g1$labx[i]
+               v <- labx0[i]
                i2 <- which(v<g1$seqx)[1]
                if ((is.na(i2))||(i2<2))
                   next
@@ -61,11 +69,12 @@
             xo <- .prettyLabel(img$x,ncol=11)
            # xo <- subset(xo,at>=g1$minx & at<=g1$maxx)
             xo <- xo[xo$at>=g1$minx & xo$at<=g1$maxx,]
-            if (0 %in% xo$at)
+            if (F & 0 %in% xo$at) ## WHY???
                xo$at <- xo$at+1L
-            if (all(xo$at>0))
+            if (F & all(xo$at>0)) ## WHY?
                xo$lab <- g1$seqx[xo$at]
-            xo$at <- xo$at-0.5
+            if (F) ## WHY?
+               xo$at <- xo$at-0.5
          }
       }
       else
@@ -76,16 +85,16 @@
       }
       if ((!is.null(g1$seqy))&&(length(g1$seqy)))
       {
-         if (length(g1$laby))
+         if (length(laby0))
          {
-            if (length(names(g1$laby))==length(g1$laby))
-               ylab <- names(g1$laby)
+            if (length(names(laby0))==length(laby0))
+               ylab <- names(laby0)
             else
-               ylab <- g1$laby
+               ylab <- laby0
             yo <- data.frame(at=NA,lab=ylab,stringsAsFactors=FALSE)
             for (i in seq(nrow(yo)))
             {
-               v <- g1$laby[i]
+               v <- laby0[i]
                i2 <- which(v<g1$seqy)[1]
                if ((is.na(i2))||(i2<2))
                   next
@@ -140,15 +149,16 @@
       }
       else if (isBottom)
          mtext(side=1,text=xo$lab,at=xo$at,padj=0.5,adj=0.5,cex=cexx,las=1)
-      if (isLeft)
+      if (isLeft) {
          mtext(side=2,text=yo$lab,at=yo$at,padj=0.4,adj=1.0,line=0.4,cex=cexy,las=1)
-      xu <- attr(g1$columns,"units")
+      }
+      xu <- attr(g1$seqx,"units")
       if ((isBottom)&&(is.character(xu)))
       {
          xu <- as.expression(substitute(bold(u),list(u=xu)))
          mtext(xu,side=1,padj=1,adj=0.5,las=1,col="black",cex=cexx,line=0.85)
       }
-      yu <- attr(g1$rows,"units")
+      yu <- attr(g1$seqy,"units")
       if ((isLeft)&&(is.character(yu)))
       {
          width <- max(strwidth(yo$lab,units="inches",cex=cexy))
