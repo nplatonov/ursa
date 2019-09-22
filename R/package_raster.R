@@ -3,12 +3,22 @@
 # 'raster' <- function(obj) UseMethod("as.Raster",obj) 
 ## The following object is masked from 'package:...'
 
+## how to register:
+# ?knitr::knit_print
+# library(knitr)
+# knit_print.data.frame = function(x, ...) {
+#    res = paste(c("", "", kable(x, output = FALSE)), collapse = "\n")
+#    asis_output(res)
+# }
+# registerS3method("knit_print", "data.frame", knit_print.data.frame)
+
+
 'as.Raster' <- function(obj=NULL) UseMethod("as.Raster",obj)
 'as.Raster.ursaRaster' <- function(obj) .as.Raster(obj)
 'as.Raster.list' <- function(obj) .as.Raster(obj)
 'as.Raster.ursaStack' <- function(obj) .as.Raster(obj)
 # 'as.Raster.ursaBrick' <- function(obj) .as.Raster(obj)
-'as.Raster.NULL' <- function(obj) .as.Raster(ursa())
+'as.Raster.NULL' <- function(obj) .as.Raster(session_grid())
 '.as.Raster' <- function(obj) {
   # suppressMessages({
       requireNamespace("methods",quietly=.isPackageInUse())
@@ -31,16 +41,17 @@
       r@legend@names <- names(value)
       r
    }
+   isGrid <- .is.grid(obj)
    isStack <- .is.ursa_stack(obj)
-   if ((!isStack)&&(!.is.ursa_brick(obj)))
+   if ((!isGrid)&&(!isStack)&&(!.is.ursa_brick(obj)))
       return(NULL)
    g1 <- ursa_grid(obj)
    ct <- ursa_colortable(obj)
   # ct2 <- lapply(obj,ursa_colortable)
    isCT <- FALSE # length(ct)>0
-   isLayer <- !isStack && length(obj)==1
-   isBrick <- !isStack && !isLayer
-  # print(c(isLayer=isLayer,isBrick=isBrick,isStack=isStack))
+   isLayer <- !isGrid && !isStack && length(obj)==1
+   isBrick <- !isGrid && !isStack && !isLayer
+  # print(c(isGrid=isGrid,isLayer=isLayer,isBrick=isBrick,isStack=isStack))
    if (isLayer) {
       res <- raster::raster(as.array(obj,permute=TRUE,flip=TRUE,drop=TRUE))
       .addColorTable(res) <- ursa_colortable(obj)
@@ -68,8 +79,13 @@
       }
       res <- raster::stack(res)
    }
+   else if (isGrid) {
+      res <- with(g1,raster::raster(nrows=rows,ncols=columns))
+   }
    raster::extent(res) <- with(g1,c(minx,maxx,miny,maxy))
    raster::crs(res) <- ursa_proj4(g1)
+   if (isGrid)
+      return(res)
    nodata <- sapply(obj,ursa_nodata)
    if (!anyNA(nodata))
       raster::NAvalue(res) <- nodata

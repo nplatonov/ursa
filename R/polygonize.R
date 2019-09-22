@@ -25,7 +25,8 @@
       verbose <- isSP
    g0 <- session_grid()
    if ((!missing(obj))&&(is.numeric(obj))&&(length(obj)==4)&&
-       (!anyNA(match(names(obj),c("minx","maxx","miny","maxy"))))) {
+       ((!anyNA(match(names(obj),c("minx","maxx","miny","maxy"))))||
+        (!anyNA(match(names(obj),c("xmin","xmax","ymin","ymax")))))) {
       obj <- regrid(bbox=unname(obj),dim=c(1,1),proj4=session_crs())
    }
    onlyGeometry <- missing(obj) || .is.grid(obj)

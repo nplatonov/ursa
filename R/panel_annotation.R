@@ -72,7 +72,7 @@
    else if (!isPicture) {
       vadj <- ifelse(any(as.numeric(unlist(gregexpr("\\\n",label)))<0),vadj0,0.5)
    }
-   if ((!is.na(lon))&&(!is.na(lat))) {
+   if ((!anyNA(lon))&&(!anyNA(lat))) {
       xy <- .project(cbind(lon,lat),g1$proj)
       pos <- c((xy[1,1]-minx)/(maxx-minx),(xy[1,2]-miny)/(maxy-miny))
    }

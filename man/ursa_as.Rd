@@ -143,7 +143,7 @@ b6 <- as.ursa(system.file("pictures/erdas_spnad83.tif",package="rgdal"))
 print(b6)
 display(b6,coast=FALSE,col="orange")
 
-\donttest{
+\donttest{ ## package 'raster' is required -- begin
 if (requireNamespace("raster")) {
    r <- raster::brick(system.file("external/rlogo.gri",package="raster"))
    print(r)
@@ -151,8 +151,8 @@ if (requireNamespace("raster")) {
    ursa_proj(b7) <- ""
    print(b7)
    display_rgb(b7)}
-}
-}
+} ## package 'raster' is required -- end
+} 
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{attribute}

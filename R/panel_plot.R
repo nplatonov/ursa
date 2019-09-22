@@ -260,7 +260,7 @@
       if ((TRUE)&&(.lgrep("point",geoType))&&(!is.null(ct))) {
          ret$col <- ct$colortable
       }
-      if ((ret$bg!="transpareny")&&(ret$border=="transparent")) {
+      if ((all(ret$bg!="transpareny"))&&(all(ret$border=="transparent"))) {
          ret$fill <- ret$bg
       }
    }

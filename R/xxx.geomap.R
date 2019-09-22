@@ -89,6 +89,7 @@
          loc <- c(.project(matrix(loc,ncol=2,byrow=TRUE),proj4
                           ,inv=TRUE))[c(1,3,2,4)]
    }
+   
    isWMS <- isUrl & .is.wms(style)
    notYetGrid <- TRUE
    g3 <- NULL
@@ -97,7 +98,7 @@
          border <- 0
          g3 <- g0 <- getOption("ursaSessionGrid")#session_grid()
          notYetGrid <- is.null(g0)
-         if (is.null(g0))
+         if (notYetGrid)
             loc <- c(-179,-82,179,82)
          else {
             loc <- with(g0,.project(rbind(c(minx,miny),c(maxx,maxy)),proj4,inv=TRUE))
@@ -150,6 +151,8 @@
          lon_0[lon_0>=(50) && lon_0<(+135)] <- 90
          proj4 <- paste("","+proj=laea +lat_0=90",paste0("+lon_0=",lon_0)
                        ,"+x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs")
+         if (bbox[3]<bbox[1])
+            bbox[3] <- bbox[3]+360
          obj <- matrix(bbox[c(1,2,1,4,3,4,3,2,1,2)],ncol=2,byrow=TRUE)
          if (TRUE) {
             x <- obj[,1]
@@ -225,6 +228,15 @@
          }
          else if ((g0$columns<=size[1])&&(g0$rows<=size[2]))
             break
+      }
+      if ((art=="polarmap")&&(!notYetGrid)) { ## more accurate checking is required
+         m1 <- gsub(".*\\+proj=laea\\s.+\\+lon_0=(\\S+)\\s.*","\\1",g0$proj4)
+         m2 <- gsub(".*\\+proj=laea\\s.+\\+lon_0=(\\S+)\\s.*","\\1",g3$proj4)
+         m3 <- !is.na(.is.near(g0$resx,g3$resx))
+         m4 <- !is.na(.is.near(g0$resy,g3$resy))
+         m <- m1==m2 & m3 & m4
+         if (m)
+            g0 <- g3
       }
       if ((art=="sputnikmap")&&(!isTile))
          g0 <- regrid(regrid(g0,mul=1/2),mul=2,border=-1) ## even cols/rows

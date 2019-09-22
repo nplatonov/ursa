@@ -14,6 +14,7 @@ ursaProgressBar(kind = c("tk", "txt"),title = .argv0(),
                 style = 1, silent = FALSE)
 
 setUrsaProgressBar(pb, value, title = NULL, label = NULL)
+
 \method{close}{ursaProgressBar}(con, ...)
 
 
@@ -29,8 +30,11 @@ Character. Type or progress bar. Valid values are \code{"tk"} to display progres
 \item{width}{
    See description for the same argument in \code{\link[tcltk:tkProgressBar]{tkProgressBar}}.
 }
-\item{title, label, min, max, initial, value, pb, \dots}{
+\item{title, label, min, max, initial, value, pb}{
    See description for the same arguments in \code{\link[tcltk:tkProgressBar]{tkProgressBar}} and \code{\link[utils:txtProgressBar]{txtProgressBar}}.
+}
+\item{con, \dots}{
+   See description for the same arguments in \code{\link[base:connections]{close}}.
 }
 \item{silent}{
    Logical. If \code{TRUE} then progress bar will not appear; it can be useful for conditional scripting. Default is \code{FALSE}.

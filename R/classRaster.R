@@ -89,7 +89,7 @@
                ind <- which(nchar(ln)!=nchar(l))
                if (length(ind)) {
                   b <- nchar(l[ind])
-                  substr(l[ind],b,b) <- ellispis
+                  substr(l[ind],b,b) <- ellipsis
                }
                f$name <- format(l)
                return(print(f,quote=FALSE))

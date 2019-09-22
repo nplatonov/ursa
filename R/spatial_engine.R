@@ -63,10 +63,18 @@
          spatial_fields(obj) <- cname
       }
       else {
+         if (inherits(obj,"sfc"))
+            return(value)
          obj[,attr(obj,"sf_column")][[1]] <- value
       }
    }
    if (isSP) {
+      if (!inherits(obj,c("SpatialLinesDataFrame","SpatialPointsDataFrame"
+                         ,"SpatialPolygonsDataFrame")))
+         return(value)
+      if (!.isSP(obj))
+         return(value)
+      obj <- methods::slot(obj,"data")
       geotype <- spatial_geotype(value)
       obj <- switch(geotype
                    ,POLYGON=sp::SpatialPolygonsDataFrame(value,obj,match.ID=FALSE)
@@ -75,6 +83,8 @@
                    ,stop(paste("unimplemented selection:",geotype)))
    }
    if (!isSP & !isSF) {
+      print(class(value))
+      stop("no sp, no sf")
       isSF <- .isSF(obj)
       isSP <- .isSP(obj)
       if (is.null(value)) {
@@ -91,6 +101,23 @@
    isSP <- .isSP(obj)
    if (verbose)
       print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
+   if (T & .lgrep("\\+proj=longlat",spatial_crs(obj))) {
+      xy <- spatial_coordinates(obj)
+      if (F & isSF) {
+         xy <- spatial_coordinates(sf::st_cast(spatial_geometry(obj),"POINT"))
+         res <- c(xmin=min(xy[,1]),ymin=min(xy[,2]),xmax=max(xy[,1]),ymax=max(xy[,2]))
+         return(res)
+      }
+      if (T | isSP) {
+         xy <- spatial_coordinates(obj)
+         while(all(sapply(xy,is.list)))
+            xy <- unlist(xy,recursive=FALSE)
+        # if (is.list(xy)) ## deprecated
+        #    xy <- do.call(rbind,xy)
+         res <- c(xmin=min(xy[,1]),ymin=min(xy[,2]),xmax=max(xy[,1]),ymax=max(xy[,2]))
+         return(res)
+      }
+   }
    if (isSF) {
       res <- sf::st_bbox(obj)
       rname <- names(res)

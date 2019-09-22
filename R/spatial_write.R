@@ -113,7 +113,7 @@
       dopt <- character()
       lopt <- character()
       if (driver=="ESRI Shapefile")
-         lopt <- c(lopt,"ENCODING=UTF-8")
+         lopt <- c(lopt,"ENCODING=UTF-8","ADJUST_GEOM_TYPE=ALL_SHAPES")
       if (driver=="MapInfo File")
          dopt <- c(dopt,"FORMAT=MIF")
       if (driver=="SQLite") {
@@ -448,7 +448,15 @@
             cat(" ok!\n")
       }
       options(opW)
-      utils::zip(z,f,flags="-qm9j") ## verbose output ## 'myzip(z,f,keys="-m -9 -j")'
+      ret <- utils::zip(z,f,flags="-qm9j") ## verbose output ## 'myzip(z,f,keys="-m -9 -j")'
+      if (ret) {
+         opW <- options(warn=1)
+         warning("Unable to compress files (zip)")
+         if (isSevenZip <- nchar(Sys.which("7z"))>0) {
+            ret <- system2("7z",c("a -mx9 -sdel -sccWIN",dQuote(z),dQuote(f)),stdout="nul")
+         }
+        # options(opW)
+      }
    }
    if (verbose)
       cat(" done!\n")

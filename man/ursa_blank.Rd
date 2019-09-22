@@ -10,21 +10,24 @@
 Set of functions for checking is any or all bands have no data, and for retrieving indices for non-data bands.
 }
 \usage{
-band_blank(obj, verbose = FALSE)
+band_blank(obj, ref = c("any", "0", "NA"), verbose = FALSE)
 %%~ which_blank(obj)
-ursa_blank(obj)
+ursa_blank(obj, ref)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{obj}{
 Object of class \code{ursaRaster}
 }
+  \item{ref}{
+Character. Definition criteria, what is blank mean. If value \code{"0"}, then blank is detected, if all values are 0. If value \code{"NA"}, then blank is detected, if all values are \code{NA}. Default value is \code{"NA"}: both \code{NA} and \code{0} are flags of blank. Non-charater values are coerced to chacter.
+}
   \item{verbose}{
 Logical. Value \code{TRUE} provides progress bar. Default is \code{FALSE}.
 }
 }
 \details{
-It is defined locally that if all values of band are \code{NA} or 0, then such band is blank. The fact is \code{\link[ursa]{ursa_new}} create new object in memory with default values \code{NA}, but \code{\link[ursa:conn.create_any]{create_envi}} writes zeros to disk quick. It is decided to consider both these cases as blank. Function \code{band_blank} checks blanks for each band of image. If all bands are blank then function \code{ursa_blank} returns \code{TRUE}.
+It is defined locally that if all values of band are \code{NA} or 0 (see description to argument \code{ref}), then such band is blank. The fact is \code{\link[ursa]{ursa_new}} create new object in memory with default values \code{NA}, but \code{\link[ursa:conn.create_any]{create_envi}} writes zeros to disk quick. It is decided to consider both these cases as blank. Function \code{band_blank} checks blanks for each band of image. If all bands are blank then function \code{ursa_blank} returns \code{TRUE}.
 %%~ Function \code{which.blank} gives band numbers of blank bands.
 }
 \value{

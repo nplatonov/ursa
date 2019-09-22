@@ -84,8 +84,10 @@ spatial_count(obj, verbose = FALSE)
 spatial_nrow(obj, verbose = FALSE)
 spatial_ncol(obj, verbose = FALSE)
 
-spatial_filelist(path = ".", pattern = NA, full.names = TRUE, recursive = FALSE, ignore.case = TRUE)
-spatial_dir(path = ".", pattern = NA, full.names = TRUE, recursive = FALSE, ignore.case = TRUE)
+spatial_filelist(path = ".", pattern = NA, full.names = TRUE, recursive = FALSE,
+                 ignore.case = TRUE)
+spatial_dir(path = ".", pattern = NA, full.names = TRUE, recursive = FALSE,
+            ignore.case = TRUE)
 
 spatial_basename(fname)
 spatial_pattern(fname)

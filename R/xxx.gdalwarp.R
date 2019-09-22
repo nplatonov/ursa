@@ -1,3 +1,6 @@
+# https://gis.stackexchange.com/questions/37790/how-to-reproject-raster-from-0-360-to-180-180-with-cutting-180-meridian
+# gdalwarp -t_srs WGS84 ~/0_360.tif 180.tif  -wo SOURCE_EXTRA=1000 --config CENTER_LONG 0
+
 '.gdalwarp' <- function(src,dst=NULL,grid=NULL,resample="near",nodata=NA
                        ,resetGrid=FALSE,opt=NULL,close=FALSE,verbose=0L) {
    if (is.null(grid)) {

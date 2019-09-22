@@ -367,7 +367,7 @@ void focalMeanWithNA(double *x,int *dim,double *W,double *cvr,int *Z,int *verbos
            // continue;
             if ((nout>0.0)&&(nout>=sizex*sizey*cover))
             {
-               if ((1)||(!fillNA))
+               if ((0)||(!fillNA))
                   res[adr2]=Mout/nout;
                else
                {
@@ -390,11 +390,11 @@ void focalMeanWithNA(double *x,int *dim,double *W,double *cvr,int *Z,int *verbos
         //   printf("\n");
       }
    }
-   for (adr=0;adr<(samples*lines*bands);adr++)
-   {
+  // for (adr=0;adr<(samples*lines*bands);adr++)
+  // {
      // printf(" %4.1f",res[adr]);
      // res[adr]=x[adr];
-   }
+  // }
   // printf("\n");
    return;
 }

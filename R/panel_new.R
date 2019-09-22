@@ -23,7 +23,7 @@
    kwd <- "blank"
    density <- .getPrm(arglist,name="density",kwd=kwd,default=NA_real_)
    angle <- .getPrm(arglist,name="angle",kwd=kwd,default=NA_real_)
-   def.col <- if ((!is.na(density))&&(!is.na(angle))) "grey80" else "chessboard"
+   def.col <- if ((any(!is.na(density)))&&(any(!is.na(angle)))) "grey80" else "chessboard"
    col <- .getPrm(arglist,name="(^$|bg|blank|fill)",kwd=kwd
                     ,default=ifelse(nchar(g1$proj4)>0,def.col,"white")) # grey90
    lwd <- .getPrm(arglist,name="lwd",kwd=kwd,default=1)

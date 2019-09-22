@@ -98,7 +98,7 @@
                         ,"jpg")
    s$opentopomap <- c("http://{abc}.tile.opentopomap.org/{z}/{x}/{y}.png"
                      ,paste0(osmCr,", \uA9 OpenTopoMap"))
-   s$polarmap <- c("http://{abc}.tiles.arcticconnect.ca/osm_{l}/{z}/{x}/{y}.png"
+   s$polarmap <- c("https://{abc}.tiles.arcticconnect.ca/osm_{l}/{z}/{x}/{y}.png"
                   ,paste0("Map \uA9 ArcticConnect. Data ",osmCr))
   # http://a.maps.owm.io/map/precipitation_new/6/37/19?appid=b1b15e88fa797225412429c1c50c122a1   
    if (!sum(nchar(server)))
@@ -217,6 +217,7 @@
   #              ,extra="-H Accept-Language:de")
    isPNG <- FALSE
    isJPEG <- FALSE
+   isGIF <- FALSE
    if (isPNG <- fileext %in% c("png"))
       a <- try(255*png::readPNG(fname),silent=!verbose)
    else if (isJPEG <- fileext %in% c("jpg","jpeg"))
@@ -226,23 +227,36 @@
       if (inherits(a,"try-error")) {
          a <- try(255*jpeg::readJPEG(fname),silent=!verbose)
          isJPEG <- !inherits(a,"try-error")
+         if (inherits(a,"try-error")) {
+            print("HERE")
+         }
       }
       else
          isPNG <- !inherits(a,"try-error")
    }
    if (inherits(a,"try-error")) {
-      if (FALSE) {
+      if (!FALSE) { ## erroneous file extension
          isPNG <- FALSE
          isJPEG <- FALSE
          a <- try(255*png::readPNG(fname),silent=!verbose)
          if (inherits(a,"try-error"))
             a <- try(255*jpeg::readJPEG(fname),silent=!verbose)
-         if ((inherits(a,"try-error"))&&
-             (requireNamespace("caTools",quietly=.isPackageInUse()))) {
-            stop("caTools")
+         if (inherits(a,"try-error")) {
+           # if (requireNamespace("miss_caTools",quietly=.isPackageInUse())) {
+           #    stop("caTools")
+           # }
+            g0 <- session_grid()
+            a <- read_gdal(fname)
+            session_grid(g0)
+            if (inherits(a,"try-error"))
+               cat(geterrmessage())
+            if (ursa_blank(a,NA))
+               ursa_value(a) <- 0
+            a <- as.array(a)
          }
       }
-      cat(geterrmessage())
+      else
+         cat(geterrmessage())
       return(a)
    }
   # file.remove(fname)

@@ -2,7 +2,7 @@
    arglist <- list(...)
    mosaic <- .getPrm(arglist,name="",default=NA,class="")
    fileout <- .getPrm(arglist,name="fileout",default="")
-   dpi <- .getPrm(arglist,name="dpi",default=96L)
+   dpi <- .getPrm(arglist,name="dpi",default=ifelse(.isKnitr(),150L,96L))
    pointsize <- .getPrm(arglist,name="pointsize",default=NA_real_)
    scale <- .getPrm(arglist,name="^scale$",class="",default=NA_real_)
    width <- .getPrm(arglist,name="width",class=list("integer","character"),default=NA_real_)
@@ -79,6 +79,12 @@
          fileout <- file.path(tempdir(),.maketmp()) ## CRAN Repository Policy
       else if (!TRUE)
          fileout <- file.path(tempdir(),basename(.maketmp()))
+      else if (.isKnitr()) {
+         bname <- basename(.maketmp())
+         bname <- gsub("_[0-9a-f]+"
+                  ,paste0("_",knitr::opts_current$get()$label),bname,ignore.case=TRUE)
+         fileout <- file.path(knitr::opts_current$get()$fig.path,bname)
+      }
       else
          fileout <- .maketmp()
       if (is.na(delafter))
@@ -149,7 +155,7 @@
    mainc <- g1$columns*dpiscale
    mainr <- g1$rows*dpiscale
   # print(c(v=scale1,h=scale2,autoscale=autoscale,scale=scale,c=g1$columns,r=g1$rows))
-   pointsize0 <- 12
+   pointsize0 <- ifelse(.isKnitr(),12,12)
    if (is.na(pointsize)) {
      # print(c(pointsize0=pointsize0,dpi=dpi,scale=scale,scale0=autoscale))
      # pointsize <- pointsize0*96/dpi*scale/autoscale ## removed 20161217
@@ -236,6 +242,10 @@
           ,ursaPngFamily=font,ursaPngWaitBeforeRemove=wait
           ,ursaPngDevice=device,ursaPngShadow=""
           ,ursaPngBackground=background,ursaPngPanel="",ursaPngSkip=FALSE)
+  # if (.isKnitr()) {
+  #   # if (knitr::opts_knit$get(""))
+  #    fileout <- paste0("file:///",fileout)
+  # }
    invisible(fileout)
 }
 '.compose_open.example' <- function() {

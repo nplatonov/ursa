@@ -812,7 +812,8 @@
       attr(xy,"south_pole") <- indP
    .elapsedTime(paste0(detail,": coercing - done"))
    if (merge)
-      saveRDS(xy,file.path(getOption("ursaRequisite"),paste0("coast-",detail,".rds")))
+      saveRDS(xy,file.path(getOption("ursaRequisite"),paste0("coast-",detail,".rds"))
+             ,version=2) ## Such files are only readable in R >= 3.5.0.
    if (!.isPackageInUse())
       spatial_write(a,paste0(paste0("coast-",detail,ifelse(merge,"","180")),".sqlite"))
    0L

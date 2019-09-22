@@ -1,11 +1,28 @@
-2019-06-14
+2019-09-22
 
 ### version 3.8.14
+
+-   Fixed appeared “length &gt; 1 in coercion to logical” in examples
+    during CRAN check.
+
+-   Packages **`leaflet`**, **`leafem`**, **`leafpop`** are added as
+    suggested for polar web mapping.
+
+-   ‘http’ protocol is changed to ‘https’ one for `style=polarmap` in
+    `glance()`
+
+-   packages **`htmlwidgets`**, **`htmltools`** are added as suggested
+    for development purpose without any next steps for involvement.
+
+-   Added new argument `ref` to functions `band_blank()` and
+    `ursa_blank()` for more flexible blank detection.
 
 -   Changed interface to ‘mapnik’ (https instead of http) and
     ‘mapsurfer’ (Tokenized Openroute service) tile services.
 
 -   Improved formatting of numeric labels in `legend_colorbar()`
+
+-   Coastline is updated to version 2019-09-21T05:39.
 
 ### version 3.8.13
 

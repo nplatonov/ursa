@@ -32,7 +32,7 @@ Object of class \code{ursaRaster} or list of \code{ursaRaster} objects
 \details{
 Package \pkg{raster} is required for conversions. 
 
-The uppercase \verb{as.\bold{R}aster} is important, because \code{\link[ursa:classRaster_as.raster]{as.raster}} is used in internal functions for coersion to object of class \code{\link[grDevices:as.raster]{raster}}.
+The uppercase \verb{as.}\bold{\verb{R}}\verb{aster} is important, because \code{\link[ursa:classRaster_as.raster]{as.raster}} is used in internal functions for coercion to object of class \code{\link[grDevices:as.raster]{raster}}.
 
 Single-banded \code{ursaRaster} object (with or without colortable) is coerced to \code{\link[raster:raster]{RasterLayer}}. Colortables are kept.
 \cr

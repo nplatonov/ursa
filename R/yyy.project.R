@@ -164,3 +164,12 @@
    }
    p4s
 }
+'.lonPlus360' <- function(xy) {
+   if (scalar <- is.null(dim(xy))) {
+      if (xy[1]<0)
+         xy[1] <- xy[1]+360
+   }
+   else if (length(ind <- which(xy[,1]<0)))
+      xy[ind,1] <- xy[ind,1]+360
+   xy
+}

@@ -86,7 +86,7 @@
    maxy <- g1$maxy
    if (any(is.na(marginalia)))
       marginalia <- TRUE
-   if ((!is.na(lon))&&(!is.na(lat)))
+   if ((!anyNA(lon))&&(!anyNA(lat)))
    {
      # dlon <- unique(diff(lon))
      # dlat <- unique(diff(lat))

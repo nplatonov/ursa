@@ -144,9 +144,11 @@
             a[[i]] <- args[i]
       }
    }
-   aname <- sapply(a,function(x){if (length(x)==1) "" else x[1]})
+   variant <- c(1,-1)[1]
+   aname <- sapply(a,function(x) {if (length(x)==variant) "" else x[1]})
    opE <- options(warn=-1,show.error.messages=FALSE)
-   a <- lapply(a,function(x){
+   for (i in seq_along(a)) {
+      x <- a[[i]]
       n <- length(x)
       y <- x[n]
       if (TRUE) {
@@ -156,6 +158,15 @@
          else if (.try(z <- eval(parse(text=y)))) {
             if (!is.null(z))
                y <- z
+         }
+         if (n==-variant) {
+            if (!length(grep("(\\s|\\.)",y))) {
+               y <- length(grep("^[-!]\\S",y))==0
+               if (!y)
+                  aname[i] <- gsub("^[-!]","",aname[i])
+            }
+            else
+               aname[i] <- ""
          }
       }
       else {
@@ -167,8 +178,8 @@
          if (.lgrep("^(-)*\\d+\\.\\d+$",y))
             return(as.numeric(y))
       }
-      y
-   })
+      a[[i]] <- y
+   }
    options(opE)
    names(a) <- aname
    a
@@ -431,31 +442,21 @@
 '.isShiny' <- function() {
    (("shiny" %in% loadedNamespaces())&&(length(shiny::shinyOptions())>0))
 }
-'.open' <- function(...) {
-   if (FALSE) {
-      arglist <- lapply(list(...), function(x) {
-         if (!file.exists(x)) {
-            if (.lgrep("\\%(\\d)*d",x))
-               x <- sprintf(x,1L)
-            else
-               x <- NULL
-         }
-         x
-      })
-      ret <- system2("R",c("CMD","open",arglist))
-   }
-   else {
-      ret <- lapply(list(...),function(fname) {
-         if (!file.exists(fname)) {
-            fname <- head(dir(path=dirname(fname)
-                             ,pattern=gsub("\\%(\\d+)*d","\\\\d+",fname)
-                             ,full.names=TRUE),1)
-         }
-         browseURL(normalizePath(fname))
-      })
-   }
+'.open.canceled' <- function(...) {
+   arglist <- lapply(list(...), function(x) {
+      if (!file.exists(x)) {
+         if (.lgrep("\\%(\\d)*d",x))
+            x <- sprintf(x,1L)
+         else
+            x <- NULL
+      }
+      x
+   })
+   ret <- system2("R",c("CMD","open",arglist))
   # browseURL("R",c("CMD","open",arglist))
-   ret
+   if (length(ret)==1)
+      ret <- ret[[1]]
+   invisible(ret)
 }
 '.isSF' <- function(obj) inherits(obj,c("sf","sfc"))
 '.isSP' <- function(obj) {

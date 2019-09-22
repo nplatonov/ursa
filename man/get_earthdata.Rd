@@ -92,11 +92,11 @@ session_grid(NULL)
 pr <- get_earthdata()
 print(pr,quote=FALSE)
 
-\donttest{ ## internet connection is required
+\donttest{ ## internet connection is required -- begin
 a1 <- get_earthdata(bbox=c(2000000,400000,2300000,700000))
 display(a1)
 }
-\donttest{ ## internet connection is required
+\donttest{ ## internet connection is required -- end
 a2 <- get_earthdata(product=2,date=Sys.Date()-7L,res=7,bbox=c(57.8,69.4,62.3,70.8))
 display(a2)
 }

@@ -17,7 +17,7 @@
                       ,class=list("character","numeric"),default="---")
    g0 <- session_grid()
    canScale <- .lgrep("(epsg:3857|\\+proj=(merc|zzzzz)\\s)",g0$proj4)>0
-   if ((position=="---")&&(canScale)) {
+   if ((all(position=="---"))&&(canScale)) {
       lat <- with(g0,.project(rbind(c(minx,miny),c(maxx,maxy)),proj4,inv=TRUE))[,2]
       sc <- sort(1/cos(lat*pi/180))
       if (sc[2]/sc[1]>1.25)

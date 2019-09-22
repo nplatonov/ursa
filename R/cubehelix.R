@@ -16,22 +16,23 @@
   # print(getOption("ursaPngBackground"))
    default.dark <- ifelse(bg>127,.dark,255-.light)
    default.light <- ifelse(bg>127,.light,255-.dark)
-   autobright <- TRUE
+   autobright <- FALSE
    if ((is.na(dark))&&(is.na(light))) {
       dark <- default.dark/255
       light <- default.light/255
+      autobright <- TRUE
    }
    else if ((is.na(dark))&&(!is.na(light))) {
       if (light>1)
          light <- light/255
       dark <- default.dark/255
-      autobright <- FALSE
+     # autobright <- FALSE
    }
    else if ((!is.na(dark))&&(is.na(light))) {
       if (dark>1)
          dark <- dark/255
       light <- default.light/255
-      autobright <- FALSE
+     # autobright <- FALSE
    }
    if ((dark>1)||(light>1)) {
       dark <- dark/255

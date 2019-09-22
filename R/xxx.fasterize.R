@@ -41,6 +41,13 @@
             obj$OGRFID <- seq(spatial_count(obj))
          by <- "OGRFID"
       }
+      if (devel <- FALSE) {
+         a9 <- fasterize::fasterize(sf=obj,raster=as.Raster()
+                    ,field=by,by=NULL,fun=fun) ## in memory 
+         print(object.size(a9))
+         print(object.size(ursa(a9)))
+         q()
+      }
       res <- ursa(fasterize::fasterize(sf=obj,raster=as.Raster()
                  ,field=by,by=NULL,fun=fun))
      # res <- fasterize::fasterize(sf=obj,raster=as.Raster(),field=by,by=NULL,fun=fun)

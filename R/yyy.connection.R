@@ -266,7 +266,7 @@
             next
          }
       }
-      if ((is.null(ignore))&&(!is.ursa(var))&&((is.numeric(var))||(is.na(var)))&&
+      if ((is.null(ignore))&&(!is.ursa(var))&&((is.numeric(var))||(anyNA(var)))&&
           (length(name))&&(length(.grep("(^bg$|nodata|ignore)",name))))
       {
          ignore <- var

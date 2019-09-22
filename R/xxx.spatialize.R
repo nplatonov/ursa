@@ -1072,11 +1072,75 @@
          else
             t_srs <- NULL
          if (is.character(t_srs)) {
+           # bbox <- ursa:::.project(matrix(spatial_bbox(a),ncol=2,byrow=TRUE)
+           #                        ,proj=spatial_crs(a),inv=TRUE)
             if (isSF) {
                obj <- sf::st_transform(obj,t_srs)
+               if ((TRUE)&&(.lgrep("\\+proj=longlat",t_srs))&&(max(lon2)>180)) {
+                  if (verbose)
+                     .elapsedTime("lon+360 -- start")
+                  objG0 <- spatial_geometry(obj)
+                  objG1 <- lapply(objG0,function(g1) {
+                     if (!is.list(g1))
+                        return(.lonPlus360(g1))
+                     ret1 <- lapply(g1,function(g2) {
+                        if (!is.list(g2))
+                           return(.lonPlus360(g2))
+                        lapply(g2,.lonPlus360)
+                     })
+                     attributes(ret1) <- attributes(g1)
+                     ret1
+                  })
+                  attributes(objG1) <- attributes(objG0)
+                  spatial_geometry(obj) <- objG1
+                  if (verbose)
+                     .elapsedTime("lon+360 -- finish")
+               }
             }
-            if (isSP)
+            if (isSP) {
                obj <- sp::spTransform(obj,t_srs)
+               if ((TRUE)&&(.lgrep("\\+proj=longlat",t_srs))&&(max(lon2)>180)) {
+                  if (verbose)
+                     .elapsedTime("lon+360 -- start")
+                  geoType <- spatial_geotype(obj)
+                  if (geoType=="POINT") {
+                     methods::slot(obj,"coords") <- .lonPlus360(methods::slot(obj,"coords"))
+                  }
+                  else {
+                     objG0 <- spatial_geometry(obj)
+                     objG1 <- switch(geoType
+                                    ,POLYGON=methods::slot(objG0,"polygons")
+                                    ,LINE=methods::slot(objG0,"lines")
+                                    ,POINT=g0)
+                     xy <- lapply(objG1,function(z) {
+                        gz <- switch(geoType
+                                    ,POLYGON=methods::slot(z,"Polygons")
+                                    ,LINE=methods::slot(z,"Lines")
+                                    ,POINT=methods::slot(z,"Points"))
+                        gz <- lapply(gz,function(z3) {
+                           methods::slot(z3,"coords") <- .lonPlus360(methods::slot(z3,"coords"))
+                           z3
+                        })
+                        if (geoType=="POLYGON")
+                           methods::slot(z,"Polygons") <- gz
+                        else if (geoType=="LINE")
+                           methods::slot(z,"Lines") <- gz
+                        else if (geoType=="POINT")
+                           methods::slot(z,"Points") <- gz
+                        z
+                     })
+                     if (geoType=="POLYGON")
+                        methods::slot(objG0,"polygons") <- xy
+                     else if (geoType=="LINE")
+                        methods::slot(objG0,"lines") <- xy ## gz? (20190921)
+                     else if (geoType=="POINT")
+                        objG0 <- xy ## gz?  (20190921)
+                     spatial_geometry(obj) <- objG0
+                  }
+                  if (verbose)
+                     .elapsedTime("lon+360 -- finish")
+               }
+            }
          }
         # xy <- .project(xy,t_srs)
         # print(summary(xy))
@@ -1128,26 +1192,37 @@
         # print(c(sp::bbox(obj)))
       }
    }
-   if (isSF) {
-      obj_geom <- sf::st_geometry(obj)
-     # bbox <- c(sf::st_bbox(obj_geom)) ## low performance sp<=0.5-2
-      if (inherits(obj,"sfc"))
-         bbox <- c(sf::st_bbox(obj_geom))
-      else
-         bbox <- attr(obj[[attr(obj,"sf_column")]],"bbox") ## ~ sf::st_bbox
-      proj4 <- sf::st_crs(obj)$proj4string
-   }
-   if (isSP) {
-      obj_geom <- switch(geoType,POLYGON=methods::slot(sp::geometry(obj),"polygons")
-                                   ,LINE=methods::slot(sp::geometry(obj),"lines")
-                                  ,POINT=sp::geometry(obj))
-      bbox <- c(sp::bbox(obj))
-      if (length(bbox)==6) {
-         bbox <- bbox[c(1,2,4,5)]
-        # names(bbox) <- c("xmin","ymin","zmin","xmax","ymax","zmax")
+   if (FALSE) { ## deprecated
+      if (isSF) {
+         obj_geom <- sf::st_geometry(obj)
+        # bbox <- c(sf::st_bbox(obj_geom)) ## low performance sp<=0.5-2
+         if (inherits(obj,"sfc"))
+            bbox <- c(sf::st_bbox(obj_geom))
+         else
+            bbox <- attr(obj[[attr(obj,"sf_column")]],"bbox") ## ~ sf::st_bbox
+         proj4 <- sf::st_crs(obj)$proj4string
       }
-      names(bbox) <- c("xmin","ymin","xmax","ymax")
-      proj4 <- sp::proj4string(obj)
+      if (isSP) {
+         obj_geom <- switch(geoType,POLYGON=methods::slot(sp::geometry(obj),"polygons")
+                                      ,LINE=methods::slot(sp::geometry(obj),"lines")
+                                     ,POINT=sp::geometry(obj))
+         bbox <- c(sp::bbox(obj))
+         if (length(bbox)==6) {
+            bbox <- bbox[c(1,2,4,5)]
+           # names(bbox) <- c("xmin","ymin","zmin","xmax","ymax","zmax")
+         }
+         names(bbox) <- c("xmin","ymin","xmax","ymax")
+         proj4 <- sp::proj4string(obj)
+      }
+   }
+   else {
+      bbox <- spatial_bbox(obj)
+      proj4 <- spatial_crs(obj)
+      obj_geom <- spatial_geometry(obj)
+      if (isSP)
+         obj_geom <- switch(geoType,POLYGON=methods::slot(obj_geom,"polygons")
+                                      ,LINE=methods::slot(obj_geom,"lines")
+                                     ,POINT=obj_geom)
    }
    if ((bbox["xmin"]==bbox["xmax"])||(bbox["ymin"]==bbox["ymax"]))
       bbox <- bbox+100*c(-1,-1,1,1)
