@@ -1382,7 +1382,7 @@ void readBilBandInteger(char **fname,int *dim,int *index,int *nindex,int *dtype
    char *buf1=malloc(samples*count*datasize);
    char *buf2=malloc(8);
    int ret;
-   __int64 offset,o1,o2;
+   long long offset,o1,o2;
    int MAXINT=2147483647;
    for (i=0;i<lines;i++)
    {
@@ -1391,8 +1391,8 @@ void readBilBandInteger(char **fname,int *dim,int *index,int *nindex,int *dtype
         // Rprintf("fseek=%d\n",(i*bands+index[k]-1)*samples*datasize-MAX_INT);
          ret=fseek(Fin,(i*bands+index[k]-1)*samples*datasize,SEEK_SET);
          if (ret) {
-            o1=(__int64)(i*bands+index[k]-1)*samples*datasize;
-            o2=(__int64)0;
+            o1=(long long)(i*bands+index[k]-1)*samples*datasize;
+            o2=(long long)0;
             ret=fseek(Fin,MAXINT,SEEK_SET);
             offset=o1-MAXINT;
             o2+=MAXINT;

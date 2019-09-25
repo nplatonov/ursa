@@ -1,7 +1,7 @@
 Package: ursa
 Type: Package
 Title: Non-Interactive Spatial Tools for Raster Processing and Visualization
-Version: 3.8.14
+Version: 3.8.15
 Authors@R: person(given="Nikita",family="Platonov",role=c("aut","cre"),email="platonov@sevin.ru",comment=c(ORCID="0000-0001-7196-7882"))
 Author: Nikita Platonov [aut, cre] (<https://orcid.org/0000-0001-7196-7882>)
 Maintainer: Nikita Platonov <platonov@sevin.ru>

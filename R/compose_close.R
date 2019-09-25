@@ -117,7 +117,8 @@
                else if (.Platform$OS.type=="unix")
                   system2("xdg-open",c(.dQuote(fileout)),wait=!.isRscript())
                else
-                  system2("R",c("CMD","open",.dQuote(fileout)),wait=!.isRscript())
+                  system2(file.path(R.home("bin"),"R")
+                         ,c("CMD","open",.dQuote(fileout)),wait=!.isRscript())
               # system2("open",list(fileout),wait=!.isRscript()) ## wait=sysWait
               # stop("How to implement file association in Unix-like systems?")
             }
@@ -130,8 +131,11 @@
                else {
                   if (wait<5)
                      wait <- 5
-                  cmd <- paste0("Sys.sleep(",wait,");","if (file.exists(",sQuote(fileout),")) file.remove(",sQuote(fileout),")")
-                  system2("Rscript",c("-e",dQuote(cmd)),wait=FALSE,stdout=NULL)
+                  cmd <- paste0("Sys.sleep(",wait,");"
+                               ,"if (file.exists(",sQuote(fileout),"))"
+                               ," file.remove(",sQuote(fileout),")")
+                  system2(file.path(R.home("bin"),"Rscript")
+                         ,c("-e",dQuote(cmd)),wait=FALSE,stdout=NULL)
                }
             }
             else if (!sysRemove)
@@ -205,16 +209,22 @@
       if ((execute)&&(.isKnitr())) {
          execute <- FALSE
          if (.isKnitr())
-            delafter <- delafter & 
+            delafter <- FALSE & delafter & ## don't delete: longtime rendering cannot find removed file
                length(grep("self-contained",knitr::opts_knit$get()$rmarkdown.pandoc.args))>0
+         dpi1 <- getOption("ursaPngDpi")
+         dpi2 <- knitr::opts_current$get("dpi")
+         dpi3 <- dpi1/96*dpi2/96
          retK <- knitr::include_graphics(fileout
                                         ,auto_pdf=FALSE
                                         ,dpi=getOption("ursaPngDpi"))
          if ((delafter)&&(sysRemove))
             on.exit({
                wait <- 5
-               cmd <- paste0("Sys.sleep(",wait,");","if (file.exists(",sQuote(fileout),")) file.remove(",sQuote(fileout),")")
-               system2("Rscript",c("-e",dQuote(cmd)),wait=FALSE,stdout=NULL)
+               cmd <- paste0("Sys.sleep(",wait,");"
+                            ,"if (file.exists(",sQuote(fileout),"))"
+                            ," file.remove(",sQuote(fileout),")")
+               system2(file.path(R.home("bin"),"Rscript")
+                      ,c("-e",dQuote(cmd)),wait=FALSE,stdout=NULL)
             },add=TRUE)
         # print(fileout)
          return(retK)
@@ -249,7 +259,8 @@
          else if (.Platform$OS.type=="unix")
             system2("xdg-open",c(.dQuote(fileout)),wait=!.isRscript())
          else
-            system2("R",c("CMD","open",.dQuote(fileout)),wait=TRUE)
+            system2(file.path(R.home("bin"),"R")
+                   ,c("CMD","open",.dQuote(fileout)),wait=TRUE)
         # system2("R cmd open",list(,fileout),wait=TRUE) #!.isRscript()) ## wait=sysWait
         # stop("How to implement file association in Unix-like systems?")
       }
@@ -281,7 +292,8 @@
             wait <- 5
          cmd <- paste0("Sys.sleep(",wait,");"
                       ,"if (file.exists(",sQuote(fileout),")) file.remove(",sQuote(fileout),")")
-         system2("Rscript",c("-e",dQuote(cmd)),wait=FALSE,stdout=NULL)
+         system2(file.path(R.home("bin"),"Rscript")
+                ,c("-e",dQuote(cmd)),wait=FALSE,stdout=NULL)
       }
    }
    if (file.exists(fileout)) {

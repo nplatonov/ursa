@@ -1,4 +1,10 @@
-2019-09-22
+2019-09-25
+
+### version 3.8.15
+
+-   Fixed behaviour for using in rmarkdown for self-contained documents
+
+-   Path to R is taken from `R.home("bin")`
 
 ### version 3.8.14
 
