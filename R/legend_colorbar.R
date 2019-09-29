@@ -303,7 +303,10 @@
                      }
                   }
                   else {
-                     label <- .prettyLabel(y,ncol=labels)$at
+                     labelProposed <- .prettyLabel(y,ncol=labels)$at
+                     if (is.null(labelProposed))
+                        break
+                     label <- labelProposed
                      if (!.is.integer(label)) {
                         labels <- labels-1
                         next

@@ -3,7 +3,7 @@
    if (!.lgrep("\\..+$",basename(fname))) {
       return(write_envi(obj,fname))
    }
-      stop("B")
+  # stop("B")
    if (.lgrep("\\.zip$",basename(fname))) {
       aname <- paste0(names(obj),".tif")
       td <- file.path(tempdir(),basename(.maketmp()))
