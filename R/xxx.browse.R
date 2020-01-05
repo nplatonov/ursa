@@ -109,7 +109,7 @@
       }
       if (inherits(obj,"mapview"))
          obj <- methods::slot(obj,"map")
-      if (inherits(obj,"htmlwidget")) {
+      if (inherits(obj,c("tmapZZZZZZZ","htmlwidget"))) {
          isUrsaCache <- !identical(normalizePath(.ursaCacheDir()),tempdir())
          if (!isUrsaCache & is.null(output))
             return(ret2)

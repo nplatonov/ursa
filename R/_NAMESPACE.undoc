@@ -9,5 +9,4 @@ spatial_dim<-
 spatial_fileext
 spatial_revise
 spatial_simplify
-spatial_valid
 spatialize

@@ -609,6 +609,7 @@
             grid$proj4 <- .gsub("\'","",readLines(wktout,warn=FALSE))
             file.remove(wktout)
             file.remove(wktin)
+            grid$proj4 <- grid$proj4[nchar(grid$proj4)>0]
          }
       }
       else if (!("sf" %in% loadedNamespaces())) {

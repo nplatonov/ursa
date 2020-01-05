@@ -36,6 +36,7 @@
    vertical <- .getPrm(arglist,name="vert(ical)*",kwd=kwd,default=FALSE)
    alpha <- .getPrm(arglist,name="(alpha|transp(aren(cy)*)*)",kwd=kwd,default=1)
    interpolate <- .getPrm(arglist,name="interp(olate)*",kwd=kwd,default=FALSE)
+   resample <- .getPrm(arglist,name="resample",kwd=kwd,default=FALSE)
    verbose <- .getPrm(arglist,name="verb(ose)*",kwd=kwd,default=FALSE)
    .panel_annotation(label=label,position=position,lon=lon,lat=lat,x=x,y=y
                                    ,cex=cex,adjust=adjust
@@ -48,7 +49,7 @@
                                ,cex=1,adjust=0.5
                                ,fg="#000000",bg="#FFFFFF1F",buffer=1,fill="#FFFFFF7F"
                                ,font=par("family"),vertical=FALSE
-                               ,alpha=1,interpolate=FALSE
+                               ,alpha=1,interpolate=FALSE,resample=FALSE
                                ,verbose=FALSE,...) {
    if (verbose)
       str(list(label=label,position=position,cex=cex,adjust=adjust,fg=fg,bg=bg
@@ -120,7 +121,7 @@
       bg <- "#FFFFFF3F"
    if (isPicture) {
       sc <- getOption("ursaPngScale")
-      g2 <- if (is.numeric(sc)) regrid(g1,mul=sc) else g1
+      g2 <- if (is.numeric(sc)) regrid(g1,mul=sc,resample=resample) else g1
       dima <- dim(label)
      # nb <- length(dima) ## -- 20170919
       nb <- dima[3] ## ++ 20170919

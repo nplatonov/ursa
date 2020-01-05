@@ -901,12 +901,18 @@
             wkt <- NULL
         # print(proj4)
         # message(wkt)
+         if (!TRUE) { ## 20191216 patch for EXTENSION["PROJ4","+proj=......."]
+            wkt <- gsub(",EXTENSION\\[\"PROJ4\".+\\]","]",wkt)
+         }
       }
       if (lverbose)
          .elapsedTime("proj4 -> wkt finish")
    }
-   if (!is.null(wkt))
+   if (!is.null(wkt)) {
+      if (length(wkt))
+         wkt <- paste(gsub("(^\\s+|\\s+$)","",wkt),collapse="")
       writeLines(sprintf("coordinate system string = {%s}",wkt),Fout)
+   }
    if ((is.character(x$name))&&(sum(nchar(x$name))>0))
    {
       if (.lgrep(",",x$name)) {

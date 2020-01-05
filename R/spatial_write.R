@@ -294,7 +294,7 @@
       if (!inherits(obj,c("SpatialPointsDataFrame","SpatialLinesDataFrame"
                          ,"SpatialPolygonsDataFrame")))
          spatial_data(obj) <- data.frame(dummy=seq_len(spatial_count(obj)))
-      rgdal::writeOGR(obj,dsn=fname,layer=lname,driver=driver
+      rgdal::writeOGR(obj,dsn=iconv(fname,to="UTF-8"),layer=lname,driver=driver
                      ,dataset_options=dopt,layer_options=lopt
                      ,encoding=if (lch=="UTF-8") NULL else lcl
                      ,overwrite_layer=TRUE,morphToESRI=FALSE

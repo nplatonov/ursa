@@ -157,7 +157,17 @@
          ziplist <- unzip(fname,exdir=tempdir());on.exit(file.remove(ziplist))
          dsn <- .grep("\\.(nc)$",ziplist,value=TRUE)
       }
-      else if ((nchar(Sys.which("gzip")))&&(isZip <- .lgrep("\\.gz$",fname)>0)) {
+      else if ((nchar(Sys.which("gzip")))&&
+               (isZip <- (isZip1 <- .lgrep("\\.gz$",fname)>0) ||
+                         (isZip2 <- file.exists(paste0(fname,".gz"))))) {
+        # print(c(isZip1=isZip1,isZip2=isZip2))
+         if (isZip1)
+            fname0 <- fname
+         else if (isZip2)
+            fname0 <- paste0(fname,".gz")
+         fname <- .ursaCacheRaster(fname0,unpack="gzip")
+      }
+      else if ((F)&&(nchar(Sys.which("gzip")))&&(isZip <- .lgrep("\\.gz$",fname)>0)) {
          fname0 <- fname
          fname <- tempfile();on.exit(file.remove(fname))
          system2("gzip",c("-f -d -c",.dQuote(fname0)),stdout=fname,stderr=FALSE)
@@ -177,8 +187,8 @@
       }
       on.exit({
          ncdf4::nc_close(nc)
-         if (isZip)
-            file.remove(fname)
+        # if (isZip)
+        #    file.remove(fname)
       })
    }
    else
@@ -440,14 +450,28 @@
       if ((length(indx))&&(length(indy))) {
          x <- b[[indx]]
          y <- b[[indy]]
+         dx <- diff(x)
+         dy <- diff(y)
+         rx <- range(dx)
+         ry <- range(dy)
+         regx <- diff(rx)/mean(dx)
+         regy <- diff(ry)/mean(dy)
+         irregular <- (regx>0.5)||(regy>0.5)
+         if (irregular) {
+            message("Irregular grid","\n   x:",round(regx,3),"   y: ",round(regy,3))
+         }
          ##~ print(sd(diff(x)))
          ##~ print(sd(diff(y)))
-         g1$resx <- mean(unique(diff(x)))
-         g1$resy <- mean(unique(diff(y)))
+         g1$resx <- mean(unique(dx))
+         g1$resy <- mean(unique(dy))
          g1$minx <- min(x)-g1$resx/2
          g1$maxx <- max(x)+g1$resx/2
          g1$miny <- min(y)-g1$resy/2
          g1$maxy <- max(y)+g1$resy/2
+         if (T & irregular) {
+            g1$seqx <- c(x)
+            g1$seqy <- c(y)
+         }
          g1$columns <- length(x)
          g1$rows <- length(y)
          if ((length(proj4))&&(nchar(b[[proj4]]))) {

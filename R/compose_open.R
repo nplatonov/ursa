@@ -1,8 +1,11 @@
 'compose_open' <- function(...) {
+   retina <- getOption("ursaRetina")
+   if (!is.numeric(retina))
+      retina <- 1
    arglist <- list(...)
    mosaic <- .getPrm(arglist,name="",default=NA,class="")
    fileout <- .getPrm(arglist,name="fileout",default="")
-   dpi <- .getPrm(arglist,name="dpi",default=ifelse(.isKnitr(),150L,96L))
+   dpi <- .getPrm(arglist,name="dpi",default=ifelse(.isKnitr(),150L,as.integer(round(96*retina))))
    pointsize <- .getPrm(arglist,name="pointsize",default=NA_real_)
    scale <- .getPrm(arglist,name="^scale$",class="",default=NA_real_)
    width <- .getPrm(arglist,name="width",class=list("integer","character"),default=NA_real_)
@@ -61,6 +64,9 @@
                           ,indent=NA,frame=NA,box=TRUE,delafter=NA,wait=5
                           ,device=NA,antialias=NA,font=NA,background="white"
                           ,dev=FALSE,verbose=FALSE) {
+   retina <- getOption("ursaRetina")
+   if (!is.numeric(retina))
+      retina <- 1
   # session_pngviewer()
    if (FALSE) {
       str(list(mosaic=if (is.list(mosaic)) sapply(mosaic,class) else class(mosaic)
@@ -142,8 +148,8 @@
    }
   # print(c(width=width,s=ifelse(is.na(width),900,width),r=ifelse(is.na(width),900,width)/g1$columns))
   # print(c(height=height,s=ifelse(is.na(height),600,height),r=ifelse(is.na(height),600,height)/g1$rows))
-   scale1 <- ifelse(is.na(height),600,height)/g1$rows
-   scale2 <- ifelse(is.na(width),900,width)/g1$columns
+   scale1 <- ifelse(is.na(height),600*retina,height)/g1$rows
+   scale2 <- ifelse(is.na(width),900*retina,width)/g1$columns
    rescale <- mosaic$image^(0.1)
    autoscale <- min(scale1,scale2)
    if ((is.na(height))&&(is.na(width)))
@@ -155,7 +161,7 @@
    mainc <- g1$columns*dpiscale
    mainr <- g1$rows*dpiscale
   # print(c(v=scale1,h=scale2,autoscale=autoscale,scale=scale,c=g1$columns,r=g1$rows))
-   pointsize0 <- ifelse(.isKnitr(),12,12)
+   pointsize0 <- ifelse(.isKnitr(),12,round(12*retina,0))
    if (is.na(pointsize)) {
      # print(c(pointsize0=pointsize0,dpi=dpi,scale=scale,scale0=autoscale))
      # pointsize <- pointsize0*96/dpi*scale/autoscale ## removed 20161217

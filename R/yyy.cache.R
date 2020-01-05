@@ -104,12 +104,14 @@
             stop("dst")
          }
          ind <- match(src0,was$src)
-         if (!is.na(ind)) {
+         if ((length(ind))&&(!is.na(ind))) {
             dst <- file.path(.ursaCacheDir(),was$dst[ind[1]])
          }
       }
    }
    if ((is.null(dst))||(!file.exists(dst))) {
+      if (!length(src))
+         return(NULL)
       if (is.null(dst))
          dst <- if (cache) .ursaCacheFile() else tempfile()
       for (i in seq_along(src)) {
@@ -192,8 +194,9 @@
       if (is.null(dst)) {
          dst <- .ursaCacheFile()
          if (unpack %in% c("gzip","bzip2")) {
-            if (unpack=="gzip")
+            if (unpack=="gzip") {
                system2("gzip",c("-f -d -c",.dQuote(src)),stdout=dst,stderr=FALSE)
+            }
             else if (unpack=="bzip2")
                system2("bzip2",c("-f -d -c",.dQuote(src)),stdout=dst,stderr=FALSE)
             if (debugExact <- F) {

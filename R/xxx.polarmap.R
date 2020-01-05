@@ -22,7 +22,11 @@
                              ,layer.name=layer)
    m
 }
-'polarmap' <- function(obj,epsg=NA) {
+'polarmap' <- function(obj,epsg=NA,group=NULL,opacity=1
+                      ,addFeature=TRUE,addHomeButton=TRUE
+                      ,addMouseCoordinates=TRUE,addScaleBar=TRUE) {
+   if (missing(obj))
+      obj <- spatialize(c(0,50,360,50))
    for (pkg in c("leaflet","leafem","leafpop")) 
       if (!requireNamespace(pkg,quietly=.isPackageInUse()))
          stop(paste("Package",sQuote(pkg),"is required for this operation"))
@@ -63,14 +67,28 @@
                           ,resolutions=resolutions,origin=origin,bounds=bounds)
    m <- leaflet::leaflet(options=leaflet::leafletOptions(crs=crsArctic,minZoom=3,maxZoom=9))
    m <- leaflet::addTiles(m
-      ,urlTemplate=paste0("https://{s}.tiles.arcticconnect.ca/osm_"
-                                 ,epsg,"/{z}/{x}/{y}.png")
-      ,attribution="Map: \uA9 ArcticConnect. Data: \uA9 OpenStreetMap contributors"
-      ,options=leaflet::tileOptions(subdomains="abc",noWrap=TRUE,continuousWorld=FALSE)) 
-   m <- leafem::addMouseCoordinates(m)
-   m <- leafem::addFeatures(m,data=obj,popup=leafpop::popupTable(obj),weight=0.5)
-  # m <- leafem::addHomeButton(m,ext=matrix(spatial_bbox(obj),ncol=2),layer.name=layer)
-   m <- leafem::addHomeButton(m,ext=raster::extent(spatial_bbox(obj)[c(1,3,2,4)])
-                             ,layer.name=layer)
+                         ,urlTemplate=paste0("https://{s}.tiles.arcticconnect.ca/osm_"
+                                            ,epsg,"/{z}/{x}/{y}.png")
+                         ,attribution=paste("Map: \uA9 ArcticConnect."
+                                           ,"Data: \uA9 OpenStreetMap contributors")
+                         ,options=leaflet::tileOptions(subdomains="abc"
+                                                      ,noWrap=TRUE
+                                                      ,continuousWorld=FALSE
+                                                      ,opacity=opacity
+                                                      )
+                         ,group=if (nchar(group)) group else "Polarmap"
+                         )
+   if (addMouseCoordinates)
+      m <- leafem::addMouseCoordinates(m)
+   if (addFeature)
+      m <- leafem::addFeatures(m,data=obj,popup=leafpop::popupTable(obj)
+                              ,weight=0.5,group=group)
+   if (addScaleBar)
+      m <- leaflet::addScaleBar(m,options=leaflet::scaleBarOptions(imperial=FALSE))
+   if (addHomeButton) {
+     # m <- leafem::addHomeButton(m,ext=matrix(spatial_bbox(obj),ncol=2),layer.name=layer)
+      m <- leafem::addHomeButton(m,ext=raster::extent(spatial_bbox(obj)[c(1,3,2,4)])
+                                ,layer.name=layer)
+   }
    m
 }

@@ -1,4 +1,16 @@
-2019-09-25
+2019-11-25
+
+### version 3.8.16
+
+-   Package **`RColorBrewer`** is added as suggested for cases when
+    `pal` attrubute in `colorize()` is equal to any palette name or
+    category from **`RColorBrewer`**.
+
+-   Fixed replace function `spatial_geometry<-` for Spatial (**`sp`**)
+    objects.
+
+-   The environental variable `PROJ_PATH` is temporal specified for GDAL
+    utils for their execution, if GDAL is found (optional).
 
 ### version 3.8.15
 

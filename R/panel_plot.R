@@ -238,12 +238,12 @@
    }
    else {
       ret <- list(name=oname,type="default"
-                 ,col="transparent",border="transparent",lty=1,lwd=1,pch=0,cex=1
-                 ,fill="transparent",bg="transparent",density=NULL,angle=45)
+                 ,col="transparent",border="transparent",lty=1,lwd=1,pch=0,cex=NA
+                 ,fill="transparent",bg="transparent",density=NA,angle=45)
       rname <- names(ret)
       if (.lgrep("polygon",geoType)) { # 20171215 -- 'if (geoType %in% c("POLYGON","MULTIPOLYGON"))'
-         ret$pch <- 22
-         ret$cex <- 3
+         ret$pch <- NA
+        # ret$cex <- 3
       }
       for (i in seq_along(rname)) {
          if (is.na(j <- match(rname[i],aname)))
@@ -262,6 +262,12 @@
       }
       if ((all(ret$bg!="transpareny"))&&(all(ret$border=="transparent"))) {
          ret$fill <- ret$bg
+      }
+      if ((TRUE)&&(.lgrep("polygon",geoType))) {
+         ret$fill <- ret$col
+         ret$col <- NA
+         ret$lwd <- NA
+         ret$lty <- NA
       }
    }
    if (FALSE) {

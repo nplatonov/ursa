@@ -36,6 +36,7 @@
       return(NULL)
   # requireNamespace("sp",quietly=.isPackageInUse())
   # requireNamespace("methods",quietly=.isPackageInUse())
+  # obj$grid$seqy <- nuimeric()
    g1 <- if (onlyGeometry) {
       if (missing(obj))
          session_grid()
@@ -60,15 +61,35 @@
       if (length(ind))
          b <- b[-ind,]
    }
-   else if (is.ursa(obj))
+   else if (is.ursa(obj)) {
       b <- as.data.frame(obj)
+      str(b)
+   }
    else
       b <- obj
   # b <- b[sample(seq(nrow(b)),1e3),]
    n <- nrow(b)
    sa <- vector("list",n)
-   dx <- g1$resx/2
-   dy <- g1$resy/2
+   if (!length(g1$seqx))
+      dx <- g1$resx/2
+   else {
+      dx <- diff(g1$seqx)
+      dx <- (c(head(dx,1),dx)+c(dx,tail(dx,1)))/2
+      ind <- match(b$x,g1$seqx) ## or .near?
+      if (anyNA(ind))
+         stop("TODO: near matching (x-axis)")
+      dx <- dx[ind]/2
+   }
+   if (!length(g1$seqy))
+      dy <- g1$resy/2
+   else {
+      dy <- diff(g1$seqy)
+      dy <- (c(head(dy,1),dy)+c(dy,tail(dy,1)))/2
+      ind <- match(b$y,g1$seqy) ## or .near?
+      if (anyNA(ind))
+         stop("TODO: near matching (y-axis)")
+      dy <- dy[ind]/2
+   }
    if (isSF) {
       if (verbose)
          cat("1 of 3: create polygons from points...")
@@ -96,7 +117,7 @@
       if (!onlyGeometry) {
          if (verbose)
             cat("3 of 3: assign data to geometry...")
-         sa <- sf::st_sf(b,coords=sa,crs=g1$proj4)
+         sa <- sf::st_sf(b,coords=sa,crs=if (nchar(g1$proj4)) g1$proj4 else sf::NA_crs_)
          if (verbose)
             cat(" done!\n")
       }
@@ -146,7 +167,26 @@
    session_grid(g0)
    sa
 }
-'.vectorize' <- function(obj,fname,opt="") {
+'.vectorize' <- function(obj,fname,opt="",engine=c("sf","sp")) {
+   engine <- match.arg(engine)
+   if (engine=="sp") {
+      isSF <- FALSE
+      isSP <- TRUE
+   }
+   else if (engine=="sf") {
+      isSF <- requireNamespace("sf",quietly=.isPackageInUse())
+      isSP <- !isSF
+   }
+   else {
+      loaded <- loadedNamespaces() # .loaded()
+      if ("sf" %in% loaded)
+         isSF <- TRUE
+      else if (("sp" %in% loaded)||("rgdal" %in% loaded))
+         isSF <- FALSE
+      else
+         isSF <- requireNamespace("sf",quietly=.isPackageInUse())
+      isSP <- !isSF
+   }
    internal <- missing(fname)
    if (internal) {
       bname <- tempfile()
@@ -160,7 +200,7 @@
    envi_remove(Fout)
    if (!internal)
       return(0L)
-   ret <- spatialize(fname)
+   ret <- spatialize(fname,engine=engine)
    file.remove(dir(path=dirname(bname),pattern=paste0("^",basename(bname)),full.names=TRUE))
    ret
 }

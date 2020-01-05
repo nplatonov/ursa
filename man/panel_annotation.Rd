@@ -40,6 +40,7 @@ panel_annotation(...)
       \cr \code{vert(ical)*} \tab \code{vertical} \tab \emph{See below}.
       \cr \code{(alpha|transp(aren(cy)*)*)} \tab \code{alpha} \tab \emph{See below}.
       \cr \code{interp(olate)*} \tab \code{interpolate} \tab \emph{See below}.
+      \cr \code{resample} \tab \code{resample} \tab \emph{See below}.
       \cr \code{verb(ose)*} \tab \code{verbose} \tab \emph{See below}.
       }
    }
@@ -58,6 +59,7 @@ panel_annotation(...)
    \item{font}{Character. Font family. Default is \code{par("family")}.}
    \item{vertical}{Logical. Vertical orientation of label. If \code{FALSE}, then horizontal labeling. Default is \code{FALSE}.}
    \item{interpolate}{Logical. Passed as argument \code{interpolate} to function \code{\link[graphics:rasterImage]{rasterImage}} for logo annotation.}
+   \item{resample}{Logical or numeric. Passed as argument \code{resample} to function \code{\link[regrid]{regrid}} for logo annotation. Default is \code{FALSE}. If \code{TRUE} , then resized logo is drawn smoothly.}
    \item{alpha}{Numeric or character. Level of transparency for logos. If numeric, the either \verb{0 <= alpha <= 1} or \code{0 <= alpha <= 255}. If character, then one byte of hexadecimal value \verb{"00" <= alpha <= "FF"}. Default is \code{1}.}
    \item{verbose}{Logical. Value \code{TRUE} may provide some additional information on console. Default is \code{FALSE}.}
 }

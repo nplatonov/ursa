@@ -67,6 +67,7 @@
         #    download.file(src1,dst,mode="wt",quiet=!verbose)
         # else if ((verbose)&&(!isMetadata))
         #    message(src1)
+         src1 <- gsub("\\?\\&","?",src1)
          if (cache)
             dst <- .ursaCacheDownload(src1,mode="wt",quiet=!verbose)
          else {
@@ -135,6 +136,7 @@
         #    download.file(src1,dst,mode="wt",quiet=!verbose)
         # else if ((verbose)&&(!isMetadata))
         #    message(src1)
+         src1 <- gsub("\\?\\&","?",src1)
          if (cache)
             dst <- .ursaCacheDownload(src1,mode="wt",quiet=!verbose)
          else {
@@ -185,6 +187,7 @@
    }
    ind <- .grep("&[cs]rs=",src)
    if (!length(ind)) {
+      src1 <- gsub("\\?\\&","?",src1)
       if (cache)
          dst <- .ursaCacheDownload(src1,mode="wt",quiet=!verbose)
       else {
@@ -271,6 +274,7 @@
      #    download.file(src1,dst,mode="wt",quiet=!verbose)
      # else if ((verbose)&&(!isMetadata))
      #    message(src1)
+      src1 <- gsub("\\?\\&","?",src1)
       if (cache)
          dst <- .ursaCacheDownload(src1,mode="wt",quiet=!verbose)
       else {
@@ -303,6 +307,13 @@
       }
       if (length(ind2))
          dname2 <- tail(unlist(strsplit(md[ind2],split="\\s+")),-1)
+      if (length(layer)==1) {
+         ind7a <- grep(layer,md)
+         ind1 <- ind1[ind1>min(ind7a)][1]
+         ##~ print(ind1)
+         ##~ print(md[ind1])
+         ##~ q()
+      }
       if (length(ind1)) {
          for (i in seq_along(ind1)) {
            # if (i==2)
@@ -347,6 +358,8 @@
                }
                else if (length(val))
                   message(paste("Values:",paste(val,collapse=" ")))
+               if (nrow(res)==1)
+                  message(paste0(colnames(res)[2],": ",res[2]))
             }
             toStop <- toStop+0L
          }
@@ -359,6 +372,7 @@
      #    download.file(src1,dst,mode="wt",quiet=!verbose)
      # else if ((verbose)&&(!isMetadata))
      #    message(src1)
+      src1 <- gsub("\\?\\&","?",src1)
       if (cache)
          dst <- .ursaCacheDownload(src1,mode="wt",quiet=!verbose)
       else {
@@ -782,6 +796,7 @@
          src2 <- paste0(src2,"&service=WMS&request=GetMap")
         # dst <- tempfile()
         # download.file(src2,dst,mode="wb",quiet=!verbose)
+         src2 <- gsub("\\?\\&","?",src2)
          if (cache)
             dst <- .ursaCacheDownload(src2,mode="wb",quiet=!verbose)
          else {
@@ -845,6 +860,7 @@
          reqL <- paste(c(a,"service=WMS","request=GetLegendGraphic"),collapse="&")
         # dst <- tempfile()
         # if (.try(download.file(reqL,dst,mode="wb",quiet=!verbose))) {
+         reqL <- gsub("\\?\\&","?",reqL)
          if (cache)
             dst <- try(.ursaCacheDownload(reqL,mode="wb",quiet=!verbose))
          else {
@@ -891,6 +907,7 @@
          logo <- vector("list",length(reqL))
         # dst <- tempfile()
          isOK <- TRUE
+         reqL <- gsub("\\?\\&","?",reqL)
          for (i in seq_along(logo)) {
            # if (.try(download.file(reqL[i],dst,mode="wb",quiet=!verbose))) {
             if (cache)

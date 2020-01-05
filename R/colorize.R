@@ -727,6 +727,21 @@
                   col <- pal(n)
             }
             else if (is.character(pal)) {
+               if ((length(pal)==1)&&
+                   (requireNamespace("RColorBrewer",quietly=.isPackageInUse()))) {
+                  available <- RColorBrewer::brewer.pal.info
+                  if (!is.na(ind <- match(pal,rownames(available)))) {
+                     pal <- RColorBrewer::brewer.pal(available$maxcolors[ind],pal)
+                     if (available$category[ind]=="qual")
+                        pal <- sample(pal)
+                  }
+                  else if (pal %in% available$category) {
+                     selected <- available[sample(which(available$category==pal),1),]
+                     pal <- RColorBrewer::brewer.pal(selected$maxcolors,rownames(selected))
+                     if (rownames(selected)=="qual")
+                        pal <- sample(pal)
+                  }
+               }
               ## 20180316 added alpha=TRUE
                col <- colorRampPalette(unlist(strsplit(pal,split="\\s+")),alpha=TRUE)(n)
             }
@@ -1206,7 +1221,23 @@
             }
          }
          else if (is.character(pal)) {
-            col <- colorRampPalette(unlist(strsplit(pal,split="\\s+")),alpha=TRUE)(n)
+            if ((length(pal)==1)&&
+                (requireNamespace("RColorBrewer",quietly=.isPackageInUse()))) {
+               available <- RColorBrewer::brewer.pal.info
+               if (!is.na(ind <- match(pal,rownames(available)))) {
+                  pal <- RColorBrewer::brewer.pal(available$maxcolors[ind],pal)
+                  if (available$category[ind]=="qual")
+                     pal <- sample(pal)
+               }
+               else if (pal %in% available$category) {
+                  selected <- available[sample(which(available$category==pal),1),]
+                  pal <- RColorBrewer::brewer.pal(selected$maxcolors,rownames(selected))
+                  if (rownames(selected)=="qual")
+                     pal <- sample(pal)
+               }
+            }
+            col <- colorRampPalette(unlist(strsplit(pal,split="\\s+"))
+                                   ,alpha=TRUE)(n)
          }
          else
             stop("Unable interpret 'pal' argument")

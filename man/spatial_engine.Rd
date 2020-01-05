@@ -37,6 +37,7 @@
 \alias{spatial_union}
 \alias{spatial_buffer}
 \alias{spatial_trim}
+\alias{spatial_valid}
 \title{
 Wrapper functions for manipulation with non-raster spatial objects
 }
@@ -62,8 +63,8 @@ spatial_data(obj, verbose = FALSE) <- value
 spatial_geometry(obj, verbose = FALSE)
 spatial_geometry(obj, verbose = FALSE) <- value
 
-spatial_geotype(obj, verbose = FALSE)
-spatial_shape(obj, verbose = FALSE)
+spatial_geotype(obj, each = FALSE, verbose = FALSE)
+spatial_shape(obj, each = FALSE, verbose = FALSE)
 
 spatial_transform(obj, crs, verbose = FALSE, ...)
 
@@ -105,6 +106,8 @@ spatial_union(x, y, byid=NA, verbose = FALSE)
 spatial_buffer(obj, dist = 0, quadsegs = 30L, verbose = FALSE)
 
 spatial_trim(obj)
+
+spatial_valid(obj, each = FALSE, reason = FALSE, verbose = FALSE)
 
 }
 %- maybe also 'usage' for other objects documented here.
@@ -153,6 +156,13 @@ Logical. For \code{spatial_union} function, \code{TRUE} does unite of each featu
 }
   \item{fname}{
 Character. Filename (source or packed) of spatial data.
+}
+  \item{each}{
+Logical. Whether result will be returned for each record (\code{TRUE}) or generalized (\code{FALSE}). Default is \code{FALSE}.
+}
+
+  \item{reason}{
+Logical. If \code{TRUE}, then the reason for validity ("Valid Geomerty") or invalidity is returned. If \code{FALSE}, then logical value of validity is returned. Default is \code{FALSE}.
 }
   \item{verbose}{
 Logical. Value \code{TRUE} provides information on console. Default is \code{FALSE}.

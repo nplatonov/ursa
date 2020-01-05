@@ -127,6 +127,7 @@
    proj4 <- system(cmd,intern=TRUE)
    proj4 <- .gsub("'","",proj4)
    proj4 <- .gsub("(^\\s|\\s$)","",proj4)
+   proj4 <- proj4[nchar(proj4)>0]
    if (noProj <- !length(proj4))
       proj4 <- "+init=epsg:4326"
    ftemp <- .maketmp() # .maketmp() #tempfile(pattern="") # ".\\tmp1"
@@ -211,6 +212,7 @@
    }
    else
       shpname <- dsn
+   dname <- dname[.grep(dmask,dname)] ## ++ 20191009
    if (is.null(dname)) {
       md <- system(paste("ogrinfo -al -so",dsn),intern=TRUE)
       patt <- "^(.+): \\S+ \\(.+\\)$"

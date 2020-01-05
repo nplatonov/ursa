@@ -50,13 +50,21 @@
    a <- try(rgdal::GDALinfo(fname,returnStats=FALSE,returnRAT=FALSE
                 ,returnColorTable=TRUE,returnCategoryNames=TRUE))
    options(op)
-   if (verbose)
-      str(a)
    if (inherits(a,"try-error")) {
+      fname <- normalizePath(fname)
+      op <- options(warn=0-!verbose)
+      a <- try(rgdal::GDALinfo(fname,returnStats=FALSE,returnRAT=FALSE
+                   ,returnColorTable=TRUE,returnCategoryNames=TRUE))
+      options(op)
       if (verbose)
-         message("It looks like file ",.dQuote(fname)
-                ," is not found or not GDAL-recognized")
-      return(NULL)
+         str(a)
+      if (inherits(a,"try-error")) {
+         if (verbose) {
+            message("It looks like file ",.dQuote(fname)
+                   ," is not found or not GDAL-recognized")
+         }
+         return(NULL)
+      }
    }
    a1 <- as.numeric(a)
    g1 <- regrid()

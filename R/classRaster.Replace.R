@@ -15,7 +15,6 @@
    missingI <- missing(i)
    if (!is.null(dimx))
    {
-      obj <- x
       if (missingJ)
          j <- seq(dimx[1])
       if (missingI)
@@ -26,9 +25,16 @@
       {
          args <- list(...)
          regexp <- if ("regexp" %in% names(args)) args[["regexp"]] else FALSE
-         i <- .getBand(obj,i,regexp=regexp)
+         i2 <- .getBand(x,i,regexp=regexp)
+         if (is.null(i2)) {
+            names(value) <- i
+            x <- c(x,value)
+            return(x)
+         }
+         i <- i2
          j <- seq(dimx[1])
       }
+      obj <- x
       if (is.ursa(i))
       {
          debug <- FALSE

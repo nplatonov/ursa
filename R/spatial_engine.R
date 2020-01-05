@@ -69,12 +69,10 @@
       }
    }
    if (isSP) {
-      if (!inherits(obj,c("SpatialLinesDataFrame","SpatialPointsDataFrame"
-                         ,"SpatialPolygonsDataFrame")))
-         return(value)
-      if (!.isSP(obj))
-         return(value)
-      obj <- methods::slot(obj,"data")
+      if (inherits(obj,c("SpatialLinesDataFrame","SpatialPointsDataFrame"
+                         ,"SpatialPolygonsDataFrame"))) {
+         obj <- methods::slot(obj,"data")
+      }
       geotype <- spatial_geotype(value)
       obj <- switch(geotype
                    ,POLYGON=sp::SpatialPolygonsDataFrame(value,obj,match.ID=FALSE)
@@ -112,8 +110,8 @@
          xy <- spatial_coordinates(obj)
          while(all(sapply(xy,is.list)))
             xy <- unlist(xy,recursive=FALSE)
-        # if (is.list(xy)) ## deprecated
-        #    xy <- do.call(rbind,xy)
+         if (is.list(xy)) ## deprecated and resored 20190930
+            xy <- do.call(rbind,xy)
          res <- c(xmin=min(xy[,1]),ymin=min(xy[,2]),xmax=max(xy[,1]),ymax=max(xy[,2]))
          return(res)
       }
@@ -283,12 +281,14 @@
    }
    return(NULL)
 }
-'spatial_geotype' <- 'spatial_shape' <- function(obj,verbose=FALSE) {
+'spatial_geotype' <- 'spatial_shape' <- function(obj,each=FALSE,verbose=FALSE) {
    isSF <- .isSF(obj)
    isSP <- .isSP(obj)
    if (verbose)
       print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
    if (isSF) {
+      if (each)
+         return(sf::st_geometry_type(obj))
       if (inherits(obj,"sfc"))
          geoType <- .grep("^sfc_.+$",class(obj),value=TRUE)
       else
@@ -303,7 +303,9 @@
                        ,SpatialPolygons="POLYGON"
                        ,SpatialPoints="POINT"
                        ,SpatialLines="LINESTRING")
-      return(geoType)
+      if (!each)
+         return(geoType)
+      return(rep(geoType,spatial_count(obj)))
    }
   # print(class(obj))
    return(NULL)
@@ -373,11 +375,16 @@
          names(ret) <- seq_along(ret)
          return(ret)
       }
-      if (all(geoType=="MULTILINESTRING")) {
-         ret <- lapply(sf::st_geometry(obj),unclass) ## Holes are not ignored
+      else if (all(geoType=="MULTILINESTRING")) {
+         ret <- lapply(sf::st_geometry(obj),unclass)
          nseg <- unique(sapply(ret,length))
          if ((FALSE)&&(length(nseg)==1)&&(nseg==1)) ## consistence with 'sp'
             ret <- lapply(ret,function(x) x[[1]])
+         names(ret) <- seq_along(ret)
+         return(ret)
+      }
+      else if (all(geoType=="MULTIPOINT")) {
+         ret <- lapply(sf::st_geometry(obj),unclass)
          names(ret) <- seq_along(ret)
          return(ret)
       }
@@ -760,6 +767,22 @@
    obj
 }
 'spatial_intersection' <- function(x,y,verbose=FALSE) {
+   if (is.ursa(x)) {
+      if (.isSF(y))
+         x <- polygonize(x,engine="sf",verbose=verbose)
+      else if (.isSP(y))
+         x <- polygonize(x,engine="sp",verbose=verbose)
+      else
+         x <- polygonize(x,verbose=verbose)
+   }
+   if (is.ursa(y)) {
+      if (.isSF(x))
+         y <- polygonize(y,engine="sf",verbose=verbose)
+      else if (.isSP(x))
+         y <- polygonize(y,engine="sp",verbose=verbose)
+      else
+         y <- polygonize(y,verbose=verbose)
+   }
    isSF <- .isSF(x) & .isSF(y)
    isSP <- .isSP(x) & .isSP(y)
    if (verbose)
@@ -780,8 +803,12 @@
                if (length(grep("POLYGON",geotype)))
                   res <- sf::st_collection_extract(res,"POLYGON")
             }
-            else if (length(match(geotype,c("POLYGON","MULTIPOLYGON")))==2)
+            else if (length(na.omit(match(geotype,c("POLYGON","MULTIPOLYGON"))))==2) {
                res <- sf::st_cast(res,"MULTIPOLYGON")
+            }
+            else if (length(na.omit(match(geotype,c("MULTILINESTRING","LINESTRING"))))==2) {
+               res <- sf::st_cast(res,"MULTILINESTRING")
+            }
          }
       }
       return(res)
@@ -1029,7 +1056,9 @@
    res
 }
 'spatial_basename' <- function(fname) {
-   gsub("\\.(shp|geojson|json|sqlite|gpkg|mif|kml|osm)(\\.(gz|bz2|zip|rar))*$"
+   gsub(paste0("\\."
+              ,"(shp|geojson|json|sqlite|gpkg|mif|kml|osm|tif|envi|bin|envigz|img|bingz)"
+              ,"(\\.(gz|bz2|zip|rar))*$")
        ,"",basename(fname),ignore.case=TRUE)
 }
 'spatial_pattern' <- function(fname) {
@@ -1061,7 +1090,7 @@
    }
    NULL
 }
-'spatial_valid' <- function(obj,reason=FALSE,verbose=FALSE) {
+'spatial_valid' <- function(obj,each=FALSE,reason=FALSE,verbose=FALSE) {
    if (is.character(obj))
       return(all(obj %in% c("Valid Geometry")))
    isSF <- .isSF(obj)
@@ -1074,12 +1103,16 @@
       res <- rgeos::gIsValid(obj,byid=TRUE,reason=TRUE)
       if (reason)
          return(unname(res))
+      if (each)
+         return(res %in% c("Valid Geometry"))
       return(all(res %in% c("Valid Geometry")))
    }
    if (isSF) {
       res <- sf::st_is_valid(obj,reason=TRUE)
       if (reason)
          return(res)
+      if (each)
+         return(res %in% c("Valid Geometry"))
       return(all(res %in% c("Valid Geometry")))
    }
    NULL

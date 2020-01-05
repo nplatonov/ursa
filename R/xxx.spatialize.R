@@ -421,7 +421,8 @@
                else if (length(da)==2) {
                   arglist <- as.list(match.call())
                   arglist$dsn <- da
-                  return(do.call(as.character(arglist[[1]]),arglist[-1])) ## RECURSIVE!!!
+                  arglist[[1]] <- tail(as.character(arglist[[1]]),1)
+                  return(do.call(arglist[[1]],arglist[-1])) ## RECURSIVE!!!
                }
             }
             else
@@ -563,7 +564,8 @@
             ##~ obj <- rgdal::readOGR(dsn,layer,pointDropZ=TRUE,encoding=enc
                                  ##~ ,use_iconv=!is.null(enc),verbose=FALSE)
             obj <- rgdal::readOGR(dsn,layer,pointDropZ=TRUE,encoding=cpg
-                                 ,use_iconv=!isSHP,verbose=FALSE)
+                                 ,use_iconv=TRUE,verbose=FALSE)
+                                 ## --20191112 use_iconv=!isSHP
             if ((length(names(obj))==1)&&(names(obj)=="FID")) {
                info <- rgdal::ogrInfo(dsn,layer)
                if (info$nitems==0)
@@ -774,7 +776,8 @@
    projPatt <- paste0("(",paste(projClass,collapse="|"),")")
    staticMap <- c("openstreetmap","google","sputnikmap")
    tilePatt <- paste0("(",paste0(unique(c(staticMap,.tileService())),collapse="|"),")")
-   len <- 640L
+   retina <- getOption("ursaRetina",1)
+   len <- 640L # as.integer(round(640*getOption("ursaRetina",1)))
    if (is.na(size[1]))
       size <- c(len,len)
    else if (is.character(size)) {
@@ -1054,8 +1057,9 @@
          else if (proj=="merc")
             t_srs <- paste("","+proj=merc +a=6378137 +b=6378137"
                           ,"+lat_ts=0.0",paste0("+lon_0=",lon_0)
-                          ,"+x_0=0.0 +y_0=0 +k=1.0"
-                          ,"+units=m +nadgrids=@null +wktext +no_defs")
+                          ,"+x_0=0.0 +y_0=0 +k=1.0 +units=m"
+                         # ,"+nadgrids=@null"
+                          ,"+wktext +no_defs")
          else if ((proj %in% c("longlat"))||(isLonLat)) {
             t_srs <- "+proj=longlat +datum=WGS84 +no_defs"
          }

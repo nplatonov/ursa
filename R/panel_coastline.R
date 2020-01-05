@@ -85,9 +85,16 @@
                rm(a)
             }
             else if (.isSF(a)) {
-               a <- do.call("rbind",lapply(spatial_coordinates(a),function(x) {
-                  do.call("rbind",lapply(x,rbind,cbind(NA,NA)))
-               }))
+               if (.lgrep("^multi",spatial_shape(a))) {
+                  a <- do.call("rbind",lapply(spatial_coordinates(a),function(x) {
+                     do.call("rbind",lapply(unlist(x,recursive=FALSE),rbind,cbind(NA,NA)))
+                  }))
+               }
+               else {
+                  a <- do.call("rbind",lapply(spatial_coordinates(a),function(x) {
+                     do.call("rbind",lapply(x,rbind,cbind(NA,NA)))
+                  }))
+               }
                coast_xy <- head(a,-1)
                rm(a)
             }

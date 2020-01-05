@@ -23,11 +23,15 @@
    if ((TRUE)&&(.lgrep("\\.tif$",basename(fname)))&&(nchar(Sys.which("gdal_translate")))) {
       ftmp <- .maketmp()
       ret <- write_envi(obj,paste0(ftmp,"."))
+      proj_lib <- Sys.getenv("PROJ_LIB")
+      Sys.setenv(PROJ_LIB=file.path(dirname(dirname(Sys.which("gdal_translate")))
+                                   ,"share/proj"))
       system2("gdal_translate",c("-q","-of","GTiff"
                                 ,"-co",.dQuote("COMPRESS=DEFLATE")
                                 ,"-co",.dQuote("PREDICTOR=2")
                                 ,"-co",.dQuote("TILED=NO")
-                                ,ftmp,fname))
+                                ,.dQuote(ftmp),.dQuote(fname)))
+      Sys.setenv(PROJ_LIB=proj_lib)
       envi_remove(ftmp)
       return(invisible(ret))
    }

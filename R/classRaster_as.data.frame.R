@@ -15,8 +15,14 @@
                                  ,na.rm=TRUE,all.na=FALSE,col.names=NULL) {
   ## TODO: categories should be intepreted as 'factor' or 'character'
    g1 <- ursa_grid(obj)
-   x <- with(g1,seq(minx,maxx,by=resx)[-1]-resx/2)
-   y <- rev(with(g1,seq(miny,maxy,by=resy)[-1]-resy/2))
+   if (!length(g1$seqx))
+      x <- with(g1,seq(minx,maxx,by=resx)[-1]-resx/2)
+   else
+      x <- g1$seqx
+   if (!length(g1$seqy))
+      y <- rev(with(g1,seq(miny,maxy,by=resy)[-1]-resy/2))
+   else
+      y <- rev(g1$seqy)
   # xy <- expand.grid(x=x,y=y,KEEP.OUT.ATTRS=FALSE,stringsAsFactors=FALSE)
    xy <- data.frame(x=rep(x,times=length(y)),y=rep(y,each=length(x)))
    isList <- .is.ursa_stack(obj)

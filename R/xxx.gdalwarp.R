@@ -79,6 +79,7 @@
    else if (!is.null(names(opt))) {
       optS <- unlist(opt)
       optF <- paste(paste0("-",names(optS)," ",.dQuote(unname(optS))),collapse=" ")
+      optF <- gsub("\\s*\"TRUE\"","",optF)
       optF <- .gsub("\\s\\\"\\\"","",optF)
    }
    else
@@ -103,7 +104,10 @@
       message(cmd)
    if (verbose>1)
       return(NULL)
+   proj_lib <- Sys.getenv("PROJ_LIB")
+   Sys.setenv(PROJ_LIB=file.path(dirname(dirname(Sys.which("gdalwarp"))),"share/proj"))
    system(cmd)
+   Sys.setenv(PROJ_LIB=proj_lib)
    session_grid(NULL)
    if (inMemory) {
       ret <- if (driver=="ENVI") read_envi(dst) else read_gdal(dst)
