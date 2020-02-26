@@ -127,7 +127,8 @@
                        ,recursive=FALSE,ignore.case=TRUE,exact=FALSE)
 {
    '.noESRI' <- function(elist) {
-      fpath <- ifelse(full.names,elist,file.path(path,elist))
+      fpath <- ifelse(full.names | length(grep("/",elist)),elist,file.path(path,elist))
+      a <- elist[sapply(fpath,function(f) readLines(paste0(f,".hdr"),1)=="ENVI")]
       elist[sapply(fpath,function(f) readLines(paste0(f,".hdr"),1)=="ENVI")]
    }
    if (!nchar(pattern))

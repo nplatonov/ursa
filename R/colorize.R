@@ -893,9 +893,12 @@
       }
       if (verbose)
          print(data.frame(colors=ncolor,min=minvalue,max=maxvalue))
-      if (interval %in% c(2L)) {
+     # str(ncolor)
+      if (interval %in% c(2L,3L)) {
          ncolor <- (ncolor-1)*2+1
       }
+     # str(ncolor)
+     # q()
       if (!is.na(byvalue)) {
          value <- seq(minb,maxb,by=byvalue)
          rm(minb,maxb)

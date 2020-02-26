@@ -2,6 +2,9 @@
 #include <Rmath.h>
 #include "ursa.h"
 
+#define memoverlap1 memcpy
+#define memoverlap memmove
+
 int progressBar(int cur,int max,char *text)
 {
    if (!cur)
@@ -128,7 +131,7 @@ void focalMean(double *x,double *bg,int *dim,double *W,double *cvr,int *Z,int *E
       {
          memset(M,0,samples*sizeof(double));
          memset(n,0,samples*sizeof(float));
-         memcpy(valuein,valuein+samples,(size-1)*samples*sizeof(double));
+         memoverlap(valuein,valuein+samples,(size-1)*samples*sizeof(double));
          if (r<lines)
             memcpy(valuein+(size-1)*samples,x+adr1+r*samples,samples*sizeof(double));
          else
@@ -292,7 +295,7 @@ void focalMeanWithNA(double *x,int *dim,double *W,double *cvr,int *Z,int *verbos
       {
          memset(M,0,samples*sizeof(double));
          memset(n,0,samples*sizeof(float));
-         memcpy(valuein,valuein+samples,(size-1)*samples*sizeof(double));
+         memoverlap(valuein,valuein+samples,(size-1)*samples*sizeof(double));
          if (r<lines)
             memcpy(valuein+(size-1)*samples,x+adr1+r*samples,samples*sizeof(double));
          else
@@ -442,7 +445,7 @@ void focalExtrem(double *x,int *K,double *bg,int *dim,int *S,double *cvr,int *Z
           valuein[adr]=background;
       for (r=0;r<shift+lines;r++)
       {
-         memcpy(valuein,valuein+samples,(size-1)*samples*sizeof(double));
+         memoverlap(valuein,valuein+samples,(size-1)*samples*sizeof(double));
          if (r<lines)
             memcpy(valuein+(size-1)*samples,x+adr1+r*samples,samples*sizeof(double));
          else
@@ -713,7 +716,7 @@ void readBsqLineInteger(char **fname,int *dim,int *index,int *nindex,int *dtype
    int n=count*samples;
    for (i=0;i<bands;i++)
    {
-      fseek(Fin,(i*lines+index[0]-1)*samples*datasize,SEEK_SET);
+      fseeko64(Fin,(long long int)(i*lines+index[0]-1)*samples*datasize,SEEK_SET);
       if (fread(buf1,datasize,n,Fin)) {};
       for (j=0;j<samples*count;j++)
       {
@@ -800,7 +803,7 @@ void readBsqLineDouble(char **fname,int *dim,int *index,int *nindex,int *dtype
    int n=count*samples;
    for (i=0;i<bands;i++)
    {
-      fseek(Fin,(i*lines+index[0]-1)*samples*datasize,SEEK_SET);
+      fseeko64(Fin,(long long int)(i*lines+index[0]-1)*samples*datasize,SEEK_SET);
       if (fread(buf1,datasize,n,Fin)) {};
       for (j=0;j<samples*count;j++)
       {
@@ -879,7 +882,7 @@ void readBsqBandInteger(char **fname,int *dim,int *index,int *nindex,int *dtype
    for (i=0;i<count;i++)
    {
      // printf(" %d",index[i]);
-      fseek(Fin,(index[i]-1)*lines*samples*datasize,SEEK_SET);
+      fseeko64(Fin,(long long int)(index[i]-1)*lines*samples*datasize,SEEK_SET);
       if (fread(buf1,datasize,n,Fin)) {};
       for (j=0;j<samples*lines;j++)
       {
@@ -968,7 +971,7 @@ void readBsqBandDouble(char **fname,int *dim,int *index,int *nindex,int *dtype
    for (i=0;i<count;i++)
    {
      // Rprintf(" %d",index[i]);
-      fseek(Fin,(index[i]-1)*lines*samples*datasize,SEEK_SET);
+      fseeko64(Fin,(long long int)(index[i]-1)*lines*samples*datasize,SEEK_SET);
       if (fread(buf1,datasize,n,Fin)) {};
       for (j=0;j<samples*lines;j++)
       {
@@ -1047,7 +1050,7 @@ void readBilLineInteger(char **fname,int *dim,int *index,int *nindex,int *dtype
    for (i=0;i<count;i++)
    {
      // printf("seek=%d(%d)\n",(index[i]-1)*bands*samples*datasize,index[i]);
-      fseek(Fin,(index[i]-1)*bands*samples*datasize,SEEK_SET);
+      fseeko64(Fin,(long long int)(index[i]-1)*bands*samples*datasize,SEEK_SET);
       if (fread(buf1,datasize,n,Fin)) {};
       for (j=0;j<samples*bands;j++)
       {
@@ -1137,7 +1140,7 @@ void readBilLineInteger2(char **fname,int *dim,int *index,int *nindex,int *dtype
    for (l=0;l<count;l++)
    {
      // printf("seek=%d(%d)\n",(index[i]-1)*bands*samples*datasize,index[i]);
-      fseek(Fin,(index[l]-1)*bands*samples*datasize,SEEK_SET);
+      fseeko64(Fin,(long long int)(index[l]-1)*bands*samples*datasize,SEEK_SET);
       if (fread(buf1,datasize,bs,Fin)) {};
       for (b=0;b<bands;b++)
       {
@@ -1228,7 +1231,7 @@ void readBilLineDouble(char **fname,int *dim,int *index,int *nindex,int *dtype
    int n=bands*samples;
    for (i=0;i<count;i++)
    {
-      fseek(Fin,(index[i]-1)*bands*samples*datasize,SEEK_SET);
+      fseeko64(Fin,(long long int)(index[i]-1)*bands*samples*datasize,SEEK_SET);
       if (fread(buf1,datasize,n,Fin)) {};
       for (j=0;j<samples*bands;j++)
       {
@@ -1302,7 +1305,7 @@ void readBilLineDouble2(char **fname,int *dim,int *index,int *nindex,int *dtype
    int bs=bands*samples;
    for (l=0;l<count;l++)
    {
-      fseek(Fin,(index[l]-1)*bands*samples*datasize,SEEK_SET);
+      fseeko64(Fin,(long long int)(index[l]-1)*bands*samples*datasize,SEEK_SET);
       if (fread(buf1,datasize,bs,Fin)) {};
       for (b=0;b<bands;b++)
       {
@@ -1390,6 +1393,8 @@ void readBilBandInteger(char **fname,int *dim,int *index,int *nindex,int *dtype
       {
         // Rprintf("fseek=%d\n",(i*bands+index[k]-1)*samples*datasize-MAX_INT);
          ret=fseek(Fin,(i*bands+index[k]-1)*samples*datasize,SEEK_SET);
+         if (ret)
+            ret=fseeko64(Fin,(long long int)(i*bands+index[k]-1)*samples*datasize,SEEK_SET);
          if (ret) {
             o1=(long long)(i*bands+index[k]-1)*samples*datasize;
             o2=(long long)0;
@@ -1496,7 +1501,7 @@ void readBilBandDouble(char **fname,int *dim,int *index,int *nindex,int *dtype
    {
       for (k=0;k<count;k++)
       {
-         fseek(Fin,(i*bands+index[k]-1)*samples*datasize,SEEK_SET);
+         fseeko64(Fin,(long long int)(i*bands+index[k]-1)*samples*datasize,SEEK_SET);
          if (fread(buf1,datasize,samples,Fin)) {};
          for (j=0;j<samples;j++)
          {
@@ -2855,7 +2860,7 @@ void focalMedian(double *x,double *bg,int *dim,int *S,int *F,int *E,double *cvr
       {
          //~ memset(M,0,samples*sizeof(double));
          //~ memset(n,0,samples*sizeof(float));
-         memcpy(valuein,valuein+samples,(size-1)*samples*sizeof(double));
+         memoverlap(valuein,valuein+samples,(size-1)*samples*sizeof(double));
          if (r<lines)
             memcpy(valuein+(size-1)*samples,x+adr1+r*samples,samples*sizeof(double));
          else
@@ -2972,7 +2977,7 @@ void focal4(double *x,double *bg,int *dim,int *S,int *F,double *cvr
       {
          //~ memset(M,0,samples*sizeof(double));
          //~ memset(n,0,samples*sizeof(float));
-         memcpy(valuein,valuein+samples,(size-1)*samples*sizeof(double));
+         memoverlap(valuein,valuein+samples,(size-1)*samples*sizeof(double));
          if (r<lines)
             memcpy(valuein+(size-1)*samples,x+adr1+r*samples,samples*sizeof(double));
          else

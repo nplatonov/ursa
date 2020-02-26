@@ -30,7 +30,9 @@
             ret <- do.call("panel_plot",c(arglist[indSP],arglist[other]))$col
          }
          if (length(indSF)) {
-            ret <- do.call("panel_plot",c(arglist[indSF],arglist[other]))$col
+            ret <- do.call("panel_plot",c(arglist[indSF],arglist[other]))#$col
+            if (!is_ursa(ret,"colortable"))
+               ret <- ret$col
          }
          if ((!length(indS))&&(length(other))) {
             ret <- do.call("panel_plot",c(arglist[other]))$col

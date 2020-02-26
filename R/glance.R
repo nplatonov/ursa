@@ -418,7 +418,7 @@
             res <- list(geometry=ursa_new())
       }
       if (isWeb) {
-         compose_open(res,scale=1,...)
+         compose_open(res,scale=1,retina=1,...)
       }
       else
          compose_open(res,...)

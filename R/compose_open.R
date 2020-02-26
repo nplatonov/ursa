@@ -5,6 +5,7 @@
    arglist <- list(...)
    mosaic <- .getPrm(arglist,name="",default=NA,class="")
    fileout <- .getPrm(arglist,name="fileout",default="")
+   retina <- .getPrm(arglist,name="retina",default=ifelse(nchar(fileout),1,retina))
    dpi <- .getPrm(arglist,name="dpi",default=ifelse(.isKnitr(),150L,as.integer(round(96*retina))))
    pointsize <- .getPrm(arglist,name="pointsize",default=NA_real_)
    scale <- .getPrm(arglist,name="^scale$",class="",default=NA_real_)
@@ -52,7 +53,7 @@
                 ,scale=scale,width=width,height=height
                 ,indent=indent,frame=frame,box=box,delafter=delafter,wait=wait
                 ,device=device,antialias=antialias,font=font
-                ,background=background,dev=dev,verbose=verbose)
+                ,background=background,retina=retina,dev=dev,verbose=verbose)
    if (dev) {
       options(ursaPngPlot=TRUE)
       compose_close(...)
@@ -63,10 +64,12 @@
                           ,width=NA,height=NA
                           ,indent=NA,frame=NA,box=TRUE,delafter=NA,wait=5
                           ,device=NA,antialias=NA,font=NA,background="white"
-                          ,dev=FALSE,verbose=FALSE) {
-   retina <- getOption("ursaRetina")
-   if (!is.numeric(retina))
-      retina <- 1
+                          ,retina=NA,dev=FALSE,verbose=FALSE) {
+   if (is.na(retina)) {
+      retina <- getOption("ursaRetina")
+      if (!is.numeric(retina))
+         retina <- 1
+   }
   # session_pngviewer()
    if (FALSE) {
       str(list(mosaic=if (is.list(mosaic)) sapply(mosaic,class) else class(mosaic)

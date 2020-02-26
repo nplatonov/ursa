@@ -32,6 +32,10 @@
    if (kind=="tk") {
       if (is.na(width))
          width <- 360
+      retina <- 1 # getOption("ursaRetina")
+      if (is.null(retina))
+         retina <- 1
+      width <- round(width*retina)
       title <- sprintf("%s: %.0f of %.0f",title,initial,max)
       pb <- try(tcltk::tkProgressBar(title=title,label=label,min=min,max=max
                          ,initial=initial,width=width))

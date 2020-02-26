@@ -3,7 +3,10 @@
    NULL
 }
 'compose_plot' <- function(...) {
-   if (getOption("ursaPngFigure")>=getOption("ursaPngLayout")$image)
+   fig <- getOption("ursaPngFigure")
+   if (is.null(fig))
+      return(invisible(NULL))
+   if (fig>=getOption("ursaPngLayout")$image)
       return(invisible(NULL))
    ct <- compose_panel(...)
    if (is.null(ct))

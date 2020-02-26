@@ -468,10 +468,6 @@
          g1$maxx <- max(x)+g1$resx/2
          g1$miny <- min(y)-g1$resy/2
          g1$maxy <- max(y)+g1$resy/2
-         if (T & irregular) {
-            g1$seqx <- c(x)
-            g1$seqy <- c(y)
-         }
          g1$columns <- length(x)
          g1$rows <- length(y)
          if ((length(proj4))&&(nchar(b[[proj4]]))) {
@@ -482,6 +478,10 @@
          if (TRUE)
             g1 <- with(g1,regrid(g1,setbound=c(minx,miny,maxx,maxy)
                                    ,dim=c(rows,columns)))
+         if (T & irregular) {
+            g1$seqx <- c(x)
+            g1$seqy <- c(y)
+         }
          session_grid(g1)
          con$samples <- g1$columns
          con$lines <- g1$rows

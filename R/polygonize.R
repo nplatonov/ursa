@@ -63,7 +63,6 @@
    }
    else if (is.ursa(obj)) {
       b <- as.data.frame(obj)
-      str(b)
    }
    else
       b <- obj

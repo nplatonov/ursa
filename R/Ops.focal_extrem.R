@@ -55,6 +55,8 @@
                 ,saveMargin=as.integer(saveMargin)
                 ,verbose=as.integer(verbose)
                 ,res=numeric(prod(dimy)),NAOK=FALSE)$res
+  # str(x$value,digits=7)
+  # x$value <- x$value$res
    if (verbose)
       .elapsedTime(paste0("finish:",fun))
    if (verbose>1)

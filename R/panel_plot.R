@@ -131,9 +131,11 @@
                  # str(ct)
                   val <- spatial_data(obj)[,1,drop=TRUE]
                   if (length(ct)==length(val)) {
+                    # stop("D1")
                      col <- unname(ct)
                   }
                   else {
+                    # stop("D2")
                     # str(val)
                     # print(table(val))
                      col <- colorize(val,colortable=ct)
@@ -361,8 +363,9 @@
          do.call("polygon",c(unclass(x1),arglist))
       })
    }
-   else
+   else {
       ret <- do.call("plot",c(list(obj),arglist))
+   }
    if (!is.null(opW))
       options(opW)
    ret

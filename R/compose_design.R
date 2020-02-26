@@ -384,6 +384,8 @@
    options(ursaPngSkipLegend=which(!sLegend)) ## ,ursaPngSkip=skip
    res <- list(layout=mosaic,image=m
               ,legend=ifelse(!forcedLegend,0L,sum(sLegend)))
+  # if (!is.null(names(legend)))
+  #    res$legendName=names(legend)
   # res <- list(layout=mosaic,image=vector("list",prod(image))
   #            ,legend=vector("list",length(legend)))
    class(res) <- "ursaLayout"

@@ -6,6 +6,7 @@
 \alias{[.ursaColorTable}
 \alias{names.ursaColorTable}
 \alias{names<-.ursaColorTable}
+\alias{ursa_colorindex}
 
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
@@ -24,6 +25,8 @@ ursa_colortable(x)
 
 ursa_colortable(x) <- value
 
+ursa_colorindex(ct)
+
 \method{names}{ursaColorTable}(x)
 
 \method{names}{ursaColorTable}(x) <- value
@@ -32,7 +35,10 @@ ursa_colortable(x) <- value
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{
-\code{ursaRaster} object.
+\code{ursaRaster} object. 
+}
+  \item{ct}{
+\code{ursaColorTable} object with or witout indexing.
 }
   \item{value}{
 Named character vector. In Replacement functions:
@@ -70,6 +76,8 @@ Class of \code{$colortable} element is \dQuote{ursaColorTable}. This is named ch
 \emph{Extract} function \code{names} for \code{ursaColorTable} object returns character vector (names of categories).
 
 \emph{Replace} function \code{names<-} for \code{ursaColorTable} object returns \code{ursaColorTable} with changed names of categories.
+
+\code{ursa_colorindex} returns index (if presents) for \code{ursaColorTable} object.
 
 Color tables are written to ENVI header file.
 }

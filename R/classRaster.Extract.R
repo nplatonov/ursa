@@ -138,6 +138,7 @@
                                           as.double(bands)*as.double(sizeof))))
      # intOverflow <- FALSE
    }
+   intOverflow <- FALSE
    internalReading <- intOverflow | con$connection %in% c("gzfile")
    externalReading <- !internalReading
    if ((1)&&(!missingJ)&&(is.character(j)))
@@ -323,14 +324,17 @@
       nb <- length(i)
       i <- as.integer(i)
       nline <- if (!is.na(con$indexR[1L])) length(con$indexR) else con$lines
-      minJ <- min(con$indexR)-1
+      if (is.na(con$indexR)[1])
+         minJ <- 0L
+      else
+         minJ <- min(con$indexR)-1L
       minI <- min(i)
       toWarp <- with(con,(!is.na(indexR)[1])&&(length(indexR)!=lines)||
                          (!is.na(indexC)[1])&&(length(indexC)!=samples))
       if (con$driver=="ENVI") {
          if (con$interleave=="bil")
          {
-            if ((externalReading)&&(TRUE))
+            if (externalReading)
             {
                if (con$seek)
                   seek(con,where=0L,origin="start",rw="r")
@@ -339,10 +343,11 @@
                   val <- .Cursa("readBilBandInteger",con$fname,dim=xdim,index=i
                            ,n=nb,datatype=con$datatype,swap=con$swap
                            ,res=integer(with(con,nb*samples*lines)))$res
-               else
+               else {
                   val <- .Cursa("readBilBandDouble",con$fname,dim=xdim,index=i
                            ,n=nb,datatype=con$datatype,swap=con$swap
                            ,res=double(with(con,nb*samples*lines)))$res
+               }
             }
             else
             {
@@ -351,7 +356,10 @@
                conseq <- all(diff(sort(i))==1)
                if (conseq) {
                   for (r in seq(nline)) {
+                    # print(with(con,c(minJ=minJ,rsi=bands*(r-1)+minI-1
+                    #                 ,samples=samples,sizeof=sizeof)))
                      pos <- with(con,(minJ+bands*(r-1)+minI-1)*samples*sizeof)
+                    # print(c(r=r,pos=pos,n=n))
                      if (con$seek)
                         seek(con,where=pos,origin="start",rw="r")
                      val[,r] <- with(con,.readline(handle,datatype,n,endian))

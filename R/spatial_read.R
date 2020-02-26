@@ -1,4 +1,6 @@
 'spatial_read' <- function(dsn,engine=c("native","sp","sf")) {
+   if (.lgrep("\\.(tif|tiff|tif\\.zip|img|png|bmp|dat)$",dsn))
+      return(ursa_read(dsn))
    g0 <- getOption("ursaSessionGrid")
    res <- spatialize(dsn=dsn,engine=engine,style="keep")
    if (FALSE)

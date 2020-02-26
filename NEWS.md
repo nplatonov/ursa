@@ -1,6 +1,15 @@
-2019-11-25
+2020-02-26
 
 ### version 3.8.16
+
+-   C-level: `memcpy` is replaced by `memmove` for overlapped memory
+    areas.
+
+-   C-level: `fseek` is replaced by `fseeko64` for positions in large
+    files.
+
+-   Added argument `retina` in functions for plotting. Not supported for
+    tiles.
 
 -   Package **`RColorBrewer`** is added as suggested for cases when
     `pal` attrubute in `colorize()` is equal to any palette name or
@@ -11,6 +20,8 @@
 
 -   The environental variable `PROJ_PATH` is temporal specified for GDAL
     utils for their execution, if GDAL is found (optional).
+
+-   Coastline is updated to version 2020-01-09T05:30
 
 ### version 3.8.15
 

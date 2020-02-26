@@ -14,8 +14,8 @@ regrid(x, ...)
 ## non-public
 .regrid(grid = NULL, mul = NA, res = NA, resx = NA, resy = NA, setbound = NA,
         columns = NA, rows = NA, dim = NA, bbox = NA, expand = NA,
-        minx = NA, miny = NA, maxx = NA, maxy = NA, cut = NA, proj4 = NA, border = 0,
-        zero = c("keep", "node", "center"), raster = FALSE, tolerance = NA,
+        minx = NA, miny = NA, maxx = NA, maxy = NA, cut = NA, proj4 = NA, crs = NA,
+        border = 0, zero = c("keep", "node", "center"), raster = FALSE, tolerance = NA,
         verbose = FALSE, ...)
 
 }
@@ -87,6 +87,9 @@ Positive \code{integer} of length 2. Dimenstion of raste image in the notation \
 }
   \item{proj4}{
 \code{character} of length 1. New projection string in the PROJ.4 notation
+}
+  \item{crs}{
+\code{character} of length 1. The synonym to \code{proj4}.
 }
   \item{expand}{
 \code{numeric} of length 1. Multiplier of boundary box.

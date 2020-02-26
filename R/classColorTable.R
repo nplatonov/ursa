@@ -109,3 +109,8 @@
    class(x) <- cl
    x
 }
+'ursa_colorindex' <- function(ct) {
+   if ((is.list(ct))&&(!is.null(ct$index))&&(inherits(ct$colortable,"ursaColorTable")))
+      return(ct$index)
+   NULL
+}

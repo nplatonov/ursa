@@ -45,6 +45,7 @@ compose_open(...)
          \item{\code{antialias}}{Characted keyword, either \code{"none"} or \code{"default"}. Defines the effect on fonts. The same as \code{antialias} argument in the \code{\link[grDevices]{png}} function. Default is \code{"default"}.}
          \item{\code{font} or \code{family}}{A length-one character vector. Specifies the font family. The same as \code{family} argument in the \code{\link[grDevices]{png}} function. Default is \code{"sans"} for \code{device="windows"} and \code{"Tahoma"} for \code{device="cairo"}.}
          \item{\code{bg} or \code{background}}{Character. The background color in PNG file. Passed as argument \code{bg} to \code{\link[grDevices]{png}} function. Default is \code{"white"}}
+         \item{\code{retina}}{Positive numeric. Scale coefficent for retina displays. Default is taken from \code{getOption("ursaRetina")}; if it missed, then \code{1}.}
          \item{\code{dev}}{Logical. If \code{TRUE} then this \strong{dev}eloper tool shows created layout without any the followed plot functions from this package are ignored. Default is \code{FALSE}}
          \item{\code{verbose}}{Logical. Shows additional output information in console. Default is \code{FALSE}.}
          \item{\code{...}}{Arguments, which can be passed to \code{\link[ursa]{compose_design}} function.}
@@ -67,6 +68,9 @@ The Cairo device (\code{device="cairo"}) is more quick on MS Windows computers. 
 The PNG layout reserves extra margins for captions of color bars. These margins are filled by white spaces. The cropping of layout applies to created PNG file using read-write functions of package \pkg{png}. Only white (\code{"white"}, \code{"#FFFFFF"}) or transparent (\code{"transparent"}) colors are regognized as white spaces. Therefore, specification of \code{bg!="white"} or \code{bg!="transparent"} breaks PNG image cropping.
 
 It is noted that Cyrillics is supported on Windows GDI (\code{device="windows"}) and is not supported on Cairo (\code{device="cairo"}) types of PNG device on MS Windows platform.
+
+Argument \code{retina} is ignored for leaflet-compatible tiling.
+
 %%  ~~ If necessary, more details than the description above ~~
 }
 \value{

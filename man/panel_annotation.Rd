@@ -16,7 +16,7 @@ panel_annotation(...)
                   lon = NA, lat = NA, x = NA, y = NA, cex = 1.0, adjust = 0.5,
                   fg = "#000000", bg = "#FFFFFF1F", buffer = 1, fill = "#FFFFFF7F",
                   font = par("family"), vertical = FALSE, alpha = 1,
-                  interpolate = FALSE, verbose = FALSE, ...)
+                  interpolate = FALSE, resample = FALSE, verbose = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -59,7 +59,7 @@ panel_annotation(...)
    \item{font}{Character. Font family. Default is \code{par("family")}.}
    \item{vertical}{Logical. Vertical orientation of label. If \code{FALSE}, then horizontal labeling. Default is \code{FALSE}.}
    \item{interpolate}{Logical. Passed as argument \code{interpolate} to function \code{\link[graphics:rasterImage]{rasterImage}} for logo annotation.}
-   \item{resample}{Logical or numeric. Passed as argument \code{resample} to function \code{\link[regrid]{regrid}} for logo annotation. Default is \code{FALSE}. If \code{TRUE} , then resized logo is drawn smoothly.}
+   \item{resample}{Logical or numeric. Passed as argument \code{resample} to function \code{\link[ursa]{regrid}} for logo annotation. Default is \code{FALSE}. If \code{TRUE} , then resized logo is drawn smoothly.}
    \item{alpha}{Numeric or character. Level of transparency for logos. If numeric, the either \verb{0 <= alpha <= 1} or \code{0 <= alpha <= 255}. If character, then one byte of hexadecimal value \verb{"00" <= alpha <= "FF"}. Default is \code{1}.}
    \item{verbose}{Logical. Value \code{TRUE} may provide some additional information on console. Default is \code{FALSE}.}
 }
