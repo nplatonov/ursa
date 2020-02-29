@@ -74,7 +74,7 @@
       toRemove <- FALSE
       for (ext in c("envi","envigz","bin","","bingz","img","dat","gz","bz2","xz"))
       {
-         b <- sprintf("%s.%s",a,ext)
+         b <- gsub("\\.$","",sprintf("%s.%s",a,ext))
          if (verbose)
             print(data.frame(file=b,exists=file.exists(b)))
          if (!file.exists(b))

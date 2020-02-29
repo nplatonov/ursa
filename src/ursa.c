@@ -4,6 +4,11 @@
 
 #define memoverlap1 memcpy
 #define memoverlap memmove
+#ifdef _WIN32
+   #define fileseek fseeko64
+#else
+   #define fileseek fseeko
+#endif
 
 int progressBar(int cur,int max,char *text)
 {
@@ -716,7 +721,7 @@ void readBsqLineInteger(char **fname,int *dim,int *index,int *nindex,int *dtype
    int n=count*samples;
    for (i=0;i<bands;i++)
    {
-      fseeko64(Fin,(long long int)(i*lines+index[0]-1)*samples*datasize,SEEK_SET);
+      fileseek(Fin,(long long int)(i*lines+index[0]-1)*samples*datasize,SEEK_SET);
       if (fread(buf1,datasize,n,Fin)) {};
       for (j=0;j<samples*count;j++)
       {
@@ -803,7 +808,10 @@ void readBsqLineDouble(char **fname,int *dim,int *index,int *nindex,int *dtype
    int n=count*samples;
    for (i=0;i<bands;i++)
    {
-      fseeko64(Fin,(long long int)(i*lines+index[0]-1)*samples*datasize,SEEK_SET);
+      Rprintf("ind=%lld\n",(long long int)(i*lines+index[0]-1)*samples*datasize);
+     // fileseek(Fin,(long long int)(i*lines+index[0]-1)*samples*datasize,SEEK_SET);
+     // fileseek(Fin,(i*lines+index[0]-1)*samples*datasize,SEEK_SET);
+      Rprintf("seek=%d\n",fileseek(Fin,(long long int)(i*lines+index[0]-1)*samples*datasize,SEEK_SET));
       if (fread(buf1,datasize,n,Fin)) {};
       for (j=0;j<samples*count;j++)
       {
@@ -882,7 +890,7 @@ void readBsqBandInteger(char **fname,int *dim,int *index,int *nindex,int *dtype
    for (i=0;i<count;i++)
    {
      // printf(" %d",index[i]);
-      fseeko64(Fin,(long long int)(index[i]-1)*lines*samples*datasize,SEEK_SET);
+      fileseek(Fin,(long long int)(index[i]-1)*lines*samples*datasize,SEEK_SET);
       if (fread(buf1,datasize,n,Fin)) {};
       for (j=0;j<samples*lines;j++)
       {
@@ -971,7 +979,7 @@ void readBsqBandDouble(char **fname,int *dim,int *index,int *nindex,int *dtype
    for (i=0;i<count;i++)
    {
      // Rprintf(" %d",index[i]);
-      fseeko64(Fin,(long long int)(index[i]-1)*lines*samples*datasize,SEEK_SET);
+      fileseek(Fin,(long long int)(index[i]-1)*lines*samples*datasize,SEEK_SET);
       if (fread(buf1,datasize,n,Fin)) {};
       for (j=0;j<samples*lines;j++)
       {
@@ -1050,7 +1058,7 @@ void readBilLineInteger(char **fname,int *dim,int *index,int *nindex,int *dtype
    for (i=0;i<count;i++)
    {
      // printf("seek=%d(%d)\n",(index[i]-1)*bands*samples*datasize,index[i]);
-      fseeko64(Fin,(long long int)(index[i]-1)*bands*samples*datasize,SEEK_SET);
+      fileseek(Fin,(long long int)(index[i]-1)*bands*samples*datasize,SEEK_SET);
       if (fread(buf1,datasize,n,Fin)) {};
       for (j=0;j<samples*bands;j++)
       {
@@ -1140,7 +1148,7 @@ void readBilLineInteger2(char **fname,int *dim,int *index,int *nindex,int *dtype
    for (l=0;l<count;l++)
    {
      // printf("seek=%d(%d)\n",(index[i]-1)*bands*samples*datasize,index[i]);
-      fseeko64(Fin,(long long int)(index[l]-1)*bands*samples*datasize,SEEK_SET);
+      fileseek(Fin,(long long int)(index[l]-1)*bands*samples*datasize,SEEK_SET);
       if (fread(buf1,datasize,bs,Fin)) {};
       for (b=0;b<bands;b++)
       {
@@ -1231,7 +1239,7 @@ void readBilLineDouble(char **fname,int *dim,int *index,int *nindex,int *dtype
    int n=bands*samples;
    for (i=0;i<count;i++)
    {
-      fseeko64(Fin,(long long int)(index[i]-1)*bands*samples*datasize,SEEK_SET);
+      fileseek(Fin,(long long int)(index[i]-1)*bands*samples*datasize,SEEK_SET);
       if (fread(buf1,datasize,n,Fin)) {};
       for (j=0;j<samples*bands;j++)
       {
@@ -1305,7 +1313,7 @@ void readBilLineDouble2(char **fname,int *dim,int *index,int *nindex,int *dtype
    int bs=bands*samples;
    for (l=0;l<count;l++)
    {
-      fseeko64(Fin,(long long int)(index[l]-1)*bands*samples*datasize,SEEK_SET);
+      fileseek(Fin,(long long int)(index[l]-1)*bands*samples*datasize,SEEK_SET);
       if (fread(buf1,datasize,bs,Fin)) {};
       for (b=0;b<bands;b++)
       {
@@ -1394,7 +1402,7 @@ void readBilBandInteger(char **fname,int *dim,int *index,int *nindex,int *dtype
         // Rprintf("fseek=%d\n",(i*bands+index[k]-1)*samples*datasize-MAX_INT);
          ret=fseek(Fin,(i*bands+index[k]-1)*samples*datasize,SEEK_SET);
          if (ret)
-            ret=fseeko64(Fin,(long long int)(i*bands+index[k]-1)*samples*datasize,SEEK_SET);
+            ret=fileseek(Fin,(long long int)(i*bands+index[k]-1)*samples*datasize,SEEK_SET);
          if (ret) {
             o1=(long long)(i*bands+index[k]-1)*samples*datasize;
             o2=(long long)0;
@@ -1501,7 +1509,7 @@ void readBilBandDouble(char **fname,int *dim,int *index,int *nindex,int *dtype
    {
       for (k=0;k<count;k++)
       {
-         fseeko64(Fin,(long long int)(i*bands+index[k]-1)*samples*datasize,SEEK_SET);
+         fileseek(Fin,(long long int)(i*bands+index[k]-1)*samples*datasize,SEEK_SET);
          if (fread(buf1,datasize,samples,Fin)) {};
          for (j=0;j<samples;j++)
          {

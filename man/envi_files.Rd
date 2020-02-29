@@ -1,4 +1,4 @@
-\name{envi.files}
+\name{envi_files}
 \alias{envi_exists}
 \alias{envi_list}
 \alias{envi_copy}
@@ -89,6 +89,7 @@ Functions do not view content of any files. The major identifier of ENVI files i
 %%~ }
 \examples{
 session_grid(NULL)
+wd <- setwd(tempdir())
 a1 <- create_envi("tmp1.envi")
 a2 <- create_envi("tmp2.")
 close(a1,a2)
@@ -102,6 +103,7 @@ envi_exists("nofilewithsuchname")
 envi_exists("tmp[34]")
 envi_remove(".+")
 envi_list()
+setwd(wd)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

@@ -1,12 +1,12 @@
-2020-02-26
+2020-02-27
 
 ### version 3.8.16
 
 -   C-level: `memcpy` is replaced by `memmove` for overlapped memory
     areas.
 
--   C-level: `fseek` is replaced by `fseeko64` for positions in large
-    files.
+-   C-level: `fseek` is replaced by `fseeko/fseeko64` for positions in
+    large files.
 
 -   Added argument `retina` in functions for plotting. Not supported for
     tiles.

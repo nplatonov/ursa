@@ -57,7 +57,7 @@ Columns extraction from returned data frame is in the group of \code{\link[ursa:
 \examples{
 session_grid(NULL)
 s <- substr(as.character(sessionInfo()),1,48)
-a <- reclass(ursa_dummy(bandname=s),ramp=FALSE)
+a <- reclass(ursa_dummy(mul=1/2,bandname=s),ramp=FALSE)
 band_stat(a,grid=TRUE)
 b2 <- band_stat(a)
 b3 <- band_stat(a,raw=TRUE)

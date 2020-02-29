@@ -102,23 +102,3 @@
       close(pb)
    res
 }
-if (FALSE) {
-   if (FALSE) {
-      elapsedTime("start")
-      mysystem("plfilt4 in=tmp1 out=tmp4 size=35 bg=7 cover=0.5",verbose=TRUE)
-      mysystem("cmd /c idr2hdr.R tmp4",verbose=TRUE)
-      elapsedTime("idrisi")
-   }
-   if (FALSE) {
-      a <- read_envi("tmp1")
-      b <- focal_mean(a,size=35,cover=0.5,saveMargin=FALSE,verbose=0)
-      write_envi(b,"tmp2.bin")
-      elapsedTime("memory")
-   }
-   if (!FALSE) {
-      a <- open_envi("tmp1")
-      b <- focal_mean.big(a,"tmp3.bin",size=35,cover=0.5,interleave="bil")
-      close(a,b)
-      elapsedTime("disk")
-   }
-}
