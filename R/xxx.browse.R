@@ -150,7 +150,7 @@
             if (is.character(height))
                iframe <- paste0(iframe,",height=",dQuote(height))
             if (is.numeric(height))
-               iframe <- paste0(iframe,",height=",dQuote(height,c("","px")[1]))
+               iframe <- paste0(iframe,",height=",dQuote(height)) ## dQuote(height,c("","px")[1])
          }
          iframe <- paste0(iframe,")")
          cmd <- c(paste0("```{r",reflab[k]
