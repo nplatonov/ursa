@@ -1,4 +1,10 @@
-2020-02-27
+2020-03-06
+
+### version 3.8.17
+
+-   Fixed for suggested package **`proj4`** (&gt;=1.0.10).
+
+-   Tested on R-devel-r77878 and Rtools 4.0 (2020-02-05); no errors.
 
 ### version 3.8.16
 

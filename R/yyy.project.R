@@ -27,13 +27,27 @@
   # if ((!FALSE)&&(!("package:rgdal" %in% search()))&&
    if ((!FALSE)&&(!("rgdal" %in% loadedNamespaces()))&&
        (requireNamespace("proj4",quietly=.isPackageInUse()))) {
+      if (F) {
+         dimx <- dim(xy)
+         if ((dimx==2)&&(dimx[1]==2)) {
+            str(dimx)
+         }
+      }
       a <- .try({
+        # str(xy)
+        # str(list(xy[,1],xy[,2]))
         ## suppressMessages(require(proj4)) ## uncomment?
-         res <- proj4::project(xy=t(xy),proj=proj,inverse=inv)
+         if (packageVersion("proj4")>="1.0.10")
+            res <- proj4::project(xy=xy,proj=proj,inverse=inv)
+         else
+            res <- proj4::project(xy=t(xy),proj=proj,inverse=inv)
+        # res <- proj4::project(xy=list(xy[,1],xy[,2]),proj=proj,inverse=inv)
       },silent=TRUE)
       if ((!FALSE)&&(!a)&&(nrow(xy)==2)) {
-         if (verbose)
+         if (verbose) {
             cat(geterrmessage())
+            message("         trying to not transpose matrix")
+         }
          a <- .try({
            ## suppressMessages(require(proj4)) ## uncomment?
             res <- proj4::project(xy=xy,proj=proj,inverse=inv)

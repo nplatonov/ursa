@@ -26,7 +26,7 @@
   # defcol <- ifelse(bg2<128,"#FFFFFF4F","#0000002F") # grey70
    bg1 <- sum(c(col2rgb(getOption("ursaPngBackground")))*c(0.30,0.59,0.11))
    bg2 <- getOption("ursaPngPanel")
-   bg2 <- if (!nchar(bg2)) bg1 else sum(c(col2rgb(bg2))*c(0.30,0.59,0.11))
+   bg2 <- if ((is.null(bg2))||(!nchar(bg2))) bg1 else sum(c(col2rgb(bg2))*c(0.30,0.59,0.11))
    col <- .getPrm(arglist,name="col",kwd=kwd,default="defcol")
    border <- .getPrm(arglist,name="border",kwd=kwd,default=col)
    if (col=="defcol")
