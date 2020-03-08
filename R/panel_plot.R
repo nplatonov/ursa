@@ -173,6 +173,8 @@
          else
             arglist2$col <- ifelse(is_spatial_lines(obj),"black","transparent")
          if (.lgrep("point",geoType)) {
+            if (!.isPackageInUse())
+               message("check 'https://github.com/exaexa/scattermore' for improve")
             if (!.lgrep("pch",names(arglist2))) {
                arglist2$pch <- 21
             }
