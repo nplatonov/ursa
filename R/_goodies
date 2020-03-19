@@ -2,3 +2,6 @@
 http://www.aboutgis.com/gis-and-remote-sensing-journal-list-with-impact-factors/
 
 ?utils::capture.output
+
+download stats
+http://cran-logs.rstudio.com/2020/2020-03-08-r.csv.gz

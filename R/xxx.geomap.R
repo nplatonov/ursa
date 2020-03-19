@@ -390,7 +390,7 @@
          for (j in seq_along(dx)) {
             tX <- NULL
             xr <- seq(sx[j]+1e-6,sx[j+1]-1e-6,len=dr)
-            gr <- .project(expand.grid(x=xr,y=yr),g0$proj4,inv=TRUE)
+            gr <- .project(as.matrix(expand.grid(x=xr,y=yr)),g0$proj4,inv=TRUE)
             gr[,1] <- gr[,1]-lon_0
            # print(unique(gr[,1]))
            # print(unique(gr[,2]))

@@ -11,7 +11,7 @@ importFrom("stats", "aggregate", "density", "loess", "median", "pf",
            "predict", "runif", "sd", "var", "na.omit")
 importFrom("utils", "str", "download.file", "head", "tail", "methods",
            "object.size", "unzip", "URLencode", "localeToCharset",
-           "read.table", "write.table", "browseURL","packageVersion")
+           "read.table", "write.table", "browseURL")
 
 export(".onAttach")
 export(".onDetach")

@@ -62,7 +62,7 @@
    class(object) <- paste0(".",class(object))
    NextMethod("str",object,...)
 }
-'print.ursaRaster' <- function(x,digits=NA,grid=FALSE,raw=FALSE,...)
+'print.ursaRaster' <- function(x,digits=NA,grid=FALSE,raw=FALSE,caption=FALSE,...)
 {
    ellipsis <- c(">","\u2026")[2]
    e <- band_stat(x,grid=grid,raw=raw)
@@ -70,6 +70,15 @@
       return(format(e,digits=digits,...))
    if ((is.null(e))||(!nrow(e)))
       return(e)
+   if (isTRUE(caption)) {
+      caption <- as.character(as.expression(as.list(match.call())[["x"]]))
+   }
+   else if (!(is.character(caption))||(!nchar(caption)))
+      caption <- ""
+   else
+      caption <- ""
+   if (nchar(caption))
+      cat(paste0(caption,":\n"))
    if (is.na(digits)) {
       ln <- e$name
       lmax <- max(nchar(ln))

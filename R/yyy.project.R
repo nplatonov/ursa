@@ -37,7 +37,7 @@
         # str(xy)
         # str(list(xy[,1],xy[,2]))
         ## suppressMessages(require(proj4)) ## uncomment?
-         if (packageVersion("proj4")>="1.0.10")
+         if (utils::packageVersion("proj4")>="1.0.10")
             res <- proj4::project(xy=xy,proj=proj,inverse=inv)
          else
             res <- proj4::project(xy=t(xy),proj=proj,inverse=inv)

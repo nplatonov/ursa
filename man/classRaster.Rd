@@ -13,7 +13,7 @@
 \cr\code{is.ursa} checks inhering to class \code{ursaRaster}
 }
 \usage{
-\method{print}{ursaRaster}(x, digits = NA, grid = FALSE, raw = FALSE, ...)
+\method{print}{ursaRaster}(x, digits = NA, grid = FALSE, raw = FALSE, caption = FALSE, ...)
 
 \method{str}{ursaRaster}(object,...)
 
@@ -38,6 +38,9 @@ Logical. If \code{grid=TRUE} then returns simplified metadata.
 }
   \item{raw}{
 Logical. If \code{FALSE} and values are categories, then attempting to restore numeric values from categorical names is before calculating of statistics. If \code{TRUE} then values for statistics are used as is. Default is \code{FALSE}.
+}
+  \item{caption}{
+Logical of character. Print title or other identificational info. If logical and \code{TRUE} then print variable name or character representation of expression. If non-zero length character, then print this value. If \code{FALSE} (\emph{default}) or zero-length character, then no header for printing.
 }
   \item{\dots}{
 Passed to \code{\link[base]{format}} function

@@ -1,7 +1,11 @@
 'compose_open' <- function(...) {
-   retina <- getOption("ursaRetina")
-   if (!is.numeric(retina))
+   if (F & .isKnitr())
       retina <- 1
+   else {
+      retina <- getOption("ursaRetina")
+      if (!is.numeric(retina))
+         retina <- 1
+   }
    arglist <- list(...)
    mosaic <- .getPrm(arglist,name="",default=NA,class="")
    fileout <- .getPrm(arglist,name="fileout",default="")
