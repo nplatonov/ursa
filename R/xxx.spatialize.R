@@ -564,7 +564,8 @@
             ##~ obj <- rgdal::readOGR(dsn,layer,pointDropZ=TRUE,encoding=enc
                                  ##~ ,use_iconv=!is.null(enc),verbose=FALSE)
             obj <- rgdal::readOGR(dsn,layer,pointDropZ=TRUE,encoding=cpg
-                                 ,use_iconv=TRUE,verbose=FALSE)
+                                 ,use_iconv=cpg %in% "UTF-8"
+                                 ,verbose=FALSE)
                                  ## --20191112 use_iconv=!isSHP
             if ((length(names(obj))==1)&&(names(obj)=="FID")) {
                info <- rgdal::ogrInfo(dsn,layer)

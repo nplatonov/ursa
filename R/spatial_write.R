@@ -330,14 +330,22 @@
               ,quote=FALSE)
          print(c(delete_layer=file.exists(fname) & !appendlayer
                 ,delete_dsn=file.exists(fname) & !appendlayer
-                ,update=appendlayer))
+                ,append=appendlayer))
       }
-      sf::st_write(obj,dsn=fname,layer=lname,driver=driver
-                  ,dataset_options=dopt,layer_options=lopt
-                  ,delete_layer=file.exists(fname) & !appendlayer
-                  ,delete_dsn=file.exists(fname) & !appendlayer
-                  ,update=appendlayer
-                  ,quiet=!verbose)
+      if (utils::packageVersion("sf")>="0.9-0")
+         sf::st_write(obj,dsn=fname,layer=lname,driver=driver
+                     ,dataset_options=dopt,layer_options=lopt
+                     ,delete_layer=file.exists(fname) & !appendlayer
+                     ,delete_dsn=file.exists(fname) & !appendlayer
+                     ,append=appendlayer
+                     ,quiet=!verbose)
+      else
+         sf::st_write(obj,dsn=fname,layer=lname,driver=driver
+                     ,dataset_options=dopt,layer_options=lopt
+                     ,delete_layer=file.exists(fname) & !appendlayer
+                     ,delete_dsn=file.exists(fname) & !appendlayer
+                     ,update=appendlayer ## -> 'append' in v0.9-0 (deprecation error)
+                     ,quiet=!verbose)
       if ((FALSE)&&(driver %in% "ESRI Shapefile")) { ## replace "OGC ESRI" by "OGC WKT" 
          prjname <- gsub("\\.shp$",".prj",fname)
          wkt1 <- readLines(prjname,warn=FALSE)

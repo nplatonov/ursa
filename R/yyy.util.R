@@ -428,7 +428,7 @@
    !is.null(dim(obj$value))
 }
 '.normalizePath' <- function(path) normalizePath(path,winslash="/",mustWork=FALSE)
-'.isKnitr' <- function() {
+'.isKnitr' <- '.isKnit' <- function() {
   # cond1 <- requireNamespace("knitr",quietly=.isPackageInUse())
   # if (!cond1)
   #    return(FALSE)

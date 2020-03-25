@@ -50,7 +50,7 @@
          ret <- c(head(x,n),tail(x,n))
          if (length(ret)>length(x))
             return(x)
-         if (grep("names",names(objAttr))) {
+         if (length(grep("names",names(objAttr)))) {
             objAttr$names <-  c(head(objAttr$names,n),tail(objAttr$names,n))
          }
          attributes(ret) <- objAttr
