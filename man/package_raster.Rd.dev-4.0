@@ -63,8 +63,9 @@ Package \pkg{raster} is marked as "Suggested".
 %%~ }
 \examples{
 session_grid(NULL)
+isDev <- length(grep("unstable",R.Version()$status))>0 & R.Version()$'svn rev'>"77878"
 if (requireNamespace("raster")) {
-   session_grid(regrid(mul=1/4))
+   require(methods) ## need to 'raster::plot'
    msk <- ursa_dummy(1,min=0,max=100)>40
    a1 <- ursa_dummy(1,min=200,max=500)[msk]
    a2 <- colorize(a1,ramp=FALSE)
@@ -75,36 +76,48 @@ if (requireNamespace("raster")) {
       r1 <- as.Raster(a1)
       message(as.character(class(r1)))
       print(r1)
-      print(raster::spplot(r1))
+      if (isDev)
+         try(raster::plot(r1))
+      else
+         raster::plot(r1)
       b1 <- as.ursa(r1)
       print(c(exported=a1,imported=b1,failed=b1-a1))
       print(c(theSameValue=identical(ursa_value(a1),ursa_value(b1))
-             ,rheSameGrid=identical(ursa_grid(a1),ursa_grid(b1))))
+             ,theSameGrid=identical(ursa_grid(a1),ursa_grid(b1))))
    }
    if (isLayerColortable <- TRUE) {
       r2 <- as.Raster(a2)
       message(as.character(class(r2)))
       print(r2)
-      print(raster::spplot(r2))
+      if (isDev)
+         try(raster::plot(r2))
+      else
+         raster::plot(r2)
       b2 <- as.ursa(r2)
       print(c(theSameValue=identical(ursa_value(a2),ursa_value(b2))
-             ,rheSameGrid=identical(ursa_grid(a2),ursa_grid(b2))))
+             ,theSameGrid=identical(ursa_grid(a2),ursa_grid(b2))))
    }
    if (isBrickOrRGB <- TRUE) {
       r3 <- as.Raster(a3)
       message(as.character(class(r3)))
       print(r3)
-      print(raster::spplot(r3))
+      if (isDev)
+         try(raster::plot(r3))
+      else
+         raster::plot(r3)
       raster::plotRGB(r3)
       b3 <- as.ursa(r3)
       print(c(theSameValue=identical(ursa_value(a3),ursa_value(b3))
-             ,rheSameGrid=identical(ursa_grid(a3),ursa_grid(b3))))
+             ,theSameGrid=identical(ursa_grid(a3),ursa_grid(b3))))
    }
    if (isStack <- TRUE) {
       r4 <- as.Raster(a4)
       message(as.character(class(r4)))
       print(r4)
-      print(raster::spplot(r4))
+      if (isDev)
+         try(raster::plot(r4))
+      else
+         raster::plot(r4)
       b4 <- as.ursa(r4)
       print(c(theSameValue=identical(ursa_value(a4),ursa_value(b4))
              ,theSameGrid=identical(ursa_grid(a4),ursa_grid(b4))))

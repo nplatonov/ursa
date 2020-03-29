@@ -82,7 +82,7 @@ for (i in seq(6)) {
       panel_raster(p[i])
    else
       panel_raster(a,interpolate=i==5)
-   panel_decor(col="black")
+   panel_decor(col="black",coast=FALSE)
    panel_annotation(c("red","green","blue"
                     ,"interpolate=FALSE","interpolate=TRUE"))
 }

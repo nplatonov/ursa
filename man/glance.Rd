@@ -158,12 +158,12 @@ session_grid(NULL)
 f <- system.file("vectors","scot_BNG.shp",package="rgdal")
 glance(f,style="merc",field="(NAME|COUNT)")
 cmd <- paste("Rscript --vanilla -e ursa::glance()",paste0("\"",f,"\"")
-            ,"proj=\"merc\"","field=\"(lon|lat)\"")
+            ,"style=\"merc\"","field=\"(lon|lat)\"")
 cat(" --------- Try in command line: -----------\n")
 message(cmd)
 cat(" ----------- end of quoting ---------------\n")
 \donttest{ ## windows: figure will be opened using *.png file association 
-system(cmd)
+try(system(cmd,wait=FALSE))
 }
 
 require(sp)

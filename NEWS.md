@@ -1,9 +1,15 @@
-2020-03-25
+2020-03-29
+
+### version 3.8.19
+
+-   Minor adjustments for timing of examples.
 
 ### version 3.8.18
 
 -   `spatial_write()`: fixed deprecated (**`sf`** &gt;= 0.9-0) argument
-    `update`-&gt;`append` in suggested `sf::sf_write`.
+    `update`-&gt;`append` in suggested `sf::sf_write()`.
+
+-   Re-check “don’t test” examples.
 
 ### version 3.8.17
 

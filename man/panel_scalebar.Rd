@@ -99,7 +99,7 @@ session_grid(NULL)
 # example no.3 -- for paper copy
    a <- colorize(pixelsize(),breakvalue=seq(400,650,by=50),palname="Greys",inv=FALSE)
    compose_open(scale="1:95000000",dpi=150,device="cairo",family="Times")
-   compose_plot(a,gridline=FALSE,scalebar=TRUE,scalebar.x=1,units="km^2")
+   compose_plot(a,gridline=FALSE,scalebar=TRUE,scalebar.x=1,units=expression(km^2))
    compose_close(bpp=8)
 
 # example no.4 -- length distortion in the Transverse Mercator projection
@@ -108,16 +108,18 @@ if (requireNamespace("ggmap")) {
   # m2 <- ggmap::get_openstreetmap(bbox=c(left=42,bottom=70,right=70,top=82)
   #                               ,format="png",messaging=TRUE
   #                               ,scale=34942642,filename="ggmapTempMy")
-   m2 <- ggmap::get_googlemap(center=c(lon=56,lat=77.5),zoom=4,scale=1
-                             ,size=c(320,640),format="png8",messaging=TRUE)
-   res <- as.ursa(m2)
-   compose_open(res,legend=NULL,scale=1,pointsize=12)
-   panel_new()
-   panel_raster(res)
-   panel_graticule(decor=TRUE)
-   for (p in c("bottom","center","top"))
-      panel_scalebar(pos=p,w=100)
-   compose_close()
+   m2 <- try(ggmap::get_googlemap(center=c(lon=56,lat=77.5),zoom=4,scale=1
+                                 ,size=c(320,640),format="png8",messaging=TRUE))
+   if (!inherits(m2,"try-error")) {
+      res <- as.ursa(m2)
+      compose_open(res,legend=NULL,scale=1,pointsize=12)
+      panel_new()
+      panel_raster(res)
+      panel_graticule(decor=TRUE)
+      for (p in c("bottom","center","top"))
+         panel_scalebar(pos=p,w=100)
+      compose_close()
+   }
 }}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

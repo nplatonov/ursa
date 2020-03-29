@@ -332,13 +332,15 @@
                 ,delete_dsn=file.exists(fname) & !appendlayer
                 ,append=appendlayer))
       }
-      if (utils::packageVersion("sf")>="0.9-0")
+      if (utils::packageVersion("sf")>="0.9-0") {
+         print(appendlayer)
          sf::st_write(obj,dsn=fname,layer=lname,driver=driver
                      ,dataset_options=dopt,layer_options=lopt
                      ,delete_layer=file.exists(fname) & !appendlayer
                      ,delete_dsn=file.exists(fname) & !appendlayer
-                     ,append=appendlayer
+                     ,append=!file.exists(fname) | appendlayer ## append=T means replace=F
                      ,quiet=!verbose)
+      }
       else
          sf::st_write(obj,dsn=fname,layer=lname,driver=driver
                      ,dataset_options=dopt,layer_options=lopt
