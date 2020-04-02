@@ -439,6 +439,12 @@
    "jupyter:irkernel" %in% search()
   # "IRkernel" %in% loadedNamespaces()
 }
+'.isReveal' <- function() {
+   res <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+   if (!is.character(res))
+      return(FALSE)
+   res=="revealjs"
+}
 '.isShiny' <- function() {
    (("shiny" %in% loadedNamespaces())&&(length(shiny::shinyOptions())>0))
 }

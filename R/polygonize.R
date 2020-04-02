@@ -188,18 +188,19 @@
    }
    internal <- missing(fname)
    if (internal) {
-      bname <- tempfile()
+      bname <- .maketmp() # tempfile()
       fname <- paste0(bname,".shp")
    }
    Fout <- .maketmp()
    write_envi(obj,paste0(Fout,"."))
    cmd <- paste("python",Sys.which("gdal_polygonize.py")
-               ,opt," -f \"ESRI Shapefile\"",Fout,".",fname)
+               ,opt," -f \"ESRI Shapefile\"",Fout,fname)
    system(cmd)
    envi_remove(Fout)
    if (!internal)
       return(0L)
    ret <- spatialize(fname,engine=engine)
-   file.remove(dir(path=dirname(bname),pattern=paste0("^",basename(bname)),full.names=TRUE))
+   list1 <- dir(path=dirname(bname),pattern=paste0("^",basename(bname)),full.names=TRUE)
+   file.remove(list1)
    ret
 }

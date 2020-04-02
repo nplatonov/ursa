@@ -333,7 +333,6 @@
                 ,append=appendlayer))
       }
       if (utils::packageVersion("sf")>="0.9-0") {
-         print(appendlayer)
          sf::st_write(obj,dsn=fname,layer=lname,driver=driver
                      ,dataset_options=dopt,layer_options=lopt
                      ,delete_layer=file.exists(fname) & !appendlayer
