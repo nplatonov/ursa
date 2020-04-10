@@ -305,7 +305,7 @@
    }
    b1
 }
-'.is.eq' <- function(x,value) {
+'.is.eq' <- function(x,value) { ## isTRUE(all.equal(a,b)) https://stackoverflow.com/questions/9508518/why-are-these-numbers-not-equal
    if (isAll <- missing(value)) {
       value <- mean(x,na.omit=TRUE)
    }
@@ -323,7 +323,7 @@
 '.is.le' <- function(x,value) x<value | .is.eq(x,value)
 '.is.gt' <- function(x,value) x>value
 '.is.lt' <- function(x,value) x<value
-'.is.near' <- function(x1,x2,verbose=FALSE) {
+'.is.near' <- function(x1,x2,verbose=FALSE) { 
   # https://stackoverflow.com/questions/9508518/why-are-these-numbers-not-equal
    m1 <- match(x1,x2)
    if (all(!is.na(m1))) { ## 20161222 add 'all', removed 'any'

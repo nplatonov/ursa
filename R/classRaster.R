@@ -101,7 +101,12 @@
                   substr(l[ind],b,b) <- ellipsis
                }
                f$name <- format(l)
-               return(print(f,quote=FALSE))
+               return({
+                  if ((FALSE)||(.isKnitr()))
+                     print(knitr::kable(f,format="pandoc"))
+                  else
+                     print(f,quote=FALSE)
+               })
             }
          }
          for (d in 3:mn) {
@@ -123,5 +128,8 @@
       }
       digits <- 3
    }
-   print(format(e,digits=digits,...),quote=FALSE)
+   if (.isKnitr())
+      knitr::kable(format(e,digits=digits,...))
+   else
+      print(format(e,digits=digits,...),quote=FALSE)
 }

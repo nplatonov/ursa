@@ -1,4 +1,8 @@
-2020-03-29
+2020-04-09
+
+### version 3.8.20
+
+-   Zero tail of GTiff palettes are cropped for plotting.
 
 ### version 3.8.19
 

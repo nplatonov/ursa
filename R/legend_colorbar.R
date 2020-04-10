@@ -99,6 +99,21 @@
    if (is.na(useRaster))
       useRaster <- getOption("ursaPngDevice")!="windows"
   # isChar <- length(grep("([A-Za-d]|[f-z]|/|\\*)",names(ct)))>0
+   if ((devSkipExtraTiffValues <- TRUE)&&(length(ct) %in% 2^c(8,16,32))) {
+     # ct <- tail(ct,-2540) ## dev N_20200407_concentration_v3.0.tif 
+      ind <- unname(which(rev(ct)=="#000000"))
+      seqi <- rev(seq(length(ct)))
+      if ((length(ind)>1)&&(1L %in% ind)) {
+         ind2 <- which(diff(ind)>1)
+         if (length(ind2)) {
+            ind3 <- seq(seqi[tail(ind2,1)]+1,seqi[1])
+         }
+         else {
+            ind3 <- seq(seqi[tail(ind,1)-1],seqi[1])
+         }
+         ct <- ct[-ind3]
+      }
+   }
    label <- .deintervale(ct,verbose=FALSE)
    fmtLabel <- attr(ct,"label")
    if (length(label)==length(fmtLabel)) {
