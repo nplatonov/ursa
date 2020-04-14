@@ -16,7 +16,7 @@ compose_design(\dots)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{\dots}{Set of argumetns, which are recognized via their names and classes:
+  \item{\dots}{Set of arguments, which are recognized via their names and classes:
    \describe{
       \item{\code{obj}}{Object of class \code{ursaRaster} or list of objects of class \code{ursaRaster} or \code{NULL}. Default is \code{NULL}. Used to detect panel layout and coordinate reference system.}
       \item{\code{layout}}{Integer of length 2 or \code{NA}. Layout matrix has dimensions\code{c(nr, nc)}, where \code{nr} is number of rows, and \code{nc} is number of columns. If \code{layout=NA} then layout matrix is recognized internally using number of bands of \code{obj} and argument \code{ratio}. If \code{layout=NA} and \code{obj=NULL} then matrix \code{c(1,1)} is used.}
@@ -57,7 +57,7 @@ Function \code{compose_design} extracts and validates required arguments from a 
 
 Argument \code{legend} is a \code{\link[base]{list}} or coerced to a \code{\link[base]{list}}. The length of this list is equal to number of color bars; each item describes certain color bar. This desctiption is a list again with two elements, which desribes the position of color bar in relation to main panels of images.
 
-If argument \code{legend} is in interval \code{1L:4L} then it is intepreted as argument \code{side} in functions \code{\link[graphics]{axis}}, \code{\link[graphics]{mtext}}.  Argument \code{side} in function \code{compose_design} plays the same role. It is introduced for consistency with \R graphic system.
+If argument \code{legend} is in interval \code{1L:4L} then it is interpreted as argument \code{side} in functions \code{\link[graphics]{axis}}, \code{\link[graphics]{mtext}}.  Argument \code{side} in function \code{compose_design} plays the same role. It is introduced for consistency with \R graphic system.
 
 In the one of example below (See \cite{Examples} section) the layout with dimension of two rows by three columns is considered (\code{layout=c(2,3)}). The dimension of resulting layout matrix is \code{c(7,9)}, where 7=\strong{2}*2+3, and 9=\strong{3}*2+3.
 \preformatted{
@@ -114,7 +114,7 @@ The resulting layout is a sparse matrix with zero values for each even row and e
 }
 \value{
 It is a list of class \code{ursaLayout}.
-\item{layout}{Integer matrix with dimension \code{c(2*nr+3, 2*nc+3)}, where \code{nr} and \code{nc} are number of rows and colunms of the layout matrix. The layout matrix of image panels is surrounded by colorbar panels. The orignial layout matrix is expanded by adding zero columns and rows. In the new matrix each even column has zero values, and each even row has zero values.}
+\item{layout}{Integer matrix with dimension \code{c(2*nr+3, 2*nc+3)}, where \code{nr} and \code{nc} are number of rows and colunms of the layout matrix. The layout matrix of image panels is surrounded by colorbar panels. The original layout matrix is expanded by adding zero columns and rows. In the new matrix each even column has zero values, and each even row has zero values.}
 \item{image}{Nonnegative integer. Number of panels with images.}
 \item{legend}{Nonnegative integer. Number of panels with color bars (legends).}
 The returned value is passed to function \code{\link[ursa]{compose_open}} and further is kept in the \code{\link[base]{options}} until calling of \code{\link[ursa]{compose_close}}.

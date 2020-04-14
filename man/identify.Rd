@@ -28,7 +28,7 @@ coord_cr(obj, ...)
   \item{obj}{
 Object of class \code{ursaRaster}.
 }
-   \item{\dots}{the set of argumetns, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes:
+   \item{\dots}{the set of arguments, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes:
       \tabular{llll}{
           \emph{Matched pattern}\code{   } \tab \emph{Function}\code{   } \tab \emph{Used name}
           

@@ -27,7 +27,7 @@ ursa_nodata(obj) <- value
    }
 }
 \details{
-\code{ursa_nodata} is synonim to \code{ignorevalue} for both \emph{Extract} and \emph{Replace} methods.
+\code{ursa_nodata} is synonym to \code{ignorevalue} for both \emph{Extract} and \emph{Replace} methods.
 
 The \sQuote{nodata} value of raster image \code{obj} is specified in the item \code{obj$con$nodata}.
 

@@ -19,7 +19,7 @@ Arguments, which are passed to \code{\link[ursa:conn.create_any]{create_envi}}. 
 }
 }
 \details{
-\code{write_envi} implements writting the whole \code{ursaRaster} object to disk. For multiple access to disk (by chunks), use followed construction: \preformatted{
+\code{write_envi} implements writing the whole \code{ursaRaster} object to disk. For multiple access to disk (by chunks), use followed construction: \preformatted{
 a <- create_envi(fname)
 a[condition_1] <- value1
 a[condition_2] <- value2
@@ -45,7 +45,7 @@ Nikita Platonov \email{platonov@sevin.ru}
 \seealso{
 \code{\link[ursa:conn.create_any]{create_envi}}, \emph{\link[ursa:classRaster.Replace]{Replace}} method \code{\link[ursa:classRaster.Replace]{[<-}} for \code{ursaRaster} object, \code{\link[ursa:classRaster_close]{close_envi}} (\code{\link[ursa:classRaster_close]{close}} for \code{ursaRaster} object).
 
-\code{\link[ursa:conn.write_gdal]{write_gdal}(...,driver="ENVI")} uses GDAL (\pkg{rgdal}) for writting \code{ursaRaster} object to the ENVI .hdr Labelled Raster file.
+\code{\link[ursa:conn.write_gdal]{write_gdal}(...,driver="ENVI")} uses GDAL (\pkg{rgdal}) for writing \code{ursaRaster} object to the ENVI .hdr Labelled Raster file.
 
 }
 \examples{

@@ -128,7 +128,7 @@
       for (i in seq(nl))
       {
          if ((verbose)&&(k==0)) {
-            pb <- ursaProgressBar(min=0,max=ifelse(isRGB,nl,nb),silent=silent)
+            pb <- ursaProgressBar(min=0,max=ifelse(isRGB,nl,nb),silent=silent,tail=TRUE)
            # setUrsaProgressBar(pb,k)
          }
          k <- k+1L

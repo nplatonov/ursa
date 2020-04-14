@@ -5,7 +5,7 @@
 Replicate bands of raster image.
 }
 \description{
-\code{rep} for object of class \code{ursaRaster} creates new \code{ursaRaster} objects with repitition of orininal band sequence.
+\code{rep} for object of class \code{ursaRaster} creates new \code{ursaRaster} objects with repitition of original band sequence.
 }
 \usage{
 \method{rep}{ursaRaster}(x, ...)

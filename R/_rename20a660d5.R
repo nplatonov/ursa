@@ -13,10 +13,10 @@
    if (!FALSE) {
      ## '\\.spatialize' --> 'spatialize'
      ## 'ursa:::spatialize' --> 'spatialize'
-      src <- "spatial_filename"
-      dst <- "spatial_basename"
+      src <- "intepreted"
+      dst <- "interpreted"
       toWrite <- FALSE
-      ind <- as.character(c(1,2,3,4,5,6,7,8,9,10,11,12))
+      ind <- "2" # as.character(c(1,2,3,4,5,6,7,8,9,10,11,12))
       dpath1 <- c('1'="C:/platt/R/ursa-package/ursa/R"
                  ,'2'="C:/platt/R/ursa-package/ursa/man"
                  ,'3'="C:/platt/R/ursa-package/ursa/example"

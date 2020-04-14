@@ -5,7 +5,7 @@
 \alias{dim.ursaGrid}
 \alias{as.data.frame.ursaGrid}
 \title{
-Spatial paramaters of raster images.
+Spatial parameters of raster images.
 }
 \description{
 Class \code{ursaGrid} is a part of class \code{ursaRaster}. It defines spatial locations of image.

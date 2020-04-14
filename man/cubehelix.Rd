@@ -4,7 +4,7 @@
 Generate "cubehelix" palette.
 }
 \description{
-\code{cubehelix} returs set of RGB colours, which are  screen display of intensity images
+\code{cubehelix} returns set of RGB colours, which are  screen display of intensity images
 }
 \usage{
 cubehelix(n, value = numeric(), weak = NA, rich = NA, rotate = NA, hue = NA, gamma = 1,
@@ -16,7 +16,7 @@ cubehelix(n, value = numeric(), weak = NA, rich = NA, rotate = NA, hue = NA, gam
 Positive integer. Length of returned color vector. If \code{n} is \link[base:missing]{missing} and length of \code{value} is positive, then length of \code{value}. If missing \code{n} and empty \code{value}, then \code{n=256}.
 }
   \item{value}{
-Numerice vector of values, which are associated with a palette. If both positive and negative values are in this vector, then divergence color palette is returned. Default in numeric of length zero (unspecified).
+Numeric vector of values, which are associated with a palette. If both positive and negative values are in this vector, then divergence color palette is returned. Default in numeric of length zero (unspecified).
 }
   \item{weak}{
 Numeric. The angle (in degrees) of the helix for color with \code{light} intensity. If both \code{rich} and \code{weak} are specified, the \code{rotate} is defined as difference between \code{rich} and \code{weak}. If all \code{weak}, \code{rich} and \code{rotate} are unspecified, then random values are used. Default is \code{NA} (unspecified).
@@ -25,7 +25,7 @@ Numeric. The angle (in degrees) of the helix for color with \code{light} intensi
 Numeric. The angle (in degrees) of the helix for color with \code{dark} intensity. If both \code{rich} and \code{weak} are specified, the \code{rotate} is defined as difference between \code{rich} and \code{weak}. If all \code{weak}, \code{rich} and \code{rotate} are unspecified, then random values are used. Default is \code{NA} (unspecified).
 }
   \item{rotate}{
-Numeric. The anlge of rotation (in degrees) of the helix over the scale; can be negative. If \code{rotate} and \code{weak} are specified, then \code{rich} is defined as sum of \code{weak} and \code{rotate}. If \code{rotate} and \code{rich} are specified, then \code{weak} is defined as difference between \code{rotate} and \code{weak}. If all \code{weak}, \code{rich} and \code{rotate} are unspecified, then random values are used. Default is \code{NA} (unspecified).
+Numeric. The angle of rotation (in degrees) of the helix over the scale; can be negative. If \code{rotate} and \code{weak} are specified, then \code{rich} is defined as sum of \code{weak} and \code{rotate}. If \code{rotate} and \code{rich} are specified, then \code{weak} is defined as difference between \code{rotate} and \code{weak}. If all \code{weak}, \code{rich} and \code{rotate} are unspecified, then random values are used. Default is \code{NA} (unspecified).
 }
   \item{hue}{
 Non-negative numeric. Saturation of color. \code{hue=0} gives pure greyscale. If unspecified, then random value in interval [0.9, 1.5] is used. Default is \code{NA} (unspecified).
@@ -43,7 +43,7 @@ Positive numeric in interval between 0 and 255. The intensity of the lightest co
 Logical. Inversion of color intensity. If \code{TRUE} then color vector is \link[base:rev]{reversed} before return. Default is \code{FALSE}.
 }
   \item{verbose}{
-Logical. Value \code{TRUE} provides information about cube helix on console. Default is \code{NA}, which is interpeted as \code{FALSE}.
+Logical. Value \code{TRUE} provides information about cube helix on console. Default is \code{NA}, which is interpreted as \code{FALSE}.
 }
 }
 \details{

@@ -17,7 +17,7 @@ compose_close(...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-   \item{\dots}{Set of argumetns, which are recognized via their names and classes, and then passed to \code{.compose_close}:
+   \item{\dots}{Set of arguments, which are recognized via their names and classes, and then passed to \code{.compose_close}:
       \tabular{ll}{
       \strong{Pattern} (\code{compose_close}) \tab \strong{Argument} (\code{.compose_close})
       \cr \code{(^$|crop|kind)} \tab \code{kind}

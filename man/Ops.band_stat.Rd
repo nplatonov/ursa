@@ -18,7 +18,7 @@ Object of class \code{ursaRaster}.
 Logical. If \code{TRUE} then metadata are returned instead of statistics. Default is \code{FALSE}
 }
   \item{raw}{
-Logical. For the case of raster values are categories, if \code{raw=TRUE}, then function returns statistics of categories; if \code{raw=FALSE} and names of categories can be tranformed to numerical values, then function returns statistics for un-categirized values. Default is \code{FALSE}.
+Logical. For the case of raster values are categories, if \code{raw=TRUE}, then function returns statistics of categories; if \code{raw=FALSE} and names of categories can be transformed to numerical values, then function returns statistics for decategorized values. Default is \code{FALSE}.
 }
 }
 \details{

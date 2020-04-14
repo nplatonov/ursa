@@ -13,7 +13,7 @@
 Extract certains statistics for whole image
 }
 \description{
-Function from this \verb{global.\emph{FUN}} list returns requred statistics \emph{FUN} for the whole image.
+Function from this \verb{global.\emph{FUN}} list returns required statistics \emph{FUN} for the whole image.
 }
 \usage{
 global_mean(x, ursa = FALSE, ...)

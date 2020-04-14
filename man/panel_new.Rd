@@ -18,7 +18,7 @@ panel_new(...)
 %%~ ## coerced to 'panel_new(fill = "grey80", density = NA, angle = NA, lwd = 1, lty = 1L, asp = 1, mar = rep(0, 4))'
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-   \item{\dots}{Set of argumetns, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes. Passed to non-public \code{.panel_new}. Optional prefix \code{"blank"} is used for indirect use. Separated by a dot \code{"."}, e.g., \code{blank.fill="transparent"}.
+   \item{\dots}{Set of arguments, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes. Passed to non-public \code{.panel_new}. Optional prefix \code{"blank"} is used for indirect use. Separated by a dot \code{"."}, e.g., \code{blank.fill="transparent"}.
       \tabular{lll}{
          \strong{Pattern} (\code{panel_new}) \tab \strong{Argument} (\code{.panel_new}) \tab \strong{Description}
 %%~          \cr \code{blank} \tab \code{} \tab \var{See below.}
@@ -38,7 +38,7 @@ panel_new(...)
    \item{density}{Numeric. The density of shading lines for fill/shadowing. If \code{NA} then no shading lines are drawn. Default is \code{NA}. See \code{density} in \code{\link[graphics]{rect}}.}
    \item{angle}{Numeric. The slope of shading lines, given as an angle in degrees (counter-clockwise). If \code{NA} then no shading lines are drawn. Default is \code{NA}. See \code{angle} in \code{\link[graphics]{rect}}.}
    \item{lwd}{Positive numeric. Width of coastline. Default is \code{1}. See \code{lwd} in \code{\link[graphics]{rect}}.}
-   \item{lty}{Character or positive integer. Type (pattern) of coasltline. Default is \code{1L} (solid). See \code{lty} in \code{\link[graphics]{rect}}.}
+   \item{lty}{Character or positive integer. Type (pattern) of coastline. Default is \code{1L} (solid). See \code{lty} in \code{\link[graphics]{rect}}.}
    \item{asp}{Positive numeric. The \emph{y/x} aspect ration. Default is \code{1}. See \code{asp} in \code{\link[graphics]{plot.window}}.}
    \item{mar}{Positive numeric of length 4. Plot margins. Default is \code{rep(0,4L)}. See \code{mar} in \code{\link[graphics]{par}}.}
    \item{verbose}{Logical. Value \code{TRUE} may provide some additional information on console. Default is \code{FALSE}.}

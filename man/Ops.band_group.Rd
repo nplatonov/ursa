@@ -14,7 +14,7 @@
 Extract certain statistics of each band.
 }
 \description{
-Function from this \code{band.*} list returns requred statistics for each band.
+Function from this \code{band.*} list returns required statistics for each band.
 }
 \usage{
 band_mean(obj)

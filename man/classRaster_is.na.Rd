@@ -7,7 +7,7 @@
 \sQuote{No data} values for raster images.
 }
 \description{
-The "Extract" function \code{is.na} creates mask for each band. In this mask value \code{1L} corresponds to \code{NA} value in the source image, and value \code{NA} corresponds non-missing values in the source image. The "Replacement" function \code{is.na<-} assings numerical value for cells with \sQuote{no data} value.
+The "Extract" function \code{is.na} creates mask for each band. In this mask value \code{1L} corresponds to \code{NA} value in the source image, and value \code{NA} corresponds non-missing values in the source image. The "Replacement" function \code{is.na<-} assigns numerical value for cells with \sQuote{no data} value.
 }
 \usage{
 \method{is.na}{ursaRaster}(x)

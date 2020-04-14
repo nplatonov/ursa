@@ -4,7 +4,7 @@
 Bundle of statistics, which is applied to each cell of multi-band image.
 }
 \description{
-If bands of \code{ursaRaster} object are interpeted as observations in time, then \code{local_stat} returns some parameters for time-series analysis. This is a \bold{local} operation of map algebra.
+If bands of \code{ursaRaster} object are interpreted as observations in time, then \code{local_stat} returns some parameters for time-series analysis. This is a \bold{local} operation of map algebra.
 }
 \usage{
 local_stat(obj, time = NULL, cover = 1e-06, smooth = FALSE, verbose = FALSE)
@@ -35,8 +35,8 @@ Object of class \code{ursaRaster} with bands:
 \item{mean}{Mean value in each cell across all bands of source raster.}
 \item{sd}{Standard deviation in each cell across all bands of source raster.  Denominator is \code{n}. }
 \item{sum}{Sum value in each cell across all bands of source raster.}
-\item{min}{Mininal value in each cell across all bands of source raster.}
-\item{max}{Maxinal value in each cell across all bands of source raster.}
+\item{min}{Minimal value in each cell across all bands of source raster.}
+\item{max}{Maximal value in each cell across all bands of source raster.}
 \item{n}{Number of non-\code{NA} values in each cell across all bands of source raster (number of observations).}
 \item{slope}{Slope value in each cell across all bands of source raster.}
 \item{slopeS}{Significance of slope value taken with a sign of slope.}

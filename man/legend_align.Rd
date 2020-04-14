@@ -4,7 +4,7 @@
 Align caption position for legend
 }
 \description{
-When multiple panels on the same axis, the different order of values or different units of values may provoke different shifting of values and caption from panels. \code{legend_align} repairs it by the taking names of classes of the requred rasters. The function output is for argument \code{aling} of \code{\link[ursa:legend_colorbar]{legend_colorbar}}.
+When multiple panels on the same axis, the different order of values or different units of values may provoke different shifting of values and caption from panels. \code{legend_align} repairs it by the taking names of classes of the required rasters. The function output is for argument \code{aling} of \code{\link[ursa:legend_colorbar]{legend_colorbar}}.
 }
 \usage{
 legend_align(obj)

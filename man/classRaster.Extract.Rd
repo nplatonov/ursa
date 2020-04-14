@@ -18,7 +18,7 @@ This operator is used to get single band or subset of bands from multi-band \cod
 \code{ursaRaster} object
 }
   \item{i}{
-Integer or character. If integer, then band index, specifying bands to extract. If character, either list of band names or charater sting for \code{\link[base:grep]{regular expression}} to match band index. In the \emph{(spatial, temporal)} iterpretation of \code{ursaRaster} object \code{j} points to \emph{temporal} component.
+Integer or character. If integer, then band index, specifying bands to extract. If character, either list of band names or character sting for \code{\link[base:grep]{regular expression}} to match band index. In the \emph{(spatial, temporal)} interpretation of \code{ursaRaster} object \code{j} points to \emph{temporal} component.
 }
   \item{j}{
 Integer. Line index, specifying lines to extract.

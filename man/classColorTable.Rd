@@ -38,20 +38,20 @@ ursa_colorindex(ct)
 \code{ursaRaster} object. 
 }
   \item{ct}{
-\code{ursaColorTable} object with or witout indexing.
+\code{ursaColorTable} object with or without indexing.
 }
   \item{value}{
 Named character vector. In Replacement functions:
 
 For \code{ursa_colortable()}: values are colors in \dQuote{#RRGGBB} notation or \R color names (\code{\link[grDevices]{colors}}). \code{names(value)} are names of categories.
 
-For \code{names()}: values are names of categories. If length of names is \code{n-1}, where \code{n} is length of colors, then intervaling is assumed, and code{value} are assing to interval breaks.
+For \code{names()}: values are names of categories. If length of names is \code{n-1}, where \code{n} is length of colors, then intervaling is assumed, and code{value} are assign to interval breaks.
 }
   \item{i}{
 Integer vector. Indices specifying elements to extract part (subset) of color table.
 }
   \item{\dots}{
-Passing to generic \code{\link[base]{print}}. Currently not used.
+passing to generic \code{\link[base]{print}}. Currently not used.
 }
 }
 \details{

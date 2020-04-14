@@ -16,7 +16,7 @@ Get and set sessional parameters for grid, CRS, external software for open PNG f
 
 \code{session_pngviwer} is used to permit external software to open PNG files.
 
-\code{session_tempdir} spefies directory for temporal files in some cases.
+\code{session_tempdir} specifies directory for temporal files in some cases.
 
 \code{session_use_experimental_functions} allows to use undocumented (experimental) functions.
 
@@ -39,8 +39,8 @@ session_use_experimental_functions()
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{obj}{Either missing, or \code{NULL}, or file name, or object of class \code{ursaRaster}, or object of class \code{\link[ursa:classGrid]{ursaGrid}}, or spatial object (simple features (\pkg{sf}), spatial abstracts (\pkg{sp})).}
-  \item{allow}{Logical. If \code{TRUE} then it is allowed to use external software for viewing PNG files. \code{NA} is interpreted as \code{TRUE} in the case of "Rscript" usage, and intepreted as \code{FALSE} in the case of interactive session or "R CMD BATCH" usage. Default is \code{NA}.}
-  \item{dst}{Character. Directory name for temporal files. Empty character or non-character is interpreted as \code{\link[base:getwd]{getwd()}} in the case of "Rscript" usage, and intepreted as \code{\link[base:tempfile]{tempdir()}} in the case of interactive session or "R CMD BATCH" usage. Default is \code{character()} (empty character).}
+  \item{allow}{Logical. If \code{TRUE} then it is allowed to use external software for viewing PNG files. \code{NA} is interpreted as \code{TRUE} in the case of "Rscript" usage, and interpreted as \code{FALSE} in the case of interactive session or "R CMD BATCH" usage. Default is \code{NA}.}
+  \item{dst}{Character. Directory name for temporal files. Empty character or non-character is interpreted as \code{\link[base:getwd]{getwd()}} in the case of "Rscript" usage, and interpreted as \code{\link[base:tempfile]{tempdir()}} in the case of interactive session or "R CMD BATCH" usage. Default is \code{character()} (empty character).}
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
@@ -53,7 +53,7 @@ Usage \code{session_grid(NULL)} resets \dQuote{ursaSessionGrid} option via calli
 The sequential calling \preformatted{
 session_grid(NULL)
 session_grid()
-} returns default CRS. For checking that the option has been resetted successfully, use \code{getOption("ursaSessionGrid")} after \code{session_grid(NULL)}
+} returns default CRS. For checking that the option has been reset successfully, use \code{getOption("ursaSessionGrid")} after \code{session_grid(NULL)}
 
 \code{session_proj4} and \code{session_crs} are synonyms.
 

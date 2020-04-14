@@ -22,7 +22,7 @@ Convert raster image to a data frame
   \item{x, obj}{
 Object of class \code{ursaRaster}
 }
-  \item{\dots}{Set of argumetns, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes. Passed to non-public \code{.as.data.frame}.
+  \item{\dots}{Set of arguments, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes. Passed to non-public \code{.as.data.frame}.
       \tabular{lll}{
          \strong{Pattern} (\code{as.data.frame}) \tab \strong{Argument} (\code{.as.data.frame}) \tab \strong{Description}
          \cr \code{band} \tab \code{band} \tab \emph{See below}.
@@ -67,7 +67,7 @@ If \code{band=FALSE} then
 \item{y}{Vertical coordinate of cell's midpoint}
 \item{...}{Additional columns. Names of columns are names of bands. Values of columns are values of corresponded bands.}
 
-If \code{ursaRaster} is projected, then data frame has additional attribite \code{attr(...,"proj")} with value of PROJ.4 string.
+If \code{ursaRaster} is projected, then data frame has additional attribute \code{attr(...,"proj")} with value of PROJ.4 string.
 }
 
 %%~ \references{

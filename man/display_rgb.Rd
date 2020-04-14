@@ -4,7 +4,7 @@
 Plot RGB (RGBA) color composition in the PNG format.
 }
 \description{
-Raster images are forced to be interpeted as color composition with 3 (RGB) or 4 (RGBA) channels. Values should be in the range between 0 and 255.
+Raster images are forced to be interpreted as color composition with 3 (RGB) or 4 (RGBA) channels. Values should be in the range between 0 and 255.
 }
 \usage{
 display_rgb(obj, ...)

@@ -649,7 +649,7 @@
       aG <- sf::st_transform(aG,crs=4326)
       cross180 <- NULL
       if (verbose)
-         pb <- ursaProgressBar(min=0,max=n)
+         pb <- ursaProgressBar(min=0,max=n,tail=TRUE)
       for (i in sample(seq_along(FID))) {
          fid <- FID[i]
          bG <- lapply(aG[[i]],function(x) which(abs(x[,1])>180-1e-11))

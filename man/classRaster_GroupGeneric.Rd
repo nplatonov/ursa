@@ -44,7 +44,7 @@ Any.
   \item{\dots}{
 For group \emph{\link[base:groupGeneric]{Math}} - further arguments passed to methods. See description for generic.
 
-For group \emph{\link[base:groupGeneric]{Summary}} - set of argumetns, which are recognized via their names (using \link[base:regex]{regular expressions}), position and classes.
+For group \emph{\link[base:groupGeneric]{Summary}} - set of arguments, which are recognized via their names (using \link[base:regex]{regular expressions}), position and classes.
    \describe{
      \item{.*}{
      Position 1. Object of class \code{ursaRaster}.

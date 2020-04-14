@@ -11,7 +11,7 @@ Informative progress bars with dispaying elapsed and remained time.
 \usage{
 ursaProgressBar(kind = c("tk", "txt"),title = .argv0(),
                 label = "", min = 0, max = 1, initial = min, width = NA,
-                style = 1, silent = FALSE)
+                style = 1, tail = FALSE, silent = FALSE)
 
 setUrsaProgressBar(pb, value, title = NULL, label = NULL)
 
@@ -36,8 +36,11 @@ Character. Type or progress bar. Valid values are \code{"tk"} to display progres
 \item{con, \dots}{
    See description for the same arguments in \code{\link[base:connections]{close}}.
 }
+\item{tail}{
+   Logical. Behaviour of progress bar appearing. If \code{TRUE} then progress bar will be used after progress step (e.g., at the end of routine). Default is \code{FALSE} (before progress step).
+}
 \item{silent}{
-   Logical. If \code{TRUE} then progress bar will not appear; it can be useful for conditional scripting. Default is \code{FALSE}.
+   Logical. If \code{TRUE} then progress bar will not appeared; it can be useful for conditional scripting. Default is \code{FALSE}.
 }
 %%~ \item{label}{
 %%~    See description for the same argument in \code{\link[tcltk:tkProgressBar]{tkProgressBar}} and \code{\link[utils:txtProgressBar]{txtProgressBar}}.
@@ -108,7 +111,7 @@ n1 <- 3
 n2 <- 83
 p <- 0.0011
 #require(tcltk)
-pb <- ursaProgressBar(min=0,max=n1,title="first")
+pb <- ursaProgressBar(min=0,max=n1,title="first",tail=TRUE)
 for (i in seq(n1)) {
    pb2 <- ursaProgressBar(min=0,max=n2,title="second")
    for (i in seq(n2)) {

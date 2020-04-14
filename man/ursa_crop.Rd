@@ -26,7 +26,7 @@ Object of class \code{ursaRaster} or \code{\link[base]{missing}}. The condition 
 Integer of length 1 or 4. Desired margins for geographical subset. Units are cells (pixels).
 }
   \item{resetGrid}{
-Logical. If \code{resetGrid=TRUE} then sessional grid paramaters is established from grid parameters of created raster. If \code{resetGrid=FALSE} then sessional grid parameters keep without change. Defailu is \code{TRUE}.
+Logical. If \code{resetGrid=TRUE} then sessional grid parameters is established from grid parameters of created raster. If \code{resetGrid=FALSE} then sessional grid parameters keep without change. Defailu is \code{TRUE}.
 }
   \item{verbose}{
 Logical. \code{TRUE} provides some additional information on console.

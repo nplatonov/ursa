@@ -12,7 +12,7 @@ compose_plot(\dots)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-   \item{\dots}{Set of argumetns, which are passed to \code{\link[ursa:compose_panel]{compose_panel}} and \code{\link[ursa:compose_panel]{compose_legend}}
+   \item{\dots}{Set of arguments, which are passed to \code{\link[ursa:compose_panel]{compose_panel}} and \code{\link[ursa:compose_panel]{compose_legend}}
    }
 }
 \details{

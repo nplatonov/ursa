@@ -20,7 +20,7 @@ ursa_blank(obj, ref)
 Object of class \code{ursaRaster}
 }
   \item{ref}{
-Character. Definition criteria, what is blank mean. If value \code{"0"}, then blank is detected, if all values are 0. If value \code{"NA"}, then blank is detected, if all values are \code{NA}. Default value is \code{"NA"}: both \code{NA} and \code{0} are flags of blank. Non-charater values are coerced to chacter.
+Character. Definition criteria, what is blank mean. If value \code{"0"}, then blank is detected, if all values are 0. If value \code{"NA"}, then blank is detected, if all values are \code{NA}. Default value is \code{"NA"}: both \code{NA} and \code{0} are flags of blank. Non-character values are coerced to character.
 }
   \item{verbose}{
 Logical. Value \code{TRUE} provides progress bar. Default is \code{FALSE}.

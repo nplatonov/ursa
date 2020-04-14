@@ -23,7 +23,7 @@
    {
       cb <- chunk_band(obj)
       if (pr <- verbose & length(cb)>1)
-         pb <- ursaProgressBar(min=0,max=length(cb))
+         pb <- ursaProgressBar(min=0,max=length(cb),tail=TRUE)
       for (i in cb) {
          res[i] <- apply(obj[i]$value,2,function(z) {#(all(is.na(z)))||(all(z==0)))
             r <- unique(z)

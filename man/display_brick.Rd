@@ -5,7 +5,7 @@
 Plot multi-band homogenous raster image in the PNG format.
 }
 \description{
-Raster image is forced to be interpeted as homogenuous (having the same units). It implies creating multi-panel layout with multiple colorbars. 
+Raster image is forced to be interpreted as homogenuous (having the same units). It implies creating multi-panel layout with multiple colorbars. 
 }
 \usage{
 display_brick(obj, ...)
@@ -43,7 +43,7 @@ Passed to hierarchy of plotting functions:
 \details{
 If argument \code{obj} is \code{\link[base]{list}} of \code{ursaRaster} objects (or object of class \code{ursaStack}) then \code{obj} is coerced to class \code{ursaRaster} ('stack' is coerced to 'brick').
 
-\code{display_homo} is a synonyn to \code{display_brick}. It is introduced to emphasize the plotting of homogenous object.
+\code{display_homo} is a synonym to \code{display_brick}. It is introduced to emphasize the plotting of homogenous object.
 }
 \value{
 Function returns \code{NULL} value.

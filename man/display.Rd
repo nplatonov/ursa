@@ -46,7 +46,7 @@ If argument \code{obj} is \code{\link[base]{list}} of \code{ursaRaster} objects 
 
 If argument \code{obj} is object of class \code{ursaRaster} and has 3 or 4 bands and values in each band are \code{\link[base]{integer}} and in interval between 0 and 255, then \code{\link[ursa]{display_rgb}} is called.
 
-If argument \code{obj} is object of class \code{ursaRaster} then firstly internal test is applied to detect either image's bands contains homogeneous information (raster brick) or heterogeneous information (raster stack). Then either \code{\link[ursa]{display_brick}} or \code{\link[ursa]{display_stack}} is called. This test is rough due to unknown data origin. It is supposed to adjust kind of plotting by means of direct specifiction of \code{\link[ursa]{display_brick}} or \code{\link[ursa]{display_stack}}.
+If argument \code{obj} is object of class \code{ursaRaster} then firstly internal test is applied to detect either image's bands contains homogeneous information (raster brick) or heterogeneous information (raster stack). Then either \code{\link[ursa]{display_brick}} or \code{\link[ursa]{display_stack}} is called. This test is rough due to unknown data origin. It is supposed to adjust kind of plotting by means of direct specification of \code{\link[ursa]{display_brick}} or \code{\link[ursa]{display_stack}}.
 }
 \value{
 %%~ Function returns \code{NULL} value.

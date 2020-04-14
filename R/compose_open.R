@@ -21,7 +21,7 @@
    box <- .getPrm(arglist,name="box",default=TRUE)
    delafter <- .getPrm(arglist,name="(del|remove)after",default=NA)
    wait <- .getPrm(arglist,name="wait",default=switch(.Platform$OS.type,windows=1,3))
-   dtype <- if (.Platform$OS.type=="windows") c("cairo","windows")
+   dtype <- if (.Platform$OS.type=="windows") c("cairo","windows","CairoPNG")
             else c("cairo","cairo-png","Xlib","quartz")
    device <- .getPrm(arglist,name="^(device|type)",valid=dtype)
    antialias <- .getPrm(arglist,name="antialias",valid=c("default","none","cleartype"))
@@ -226,14 +226,20 @@
              ,scale=scale,autoscale=autoscale,pointsize=pointsize,dpi=dpi))
    if (.isJupyter())
       options(jupyter.plot_mimetypes=ifelse(isJPEG,'image/jpeg','image/png'))
-   if (isJPEG)
+   if ((device=="CairoPNG")&&(requireNamespace("Cairo"))) {
+      a <- try(Cairo::CairoPNG(filename=fileout
+              ,width=png_width,height=png_height,res=dpi
+              ,bg=background,pointsize=pointsize
+              #,type="png"
+              ,antialias=antialias,family=font))
+   }
+   else {
+      if (device=="default")
+         device <- "cairo"
       a <- try(png(filename=fileout,width=png_width,height=png_height,res=dpi
               ,bg=background,pointsize=pointsize
               ,type=device,antialias=antialias,family=font))
-   else
-      a <- try(png(filename=fileout,width=png_width,height=png_height,res=dpi
-              ,bg=background,pointsize=pointsize
-              ,type=device,antialias=antialias,family=font))
+   }
    if ((inherits(a,"try-error"))&&(.Platform$OS.type=="windows")) { ## 20180117 patch for conda without cairo
       device <- "windows"
       if (isJPEG)

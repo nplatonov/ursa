@@ -14,7 +14,7 @@ spatial_read(dsn, engine = c("native", "sp", "sf"))
 Character. File name of spatial object (vector GIS).
 }
   \item{engine}{
-Character. Functionality of which package is used for reading data. If value is \code{"sf"} then package is \pkg{sf} is used and simple features are returned. If value is \code{"sp"}, then package \pkg{rgdal} is used and Spatial abstracrs (package \pkg{sp}) are returned. If value is \code{"native"} then engine selection depends of which namespace has already loaded or has suggested package \pkg{sf} been installed.
+Character. Functionality of which package is used for reading data. If value is \code{"sf"} then package is \pkg{sf} is used and simple features are returned. If value is \code{"sp"}, then package \pkg{rgdal} is used and Spatial abstracts (package \pkg{sp}) are returned. If value is \code{"native"} then engine selection depends of which namespace has already loaded or has suggested package \pkg{sf} been installed.
 }
 }
 \details{

@@ -16,9 +16,9 @@ panel_raster(...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-   \item{\dots}{Set of argumetns, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes.
+   \item{\dots}{Set of arguments, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes.
    \cr 1. Passed to \code{\link[ursa:colorize]{colorize}}.
-   \cr 2. Interpeted in this function:
+   \cr 2. interpreted in this function:
 %%~    Passed to non-public \code{.panel_raster}.
       \describe{
          \item{\code{"(^$|obj)"} \var{as} \code{obj}}{Object of class \code{ursaRaster}. Raster band for plotting. Multiple bands are allowed if then can be interpreted as RGB or RGBA.}
@@ -46,7 +46,7 @@ panel_raster(...)
 \details{
 If \code{obj} is list of raster images, then \code{panel_raster} is applied to each item of list, and colortable of last item is returned.
 
-If \code{obj} has 3 or 4 bands then \code{obj} is intepreted as RGB(A) image.
+If \code{obj} has 3 or 4 bands then \code{obj} is interpreted as RGB(A) image.
 
 Function attempts to speed up plotting by reduce image matrix for big rasters.
 }

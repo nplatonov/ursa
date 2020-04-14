@@ -61,7 +61,7 @@ Positive \code{integer} of length 1. Number of columns/samples in the case of de
 Positive \code{integer} of length 1. Number of rows/lines in the case of definition of new spatial extension (\code{setbound} is non-\code{NA}).
 }
   \item{dim}{
-Positive \code{integer} of length 2. Dimenstion of raste image in the notation \code{c(rows, columns)} (or, \code{c(lines, samples)}) in the case of definition of new spatial extension (\code{setbound} is non-\code{NA}).
+Positive \code{integer} of length 2. Dimenstion of raster image in the notation \code{c(rows, columns)} (or, \code{c(lines, samples)}) in the case of definition of new spatial extension (\code{setbound} is non-\code{NA}).
 }
   \item{bbox}{
 \code{numeric} of length 4. New spatial extension (boundary box) in the notation \code{c(minx,miny,maxx,maxy)} in the same units of existing spatial extension.
@@ -104,12 +104,12 @@ Positive \code{integer} of length 2. Dimenstion of raste image in the notation \
 \code{numeric}. Threshold for comparison float point numerics. Required for internal check of grid consistence. Default is \code{NA}; value \code{.Machine$double.eps} multiplied on maximal value of coordinates is used.
 }
   \item{verbose}{
-Reporting via \code{message} about violation and restoration of coordinate grid regilarity after non-consistence usage of paramaters.
+Reporting via \code{message} about violation and restoration of coordinate grid regilarity after non-consistence usage of parameters.
 %%     ~~Describe \code{verbose} here~~
 }
 }
 \details{
-Generally, argument \code{resample} sets a rectangular region. The area of this region is in proportion to area of output cell. Argument \code{resample} is the value of this proportion. Each cell is interpeted as a set of adjoining rectangular figures. The value of output cells is a weighted mean of that input cells, which fall into rectangular region. The weights are defined as an partial area inside of rectangular region.
+Generally, argument \code{resample} sets a rectangular region. The area of this region is in proportion to area of output cell. Argument \code{resample} is the value of this proportion. Each cell is interpreted as a set of adjoining rectangular figures. The value of output cells is a weighted mean of that input cells, which fall into rectangular region. The weights are defined as an partial area inside of rectangular region.
 
 Function implements "nearest neighbor" resampling method if argument \code{resample=0} (or, \code{resample=FALSE}). If \code{resample=1} (or, \code{resample=TRUE}) and both input and output rasters have the same cell size, then resampling method is "bilinear interpolation".
 
@@ -123,7 +123,7 @@ However, simple contraction \code{regrid(x,mul=1/2,resample=FALSE)} is implement
 
 It seems that for categorical rasters parameter \code{resample=0} is more suitable, because nearest neigboring does not introduce new values to output raster, excepting coincidence of input cells' nodes and output cell centers.
 
-Usage of \code{proj4} argument specifiles only desirable PROJ.4 string and does not do reprojection.
+Usage of \code{proj4} argument specifies only desirable PROJ.4 string and does not do reprojection.
 
 The violation of grid regualarity is due to columns and rows of image should be integer. The restoration of grid regularity is realized by spatial extension (boundary box) expansion.
 

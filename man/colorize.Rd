@@ -46,7 +46,7 @@ colorize(obj, value = NULL, breakvalue = NULL, name = NULL, pal = NULL, inv = NA
       Logical. Invert sequence of colors.
    }
    \item{stretch}{
-      Character. Either kind of value transformatin (\code{"linear", "equal"}) or pre-defined options with palette specification (\code{"positive", "data", "significance"}, etc)
+      Character. Either kind of value transformation (\code{"linear", "equal"}) or pre-defined options with palette specification (\code{"positive", "data", "significance"}, etc)
    }
    \item{minvalue}{
       Numeric. Lower range limit.
@@ -97,7 +97,7 @@ colorize(obj, value = NULL, breakvalue = NULL, name = NULL, pal = NULL, inv = NA
       Character. Format date/time objects for arguments \code{stretch} with values "date", "time", or "julian". Default is "" (character of length 0).
    }
    \item{alpha}{
-      Character or numeric. The characteristics of transparency. If character, then hexadecimal values between "00" and "FF" are allowed, and then coerced to numeric value between 0 and 255. If numeric, and \verb{0 <= alpha <= 1}, then \code{alpha} is multiplied to 255. \code{alpha=0} means full transparency,  \code{alpha=255} means full opacity. Default is ""; if palette has no alpha channel, then \code{alpha} is assing to \code{"FF"}.
+      Character or numeric. The characteristics of transparency. If character, then hexadecimal values between "00" and "FF" are allowed, and then coerced to numeric value between 0 and 255. If numeric, and \verb{0 <= alpha <= 1}, then \code{alpha} is multiplied to 255. \code{alpha=0} means full transparency,  \code{alpha=255} means full opacity. Default is ""; if palette has no alpha channel, then \code{alpha} is assign to \code{"FF"}.
    }
    \item{colortable}{
       Object of class \code{ursaColorTable} or object of class \code{ursaRaster} with color table. Reference color table. Is specified, then all other arguments are ignored, expexted \code{lazyload}. Default is \code{NULL} (unspecified).
@@ -106,7 +106,7 @@ colorize(obj, value = NULL, breakvalue = NULL, name = NULL, pal = NULL, inv = NA
       Logical. Some output in console. Primarily for debug purposes.
    }
    \item{\dots}{
-      If \code{pal} is a function, and argrument names are in the format "\code{pal.*}" then prefix "\code{pal.}" is omitted, and the rest part is used for argument names, which are passed to \code{pal} function.
+      If \code{pal} is a function, and argument names are in the format "\code{pal.*}" then prefix "\code{pal.}" is omitted, and the rest part is used for argument names, which are passed to \code{pal} function.
    }
 }
 \details{

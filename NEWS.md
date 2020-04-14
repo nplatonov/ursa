@@ -1,8 +1,16 @@
-2020-04-09
+2020-04-14
 
 ### version 3.8.20
 
 -   Zero tail of GTiff palettes are cropped for plotting.
+
+-   In `ursaProgressBar()` added argument `tail` with default value
+    `FALSE`; use `TRUE` (previous behaviour) if indication is appeared
+    after progress step.
+
+-   In `compose_open` added value `CairoPNG` for agrument
+    `device`/`type` for handled by **Cairo** package, which is added as
+    suggested.
 
 ### version 3.8.19
 
@@ -38,7 +46,7 @@
     tiles.
 
 -   Package **`RColorBrewer`** is added as suggested for cases when
-    `pal` attrubute in `colorize()` is equal to any palette name or
+    `pal` attribute in `colorize()` is equal to any palette name or
     category from **`RColorBrewer`**.
 
 -   Fixed replace function `spatial_geometry<-` for Spatial (**`sp`**)
@@ -88,9 +96,9 @@
     objects.
 
 -   Cancelled replacement “ESRI WKT” by “OGC WKT” format of projection
-    file when writting “ESRI Shapefile”.
+    file when writing “ESRI Shapefile”.
 
--   Connections (writting and simplified reading) are made public:
+-   Connections (writing and simplified reading) are made public:
     `spatial_write` and `spatial_read` functions.
 
 -   File extensions `.webp` (if **webp** is installed), `.jpg`, `.jpeg`
@@ -255,7 +263,7 @@
 
 -   Caching is introduced for downloaded files.
 
--   Changed structure of `inst` directory by adding sudirectories
+-   Changed structure of `inst` directory by adding subdirectories
     `requisite` with neccessary files and `optional` with secondary
     files and directories.
 
@@ -334,8 +342,8 @@
 
 ### version 3.7-10
 
--   Adapation glance() for if argument “dsn” is “point” ‘c(lon,lat)’ and
-    “boundary” ‘c(minx,miny,maxx,maxy)’
+-   Adaptation glance() for condition if argument “dsn” is “point”
+    ‘c(lon,lat)’ and “boundary” ‘c(minx,miny,maxx,maxy)’
 
 ### version 3.7-9
 
@@ -385,7 +393,7 @@
     in “+proj=merc”
 
 -   Dismiss from dQuote() and sQuote(), which put non-symmetrical quotes
-    in Rgui; GDAL does’t understad it.
+    in Rgui; GDAL does’t understand it.
 
 -   ‘inst/glance’ contains mock-up to create vector/raster file
     associantion with glance()

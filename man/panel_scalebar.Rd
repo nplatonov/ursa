@@ -18,12 +18,12 @@ panel_scalebar(...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-   \item{\dots}{Set of argumetns, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes. Passed to non-public \code{.panel_scalebar}, excepting argument \code{scalebar}:
+   \item{\dots}{Set of arguments, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes. Passed to non-public \code{.panel_scalebar}, excepting argument \code{scalebar}:
 %%~       \describe{
-%%~          \item{\code{scalebar}}{Logical or integer. Responsible for should scale bar be displayed or not. If logical and \code{TRUE} then scale bars are plotted on all panel of layout. If logical and \code{FALSE} then scale bars are not displayed. If argument is a vector of positive integers, then scale bars are plotted only in the specified panels, which sequence is defined in \code{\link[ursa]{compose_design}} function and returend from \code{getOption("ursaPngLayout")$layout}. Default is \code{TRUE}.
+%%~          \item{\code{scalebar}}{Logical or integer. Responsible for should scale bar be displayed or not. If logical and \code{TRUE} then scale bars are plotted on all panel of layout. If logical and \code{FALSE} then scale bars are not displayed. If argument is a vector of positive integers, then scale bars are plotted only in the specified panels, which sequence is defined in \code{\link[ursa]{compose_design}} function and returned from \code{getOption("ursaPngLayout")$layout}. Default is \code{TRUE}.
          \tabular{lll}{
             \strong{Pattern} (\code{panel_scalebar}) \tab \strong{Argument} (\code{.panel_scalebar}) \tab \strong{Description}
-            \cr \code{(scalebar|ruler|decor)} \tab \code{   } \tab Logical or integer. Responsible for should scale bar be displayed or not. If logical and \code{TRUE} then scale bars are plotted on all panel of layout. If logical and \code{FALSE} then scale bars are not displayed. If argument is a vector of positive integers, then scale bars are plotted only in the specified panels, which sequence is defined in \code{\link[ursa]{compose_design}} function and returend from \code{getOption("ursaPngLayout")$layout}. Default is \code{TRUE}.
+            \cr \code{(scalebar|ruler|decor)} \tab \code{   } \tab Logical or integer. Responsible for should scale bar be displayed or not. If logical and \code{TRUE} then scale bars are plotted on all panel of layout. If logical and \code{FALSE} then scale bars are not displayed. If argument is a vector of positive integers, then scale bars are plotted only in the specified panels, which sequence is defined in \code{\link[ursa]{compose_design}} function and returned from \code{getOption("ursaPngLayout")$layout}. Default is \code{TRUE}.
             \cr \code{(scalebar\\\\.)*pos(ition)*} \tab \code{position} \tab \emph{See below}.
             \cr \code{(scalebar\\\\.)*w} \tab \code{w} \tab \emph{See below}.
             \cr \code{(scalebar\\\\.)*cex} \tab \code{cex} \tab \emph{See below}.
@@ -60,7 +60,7 @@ The length distortions is taken into account for transverse Mercator (\code{"+pr
 
 Scalebar (single occurence) can be controlled in high-level plot functions (\emph{e.g.}, \code{\link[ursa]{display}}, \code{\link[ursa]{compose_plot}}, \code{\link[ursa]{display_stack}}, \code{\link[ursa]{display_brick}}, \code{\link[ursa]{display_rgb}}, \emph{etc}.). 
 
-To plot scalebar, use argument \code{scalebar=TRUE} and prefix \code{(ruler|scalebar)} (\code{scalebar.*} or \code{ruler.*}) for scalebar's parametes, \emph{e.g.}, \code{scalebar.pos="bottomright"}, \code{scalebar.cex=0.9}.
+To plot scalebar, use argument \code{scalebar=TRUE} and prefix \code{(ruler|scalebar)} (\code{scalebar.*} or \code{ruler.*}) for scalebar's parameters, \emph{e.g.}, \code{scalebar.pos="bottomright"}, \code{scalebar.cex=0.9}.
 
 Scalebar is not displayed for longlat projection (\code{"+proj=longlat"}), where units are degrees.
 }

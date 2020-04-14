@@ -27,7 +27,7 @@ Character. File name with extension.
 \code{ursa_write} is simplified call of \code{write_gdal}.
 
 
-\code{write_gdal} implements writting the whole \code{ursaRaster} object to disk. For multiple access to disk (by chunks), use followed \emph{\link[ursa:classRaster.Replace]{Replace}} construction: \preformatted{
+\code{write_gdal} implements writing the whole \code{ursaRaster} object to disk. For multiple access to disk (by chunks), use followed \emph{\link[ursa:classRaster.Replace]{Replace}} construction: \preformatted{
 a <- create_gdal(fname)
 a[condition_1] <- value1
 a[condition_2] <- value2

@@ -46,19 +46,19 @@ Numeric. Multiplier for plotting panel zoom in relation to extent of plotting ge
 Integer. Value in pixels of fixed margins around plotting geometry. Default is \code{27L}.
 }
   \item{lat0}{
-Numeric. Parallel os zero distortion. If \code{NA}, then parallel os zero distortion is determed from object geometry. Actual for \code{"+proj=stere"} projections. Default is \code{NA}.
+Numeric. Parallel os zero distortion. If \code{NA}, then parallel os zero distortion is determined from object geometry. Actual for \code{"+proj=stere"} projections. Default is \code{NA}.
 }
   \item{lon0}{
-Numeric. Central meridian, which have vertical direction on the plot. If \code{NA}, then central meridian is determed from object geometry. Default is \code{NA}.
+Numeric. Central meridian, which have vertical direction on the plot. If \code{NA}, then central meridian is determined from object geometry. Default is \code{NA}.
 }
   \item{resetProj}{
 Logical. Value \code{TRUE} overwrites projection of vector file. Default is \code{FALSE}.
 }
   \item{style}{
-Character. Either projection class or source of web-catrogrpaphy for basemep. Specified by a sentence of words separated by spaces.
+Character. Either projection class or source of web-catrogrpaphy for basemap. Specified by a sentence of words separated by spaces.
 \itemize{
    \item Projection class \cr
-Valid values are \code{"stere"}, \code{"laea"}, \code{"merc"}, \code{"longlat"}. Default is keyword \code{"auto"}; use object projection, if this projection differs from projection class \code{"+longlat"}, otherwise, projection (\code{"stere"} or \code{"merc"}) is determed internally.
+Valid values are \code{"stere"}, \code{"laea"}, \code{"merc"}, \code{"longlat"}. Default is keyword \code{"auto"}; use object projection, if this projection differs from projection class \code{"+longlat"}, otherwise, projection (\code{"stere"} or \code{"merc"}) is determined internally.
    \item Web cartography.
       \itemize{
          \item Static map\cr
@@ -126,7 +126,7 @@ Logical. Logical. Value \code{TRUE} may provide some additional information on c
 }
 }
 \details{
-Command line usage implies set of arguments using pair: argument \emph{\verb{name}} and argument \emph{\verb{value}}. and values in the format "\emph{\verb{[name1=]value1 [name2]=value2}}". No spaces around \emph{\verb{=}} (equal symbol). Argument \emph{\verb{name}} can be omitted, symbol \emph{\verb{=}} is omitted too. If argument \emph{\verb{value}} has spaces, then argumetn value should be surrounded by double quotes (\code{fname="my test.shp"}). If argument \emph{\verb{value}} is matched to \R function, then such value should be surrounded by single quotes (\code{layer='density'}).
+Command line usage implies set of arguments using pair: argument \emph{\verb{name}} and argument \emph{\verb{value}}. and values in the format "\emph{\verb{[name1=]value1 [name2]=value2}}". No spaces around \emph{\verb{=}} (equal symbol). Argument \emph{\verb{name}} can be omitted, symbol \emph{\verb{=}} is omitted too. If argument \emph{\verb{value}} has spaces, then argument value should be surrounded by double quotes (\code{fname="my test.shp"}). If argument \emph{\verb{value}} is matched to \R function, then such value should be surrounded by single quotes (\code{layer='density'}).
 
 Command line usage example: \code{Rscript -e ursa::glance() 'final_more_than_032.sqlite' attr="select" resetProj=TRUE expand=1.5}
 

@@ -15,9 +15,9 @@ panel_decor(...)
   \item{\dots}{
 Passed to sequence of plotting functions:
 \itemize{
-   \item \code{\link[ursa]{panel_graticule}}. To distinguish the same agrument names in different functions it is provided to use prefix \dQuote{\code{grid.*}}, e.g., \code{grid.col="grey40"}.
-   \item \code{\link[ursa]{panel_coastline}}. To distinguish the same agrument names in different functions it is provided to use prefix \dQuote{\code{coast.*}}, e.g., \code{coast.col="grey60"}.
-   \item \emph{(not applicable for \code{layout.grid})} \code{\link[ursa]{panel_scalebar}}. To distinguish the same agrument names in different functions it is provided to use prefix \dQuote{\code{scalebar.*}}, e.g., \code{scalebar.col="black"}.
+   \item \code{\link[ursa]{panel_graticule}}. To distinguish the same argument names in different functions it is provided to use prefix \dQuote{\code{grid.*}}, e.g., \code{grid.col="grey40"}.
+   \item \code{\link[ursa]{panel_coastline}}. To distinguish the same argument names in different functions it is provided to use prefix \dQuote{\code{coast.*}}, e.g., \code{coast.col="grey60"}.
+   \item \emph{(not applicable for \code{layout.grid})} \code{\link[ursa]{panel_scalebar}}. To distinguish the same argument names in different functions it is provided to use prefix \dQuote{\code{scalebar.*}}, e.g., \code{scalebar.col="black"}.
    }
 }
 }

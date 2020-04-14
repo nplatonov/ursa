@@ -3,7 +3,7 @@
 \alias{.panel_annotation}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Add label or annotaion to the image panel.
+Add label or annotation to the image panel.
 }
 \description{
 \code{panel_annotation} puts an annotation (text label) on the panel with raster image without anchors to any layer. Can be used as captions to image panels.
@@ -20,10 +20,10 @@ panel_annotation(...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-   \item{\dots}{Set of argumetns, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes:
+   \item{\dots}{Set of arguments, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes:
    \tabular{lll}{
       \emph{Matched pattern} (\code{panel_annotation}) \tab \emph{Argument} (\code{.panel_annotation}) \tab \emph{Description}
-      \cr \code{((caption|ann(otation)*)} \tab \tab Logical or integer. Responsible for should annotation be displayed or not. If logical and \code{TRUE} then annotations are plotted on all panel of layout. If logical and \code{FALSE} then anootation is not displayed. If argument is a vector of positive integers, then annotations are plotted only in the specified panels, which sequence is defined in \code{\link[ursa]{compose_design}} function and returend from \code{getOption("ursaPngLayout")$layout}. Default is \code{TRUE}.
+      \cr \code{((caption|ann(otation)*)} \tab \tab Logical or integer. Responsible for should annotation be displayed or not. If logical and \code{TRUE} then annotations are plotted on all panel of layout. If logical and \code{FALSE} then annotation is not displayed. If argument is a vector of positive integers, then annotations are plotted only in the specified panels, which sequence is defined in \code{\link[ursa]{compose_design}} function and returned from \code{getOption("ursaPngLayout")$layout}. Default is \code{TRUE}.
       \cr \code{(label|text)} \tab \code{label} \tab \emph{See below}.
       \cr \code{pos(ition)*} \tab \code{pos} \tab \emph{See below}.
       \cr \code{lon(gitude)*} \tab \code{lon} \tab \emph{See below}.
@@ -53,9 +53,9 @@ panel_annotation(...)
    \item{cex}{Positive numeric. The relative font size for annotation's label. Default is \code{1}. See description of argument \code{cex} in \link[graphics]{text} function.}
    \item{adjust}{One or two values in [0, 1]. Specifies the horizontal (and optionally vertical) adjustment of the labels. See description of argument \code{adj} in \link[graphics]{text} function.}
    \item{fg}{Character. Color name or code for label (texts and symbols). Default is \code{"#000000"} (black). }
-   \item{bg}{Character. Color name or code for thin buffer around label's elements. Default is \code{NA}, which is interpeted as \code{"transparent"} for \emph{captions} and as \code{"#FFFFFF1F"} for \emph{annotations}.}
+   \item{bg}{Character. Color name or code for thin buffer around label's elements. Default is \code{NA}, which is interpreted as \code{"transparent"} for \emph{captions} and as \code{"#FFFFFF1F"} for \emph{annotations}.}
    \item{buffer}{Numeric. The relative width of buffer around label's elements. Default is \code{1}.}
-   \item{fill}{Character. Color name or code for circumscribed rectangle around labels. Default is \code{NA}, which is interpeted as \code{"#FFFFFF7F"} for \emph{captions} and as \code{"transparent"} for \emph{annotations}.}
+   \item{fill}{Character. Color name or code for circumscribed rectangle around labels. Default is \code{NA}, which is interpreted as \code{"#FFFFFF7F"} for \emph{captions} and as \code{"transparent"} for \emph{annotations}.}
    \item{font}{Character. Font family. Default is \code{par("family")}.}
    \item{vertical}{Logical. Vertical orientation of label. If \code{FALSE}, then horizontal labeling. Default is \code{FALSE}.}
    \item{interpolate}{Logical. Passed as argument \code{interpolate} to function \code{\link[graphics:rasterImage]{rasterImage}} for logo annotation.}
@@ -68,7 +68,7 @@ This function is based on function \link[graphics]{text} with adding some decora
 
 Since the most of character keywords of \code{position} have relation to the boundary of image panel, such annotation is assigned as a \emph{caption} for image panel. Default decoration is shadowed background rectangle, which is implemented by function \link[graphics]{rect}.
 
-If location is defined by two-dimensional vector (either relative position inside of image boundaris (\code{pos} is numeric of length two), or pair \code{lon}, \code{lat}, or pair \code{x}, \code{y}), then such labeling is assigned as an \emph{annotation}. Default decoration is thin buffer around symbols. The implementaion is via application of function function \link[graphics]{text} for small diplacements around original position.
+If location is defined by two-dimensional vector (either relative position inside of image boundaries (\code{pos} is numeric of length two), or pair \code{lon}, \code{lat}, or pair \code{x}, \code{y}), then such labeling is assigned as an \emph{annotation}. Default decoration is thin buffer around symbols. The implementaion is via application of function function \link[graphics]{text} for small diplacements around original position.
 
 The priority of arguments (from higher to lower): 1) pair \code{lon}, \code{lat}, 2) pair \code{x}, \code{y}, 3) two-dimensional numeric of \code{pos}, 4) character keyword of \code{pos}. However, the default annotation is interpreted as a caption.
 }

@@ -29,7 +29,7 @@ update_coastline(merge = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-   \item{\dots}{Set of argumetns, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes:
+   \item{\dots}{Set of arguments, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes:
       \tabular{lll}{
           \emph{Matched pattern}\code{   } \tab \emph{Used name} \tab \emph{Description}
           \cr\code{coast(line)*} \tab \code{   } \tab
@@ -49,15 +49,15 @@ update_coastline(merge = TRUE)
    }
    \item{obj}{Objects of the one of the classes \code{\link[sp:Spatial-class]{Spatial}}, \code{\link[sf:sfc]{sfc}}, \code{ursaCoastLine}. The last one is internal structure, which is returned by function \code{.compose_coastline}.}
    \item{panel}{Integer vector. Panel for which coastline will be displayed. \code{0L} means that coastline will bw displayed for all panels. Default is \code{0L}.}
-   \item{col}{Character. Color code/name for coasline. Default is \code{"grey60"}.}
+   \item{col}{Character. Color code/name for coastline. Default is \code{"grey60"}.}
    \item{fill}{Character. Color code/name for land masking/shadowing. Default is \code{"transapent"}.}
    \item{detail}{Character keyword. The categorical spatial resolution for coastline. Valid values are \code{"l"} (low), \code{"m"} (medium), \code{"h"} (high), \code{"f"} (full). If value is \code{NA}, then coasline resolution is selected internally. Default is \code{NA}.}
    \item{density}{Numeric. The density of shading lines for land masking/shadowing. If \code{NA} then no shading lines are drawn. Default is \code{NA}. See \code{density} in \code{\link[graphics]{polygon}}.}
    \item{angle}{Numeric. The slope of shading lines, given as an angle in degrees (counter-clockwise). If \code{NA} then no shading lines are drawn. Default is \code{NA}. See \code{angle} in \code{\link[graphics]{polygon}}.}
    \item{land}{Logical. If \code{TRUE} then map's accent is to land, and ocean is masked/shadowed. If \code{FALSE} then map's accent is to ocean, and land is masked/shadowed. Default is \code{FALSE}.}
    \item{lwd}{Positive numeric. Width of coastline. Default is \code{1}. See \code{lwd} in \code{\link[graphics]{par}}.}
-   \item{lty}{Positive integer. Type (pattern) of coasltline. Default is \code{1L} (solid). See \code{lty} in \code{\link[graphics]{par}}.}
-   \item{fail180}{Logical. Patch for correct plotof poligons crossing 180 degree longitude. \code{NA} means than decision is taken intuitively. \code{TRUE} forces to implement crossing og 180 degree longitude. \code{FALSE} forces to not implement crossing og 180 degree longitude. Default is \code{NA}.}
+   \item{lty}{Positive integer. Type (pattern) of coastline. Default is \code{1L} (solid). See \code{lty} in \code{\link[graphics]{par}}.}
+   \item{fail180}{Logical. Patch for correct plotof polygons crossing 180 degree longitude. \code{NA} means than decision is taken intuitively. \code{TRUE} forces to implement crossing og 180 degree longitude. \code{FALSE} forces to not implement crossing og 180 degree longitude. Default is \code{NA}.}
    \item{verbose}{Logical. Value \code{TRUE} may provide some additional information on console. Default is \code{FALSE}.}
    \item{merge}{Logical. Ingored.}
 }
@@ -65,15 +65,15 @@ update_coastline(merge = TRUE)
 
 \code{compose_coastline} forms an obect of class \code{ursaCoastLine}. \code{panel_coastline} displays object of class \code{ursaCoastLine}. It is expected higher performance for multi-panel plotting.
 
-If \code{obj} is \code{NULL}, then internal data is used. This data is based on simplified polygons of \href{https://osmdata.openstreetmap.de/data/land-polygons.html}{OpenStreetMap-derived data}. Source data is \href{https://osmdata.openstreetmap.de/info/license.html}{licensed} under the Open Data Commons Open Database License (ODbL). The crossing longitude 180 degrees polygons are merged. Removing of small polygons and simplifying of polygons geometry is applyed for three levels of detalizations (\code{"l"} - low, \code{"i"} - interim, \code{"h"} - high). For the full (\code{"f"}) level of detalization data simplification is not applied.
+If \code{obj} is \code{NULL}, then internal data is used. This data is based on simplified polygons of \href{https://osmdata.openstreetmap.de/data/land-polygons.html}{OpenStreetMap-derived data}. Source data is \href{https://osmdata.openstreetmap.de/info/license.html}{licensed} under the Open Data Commons Open Database License (ODbL). The crossing longitude 180 degrees polygons are merged. Removing of small polygons and simplifying of polygons geometry is applied for three levels of details (\code{"l"} - low, \code{"i"} - interim, \code{"h"} - high). For the full (\code{"f"}) level of details data simplification is not applied.
 
-Coastline data are taken from directory, which is specidied by \code{getOption("ursaRequisite")} with default value \code{system.file("requisite",package="ursa")}. Package contains data of \code{"l"} (low) detalization level in the file \code{system.file("requisite/coast-l.rds",package="ursa")}. Data of higher levels can be added using \code{update_coastline()} function. It is required to specify user's requisite path using \code{options(ursaRequisite=path/to/user/files)} before loading \pkg{ursa}, e.g. in the user's \code{~/.Rprofile} file. Otherwise, there is a chance that data can not be updated due to 'permission deny' of the system directories. Package \pkg{sf} and some it's suggestions are required for data update.
+Coastline data are taken from directory, which is specified by \code{getOption("ursaRequisite")} with default value \code{system.file("requisite",package="ursa")}. Package contains data of \code{"l"} (low) details level in the file \code{system.file("requisite/coast-l.rds",package="ursa")}. Data of higher levels can be added using \code{update_coastline()} function. It is required to specify user's requisite path using \code{options(ursaRequisite=path/to/user/files)} before loading \pkg{ursa}, e.g. in the user's \code{~/.Rprofile} file. Otherwise, there is a chance that data can not be updated due to 'permission deny' of the system directories. Package \pkg{sf} and some it's suggestions are required for data update.
 
 
 
-If \code{detail=NA} then te spatial resolution is selected using CRS boundary and resolution using intuitive approach. If package's database cannot supply required detalization, then lower resolution is used.
+If \code{detail=NA} then the spatial resolution is selected using CRS boundary and resolution using intuitive approach. If package's database cannot supply required details, then lower resolution is used.
 
-Source coastline data in EPSG:4326 are transformed to CRS projection, extracted using \code{\link[ursa:session]{session_grid}} function. Coastlines with optional filling of either land or ocean area is interpreted as polygins. If filling is solid (there is no transparency or shading lines (numerical values of arguments \code{density} and \code{angle}), then coastline plotting is imlemented via \code{\link[graphics]{polypath}} function, otherwise  \code{\link[graphics]{polygon}} function.
+Source coastline data in EPSG:4326 are transformed to CRS projection, extracted using \code{\link[ursa:session]{session_grid}} function. Coastlines with optional filling of either land or ocean area is interpreted as polygons. If filling is solid (there is no transparency or shading lines (numerical values of arguments \code{density} and \code{angle}), then coastline plotting is imlemented via \code{\link[graphics]{polypath}} function, otherwise  \code{\link[graphics]{polygon}} function.
 }
 \value{
 \code{panel_coastline} returns \code{NULL}

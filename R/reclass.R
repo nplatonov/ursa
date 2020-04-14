@@ -91,7 +91,8 @@
                   str(dst)
                   val <- c(obj$value)
                   pb <- ursaProgressBar(min=0,max=length(src)
-                                     ,title="reclass: need optimization")
+                                       ,title="reclass: need optimization"
+                                       ,tail=TRUE)
                   for (i in seq_along(src)) {
                      ind <- .is.eq(c(obj$value),src[i])
                      if (length(ind))

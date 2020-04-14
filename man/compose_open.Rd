@@ -27,7 +27,7 @@ compose_open(...)
 %%~ dev <- .getPrm(list1,name="^dev",default=FALSE)
 %%~ verbose <- .getPrm(list1,name="^verb",default=FALSE)
 \arguments{
-   \item{\dots}{Set of argumetns, which are recognized via their names and classes:
+   \item{\dots}{Set of arguments, which are recognized via their names and classes:
       \describe{
          \item{\code{mosaic}}{Layout matrix or reference object to produce layout matrix. It is permitted to do not use name for this argument. Multiple types of argument are allowed: 1) object of class \code{ursaRaster}, 2) \code{\link[base:list]{list}} of \code{ursaRaster} objects (raster stack), 3) object of class \code{ursaLayout} from function \code{\link[ursa]{compose_design}}, 4) character keyword or 5) missing. Default is \code{NA}.}
          \item{\code{fileout}}{Character. Name for created PNG file. If absent (\code{""}) then temporal file is created and removed in \code{wait} seconds after opening in the associated external viewer. Default is absent (\code{""}).}
@@ -39,10 +39,10 @@ compose_open(...)
          \item{\code{colorbar} or \code{colorbarwidth}}{Positive numeric. Scale factor to increase (\code{colorbar>1}) or decrease (\code{colorbar<1}) width (the shortest dimension) of color bars (legends). Default value (\code{NA}) means 2.8\% of image panel width.}
          \item{\code{indent} or \code{space} or \code{offset}.}{Positive numeric. Scale factor to increase (\code{space>1}) or decrease (\code{space<1}) the white space between image panels and between image and color bar panels. Default value (\code{NA}) means 0.8\% of image panel width.}
          \item{\code{box}}{Logical. If \code{TRUE} then boundary box is plotted around image panels and color bar panels. It is a transparent rectangle with black border. Default is \code{TRUE}.}
-         \item{\code{delafter}}{Logical. If \code{TRUE} then created PNG file will be deleted after viewing. Default is \code{FALSE} for specified file names and \code{TRUE} for unspecidied (temporal) file names. It is implemented as file removing after opening in the external PNG viewer.}
+         \item{\code{delafter}}{Logical. If \code{TRUE} then created PNG file will be deleted after viewing. Default is \code{FALSE} for specified file names and \code{TRUE} for unspecified (temporal) file names. It is implemented as file removing after opening in the external PNG viewer.}
          \item{\code{wait}}{Positive numeric. Seconds between PNG file opening in the associated program and file removing. It make sense only if \code{delafter=TRUE}. Default is \code{1.0} (one second).}
-         \item{\code{device} or \code{type}}{Character keyword, either \code{"cairo"} or \code{"windows"} for OS Windows, and either \code{"cairo"}, \code{"cairo-png"}, \code{Xlib} or \code{quartz} for other OSes. Should be plotting be done using cairographics or Windows GDI? The same as \code{type} argument in the \code{\link[grDevices]{png}} function.  Default is \code{"cairo"}.}
-         \item{\code{antialias}}{Characted keyword, either \code{"none"} or \code{"default"}. Defines the effect on fonts. The same as \code{antialias} argument in the \code{\link[grDevices]{png}} function. Default is \code{"default"}.}
+         \item{\code{device} or \code{type}}{Character keyword, either \code{"cairo"}, \code{"windows"} or \code{"CairoPNG"} for OS Windows, and either \code{"cairo"}, \code{"cairo-png"}, \code{"Xlib"} or \code{"quartz"} for other OSes. Should be plotting be done using cairographics or Windows GDI? The same as \code{type} argument in the \code{\link[grDevices]{png}} function, excepting \code{"CairoPNG"}, which is handed by \pkg{Cairo} package. Default is \code{"cairo"}.}
+         \item{\code{antialias}}{Character keyword, either \code{"none"} or \code{"default"}. Defines the effect on fonts. The same as \code{antialias} argument in the \code{\link[grDevices]{png}} function. Default is \code{"default"}.}
          \item{\code{font} or \code{family}}{A length-one character vector. Specifies the font family. The same as \code{family} argument in the \code{\link[grDevices]{png}} function. Default is \code{"sans"} for \code{device="windows"} and \code{"Tahoma"} for \code{device="cairo"}.}
          \item{\code{bg} or \code{background}}{Character. The background color in PNG file. Passed as argument \code{bg} to \code{\link[grDevices]{png}} function. Default is \code{"white"}}
          \item{\code{retina}}{Positive numeric. Scale coefficent for retina displays. Default is taken from \code{getOption("ursaRetina")}; if it missed, then \code{1}.}
@@ -85,7 +85,7 @@ The set of required parameters for plotting are kept until function \code{\link[
    \item{ursaPngAuto}{For developers. Indicator of high-level functions for internal use (manual set; value is \code{TRUE}). Or, can be missed.}
    \item{ursaPngBox}{Argument \code{box}. If TRUE then \code{\link[graphics]{box}} is called for each panel of layout at the end of plotting.}
    \item{ursaPngDelafter}{Argument \code{delafter}. Applied in the function \code{\link[ursa]{compose_close}}.}
-   \item{ursaPngDevice}{Argument \code{device}. Appied for effective plottting of rasters and checking the ability for final reducing color depth from 24 to 8 bpp.}
+   \item{ursaPngDevice}{Argument \code{device}. Applied for effective plottting of rasters and checking the ability for final reducing color depth from 24 to 8 bpp.}
    \item{ursaPngDpi}{Argument \code{dpi}. Currently used for verbose only.}
    \item{ursaPngFamily}{Applied for text plotting in annotations and legends.}
    \item{ursaPngFigure}{Set \code{0L}. Specifies number of current panel in layout matrix. Used to detect term for applying \code{$ursaPngBox} option.}
@@ -94,7 +94,7 @@ The set of required parameters for plotting are kept until function \code{\link[
    \item{ursaPngPaperScale}{Numeric. Used for scalebar representation on the paper-based maps. If value \code{0}, then scalebar is display-based. If value is greater \code{0} then the scale is exact. If value is \code{-1} then the resonable rounding is used for scale displaying.}
    \item{ursaPngPlot}{The opposite to argument \code{dev}. If \code{$ursaPngPlot} is \code{FALSE} then any plotting functions of this package are ignored.}
    \item{ursaPngScale}{The actual value of argument \code{scale}, specified during function call or stated internally.}
-   \item{ursaPngShadow}{Set \code{""}. Used for shadowing of the part of color bars in the case of semi-trasparent land or ocean filling mask in the \code{\link[ursa]{panel_coastline}} function.}
+   \item{ursaPngShadow}{Set \code{""}. Used for shadowing of the part of color bars in the case of semi-transparent land or ocean filling mask in the \code{\link[ursa]{panel_coastline}} function.}
    \item{ursaPngSkipLegend}{Integer vector of non-negative length. Defines list of images panels, for which the color bars are not displayed.}
    \item{ursaPngWaitBeforeRemove}{Argument \code{wait}. Applied in the function \code{\link[ursa]{compose_close}} for temporal PNG file.}
 }

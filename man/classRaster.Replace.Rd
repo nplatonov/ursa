@@ -5,7 +5,7 @@
 \alias{[<-.ursaRaster}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Assing values to the portion of raster images
+assign values to the portion of raster images
 }
 \description{
 This operator is used to set or replace values in portion of bands or lines in \code{ursaRaster} object in memory or data writing to file.
@@ -21,7 +21,7 @@ This operator is used to set or replace values in portion of bands or lines in \
 \code{ursaRaster} object
 }
   \item{i}{
-Integer or character. If integer, then band index, specifying bands to replace. If character, either list of band names or charater sting for \code{\link[base:grep]{regular expression}} to match band index. In the \emph{(spatial, temporal)} iterpretation of \code{ursaRaster} object \code{j} points to \emph{temporal} component.
+Integer or character. If integer, then band index, specifying bands to replace. If character, either list of band names or character sting for \code{\link[base:grep]{regular expression}} to match band index. In the \emph{(spatial, temporal)} interpretation of \code{ursaRaster} object \code{j} points to \emph{temporal} component.
 }
   \item{j}{
 Mentioned for consistence with internal generic function \code{\link[base:Extract]{[<-}}.

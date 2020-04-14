@@ -128,7 +128,7 @@
    }
    else if (isSP) {
       if (verbose) {
-         pb <- ursaProgressBar(min=0,max=n)
+         pb <- ursaProgressBar(min=0,max=n,tail=TRUE)
          i <- -1
          repeat({
             n1 <- n*(10^i)

@@ -34,7 +34,7 @@ Character vector or \code{NULL}. Band names for created raster image. If \code{N
   \item{nodata}{
 Numerical or logical. Set value, which is interpreted as 'no-data' flag. If logical and \code{FALSE} then no no-data flag is assigned. If logical and \code{TRUE} then value of no-data flag is generated automatically. If numeric, then no-data is assigned to value of this argument. Default is \code{TRUE}.
 }
-\item{resetGrid}{Logical. Whether the grid will be resetted to default before raster generation? If \code{FALSE} then raster is generated in the sessional grid. If \code{TRUE} then default parameters are used for raster and session. Default is \code{FALSE}.}
+\item{resetGrid}{Logical. Whether the grid will be reset to default before raster generation? If \code{FALSE} then raster is generated in the sessional grid. If \code{TRUE} then default parameters are used for raster and session. Default is \code{FALSE}.}
 
 }
 \details{

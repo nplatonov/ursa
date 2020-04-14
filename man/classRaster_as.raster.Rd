@@ -15,7 +15,7 @@ Export raster object to a colored representation.
   \item{x}{
 \code{ursaRaster} object
 }
-  \item{\dots}{Set of argumetns, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes:
+  \item{\dots}{Set of arguments, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes:
   \describe{
      \item{\code{max}}{number giving the maximum of the color values range. Passed to function \code{\link[grDevices]{as.raster}} for S3 class 'array'. Default is 255.}
   }

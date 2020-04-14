@@ -61,7 +61,7 @@ Function \code{median} - arguments, which are passed to \code{local_median}.
 }
 }
 \details{
-If for valid output cell value it is requred to have at least \code{m} values not marked as \code{NA}, specify quota as \code{cover=m/nband(x)}.
+If for valid output cell value it is required to have at least \code{m} values not marked as \code{NA}, specify quota as \code{cover=m/nband(x)}.
 
 \code{local_mean} and \code{local_sum} are wrapper to non-public function \code{.average}.
 

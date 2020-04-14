@@ -30,6 +30,11 @@
       s2 <- c(s2,length(b$indr))
    indr <- c(indentr,s1[1]:s2[length(s2)],indentc)
    att <- attr(x,"info")
+   if (is.null(att$dpi)) { ## e.g. after Cairo::CairoPNG
+      dpi <- getOption("ursaPngDpi")
+      if (is.numeric(dpi))
+         att$dpi <- dpi
+   }
    if (isJPEG)
       jpeg::writeJPEG(x[indr,indc,],fileout)
    else if (isWEBP)

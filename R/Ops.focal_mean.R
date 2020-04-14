@@ -85,7 +85,7 @@
    chunk <- chunk_line(x,memory)
    isPb <- verbose & length(chunk)>1
    if (isPb)
-      pb <- ursaProgressBar(min=0,max=length(chunk))
+      pb <- ursaProgressBar(min=0,max=length(chunk),tail=TRUE)
    for (i in seq_along(chunk)) {
      # if (verbose)
          print(range(i))

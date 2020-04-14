@@ -40,7 +40,7 @@ Numeric. \code{0<=cover<=1}. Quota for \code{NA} values in the focal window in r
 Logical. If \code{TRUE} then only \code{NA} values of source image can be changed, and non-\code{NA} values of source image are kept without changes. It may provide less reducing of spatial resolution in the task of spatial interpolation. Default is \code{FALSE}.
 }
   \item{saveMargin}{
-Logical. If \code{TRUE} then adaptive window size is used for cells, where original window goes over image boundary. If \code{FALSE} then image is epxaned to the half size of focal window by \code{NA} values and argument \code{cover} is applied to this expanded part. Default is \code{FALSE}.
+Logical. If \code{TRUE} then adaptive window size is used for cells, where original window goes over image boundary. If \code{FALSE} then image is expanded to the half size of focal window by \code{NA} values and argument \code{cover} is applied to this expanded part. Default is \code{FALSE}.
 }
   \item{verbose}{
 Integer of \code{0L}, \code{1L}, or \code{2L}, or logical, which is coerced to integer. The level of verbosity. Values \code{>0} provide some additional information on console, \code{verbose=1L} is less detailed, \code{verbose=2L} is more detailed. Default is \code{0L}.

@@ -24,7 +24,7 @@ compose_graticule(...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-   \item{\dots}{Set of argumetns, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes:
+   \item{\dots}{Set of arguments, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes:
       \tabular{lll}{
           \emph{Matched pattern} \tab \emph{Used argument} \tab \emph{Description}
           \cr\code{(graticule|grid(line)*)} \tab \code{   } \tab Logical. Responsible for should grid lines be displayed or not. If \code{TRUE} then grid lines are plotted. If \code{FALSE} then grid lines are not displayed. Default is \code{TRUE}.
@@ -50,7 +50,7 @@ compose_graticule(...)
    \item{lat}{Numeric vector. Set of latitudes for grid. If \code{NA} then set of latidudes is formed internally. Default is \code{NA}.}
    \item{lwd}{Positive numeric. Width of grid line. Default is \code{0.5}. See \code{lwd} in \code{\link[graphics]{par}}.}
    \item{lty}{Positive integer. Type (pattern) of grid line. Default is \code{2} (dashed). See \code{lty} in \code{\link[graphics]{par}}.}
-   \item{marginalia}{Logical or integer vectors. Responsible for whether longitudes and latitudes (or metric coordinates) be labelled on the frame of panel with raster image. If logical and \code{TRUE}, then labels will be displatyed on each open side of panel. If logical and \code{FALSE} then labels will not be displayed. If logical of length 4, then labels will be displayed on specific side, where side index is \code{c(bottom, left, top, right)} (see description for marginal parameters in \code{\link[graphics]{par}}). If argument is a vector of positive integers, then labels for grid lines are plotted only for the specified panels, which sequence is defined in \code{\link[ursa]{compose_design}} function and returend from \code{getOption("ursaPngLayout")$layout}. Default is \code{c(TRUE,TRUE,TRUE,TRUE)}.}
+   \item{marginalia}{Logical or integer vectors. Responsible for whether longitudes and latitudes (or metric coordinates) be labelled on the frame of panel with raster image. If logical and \code{TRUE}, then labels will be displatyed on each open side of panel. If logical and \code{FALSE} then labels will not be displayed. If logical of length 4, then labels will be displayed on specific side, where side index is \code{c(bottom, left, top, right)} (see description for marginal parameters in \code{\link[graphics]{par}}). If argument is a vector of positive integers, then labels for grid lines are plotted only for the specified panels, which sequence is defined in \code{\link[ursa]{compose_design}} function and returned from \code{getOption("ursaPngLayout")$layout}. Default is \code{c(TRUE,TRUE,TRUE,TRUE)}.}
    \item{language}{Character. Language for longitude and latitude captions. If \code{"ru"} then captions are in Russian else in English. Default is \code{NA}.}
    \item{trim}{Logical. If grid lines are labelled then \code{trim=TRUE} prevents crossing the labels on neighbor perpendicular sides.}
    \item{cex}{Positive numeric. The relative font size for grid lines' labels. Make sence in the case of labels plotting. Default is \code{0.75}.}
@@ -61,7 +61,7 @@ If not \code{language="ru"} but environmental variable \code{LANGUAGE=ru} then l
 
 Argument \code{gridline} (or, \code{grid}) is introduced for unconditional calling of \code{panel_graticule} inside of high-level functions.
 
-Grid lines can be controlled in high-level plot functions (\emph{e.g.}, \code{\link[ursa]{display}}, \code{\link[ursa]{compose_plot}}, \code{\link[ursa]{display_stack}}, \code{\link[ursa]{display_brick}}, \code{\link[ursa]{display_rgb}}, \emph{etc}.). To prevent displaying grid lines, use argument \code{gridline=FALSE} (or \code{grid=FALSE}). To display grid lines, use argument \code{gridline=TRUE} (or \code{grid=TRUE}) and prefix \code{grid(line)*} (\code{gridline.*} or \code{grid.*}) for grid lines' parametes, \emph{e.g.}, \code{gridline.verb=TRUE}, \code{grid.col="black"}. If prefix is omitted then agruments with the same names affect in other functions in the part of high-level function.
+Grid lines can be controlled in high-level plot functions (\emph{e.g.}, \code{\link[ursa]{display}}, \code{\link[ursa]{compose_plot}}, \code{\link[ursa]{display_stack}}, \code{\link[ursa]{display_brick}}, \code{\link[ursa]{display_rgb}}, \emph{etc}.). To prevent displaying grid lines, use argument \code{gridline=FALSE} (or \code{grid=FALSE}). To display grid lines, use argument \code{gridline=TRUE} (or \code{grid=TRUE}) and prefix \code{grid(line)*} (\code{gridline.*} or \code{grid.*}) for grid lines' parameters, \emph{e.g.}, \code{gridline.verb=TRUE}, \code{grid.col="black"}. If prefix is omitted then arguments with the same names affect in other functions in the part of high-level function.
 
 If grid lines are formed internally, then desirable number of lines for each direction is 3. The design of line density is based on intuition, providing pretty labelling.
 

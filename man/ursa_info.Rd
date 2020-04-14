@@ -15,7 +15,7 @@ ursa_info(obj, detail = NA, ...)
   \code{ursaRaster} object
 }
   \item{detail}{
-\emph{Not used. Reserved for potential detalization levels}
+\emph{Not used. Reserved for potential detail levels}
 }
 %%~   \item{digits}{
 %%~   Non-negative integer. Minimal number of \emph{significant} digits, see \code{\link[base]{print.default}}. Default is \code{3}.
@@ -45,7 +45,7 @@ Object of \emph{temporal} class \code{ursaMetadata} is a list with items:
 \item{bandname}{Band names.}
 \item{colortable}{\emph{Optional}. Structure of \link[ursa:classColorTable]{color table}.}
 
-Function returs \code{NULL}.
+Function returns \code{NULL}.
 }
 %%~ \references{
 %%~ %% ~put references to the literature/web site here ~

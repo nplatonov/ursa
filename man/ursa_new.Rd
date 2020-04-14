@@ -12,13 +12,13 @@ ursa_new(...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-   \item{\dots}{Set of argumetns, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes:
+   \item{\dots}{Set of arguments, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes:
       \describe{
          \item{\code{value}}{Pattern is \code{"(|^value)"}. Admissible classes are (\code{\link[base]{matrix}}, \code{\link[base]{array}},\code{\link[base]{numeric}},\code{\link[base]{logical}}. Values to fill image. Array or matrix defines raster grid. If \code{value=FALSE} (logical), then created raster image has no values. By default, \code{value=NA}, the created raster image is filled by blank values (\code{NA}).}
          \item{\code{nband}}{Positive integer. Number of bands. Default is \code{1L}.}
          \item{\code{bandname}}{Character. Band names. Default is \code{NULL}. If specified, then \code{nband} is ignored, and the number of bands is equal to length of \code{bandname} character vector.}
-         \item{\code{ignorevalue}}{Integer or numeric. Value in ENVI binary file, which is iterpetted as \code{NA} in \R.}
-         \item{\code{datatype}}{Positive integer \code{c(1L, 2L, 3L, 4L, 5L, 11L, 12L, 13L)} or character. Data type (integer, floating-point) and byte length. See details for argument \code{datatype} of function \code{\link[ursa:conn.create_any]{create_envi}}. Required for writting raster to ENVI binart file. Optional for rasters in memory. Default is \code{NA}: data type is defined internally.}
+         \item{\code{ignorevalue}}{Integer or numeric. Value in ENVI binary file, which is interpretted as \code{NA} in \R.}
+         \item{\code{datatype}}{Positive integer \code{c(1L, 2L, 3L, 4L, 5L, 11L, 12L, 13L)} or character. Data type (integer, floating-point) and byte length. See details for argument \code{datatype} of function \code{\link[ursa:conn.create_any]{create_envi}}. Required for writing raster to ENVI binart file. Optional for rasters in memory. Default is \code{NA}: data type is defined internally.}
          \item{\code{colortable}}{Object of class \code{\link[ursa:classColorTable]{ursaColorTable}}. Color table for raster. Default is \code{NULL}: color table is absent}
          \item{\code{permute}}{Logical. Should dimensions of input matrix be changed. Default is \code{FALSE}.}
          \item{\code{flip}}{Logical. Vertical flip for input matrix. Default is \code{FALSE}: no flip.}

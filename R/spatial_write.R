@@ -62,7 +62,7 @@
      # fname1 <- paste0("res",seq_along(obj),".gpkg")
       fname1 <- .maketmp(length(obj),ext=interimExt)
       if (!allSF)
-         pb <- ursaProgressBar(min=0,max=2*length(obj))
+         pb <- ursaProgressBar(min=0,max=2*length(obj),tail=TRUE)
       p4s <- sapply(obj,function(x){
          res <- if (inherits(x,c("sf","sfc"))) sf::st_crs(x)$proj4string
                 else sp::proj4string(x)

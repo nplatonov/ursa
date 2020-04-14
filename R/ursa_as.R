@@ -170,8 +170,8 @@
    }
    if (inherits(obj,"stars")) {
       d <- sapply(obj,function(x) length(dim(x)))
-      if (any(d!=3))
-         stop("import 'stars' object: unhandled 4-dimensional arrays")
+      if (any(d>3))
+         stop("import 'stars' object: unhandled 4-dimensional (>3D) arrays")
       md <- attr(obj,"dimensions")
       cond1 <- identical(md$x$geotransform,md$y$geotransform)
       cond2 <- identical(md$x$refsys,md$y$refsys)

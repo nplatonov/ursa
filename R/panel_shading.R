@@ -28,7 +28,7 @@
    if (verbose)
    {
      # print(c(original=density,applied=dens,cex=par()$cex,scale=scale,res=res/1e3))
-      pb <- ursaProgressBar(min=0,max=nrow(obj))
+      pb <- ursaProgressBar(min=0,max=nrow(obj),tail=TRUE)
      # cat("dashing start...")
    }
    for (i in seq(nrow(obj)))

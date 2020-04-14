@@ -11,7 +11,7 @@
 \alias{ursa_extent}
 \alias{ursa_bbox}
 \title{
-   Extract and assign spatial paramaters of raster images.
+   Extract and assign spatial parameters of raster images.
 }
 \description{
 Raster image (\code{ursaRaster}) contains embedded spatial parameters (\code{\link[ursa:classGrid]{ursaGrid}}) in item \code{$grid}. These functions manipulate with item \code{$grid}.

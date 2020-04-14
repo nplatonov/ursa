@@ -11,7 +11,7 @@ compose_panel(..., silent = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-   \item{\dots}{Set of argumetns, which are passed to \code{\link[ursa:panel_new]{panel_new}}, \code{\link[ursa:panel_raster]{panel_raster}}, \code{\link[ursa:panel_coastline]{panel_coastline}}, \code{\link[ursa:panel_graticule]{panel_graticule}}, \code{\link[ursa:panel_annotation]{panel_annotation}}, \code{\link[ursa:panel_scalebar]{panel_scalebar}}.
+   \item{\dots}{Set of arguments, which are passed to \code{\link[ursa:panel_new]{panel_new}}, \code{\link[ursa:panel_raster]{panel_raster}}, \code{\link[ursa:panel_coastline]{panel_coastline}}, \code{\link[ursa:panel_graticule]{panel_graticule}}, \code{\link[ursa:panel_annotation]{panel_annotation}}, \code{\link[ursa:panel_scalebar]{panel_scalebar}}.
    }
      \item{silent}{Logical. Value \code{TRUE} cancels progress bar. Default is \code{FALSE}.
    }

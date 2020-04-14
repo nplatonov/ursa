@@ -16,7 +16,7 @@ focal_mean(x, size = 3.0, cover = 1e-06, fillNA = FALSE, saveMargin = TRUE
 Object of class \code{ursaRaster}.
 }
   \item{size}{
-Positive numeric. Size of square focal window. Fractional values are allowed. If \code{size} is not odd (3, 5, 7, \dots), then window size is expanded to the nearest odd value not less than original value, and pixels on border are taken with the weight, which is proportional to the cell area inside of orininal size. Default \code{size=3}.
+Positive numeric. Size of square focal window. Fractional values are allowed. If \code{size} is not odd (3, 5, 7, \dots), then window size is expanded to the nearest odd value not less than original value, and pixels on border are taken with the weight, which is proportional to the cell area inside of original size. Default \code{size=3}.
 }
   \item{cover}{
 Numeric. \code{0<=cover<=1}. Quota for \code{NA} values in the focal window in relation to all values. Values are taken with the weight proportional of cell areas inside of focal window. Quota exceeding leads to recording \code{NA} value in the cell. Default is \code{cover=1e-6}.
@@ -25,10 +25,10 @@ Numeric. \code{0<=cover<=1}. Quota for \code{NA} values in the focal window in r
 Logical. If \code{TRUE} then only \code{NA} values of source image can be changed, and non-\code{NA} values of source image are kept without changes. It may provide less reducing of spatial resolution in the task of spatial interpolation. Default is \code{FALSE}.
 }
   \item{saveMargin}{
-Logical. If \code{TRUE} then adaptive window size is used for cells, where original window goes over image boundary. If \code{FALSE} then image is epxaned to the half size of focal window by \code{NA} values and argument \code{cover} is applied to this expanded part. Default is \code{TRUE}.
+Logical. If \code{TRUE} then adaptive window size is used for cells, where original window goes over image boundary. If \code{FALSE} then image is expanded to the half size of focal window by \code{NA} values and argument \code{cover} is applied to this expanded part. Default is \code{TRUE}.
 }
   \item{noNA}{
-Logical. If \code{TRUE} then \code{NA} values are transformed to numerical constant, which is interpeted as "no data" value. Filter without \code{NA} values has more perfomance, and generally filter with pre- and post-trandormations of \code{NA} values have more perfomance too. Default is \code{TRUE}.
+Logical. If \code{TRUE} then \code{NA} values are transformed to numerical constant, which is interpreted as "no data" value. Filter without \code{NA} values has more perfomance, and generally filter with pre- and post-transformations of \code{NA} values have more perfomance too. Default is \code{TRUE}.
 }
   \item{verbose}{
 Integer of \code{0L}, \code{1L}, or \code{2L}, or logical, which is coerced to integer. The level of verbosity. Values \code{>0} provide some additional information on console, \code{verbose=1L} is less detailed, \code{verbose=2L} is more detailed. Default is \code{0L}.

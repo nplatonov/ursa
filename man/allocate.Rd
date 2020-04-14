@@ -29,7 +29,7 @@ Numeric of length 1. This value used to mark \code{NA} values in the writing to 
 Pattern in the format of \link[base:regex]{regular expressions}, which is used to select required columns in data frame. By default (\code{".*"}) all columns are used.
 }
   \item{cellsize}{
-Numeric. Desired size of cell in the raster grid. Used only when source data are not in regular grid. Default is \code{NA}; cell size is determed automatically to exclude case of points overlapping.
+Numeric. Desired size of cell in the raster grid. Used only when source data are not in regular grid. Default is \code{NA}; cell size is determined automatically to exclude case of points overlapping.
 }
   \item{verbose}{
 Logical. Some output in console. Primarily for debug purposes.

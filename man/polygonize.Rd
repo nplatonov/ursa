@@ -18,13 +18,13 @@ Object of class \code{ursaRaster}.
 Missing or character. If specified, then ESRI Shapefile is created. Default is \link[base]{missing}.
 }
   \item{engine}{
-Character keyword from list \code{c("native","sp","sf")}. Define package with tools for creating spatial data. If \code{engine="sp"}, then functions from package \pkg{sp} are used. If \code{engine="sf"}, then functions from package \pkg{sf} are used. If \code{engine="native"}, then apprpopriate package is used based on loaded namespaces before.
+Character keyword from list \code{c("native","sp","sf")}. Define package with tools for creating spatial data. If \code{engine="sp"}, then functions from package \pkg{sp} are used. If \code{engine="sf"}, then functions from package \pkg{sf} are used. If \code{engine="native"}, then appropriate package is used based on loaded namespaces before.
 }
   \item{verbose}{
 Logical. If \code{TRUE} then convertion is attended by progress bar. Default is \code{NA}; it means \code{TRUE} for \code{engine="sp"} and \code{FALSE} for \code{engine="sp"}.
 }
   \item{\dots}{
-   Additional arguments, which are passed to internal function for writting ESRI Shapefile.
+   Additional arguments, which are passed to internal function for writing ESRI Shapefile.
       \describe{
          \item{\code{compress}}{Logical. Should output ESRI Shapefile files be compressed by zip? Default is \code{FALSE}.}
    }

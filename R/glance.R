@@ -27,7 +27,7 @@
         # session_grid(NULL)
          s2 <- unlist(sapply(s1,.compose_wms,extend=FALSE))
          compose_open(length(s2),legend=NULL,...)#,fileout="res1.png")
-         pb <- ursaProgressBar(min=0,max=length(s2))
+         pb <- ursaProgressBar(min=0,max=length(s2),tail=TRUE)
         # print(getOption("ursaPngScale"))
          for (i in seq_along(s2)) {
             arglist[[1]] <- s2[i]
@@ -72,7 +72,7 @@
       else if (envi_exists(arglist[[1]],exact=TRUE)) {
          return(do.call("display",arglist))
       }
-      else if (.lgrep("\\.(tif|tiff|img|png|bmp|dat)$",arglist[[1]])) {
+      else if (.lgrep("\\.(tif|tiff|img|png|bmp|dat|grb)$",arglist[[1]])) {
          return(do.call("display",arglist))
       }
       else {
@@ -425,7 +425,7 @@
       gline <- compose_graticule(...)
       if (toCoast)
          cline <- compose_coastline(...)
-      pb <- ursaProgressBar(min=0,max=length(res),silent=silent)
+      pb <- ursaProgressBar(min=0,max=length(res),silent=silent,tail=TRUE)
       for (i in seq_along(res)) {
          if (isWeb)
             panel_new(fill="transparent",...)

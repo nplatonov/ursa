@@ -17,7 +17,7 @@ Convert raster image to a matrix
   \item{x}{
 Object of class \code{ursaRaster}
 }
-  \item{\dots}{Set of argumetns, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes.
+  \item{\dots}{Set of arguments, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes.
   \describe{
   \item{\code{(coord(s)*|crd|^$)}}{
       Logical If \code{TRUE} then \code{\link[base:list]{list}} is created with \code{x}, \code{y}, \code{z} components, where component \code{$z} contains matrix, components \code{$x} and \code{$y} are coordinates for elements if matrix. 

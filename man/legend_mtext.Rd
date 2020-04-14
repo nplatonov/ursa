@@ -16,7 +16,7 @@ legend_mtext(...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-   \item{\dots}{Set of argumetns, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes.  Passed to non-public \code{.legend_mtext}, excepting argument \code{mtext}:
+   \item{\dots}{Set of arguments, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes.  Passed to non-public \code{.legend_mtext}, excepting argument \code{mtext}:
       \describe{
          \item{\code{mtext}}{Prefix for indirect use (e.g., in \code{\link[ursa:compose_legend]{compose_legend}}). Separated by a dot \code{"."}, e.g., \code{mtext.cex=0.85}.}
       }

@@ -16,13 +16,13 @@ reclass(obj, dst = NULL, src = NULL, sparse = FALSE, ...)
 Object of class \code{ursaRaster} or \code{ursaColorTable}.
 }
   \item{dst}{
-Object of class \code{ursaRaster}, or object of class \code{ursaColorTable}, or numeric vector. If numeric, then the desired destination set of values, else reference object for reclassification; this object should have numerucial values of categories.
+Object of class \code{ursaRaster}, or object of class \code{ursaColorTable}, or numeric vector. If numeric, then the desired destination set of values, else reference object for reclassification; this object should have numerical values of categories.
 }
   \item{src}{
 Numerical vector, but allowed using with numerical vector of \code{dst} and \code{length(src)==length(dst)}. Source set of values.
 }
   \item{sparse}{
-Logical. If image has a lot of \code{NA} values then \code{sparse=TRUE} may speed up transforamtion. Default is \code{FALSE}.
+Logical. If image has a lot of \code{NA} values then \code{sparse=TRUE} may speed up transformation. Default is \code{FALSE}.
 }
   \item{\dots}{
 Other arguments are used for classification in the function \code{\link[ursa]{colorize}}.

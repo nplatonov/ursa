@@ -1,10 +1,10 @@
 \name{spatial_write}
 \alias{spatial_write}
 \title{
-Wrapper functions for writting spatial objects.
+Wrapper functions for writing spatial objects.
 }
 \description{
-Write spatial object to disk. If spatial object is Simple Features, then appropriate functions from package \pkg{sf} are used. If spatial objest are abstract of class Spatialm then appropriate functions from packages \pkg{sp} and \pkg{rgdal} are used.
+Write spatial object to disk. If spatial object is Simple Features, then appropriate functions from package \pkg{sf} are used. If spatial objest are abstract of class Spatial then appropriate functions from packages \pkg{sp} and \pkg{rgdal} are used.
 
 }
 \usage{
@@ -23,10 +23,10 @@ Character. File name with or without extension. If extension is missed, then arg
 Character. Layer name. If missed, then basename of \code{fname} is used.
 }
   \item{driver}{
-Character. Driver for specification of output file format. Default is \code{NA}; value is determed from extension of \code{fname}.
+Character. Driver for specification of output file format. Default is \code{NA}; value is determined from extension of \code{fname}.
 }
   \item{compress}{
-Character or logical. Will output file or list of files be packed after writting and what archive format will be used. Available character values are \code{""} (default; no compression), \code{"gz"}, \code{"gzip"}, \code{"bz2"}, \code{"bzip2"}, \code{"zip"}, \code{"xz"}. If logical and \code{TRUE}, then "zip" is used for \code{driver} "ESRI Shapefile" and "gzip" otherwise. If logical and \code{FALSE}, then no compression.
+Character or logical. Will output file or list of files be packed after writing and what archive format will be used. Available character values are \code{""} (default; no compression), \code{"gz"}, \code{"gzip"}, \code{"bz2"}, \code{"bzip2"}, \code{"zip"}, \code{"xz"}. If logical and \code{TRUE}, then "zip" is used for \code{driver} "ESRI Shapefile" and "gzip" otherwise. If logical and \code{FALSE}, then no compression.
 }
   \item{ogr2ogr}{
 Logical. If \code{"ogr2ogr"} is found in system path, then GDAL utils are used for speed up and layer merge (if \code{obj} is list of spatial objects)

@@ -17,7 +17,7 @@ Character. Filename for ENVI .hdr Labelled Raster file.
    \item{\dots}{
 %%~    For \code{readENVI}: arguments, which are passed to \code{read_envi} function.
    
-   For \code{read_envi}: Set of argumetns, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes. In the case of grids mismatch some arguments (e.g., \code{resample}) are passed to \code{\link[ursa:regrid]{regrid}} function.
+   For \code{read_envi}: Set of arguments, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes. In the case of grids mismatch some arguments (e.g., \code{resample}) are passed to \code{\link[ursa:regrid]{regrid}} function.
       \describe{
          \item{\code{(subset)*}}{\emph{Name can be omitted.} Integer or character. If integer, then indices of bands, either positive or negative. Positive indices are for included bands, negative indices for omitted bands. If character, then either sequence of band names or regex string. By default (\code{subset=NULL}), function reads all bands.}
          \item{\code{(ref)*}}{\emph{Name can be omitted.} \code{ursaRaster} or \code{ursaGrid} object. Reference grid for raster image resizing. By default (\code{ref=NULL}) there is no resizing.}

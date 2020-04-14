@@ -18,7 +18,7 @@ panel_contour(obj, type = "", ...)
 \arguments{
    \item{obj}{Object of class \code{ursaRaster} or \code{NULL}. Raster band for contouring. If \code{NULL} then contour is not displayed. Default is \code{NULL}.}
    \item{type}{Character. Keyword list to descibe characteristics of contour, which is interpreted using \link[base:regex]{regular expressions}.\cr\code{"label"} specifies displaying labels on contour lines. \cr\code{"line"} specifies displaying contour lines.\cr\code{"colo(u)*r"} specifies displaying colored contour lines. \cr\code{"fill"} specifies displaying filled contour lines.\cr Keywords can be combined in a single character, e.g., \code{"fill label"} specifies displaying filled contours with labels.}
-   \item{\dots}{Set of argumetns, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes:
+   \item{\dots}{Set of arguments, which are recognized via their names (using \link[base:regex]{regular expressions}) and classes:
       \describe{
          \item{\code{bg}}{Character. Color name or code for contour border. Used for contrast increasing. Semi-transparency and transparency (\code{"transparent"}) are allowed. Default is \code{"black"}.}
          \item{\code{lwd(\\\\.fg)*}}{Positive numeric. Width of contour line. Default is \code{1}.}
@@ -27,7 +27,7 @@ panel_contour(obj, type = "", ...)
          \item{\code{(lab)*cex}}{Numeric. Character expansion factor for labels. Default is \code{0.85}.}
          \item{\code{method}}{Character. Argument, which is passed to \code{\link[graphics]{contour}}. Default is \code{"flattest"}.}
 %%~          \item{\code{add}{Logical. Patch for displaying contour lines without starting new plot layout. Default is \code{TRUE}.}
-         \item{\code{expand}}{Numeric. Scale factor (\code{>=1}) to artificial increasing contour detalization by means of smoothing of increased image size. Not applicable for images with \link[ursa:classColorTable]{color tables}. Default is \code{NA}; smoothing is determed intuitively.}
+         \item{\code{expand}}{Numeric. Scale factor (\code{>=1}) to artificial increasing contour details by means of smoothing of increased image size. Not applicable for images with \link[ursa:classColorTable]{color tables}. Default is \code{NA}; smoothing is determined intuitively.}
          \item{\code{before}}{Logical. Should image reclassification be done before smoothing? Default is \code{FALSE} for categorical images and \code{TRUE} for numerical images.}
          \item{\code{cover}}{Numeric. Argument, which is passed to \code{\link[ursa:regrid]{regrid}} to control \code{NA} values during smoothing. Default is \code{NA}; connected to default value of argument \code{cover} in function \code{\link[ursa:regrid]{regrid}}.}
          \item{\code{short}}{Positive integer. Minimal number of points in segments for displaying. Prevents displaying very short segments in the case of high-detailed image. Default is \code{0}: all segments are displayed.}
@@ -46,7 +46,7 @@ The color table is forced not to be ramp (argument \code{ramp=FALSE} in the func
 The color table is forced to be interval (argument \code{interval=1L} in the function \code{\link[ursa]{colorize}}) to prevent lost of elements in the palette.
 }
 \value{
-Object of class \code{ursaColorTable}, which then should be used as an input argument for the colorbar legend (function \code{\link[ursa:legend_colorbar]{legend_colorbar}}). If there is no argument of class \code{ursaRaster} then function retunrs \code{NULL} value.
+Object of class \code{ursaColorTable}, which then should be used as an input argument for the colorbar legend (function \code{\link[ursa:legend_colorbar]{legend_colorbar}}). If there is no argument of class \code{ursaRaster} then function returns \code{NULL} value.
 }
 %%~ \references{
 %%~ %% ~put references to the literature/web site here ~

@@ -46,10 +46,10 @@ Keywords:
 \item{\code{layername} - character of length>=1. Layernames (\sQuote{Band name} in ENVI header file)}
 \item{\code{bandname} - character of length>=1. Layernames (\sQuote{Band name} in ENVI header file)}
 \item{\code{name} - character of length>=1. Layernames (\sQuote{Band name} in ENVI header file)}
-\item{\code{nodata} - integer or numeric. Value in GDAL or ENVI binary file, which is iterpetted as \code{NA} in \R}
-\item{\code{ignore} - integer or numeric. Value in GDAL or ENVI binary file, which is iterpetted as \code{NA} in \R}
-\item{\code{ignorevalue} - integer or numeric. Value in GDAL or ENVI binary file, which is iterpetted as \code{NA} in \R}
-\item{\code{bg} - integer or numeric. Value in GDAL or ENVI binary file, which is iterpetted as \code{NA} in \R}
+\item{\code{nodata} - integer or numeric. Value in GDAL or ENVI binary file, which is interpretted as \code{NA} in \R}
+\item{\code{ignore} - integer or numeric. Value in GDAL or ENVI binary file, which is interpretted as \code{NA} in \R}
+\item{\code{ignorevalue} - integer or numeric. Value in GDAL or ENVI binary file, which is interpretted as \code{NA} in \R}
+\item{\code{bg} - integer or numeric. Value in GDAL or ENVI binary file, which is interpretted as \code{NA} in \R}
 \item{\code{connection} - character. \emph{For} \code{create_envi} \emph{only}. \code{\link[base]{connections}} for ENVI binary file.}
 \cr\cr Valid values are:
 \itemize{

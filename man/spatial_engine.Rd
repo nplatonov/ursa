@@ -182,7 +182,7 @@ Further arguments passed to \code{sf::st_transform} or to \code{sp::spTransform}
 
 \code{spatial_data} (\emph{Extract} function) returns attribute table only, without geometry. Subsetting fields can be specified by argument \code{subset} using regular expressions. If \code{drop=TRUE} and selected single column then vector is returned instead of data frame.
 
-\code{spatial_data<-} (\emph{Replace} function) addes spatial data to the object geomerty. Source data (if presents) are droped.
+\code{spatial_data<-} (\emph{Replace} function) adds spatial data to the object geomerty. Source data (if presents) are droped.
 
 \code{spatial_geometry} (\emph{Extract} function) returns only geometry, which format is depended on class of \code{obj}.
 
@@ -192,7 +192,7 @@ Further arguments passed to \code{sf::st_transform} or to \code{sp::spTransform}
 
 \code{spatial_geotype} and \code{spatial_shape} are synonyms; each returns type of spatial data: "POINT", "LINESTRING", "POLYGON", "MULTIPOLYGON", \dots.
 
-\code{spatial_coordinates} returns simpliefied matrix or list of coordinates of original object.
+\code{spatial_coordinates} returns simplified matrix or list of coordinates of original object.
 
 \emph{Extract} functions \code{spatial_fields} and \code{spatial_columns} return column names of spatial attributive table. \code{spatial_columns} is synonym to \code{spatial_fields}.
 

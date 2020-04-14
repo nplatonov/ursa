@@ -24,7 +24,7 @@ ursa_seqr(obj)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-   \item{\dots}{Set of argumetns, which are recognized via their names (using \link[base:regex]{regular expressions}), position and classes.
+   \item{\dots}{Set of arguments, which are recognized via their names (using \link[base:regex]{regular expressions}), position and classes.
       \describe{
          \item{\code{.*}}{First argument (position 1). Object of classes \code{ursaRaster}, \code{ursaGrid}.}
          \item{\code{.*}}{Second argument (position >1). One-character name. Valid values are in the list \code{c("z","x","y","c","r","lines","samples")}. \code{"c"} (\code{"samples"}) and \code{"r"} (\code{"lines"}) specify to generate cell sequence in the horizontal and vertical directions from bottom-left corner, whereas \code{"z"} specifies to generate sequence of bands. \code{x} and \code{"y"} return cell midpoints in spatial dimension.}
