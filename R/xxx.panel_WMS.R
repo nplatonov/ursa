@@ -269,7 +269,7 @@
    }
    layer <- unlist(strsplit(paste(layers,collapse=","),split=","))#[1]
    arglist <- list(...)
-   if ((length(layer)==1)&&(extend | toStop)) { 
+   if ((length(layer)==1)&&(extend | toStop)) {
      # if (!file.exists(dst))
      #    download.file(src1,dst,mode="wt",quiet=!verbose)
      # else if ((verbose)&&(!isMetadata))
@@ -307,7 +307,7 @@
       }
       if (length(ind2))
          dname2 <- tail(unlist(strsplit(md[ind2],split="\\s+")),-1)
-      if (length(layer)==1) {
+      if ((length(ind1)>1)&&(length(layer)==1)) {
          ind7a <- grep(layer,md)
          ind1 <- ind1[ind1>min(ind7a)][1]
          ##~ print(ind1)

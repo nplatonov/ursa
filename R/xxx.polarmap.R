@@ -13,6 +13,7 @@
       layer <- as.character(as.list(match.call())[["obj"]])
       obj <- spatialize(obj,style="longlat")
    }
+   print("LAYER")
   # glance(obj);q()
    m <- leaflet::leaflet()
    m <- leaflet::addTiles(m)
@@ -54,9 +55,15 @@
       epsg[lon_0>=(-25) && lon_0<(+50)] <- 3575 ## 10
       epsg[lon_0>=(50) && lon_0<(+135)] <- 3576 ## 90
    }
+  # g0 <- session_grid()
+   if (!addFeature)
+      spatialize(obj,epsg=epsg,style="polarmap",resetGrid=TRUE)
+   g1 <- session_grid()
    obj <- spatial_transform(obj,4326)
    if ((.isSP(obj))&&(is.null(spatial_data(obj))))
       spatial_data(obj) <- data.frame(fid=seq(spatial_count(obj)))
+   if ((!is.character(group))||(!nchar(group)))
+      group <- "AOI" # "\u2302" # as.character(as.list(match.call())$obj)
    extent <- 11000000 + 9036842.762 + 667
    origin <- c(-extent, extent)
    maxResolution <- 2*extent/256
@@ -65,7 +72,7 @@
    crsArctic <- leaflet::leafletCRS(crsClass="L.Proj.CRS",code=paste0("EPSG:",epsg)
                           ,proj4def=ursa::spatial_crs(epsg)
                           ,resolutions=resolutions,origin=origin,bounds=bounds)
-   m <- leaflet::leaflet(options=leaflet::leafletOptions(crs=crsArctic,minZoom=3,maxZoom=9))
+   m <- leaflet::leaflet(options=leaflet::leafletOptions(crs=crsArctic,minZoom=3,maxZoom=12))
    m <- leaflet::addTiles(m
                          ,urlTemplate=paste0("https://{s}.tiles.arcticconnect.ca/osm_"
                                             ,epsg,"/{z}/{x}/{y}.png")
@@ -75,20 +82,42 @@
                                                       ,noWrap=TRUE
                                                       ,continuousWorld=FALSE
                                                       ,opacity=opacity
+                                                      ,minZoom=3,maxZoom=9
                                                       )
-                         ,group=if (nchar(group)) group else "Polarmap"
+                         ,group=group
                          )
    if (addMouseCoordinates)
       m <- leafem::addMouseCoordinates(m)
-   if (addFeature)
+   if (addFeature) {
       m <- leafem::addFeatures(m,data=obj,popup=leafpop::popupTable(obj)
-                              ,weight=0.5,group=group)
+                              ,weight=0.5
+                              ,group=group
+                              )
+   }
+   else {
+      z <- which.min(abs(g1$resx-resolutions))
+      if (z>9)
+         z <- 9
+      if (F) {
+         ll <- c(with(g1,.project(cbind((maxx+minx)/2,(maxy+miny)/2),proj4,inv=TRUE)))
+      }
+      else {
+         bbox <- spatial_bbox(obj)
+         ll <- unname(c((bbox[1]+bbox[3])/2,(bbox[2]+bbox[4])/2))
+      }
+     # print(ll)
+      m <- leaflet::setView(m,lng=ll[1],lat=ll[2],zoom=z)
+     # m <- leaflet::fitBounds(m,bbox[1],bbox[2],bbox[3],bbox[4])
+      #q()
+   }
    if (addScaleBar)
       m <- leaflet::addScaleBar(m,options=leaflet::scaleBarOptions(imperial=FALSE))
    if (addHomeButton) {
-     # m <- leafem::addHomeButton(m,ext=matrix(spatial_bbox(obj),ncol=2),layer.name=layer)
-      m <- leafem::addHomeButton(m,ext=raster::extent(spatial_bbox(obj)[c(1,3,2,4)])
-                                ,layer.name=layer)
+      m <- leafem::addHomeButton(m
+                               # ,ext=raster::extent(spatial_bbox(obj)[c(1,3,2,4)])
+                                ,ext=matrix(spatial_bbox(obj),ncol=2)
+                                ,group=group
+                                )
    }
    m
 }

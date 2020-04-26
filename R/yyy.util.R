@@ -397,7 +397,8 @@
    y
 }
 '.isRscript' <- function() .lgrep("^(--file=|-f$|-e$|--slave$)",commandArgs(FALSE))>=2
-'.isPackageInUse' <- function() "ursa" %in% loadedNamespaces()
+#'.isPackageInUse.deprecated' <- function() "ursa" %in% loadedNamespaces()
+'.isPackageInUse' <- function() "package:ursa" %in% search()
 '.argv0path' <- function() {
    arglist <- commandArgs(FALSE)
    if (length(ind <- .grep("^--file=.+",arglist,ignore.case=FALSE))==1)

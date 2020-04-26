@@ -1262,7 +1262,13 @@
       res <- with(g0,sqrt(resx*resy))
       s <- 2*6378137*pi/(2^(1:21+8))
       zoom <- which.min(abs(s-res))
-      g0 <- regrid(g0,res=s[zoom])
+      if ((style=="polarmap")&&(zoom>9)) {
+         znew <- 9
+         g0 <- regrid(g0,res=s[znew],expand=ifelse(dev <-F ,2^(zoom-znew),1))
+         zoom <- znew
+      }
+      else
+         g0 <- regrid(g0,res=s[zoom])
    }
    if (any(border!=0)) {
       g0 <- regrid(g0,border=border)

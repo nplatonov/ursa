@@ -1,4 +1,4 @@
-2020-04-14
+2020-04-20
 
 ### version 3.8.20
 
@@ -11,6 +11,12 @@
 -   In `compose_open` added value `CairoPNG` for agrument
     `device`/`type` for handled by **Cairo** package, which is added as
     suggested.
+
+-   Package **`widgetframe`** is added as suggested for development
+    purpose.
+
+-   In `allocate()` added argument `resetGrid` with default value
+    `FALSE` for resetting session grid before raster formation.
 
 ### version 3.8.19
 

@@ -9,7 +9,7 @@ Rasterization of point data into grid cells
 }
 \usage{
 allocate(vec, coords = c("x", "y"), nodata = NA, attr = ".+", fun = c("mean", "sum", "n"),
-         cellsize = NA, verbose = FALSE)
+         cellsize = NA, resetGrid = FALSE, verbose = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -30,6 +30,9 @@ Pattern in the format of \link[base:regex]{regular expressions}, which is used t
 }
   \item{cellsize}{
 Numeric. Desired size of cell in the raster grid. Used only when source data are not in regular grid. Default is \code{NA}; cell size is determined automatically to exclude case of points overlapping.
+}
+  \item{resetGrid}{
+Logical. If \code{TRUE} then existing base grid (from \code{\link[ursa:session]{session_grid()}}) will be overwritten. Otherwise using of current grid will be attempted.
 }
   \item{verbose}{
 Logical. Some output in console. Primarily for debug purposes.

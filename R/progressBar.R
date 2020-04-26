@@ -86,7 +86,7 @@
    op <- list(st)
    names(op) <- pb$optionName
    options(op)
-   if (!reset)
+   if ((!reset)&&(T & st["max"]!=st["current"]))
       return(NULL)
    if (missing(value))
       value <- unname(st["current"])-1
@@ -166,6 +166,8 @@
    utils::setTxtProgressBar(pb,value,title=title,label=label)
 }
 'close.ursaProgressBar' <- function(con,...) {
+   if (!length(con))
+      return(invisible(NULL))
    p <- getOption(con$optionName)
    if (p["current"]==p["max"]) {
       setUrsaProgressBar(con,unname(p["max"]))

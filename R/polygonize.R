@@ -1,5 +1,6 @@
 'polygonize' <- function(obj,fname,engine=c("native","sp","sf")
                         ,verbose=NA,...) {
+   class(obj) ## keep`session_grid` from reset in `a <- polygonize(envi_read())`
    engine <- match.arg(engine)
    if (engine=="sp") {
       isSF <- FALSE

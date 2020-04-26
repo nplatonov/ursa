@@ -40,13 +40,13 @@
    if (!is.ursa(obj))
       return(NULL)
    y <- obj$con
-   if (any(is.na(with(y,c(samples,lines,bands))))) {
+   if (anyNA(with(y,c(samples,lines,bands)))) {
       nb <- nband(obj)
       nc <- obj$grid$columns
       nr <- obj$grid$rows
    }
    else {
-      nb <- y$bands
+      nb <- if (!is.na(y$posZ[1])) length(y$posZ) else y$bands
       nr <- y$lines
       nc <- y$samples
    }

@@ -104,8 +104,19 @@
                return({
                   if ((FALSE)||(.isKnitr()))
                      print(knitr::kable(f,format="pandoc"))
-                  else
-                     print(f,quote=FALSE)
+                  else {
+                     ret <- print(f,quote=FALSE)
+                     if (candidate <- TRUE) {
+                        ct <- ursa(x,"category")
+                        if (!is.null(ct)) {
+                           o <- paste(ct,collapse=", ")
+                           if (nchar(o)>72)
+                              o <- paste0(substr(o,1,71),"\u2026")
+                           cat("   Classes: ",o,"\n")
+                        }
+                     }
+                     ret
+                  }
                })
             }
          }

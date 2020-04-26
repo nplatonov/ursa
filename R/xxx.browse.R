@@ -1,3 +1,16 @@
+'widgetize' <- function(obj,...) {
+   if (is.null(obj))
+      return(invisible(obj))
+   if (is.character(obj)) {
+      return(cat(obj,sep="\n"))
+   }
+   if (!ursa:::.isKnitr())
+      return(browse(obj,...))
+   obj
+  # if (!requireNamespace("widgetframe",quietly=.isPackageInUse()))
+  #    return(browse(obj))
+  # widgetframe::frameWidget(obj)
+}
 'browse' <- '.open' <- function(...) {
    arglist <- list(...)
    if (length(ind <- grep("^ref$",ignore.case=FALSE,names(arglist)))) {
@@ -130,8 +143,26 @@
          fname <- file.path(output,paste0("htmlwidget_",unname(md5),".html"))
          if (!file.exists(fname)) {
            # obj <- htmlwidgets::prependContent(obj,htmltools::HTML("<style>iframe {border: 3px solid magenta;}</style>"))
+            if (requireNamespace("widgetframe",quietly=.isPackageInUse())) {
+               obj <- widgetframe::frameableWidget(obj)
+            }
             htmlwidgets::saveWidget(obj,file=fname,libdir=libdir
-                                   ,selfcontained=FALSE)
+                                   ,selfcontained=FALSE
+                                   ,knitrOptions=list(hello="World")
+                                   )
+         }
+         a <- readLines(fname)
+         a <- grep("application/json.+data-for=\\\"htmlwidget",a,value=TRUE)
+         id <- gsub("^.+visdat\\W+([0-9a-f]+)\\W+.+$","\\1",a)
+         if ((nchar(id)>4)&&(nchar(id)<36)) {
+            a <- gsub(id,"gggg",a)
+            a <- gsub("(^.+htmlwidget\\W+)([0-9a-f]+)(\\W+.+$)","\\1hhhhh\\3",a)
+            saveRDS(a,ftemp)
+            md5 <- unname(tools::md5sum(ftemp))
+            file.remove(ftemp)
+            ename <- fname
+            fname <- file.path(dirname(fname),paste0("htmlwidget-",md5,".html"))
+            file.rename(ename,fname)
          }
          fname <- gsub("\\\\","/",fname)
          if (.lgrep("^(/\\w|[A-Z\\:\\w])",fname))
@@ -174,6 +205,7 @@
             ret2 <- browseURL(fname)
          }
          else {
+           # writeLines(cmd,"c:/tmp/cap.Rmd")
            # knitr::asis_output(cmd)
             cmd <- knitr::knit_child(text=cmd,quiet=TRUE)
             cat(cmd,sep="\n")

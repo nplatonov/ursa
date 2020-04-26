@@ -300,7 +300,7 @@
    flip <- TRUE
    permute <- FALSE
    bY <- b[[indY]]
-   if ((is.numeric(bY))&&((all(diff(bY)<0))||(nonstandard))) {
+   if ((is.numeric(bY))&&((all(diff(bY)<0))||(F & nonstandard))) {
       flip <- FALSE
       if (verbose)
          message("flip - reverse second dim")
@@ -540,6 +540,8 @@
       x <- x*60*60
    else if (.lgrep("day(s)* since",units))
       x <- x*60*60*24
+   else if (.lgrep("month(s)* since",units))
+      x <- x*60*60*24*365.25/12
    else if (.lgrep("since",units))
       stop(paste("incorrect parsing for 'origin' detection:",dQuote(units)))
    y <- as.POSIXct(x,origin=or,tz="UTC")

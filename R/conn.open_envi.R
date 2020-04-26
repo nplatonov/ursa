@@ -386,27 +386,43 @@
    }
    else if ((file.exists(fname.gz))&&(!file.info(fname.gz)$isdir))
    {
-      if (!decompress)
-      {
+      verbose <- Sys.Date()<=as.Date("2020-04-20") & !.isPackageInUse()
+      solved <- FALSE
+      if (nchar(Sys.which("gzip"))) {
+         if (cache) {
+            if (verbose)
+               message("trying cache")
+            con$fname <- .ursaCacheRaster(fname.gz
+                              ,ifelse(decompress,"gzip","gzip"),reset=cache!=1)
+            solved <- !is.null(con$fname)
+         }
+         else if (decompress) {
+            if (verbose)
+               message("local unpack")
+           # con$fname <- paste0(fname,".unpacked",.maketmp(),"~")
+            fbase <- .maketmp()
+            con$fname <- file.path(dirname(fbase)
+                                  ,paste0(basename(fname)
+                                         ,".unpacked",basename(fbase),"~"))
+           # print(con$fname)
+           # q()
+            system2("gzip",c("-f -d -c",.dQuote(fname.bz)),stdout=con$fname,stderr=FALSE)
+            solved <- !is.null(con$fname)
+         }
+         if (solved) {
+            con$connection <- "file"
+            con$compress <- ifelse(cache,0,-1L)
+         }
+      }
+      if ((!solved)&&(!decompress)) {
+         if (verbose)
+            message("internal ungzip")
          con$connection <- "gzfile"
          con$fname <- fname.gz
+         solved <- TRUE
       }
-      else
-      {
-         con$connection <- "file"
-        # con$fname <- paste0(fname,".unpacked~")
-         fbase <- .maketmp()
-         con$fname <- file.path(dirname(fbase)
-                               ,paste0(basename(fname)
-                                      ,".unpacked",basename(fbase),"~"))
-         if (FALSE) {
-            system(paste("gzip -f -d -k",fname.gz))
-            file.rename(fname,con$fname)
-         }
-         else  ## without "-k" key
-            system2("gzip",c("-f -d -c",.dQuote(fname.gz)),stdout=con$fname,stderr=FALSE)
-         con$compress <- -1L
-      }
+      if (!solved)
+         stop("Unable to open gzipped file")
       fname.aux <- paste0(fname,".aux.xml")
    }
    else if ((file.exists(fname.envigz))&&(!file.info(fname.envigz)$isdir))
@@ -450,6 +466,46 @@
          stop("Unable to open gzipped file")
       fname.aux <- paste0(fname.envi,".aux.xml")
    }
+   else if ((file.exists(fname.bz))&&(!file.info(fname.bz)$isdir)) {
+      verbose <- Sys.Date()<=as.Date("2020-04-20") & !.isPackageInUse()
+      solved <- FALSE
+      if (nchar(Sys.which("bzip2"))) {
+         if (cache) {
+            if (verbose)
+               message("trying cache")
+            con$fname <- .ursaCacheRaster(fname.bz
+                              ,ifelse(decompress,"bzip2","bzip2"),reset=cache!=1)
+            solved <- !is.null(con$fname)
+         }
+         else if (decompress) {
+            if (verbose)
+               message("local unpack")
+           # con$fname <- paste0(fname,".unpacked",.maketmp(),"~")
+            fbase <- .maketmp()
+            con$fname <- file.path(dirname(fbase)
+                                  ,paste0(basename(fname)
+                                         ,".unpacked",basename(fbase),"~"))
+           # print(con$fname)
+           # q()
+            system2("bzip2",c("-f -d -c",.dQuote(fname.bz)),stdout=con$fname,stderr=FALSE)
+            solved <- !is.null(con$fname)
+         }
+         if (solved) {
+            con$connection <- "file"
+            con$compress <- ifelse(cache,0,-1L)
+         }
+      }
+      if ((!solved)&&(!decompress)) {
+         if (verbose)
+            message("internal un-bzip2")
+         con$connection <- "bzfile"
+         con$fname <- fname.bz
+         solved <- TRUE
+      }
+      if (!solved)
+         stop("Unable to open bzip2-ped file")
+      fname.aux <- paste0(fname,".aux.xml")
+   }
    else if ((file.exists(fname.bingz))&&(!file.info(fname.bingz)$isdir))
    {
       if (!decompress)
@@ -475,32 +531,6 @@
          con$compress <- -1L
       }
       fname.aux <- paste0(fname.bin,".aux.xml")
-   }
-   else if ((file.exists(fname.bz))&&(!file.info(fname.bz)$isdir))
-   {
-      if (!decompress)
-      {
-         con$connection <- "bzfile"
-         con$fname <- fname.bz
-      }
-      else
-      {
-         con$connection <- "file"
-        # con$fname <- paste0(fname,".unpacked~")
-        # con$fname <- paste0(fname,".unpacked",basename(.maketmp()),"~")
-         fbase <- .maketmp()
-         con$fname <- file.path(dirname(fbase)
-                               ,paste0(basename(fname)
-                                      ,".unpacked",basename(fbase),"~"))
-         if (FALSE) ## should be obsolete
-            shell(paste("bzip2 -d -c",fname.bz,"1>",con$fname))
-         else {
-            system(paste("bzip2 -f -d -k",fname.bz))
-            file.rename(fname,con$fname)
-         }
-         con$compress <- -1L
-      }
-      fname.aux <- paste0(fname,".aux.xml")
    }
    else if ((file.exists(fname.xz))&&(!file.info(fname.xz)$isdir))
    {
@@ -585,16 +615,15 @@
    }
    if (is.null(grid$proj4))
       grid$proj4 <- ""
-  # print(str(wkt))
-  # print(str(grid$proj4))
    if ((!nchar(grid$proj4))&&(nchar(wkt)))
    {
-      lverbose <- FALSE
+      lverbose <- !FALSE
       if (lverbose)
          .elapsedTime("wkt -> proj4 start")
      # (!("package:rgdal" %in% search()))) { 
-      if ((nchar(Sys.which("gdalsrsinfo")))&&
-          (!any(c("rgdal","sf") %in% loadedNamespaces()))) {
+      isSF <- ("sf" %in% loadedNamespaces())&&(utils::packageVersion("sf")<"99990.9")
+      isSP <- "sp" %in% loadedNamespaces()
+      if ((nchar(Sys.which("gdalsrsinfo")))&&(!isSF)&&(!isSP)) {
          if (lverbose)
             message("'gdalsrsinfo' engine (read)")
          if (FALSE) ## slow
@@ -612,7 +641,7 @@
             grid$proj4 <- grid$proj4[nchar(grid$proj4)>0]
          }
       }
-      else if (!("sf" %in% loadedNamespaces())) {
+      else if (!isSF) {
          if (lverbose)
             message("rgdal::showP4")
          .try(grid$proj4 <- rgdal::showP4(wkt))
@@ -622,7 +651,35 @@
       else  {
          if (lverbose)
             message("sf::st_crs")
-         .try(grid$proj4 <- sf::st_crs(wkt=wkt)$proj4string)
+         opW <- options(warn=ifelse(.isPackageInUse(),-1,1))
+         if (utils::packageVersion("sf")<"0.9")
+            .try(grid$proj4 <- sf::st_crs(wkt=wkt)$proj4string)
+         else
+            .try(grid$proj4 <- sf::st_crs(wkt)$proj4string)
+         options(opW)
+        # res <- sf::st_crs(wkt)$proj4string
+        # message(res)
+         if ((is.na(grid$proj4))||(!nchar(grid$proj4))) {
+            if (nchar(Sys.which("gdalsrsinfo"))) {
+              ## FAILED for prj with 'wkt_esri' spec 
+               if (lverbose)
+                  message("      sf::st_crs --> gdalsrsinfo")
+               tmp <- .maketmp()
+               wktin <- paste0(tmp,".prj~")
+               writeLines(wkt,wktin)
+               wktout <- paste0(tmp,".wkt~")
+               system2("gdalsrsinfo",c("-o proj4",wktin),stdout=wktout,stderr=FALSE)
+               grid$proj4 <- .gsub("\'","",readLines(wktout,warn=FALSE))
+               file.remove(wktout)
+               file.remove(wktin)
+               grid$proj4 <- grid$proj4[nchar(grid$proj4)>0]
+            }
+            else {
+               message("      sf::st_crs -> rgdal::showP4")
+               .try(grid$proj4 <- rgdal::showP4(wkt))
+            }
+         }
+        # stop("This is ureacheable branch! TODO for `sf`>0.8")
       }
       if (lverbose)
          .elapsedTime("wkt -> proj4 finish")
@@ -652,7 +709,7 @@
   # m21 <- match(ln2,ln1)
    ftemp <- .maketmp()
    envi_rename(fname,ftemp)
-   src <- open_envi(ftemp)
+   src <- open_envi(ftemp) ## RECURSUVE
    dst <- create_envi(wname,...)
    for (i in chunk_band(src)) {
       dst[i] <- src[i]

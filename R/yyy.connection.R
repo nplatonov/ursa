@@ -870,6 +870,7 @@
       lverbose <- FALSE
       if (lverbose)
          .elapsedTime("proj4 -> wkt start")
+     # loadNamespace("sf") ## for development
      # (!("package:rgdal" %in% search()))) {
       if ((nchar(Sys.which("gdalsrsinfo")))&&
           (!(any(c("rgdal","sf") %in% loadedNamespaces())))) {
@@ -897,8 +898,15 @@
       else { ## 'sf' in namespace; 'OGC_WKT' ONLY. 
          if (lverbose)
             message("'sf' engine")
-         if (!.try(wkt <- sf::st_as_text(sf::st_crs(proj4),EWKT=TRUE)))
-            wkt <- NULL
+         if (!.try(wkt <- {
+            if (utils::packageVersion("sf")<"0.9")
+               ret <- sf::st_as_text(sf::st_crs(proj4),EWKT=TRUE)
+            else
+               ret <- sf::st_crs(proj4)$Wkt
+            ret
+         }))
+        # if (!.try(wkt <- sf::st_as_text(sf::st_crs(proj4),EWKT=TRUE)))
+        #    wkt <- NULL
         # print(proj4)
         # message(wkt)
          if (!TRUE) { ## 20191216 patch for EXTENSION["PROJ4","+proj=......."]

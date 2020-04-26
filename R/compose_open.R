@@ -1,15 +1,17 @@
 'compose_open' <- function(...) {
    if (F & .isKnitr())
-      retina <- 1
+      retina0 <- 1
    else {
-      retina <- getOption("ursaRetina")
-      if (!is.numeric(retina))
-         retina <- 1
+      retina0 <- getOption("ursaRetina")
+      if (!is.numeric(retina0))
+         retina0 <- 1
    }
    arglist <- list(...)
    mosaic <- .getPrm(arglist,name="",default=NA,class="")
    fileout <- .getPrm(arglist,name="fileout",default="")
-   retina <- .getPrm(arglist,name="retina",default=ifelse(nchar(fileout),1,retina))
+   retina <- .getPrm(arglist,name="retina",default=ifelse(nchar(fileout),1,retina0))
+   if ((!is.numeric(retina))||(is.na(retina)))
+      retina <- retina0
    dpi <- .getPrm(arglist,name="dpi",default=ifelse(.isKnitr(),150L,as.integer(round(96*retina))))
    pointsize <- .getPrm(arglist,name="pointsize",default=NA_real_)
    scale <- .getPrm(arglist,name="^scale$",class="",default=NA_real_)
@@ -226,7 +228,7 @@
              ,scale=scale,autoscale=autoscale,pointsize=pointsize,dpi=dpi))
    if (.isJupyter())
       options(jupyter.plot_mimetypes=ifelse(isJPEG,'image/jpeg','image/png'))
-   if ((device=="CairoPNG")&&(requireNamespace("Cairo"))) {
+   if ((device=="CairoPNG")&&(requireNamespace("Cairo",quietly=.isPackageInUse()))) {
       a <- try(Cairo::CairoPNG(filename=fileout
               ,width=png_width,height=png_height,res=dpi
               ,bg=background,pointsize=pointsize

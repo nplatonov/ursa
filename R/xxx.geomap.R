@@ -272,6 +272,8 @@
          else
             zman <- zoom
       }
+      if ((art=="polarmap")&&(zman>9))
+         zman <- 9
       if (zman!=zoom) {
          if (verbose)
             print(c(zoomAuto=zoom,zoomManual=zman))
