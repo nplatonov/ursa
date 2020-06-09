@@ -8,7 +8,8 @@ Read GDAL supported raster files.
 \code{read_gdal} creates \code{ursaRaster} object from GDAL supported raster files using functions from \pkg{rgdal} packages.
 }
 \usage{
-read_gdal(fname, resetGrid = TRUE, band = NULL, verbose = FALSE, ...)
+read_gdal(fname, resetGrid = TRUE, band = NULL, engine = c("native", "rgdal", "sf"),
+          verbose = FALSE, ...)
 
 ursa_read(fname, verbose = FALSE)
 }
@@ -22,6 +23,9 @@ Logical. If \code{TRUE} then new sessional grid is based on opened raster image.
 }
   \item{band}{
 Character (\link[base:regex]{regular expression}) or integer.
+}
+  \item{engine}{
+Character. Functionality of which package is used for reading data. If partial data (\code{band} is not \code{NULL}), then \code{engine} is \code{"rgdal"}. If value is \code{"sf"} and no partial data reading then \code{sf::gdal_read()} is used before importing. If value is \code{"rgdal"} or partial data reading, then interaction with \pkg{rgdal} is used. Currently, \code{"native"} is similar to \code{"rgdal"}, but in next versions behaviour can be changed to engine selection depends on which namespace has already loaded or has suggested package \pkg{sf} been installed.
 }
   \item{verbose}{
 Logical. Value \code{TRUE} may provide some additional information on console. Default is \code{FALSE}.

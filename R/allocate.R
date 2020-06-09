@@ -88,7 +88,7 @@
       colnames(vec) <- c("x","y")
       ind <- .grep("^(lon|lat)",mname)
       if ((length(ind)==2)&&(is.null(proj4)))
-         proj4 <- paste(" +proj=longlat +datum=WGS84 +no_defs")
+         proj4 <- paste("+proj=longlat +datum=WGS84 +no_defs")
    }
    if (is.null(proj4))
       proj4 <- ""

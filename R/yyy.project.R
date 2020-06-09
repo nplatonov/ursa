@@ -20,9 +20,11 @@
   # print(summary(xy))
   # proj4 <- requireNamespace("proj4",quietly=.isPackageInUse())
   # print(loadedNamespaces())
-   if (.lgrep("^\\s*\\+init=epsg:\\d+\\s*$",proj)) {
-     # proj <- .epsg2proj4(proj,force=TRUE,verbose=TRUE)
-     # requireNamespace("rgdal",quietly=.isPackageInUse())
+   if (F) {
+      if (.lgrep("^\\s*\\+init=epsg:\\d+\\s*$",proj)) {
+        # proj <- .epsg2proj4(proj,force=TRUE,verbose=TRUE)
+        # requireNamespace("rgdal",quietly=.isPackageInUse())
+      }
    }
   # if ((!FALSE)&&(!("package:rgdal" %in% search()))&&
    if ((!FALSE)&&(!("rgdal" %in% loadedNamespaces()))&&
@@ -55,7 +57,8 @@
       }
    }
    if (!a) {
-      requireNamespace("rgdal",quietly=.isPackageInUse())
+      if (!("rgdal" %in% loadedNamespaces()))
+         requireNamespace("rgdal",quietly=.isPackageInUse())
       if (is.list(xy))
          xy <- cbind(xy[[1]],xy[[2]])
       else if (!is.matrix(xy))

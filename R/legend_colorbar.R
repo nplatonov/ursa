@@ -517,6 +517,8 @@
       opacity <- 0
    else if (opacity>=1)
       opacity <- 1
+   if (opacity)
+      shadow <- ""
    if (side %in% c(1,3))
    {
       if (opacity) {

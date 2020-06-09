@@ -133,7 +133,7 @@
       }
       return(res)
    }
-   if ((is.list(obj))&&(!anyNA(match(c("filename","cols","rows","bands","proj4string"
+   if ((is.list(obj))&&(!anyNA(match(c("filename","cols","rows","bands","crs"
                                       ,"geotransform","datatype","meta")
                                     ,names(obj))))) { ## from 'sf::gdal_read'
       columns <- obj$cols[2]
@@ -150,8 +150,17 @@
       maxy <- obj$geotransform[4]
       maxx <- minx+columns*resx
       miny <- maxy-rows*resy
-      g1 <- regrid(minx=minx,maxx=maxx,miny=miny,maxy=maxy,columns=columns,rows=rows
-                  ,proj4=obj$proj4string)
+      if (miny>maxy) {
+         interim <- maxy
+         maxy <- miny
+         miny <- interim
+      }
+      prm <- list(minx=minx,maxx=maxx,miny=miny,maxy=maxy,columns=columns,rows=rows
+                  ,proj4=obj$crs$proj4string)
+      ##~ g1 <- regrid(minx=minx,maxx=maxx,miny=miny,maxy=maxy,columns=columns,rows=rows
+                  ##~ ,proj4=obj$crs$proj4string)
+      g1 <- regrid(setbound=c(minx,miny,maxx,maxy),dim=c(rows,columns)
+                  ,proj4=obj$crs$proj4string)
       session_grid(g1)
      # hasData <- inherits("NULL",class(attr(obj,"data")))
       hasData <- !inherits(attr(obj,"data"),"NULL")
@@ -163,7 +172,23 @@
                        ,flip=TRUE)
       }
       else {
-         res <- as.ursa(attr(obj,"data"),flip=TRUE)
+         v <-  attr(obj,"data")
+         attr(v,"units") <- NULL
+         dimv <- dim(v)
+         if (R.Version()$arch %in% c("i386","x86_64","dummy")[1]) {
+            if (length(dimv)==2)
+               res <- ursa_new() ## or RECURSIVE as_ursa()
+            else
+               res <- ursa_new(nband=dimv[3])
+            res$value <- v
+            dima <- dim(res)
+            dim(res$value) <- c(prod(dima[1:2]),dima[3])
+            class(res$value) <- "ursaNumeric"
+            rm(v)
+         }
+         else {## quicker for 'x86_64'
+            res <- as.ursa(v,flip=TRUE) ## RECURSIVE!!!
+         }
       }
      # .elapsedTime("sf::gdal_read -- finish")
       return(res)
@@ -194,17 +219,36 @@
       }
       maxx <- minx+columns*resx
       miny <- maxy-rows*resy
-      g1 <- regrid(minx=minx,maxx=maxx,miny=miny,maxy=maxy,columns=columns,rows=rows
-                  ,proj4=md$x$refsys)
+      ##~ prm <- list(minx=minx,maxx=maxx,miny=miny,maxy=maxy,columns=columns,rows=rows
+                  ##~ ,proj4=md$x$refsys)
+      ##~ g1 <- regrid(minx=minx,maxx=maxx,miny=miny,maxy=maxy,columns=columns,rows=rows
+                  ##~ ,proj4=md$x$refsys)
+      g1 <- regrid(setbound=c(minx,miny,maxx,maxy),dim=c(rows,columns)
+                  ,proj4=md$x$refsys$proj4string)
       session_grid(g1)
       isHomo <- length(obj)==0 ##
-      if (isHomo)
+      if (isHomo) {
          res <- as.ursa(obj[[1]],flip=TRUE)
+      }
       else {
          res <- vector("list",length(obj))
          names(res) <- names(obj)
-         for (i in seq_along(res))
-            res[[i]] <- as.ursa(obj[[i]],flip=TRUE)
+         for (i in seq_along(res)) {
+            if (R.Version()$arch %in% c("i386","x86_64")[1]) {
+              # print("A")
+               a <- ursa()
+               a$value <- obj[[i]]
+               dima <- dim(a)
+               dim(a$value) <- c(prod(dima[1:2]),dima[3])
+               class(a$value) <- "ursaNumeric"
+               res[[i]] <- a
+               rm(a)
+            }
+            else { ## quicker for 'x86_64'
+              # print("B")
+               res[[i]] <- as.ursa(obj[[i]],flip=TRUE) ## RECURSIVE!!!
+            }
+         }
       }
       return(res)
    }
@@ -248,7 +292,7 @@
    }
    if (inherits(obj,"ggmap")) {
       B <- 6378137*pi
-      .epsg3857 <- paste("","+proj=merc +a=6378137 +b=6378137"
+      .epsg3857 <- paste("+proj=merc +a=6378137 +b=6378137"
                         ,"+lat_ts=0.0 +lon_0=0.0"
                         ,"+x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null"
                         ,"+wktext +no_defs")
@@ -340,7 +384,6 @@
       return(res)
    }
    if (is.array(obj)) {
-     # print("ARRAY")
       arglist <- list(...)
       bname <- NULL
       if (!is.null(b1 <- attr(obj,"grid"))) {
@@ -366,7 +409,7 @@
                g1$proj4 <- p
             }
             else if (.lgrep("(lon|lat)",aname)==2)
-               g1$proj4 <- " +proj=longlat +datum=WGS84 +no_defs"
+               g1$proj4 <- "+proj=longlat +datum=WGS84 +no_defs"
             session_grid(g1)
          }
          if (length(indz)==1)

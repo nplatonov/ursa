@@ -18,10 +18,11 @@
    else
       kind <- kind0
    if (kind=="tk") {
+      Rver <- R.Version()
       if ((.Platform$OS.type=="unix")&&(!nchar(Sys.getenv("DISPLAY"))))
          kind <- "txt"
       else if ((!requireNamespace("tcltk",quietly=.isPackageInUse()))||
-        (!capabilities("tcltk")))
+        (!capabilities("tcltk"))||((Rver$'svn rev' %in% c("78619"))&&(Rver$arch %in% c("x86_64"))))
          kind <- "txt"
    }
    if ((!is.na(title))&&(!nchar(title)))

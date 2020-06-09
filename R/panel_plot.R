@@ -1,3 +1,4 @@
+## ?formals
 'panel_plot' <- function(obj,...)
 {
    if (.skipPlot(TRUE))
@@ -347,6 +348,19 @@
          return(unclass(unname(x1$colortable))[x1$index])
       x1
    })
+   if ((TRUE)&&(.isSF(obj))&&(.lgrep("(dens|angl)",names(arglist)))) {
+     # arglist$add <- NULL
+      if (!.isPackageInUse())
+         message("'sf' cannot deal with fill patterns; converted to 'Spatial'")
+      if (TRUE)
+         obj <- sf::as_Spatial(obj)
+      else if (FALSE) {
+         arglist$add <- NULL
+         ret <- lapply(obj,function(x1) {
+            do.call("polygon",c(unclass(x1),arglist))
+         })
+      }
+   }
    pkg <- attr(class(obj),"package")
    opW <- NULL
    if (is.character(pkg)) {
@@ -357,17 +371,7 @@
   # message("-----------------")
   # str(arglist)
   # message("-----------------")
-   if ((.isSF(obj))&&(.lgrep("(dens|angl)",names(arglist)))) {
-     # arglist$add <- NULL
-      message("'sf' cannot deal with fill patterns")
-      arglist$add <- NULL
-      ret <- lapply(obj,function(x1) {
-         do.call("polygon",c(unclass(x1),arglist))
-      })
-   }
-   else {
-      ret <- do.call("plot",c(list(obj),arglist))
-   }
+   ret <- do.call("plot",c(list(obj),arglist))
    if (!is.null(opW))
       options(opW)
    ret

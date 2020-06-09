@@ -58,3 +58,51 @@
    attr(res,"proj4") <- ursa_proj(obj)
    res
 }
+'consistent_grid' <- function(obj,ref,border=rep(0,4)) {
+   g0 <- getOption("ursaSessionGrid")
+  # if (identical(obj,g0))
+   if (missing(ref)) {
+      if ((!missing(obj))&&(!identical(obj,g0))) {
+         ref <- obj
+         obj <- g0
+      }
+      else
+         ref <- g0
+   }
+   if (missing(obj))
+      obj <- g0
+   if (identical(obj,ref))
+      return(obj)
+   isWeb <- ((.lgrep("\\+proj=merc",session_proj4()))&&
+      (!is.na(.is.near(ursa(obj,"cellsize"),2*6378137*pi/(2^(1:21+8))))))
+   if (is_ursa(ursa_grid(ref),"grid"))
+      d2 <- unname(ursa(ref,"dim"))
+   else if ((is.numeric(ref))&&(length(ref)==2))
+      d2 <- unname(ref)
+   d1 <- unname(ursa(obj,"dim"))
+   ##~ print(d1)
+   ##~ print(d2)
+   d <- min(d2/d1)
+   ##~ print(d)
+   if (d>1)
+      g2 <- regrid(obj,expand=d)
+   else
+      g2 <- regrid(obj,mul=ifelse(isWeb,1/2,d))
+   d3 <- c(ursa(g2,"nrow"),ursa(g2,"ncol"))
+   ##~ print(d3)
+   d4 <- d2-d3
+   dx <- rep(floor(d4[1]/2),2)
+   dy <- rep(floor(d4[2]/2),2)
+   if (d4[1] %%2 ==1)
+      dx <- dx+c(0,1)
+   if (d4[2] %%2 ==1)
+      dy <- dy+c(0,1)
+   b <- c(dx[1],dy[1],dx[2],dy[2])
+   g3 <- regrid(g2,border=b)
+   if (any(border!=0)) {
+      g3 <- consistent_grid(regrid(g3,border=border),ref=g3) ## RECURSIVE
+   }
+   ##~ d4 <- c(ursa(g3,"nrow"),ursa(g3,"ncol"))
+   ##~ print(d4)
+   g3
+}

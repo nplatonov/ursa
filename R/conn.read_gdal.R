@@ -2,8 +2,10 @@
    if (envi_exists(fname)) {
       return(read_envi(fname))
    }
-   if (!.lgrep("\\.zip$",fname))
-      return(.read_gdal(fname=fname,verbose=verbose))
+   if (!.lgrep("\\.zip$",fname)) {
+      return(read_gdal(fname=fname,verbose=verbose))
+     # return(.read_gdal(fname=fname,verbose=verbose))
+   }
    list1 <- unzip(fname,exdir=tempdir());on.exit(file.remove(list1))
    ind <- .grep("\\.tif(f)*$",list1)
    if (length(ind)) {
@@ -28,12 +30,56 @@
    }
    NULL
 }
-'read_gdal' <- function(fname,resetGrid=TRUE,band=NULL,verbose=FALSE,...) { ## ,...
-   obj <- open_gdal(fname,verbose=verbose)
-   if (is.null(obj))
-      return(NULL)
-   res <- if (!is.null(band)) obj[band] else obj[]
-   close(obj)
+'read_gdal' <- function(fname,resetGrid=TRUE,band=NULL
+                       ,engine=c("native","rgdal","sf"),verbose=FALSE,...) { ## ,...
+   engine <- match.arg(engine)
+   if (accepted_changes <- TRUE) {
+      if ((!is.null(band))||(engine %in% c("native","rgdal")[1:2])) {
+         isSF <- FALSE
+      }
+      else if (engine %in% c("native","sf")[2])
+         isSF <- TRUE
+      else {
+         loaded <- loadedNamespaces() #.loaded()
+         if ("sf" %in% loaded)
+            isSF <- TRUE
+         else if (("sp" %in% loaded)||("rgdal" %in% loaded))
+            isSF <- FALSE
+         else
+            isSF <- requireNamespace("sf",quietly=.isPackageInUse())
+      }
+   }
+   else
+      isSF <- FALSE
+   if (isSF) {
+     # str(md <- sf::gdal_metadata(fname,parse=!FALSE))
+     # str(ds <- sf::gdal_subdatasets(fname,name=TRUE))
+      res <- as_ursa(sf::gdal_read(fname))
+   }
+   else {
+      obj <- open_gdal(fname,verbose=verbose)
+      if (is.null(obj))
+         return(NULL)
+      res <- if (!is.null(band)) obj[band] else obj[]
+      close(obj)
+   }
+   if (T & length(grep("^\\d{8}\\.s1ab\\.1km\\.n\\.mos[13]d\\.jpg$",basename(fname)))) {
+     ## patch to seaice.dk Sentinel-1 mosaic
+      g0 <- ursa_grid(res)
+      if ((g0$columns==4500L)&&(g0$rows==5500L)) {
+         xy <- .project(c(-176.682000,61.327000),spatial_crs(3413))
+         g1 <- .grid.skeleton()
+         g1$resx <- g1$resy <- 1004.1
+         g1$proj4 <- spatial_crs(3413)
+         g1$columns <- g0$columns
+         g1$rows <- g0$rows
+         g1$minx <- round(xy[,1])-g1$resx/2
+         g1$maxy <- round(xy[,2])#+g1$resy/2
+         g1$maxx <- g1$minx+g1$resx*g1$columns
+         g1$miny <- g1$maxy-g1$resy*g1$rows
+         ursa_grid(res) <- g1
+      }
+   }
    if (resetGrid)
       session_grid(res)
    res

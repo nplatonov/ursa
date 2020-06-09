@@ -617,7 +617,7 @@
       grid$proj4 <- ""
    if ((!nchar(grid$proj4))&&(nchar(wkt)))
    {
-      lverbose <- !FALSE
+      lverbose <- FALSE
       if (lverbose)
          .elapsedTime("wkt -> proj4 start")
      # (!("package:rgdal" %in% search()))) { 

@@ -3681,6 +3681,7 @@ void isNear(double *x1,double *x2,int *len1,int *len2,int *res)
             }
          }
       }
+      //~ Rprintf("i2=%d\n",i2);
       //~ if (i2<n2)
          //~ Rprintf("ratio=%f\n",fabs(x1[i1]/x2[i2]-1.0));
       if (i2<n2)

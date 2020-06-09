@@ -21,11 +21,14 @@
 # https://leaflet-extras.github.io/leaflet-providers/preview/
 # https://leaflet-extras.github.io/leaflet-providers/leaflet-providers.js
 '.tileService' <- function(server="") {
+   language <- if (.lgrep("Russian",ctype <- Sys.getlocale("LC_TIME"))) "ru"
+               else Sys.getenv("LANGUAGE")
    osmCr <- "\uA9 OpenStreetMap contributors"
    optHERE <- getOption("HEREapp")
    TFkey <- getOption("ThunderforestApiKey")
    BingKey <- getOption("BingMapsKey")
    mapsurferKey <- getOption("openrouteserviceToken")
+   googleCr <- "Google TERMS OF USE ARE VIOLATED"
    s <- list()
    s$mapnik <- c("https://{abc}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 ,osmCr) ## # http://{abc}.tile.osm.org/{z}/{x}/{y}.png
@@ -100,6 +103,20 @@
                      ,paste0(osmCr,", \uA9 OpenTopoMap"))
    s$polarmap <- c("https://{abc}.tiles.arcticconnect.ca/osm_{l}/{z}/{x}/{y}.png"
                   ,paste0("Map \uA9 ArcticConnect. Data ",osmCr))
+   s$google.h <- c(paste0("https://mt{0123}.google.com/vt/lyrs=h" ## roads only
+                               ,"&x={x}&y={y}&z={z}&hl=",language),googleCr)
+   s$google.m <- c(paste0("https://mt{0123}.google.com/vt/lyrs=m" ## standard roadmap
+                               ,"&x={x}&y={y}&z={z}&hl=",language),googleCr)
+   s$google.r <- c(paste0("https://mt{0123}.google.com/vt/lyrs=r" ## somehow altered roadmap
+                               ,"&x={x}&y={y}&z={z}&hl=",language),googleCr)
+   s$google.s <- c(paste0("https://mt{0123}.google.com/vt/lyrs=s" ## satellite only
+                                 ,"&x={x}&y={y}&z={z}&hl=",language),googleCr)
+   s$google.y <- c(paste0("https://mt{0123}.google.com/vt/lyrs=y" ## hybrid
+                                 ,"&x={x}&y={y}&z={z}&hl=",language),googleCr)
+   s$google.t <- c(paste0("https://mt{0123}.google.com/vt/lyrs=t" ## terrain only
+                                 ,"&x={x}&y={y}&z={z}&hl=",language),googleCr)
+   s$google.p <- c(paste0("https://mt{0123}.google.com/vt/lyrs=p" ## terrain
+                                 ,"&x={x}&y={y}&z={z}&hl=",language),googleCr)
   # http://a.maps.owm.io/map/precipitation_new/6/37/19?appid=b1b15e88fa797225412429c1c50c122a1   
    if (!sum(nchar(server)))
      return(names(s))

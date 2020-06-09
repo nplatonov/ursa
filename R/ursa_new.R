@@ -143,8 +143,13 @@
       ##~ dim1[3] <- bands
      # dim3 <- as.integer(c(prod(dim1[1:2]),dim1[3]))
       dim3 <- c(dim1[1]*dim1[2],dim1[3])
-      if ((is.null(dim(value)))&&(length(value)==bands))
-         result$value <- array(rep(value,each=dim3[1]),dim=dim3)
+      if ((is.null(dim(value)))&&(length(value)==bands)) {
+         if ((bands==1)&&(length(value)==1)) {
+            result$value <- array(value,dim=dim3)
+         }
+         else
+            result$value <- array(rep(value,each=dim3[1]),dim=dim3)
+      }
       else {
          result$value <- array(value,dim=dim3)
       }
@@ -181,8 +186,11 @@
       class(result$value) <- "ursaCategory"
    }
    else {
-      ursa_colortable(result) <- NULL
-      class(result$value) <- "ursaNumeric"
+      ursa_colortable(result) <- character()
+      class(result$value) <- "ursaNumeric" ## not quick
+     # attr(result$value,"class") <- c(attr(result$value,"class"),"ursaNumeric")
+     # attr(result$value,"class") <- "ursaNumeric" ## not quick too
+     # print(class(result$value))
    }
    result
 }

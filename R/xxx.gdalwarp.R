@@ -106,6 +106,8 @@
       return(NULL)
    proj_lib <- Sys.getenv("PROJ_LIB")
    Sys.setenv(PROJ_LIB=file.path(dirname(dirname(Sys.which("gdalwarp"))),"share/proj"))
+  # Sys.setenv(PROJ_LIB="")
+  # print(Sys.getenv("PROJ_LIB"))
    system(cmd)
    Sys.setenv(PROJ_LIB=proj_lib)
    session_grid(NULL)

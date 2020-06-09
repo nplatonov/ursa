@@ -1043,6 +1043,10 @@
          }
          else if (proj=="laea") {
             if (style=="polarmap") {
+               if (length(crs)) {
+                  lon_0 <- as.numeric(gsub(".*\\+lon_0=(\\S+)\\s.*","\\1"
+                                          ,spatial_crs(crs)))
+               }
                lon_0[lon_0<(-165) || lon_0>=(+135)] <- -180
                lon_0[lon_0>=(-165) && lon_0<(-125)] <- -150
                lon_0[lon_0>=(-125) && lon_0<(-70)] <- -100
@@ -1056,7 +1060,7 @@
                           ,"+k=1","+x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs")
          }
          else if (proj=="merc")
-            t_srs <- paste("","+proj=merc +a=6378137 +b=6378137"
+            t_srs <- paste("+proj=merc +a=6378137 +b=6378137"
                           ,"+lat_ts=0.0",paste0("+lon_0=",lon_0)
                           ,"+x_0=0.0 +y_0=0 +k=1.0 +units=m"
                          # ,"+nadgrids=@null"
@@ -1066,11 +1070,11 @@
          }
          else if (proj %in% c("zzzgoogle")) {
             if (FALSE)#(selection %in% c(1000L,3L))
-               t_srs <- paste("","+proj=merc +a=6378137 +b=6378137"
+               t_srs <- paste("+proj=merc +a=6378137 +b=6378137"
                              ,"+lat_ts=0.0 +lon_0=180.0 +x_0=0.0 +y_0=0 +k=1.0"
                              ,"+units=m +nadgrids=@null +wktext +no_defs")
             else
-               t_srs <- paste("","+proj=merc +a=6378137 +b=6378137"
+               t_srs <- paste("+proj=merc +a=6378137 +b=6378137"
                              ,"+lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0"
                              ,"+units=m +nadgrids=@null +wktext +no_defs")
          }
@@ -1156,6 +1160,9 @@
            # str(style)
            # str(t_srs)
             if (isSF) {
+               patt <- "\\+init=epsg\\:(.+)\\s*$"
+               if (length(grep(patt,t_srs)))
+                  t_srs <- as.integer(gsub(patt,"\\1",t_srs))
               # str(sf::st_crs(obj))
                obj <- sf::st_transform(obj,t_srs)
             }

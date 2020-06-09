@@ -49,8 +49,12 @@
             obj <- round(obj*alpha)
       }
       if ((is.numeric(alpha))&&(alpha<1)) {
-         if (nband(obj) %in% c(1,3))
+         if (nband(obj) %in% c(1,3)) {
+            g3 <- session_grid()
+            session_grid(obj)
             obj <- c(obj,ursa_new(round(alpha*255),bandname=paste("Band",nband(obj)+1)))
+            session_grid(g3)
+         }
          else if (nband(obj) %in% c(4)) {
             obj[4] <- round(obj[4]*alpha)
          }

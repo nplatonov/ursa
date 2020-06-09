@@ -10,6 +10,7 @@
 \alias{ursa_lines}
 \alias{ursa_extent}
 \alias{ursa_bbox}
+\alias{consistent_grid}
 \title{
    Extract and assign spatial parameters of raster images.
 }
@@ -29,14 +30,22 @@ ursa_lines(obj)
 
 ursa_extent(obj)
 ursa_bbox(obj)
+
+consistent_grid(obj, ref, border = rep(0, 4))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{obj}{
-\code{ursaRaster} object. For \code{ursa_grid} function \code{\link[base]{list}} of \code{ursaRaster} objects is allowed
+\code{ursaRaster} object. For \code{ursa_grid} function \code{\link[base]{list}} of \code{ursaRaster} objects is allowed.
 }
   \item{value}{
-\code{\link[ursa:classGrid]{ursaGrid}} object
+\code{\link[ursa:classGrid]{ursaGrid}} object.
+}
+  \item{ref}{
+\code{\link[ursa:classGrid]{ursaGrid}} reference object.
+}
+  \item{border}{
+\code{integer} of length 1 or 4. If length 4, then vector (bottom, left, top, right) in cells for extent expand. If length <4, then value is repeated for length 4. Passed to \code{\link[ursa:regrid]{regrid()}}.
 }
 }
 \details{
@@ -47,6 +56,8 @@ ursa_bbox(obj)
 \code{ursa_nrow}, \code{ursa_rows}, \code{ursa_lines} are synonyms for extracting number of rows/lines.
 
 \code{ursa_extent}, \code{ursa_bbox}, are synonyms for extracting boundary box (spatial extent).
+
+\code{consistent_grid} trasforms dimension (\code{ursa_nrow()} by \code{ursa_ncol()}) \code{obj}-grid to dimension of \code{ref}-grid. This helpful for multipanel plotting if objects have different boundary boxes.
 }
 \value{
 \code{ursa_grid} return value of \code{$grid} item of \code{ursaRaster} object.
@@ -58,6 +69,9 @@ ursa_bbox(obj)
 \code{ursa_nrow}, \code{ursa_rows}, \code{ursa_lines} return integer of length 1.
 
 \code{ursa_extent}, \code{ursa_bbox} return numeric of length 4 (xmin, ymin, xmax, ymax).
+
+\code{ursa_consistent} returns \code{\link[ursa:classGrid]{ursaGrid}} object.
+
 }
 %%~ \references{
 %%~ %% ~put references to the literature/web site here ~

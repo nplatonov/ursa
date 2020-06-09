@@ -13,8 +13,8 @@ glance(...)
 
 # non-public
 .glance(dsn, layer = ".*", grid = NULL, field = ".+", size = NA, expand = 1,
-        border = 27, lat0 = NA, lon0 = NA, resetProj = FALSE, style = "auto",
-        feature = c("auto", "field", "geometry"), alpha = NA,
+        border = 27, lat0 = NA, lon0 = NA, resetProj = FALSE, resetGrid = FALSE, 
+        style = "auto", feature = c("auto", "field", "geometry"), alpha = NA,
         basemap.order = c("after", "before"), basemap.alpha = NA,
         engine = c("native", "sp", "sf"), geocode = "", place="",
         area = c("bounding", "point"), zoom = NA, gdal_rasterize = FALSE,
@@ -53,6 +53,9 @@ Numeric. Central meridian, which have vertical direction on the plot. If \code{N
 }
   \item{resetProj}{
 Logical. Value \code{TRUE} overwrites projection of vector file. Default is \code{FALSE}.
+}
+  \item{resetGrid}{
+Logical. If \code{TRUE}, then \link[ursa:session]{session grid} is ignored, and new session grid is assigned from input file. If \code{FALSE}, then input file is nested in the session grid.
 }
   \item{style}{
 Character. Either projection class or source of web-catrogrpaphy for basemap. Specified by a sentence of words separated by spaces.

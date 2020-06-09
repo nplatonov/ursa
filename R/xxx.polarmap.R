@@ -13,7 +13,6 @@
       layer <- as.character(as.list(match.call())[["obj"]])
       obj <- spatialize(obj,style="longlat")
    }
-   print("LAYER")
   # glance(obj);q()
    m <- leaflet::leaflet()
    m <- leaflet::addTiles(m)

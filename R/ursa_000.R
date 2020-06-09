@@ -49,6 +49,8 @@
          return(ursa_grid(obj)$columns)
       if (.lgrep("(nrow|rows|lines)",attr))
          return(ursa_grid(obj)$rows)
+      if (.lgrep("^dim",attr))
+         return(dim(obj))
       return(NULL)
    }
    if (!is.ursa(obj)) {

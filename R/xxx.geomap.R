@@ -12,7 +12,7 @@
                            ,"mapnik"),"color")
    if (is.na(zoom))
       zoom <- "0"
-   staticMap <- c("openstreetmap","google","sputnikmap")
+   staticMap <- c("openstreetmap","google$","sputnikmap")
    tilePatt <- paste0("(",paste0(unique(c(staticMap,tileList))
                                 ,collapse="|"),")")
    tilePatt <- .gsub("\\.","\\\\.",tilePatt)
@@ -103,6 +103,8 @@
          else {
             loc <- with(g0,.project(rbind(c(minx,miny),c(maxx,maxy)),proj4,inv=TRUE))
             loc <- c(loc)[c(1,3,2,4)]
+            if ((art=="polarmap")&&(loc[1]>loc[3]))
+               loc <- loc[c(3,2,1,4)]
          }
       }
       if (!((is.numeric(loc))&&(length(loc) %in% c(4,2)))) {
@@ -176,7 +178,7 @@
          s <- 2*B/(2^(1:19+8))
       }
       else {
-         proj4 <- paste("","+proj=merc +a=6378137 +b=6378137"
+         proj4 <- paste("+proj=merc +a=6378137 +b=6378137"
                        ,"+lat_ts=0.0",paste0("+lon_0=",lon_0)
                        ,"+x_0=0.0 +y_0=0 +k=1.0"
                        ,"+units=m +nadgrids=@null +wktext +no_defs")
@@ -363,7 +365,7 @@
          dx0 <- lon_0*pi/180*B0
          minx <- g0$minx+dx0
          maxx <- g0$maxx+dx0
-         epsg3857 <- paste("","+proj=merc +a=6378137 +b=6378137"
+         epsg3857 <- paste("+proj=merc +a=6378137 +b=6378137"
                           ,"+lat_ts=0.0 +lon_0=0.0"
                           ,"+x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null"
                           ,"+wktext  +no_defs")

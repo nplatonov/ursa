@@ -334,7 +334,7 @@
    n1 <- length(x1)
    n2 <- length(x2)
    b1 <- .Cursa("isNear",x1=as.numeric(x1),x2=as.numeric(x2),n1=n1,n2=n2
-           ,res=integer(n1),NAOK=TRUE)$res
+           ,res=integer(n1),NAOK=FALSE)$res
    b1[b1==0] <- NA
    if (verbose)
       message(".is.near: fuzzy matching")
@@ -428,7 +428,7 @@
       return(NA)
    !is.null(dim(obj$value))
 }
-'.normalizePath' <- function(path) normalizePath(path,winslash="/",mustWork=FALSE)
+'.normalizePath' <- function(path) normalizePath(path,winslash=.Platform$file.sep,mustWork=FALSE)
 '.isKnitr' <- '.isKnit' <- function() {
   # cond1 <- requireNamespace("knitr",quietly=.isPackageInUse())
   # if (!cond1)
@@ -445,6 +445,18 @@
    if (!is.character(res))
       return(FALSE)
    res=="revealjs"
+}
+'.isDashboard' <- function() {
+   if (!all(c("knitr","rmarkdown") %in% loadedNamespaces()))
+      return(FALSE)
+   length(grep("flex.*dashboard"
+              ,rmarkdown::all_output_formats(knitr::current_input())[1]))>0
+}
+'.isVignette' <- function() {
+   if (!all(c("knitr","rmarkdown") %in% loadedNamespaces()))
+      return(FALSE)
+   length(grep("(vignette|html_document)"
+              ,rmarkdown::all_output_formats(knitr::current_input())[1]))>0
 }
 '.isShiny' <- function() {
    (("shiny" %in% loadedNamespaces())&&(length(shiny::shinyOptions())>0))

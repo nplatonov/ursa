@@ -1,15 +1,18 @@
 'widgetize' <- function(obj,...) {
-   if (is.null(obj))
-      return(invisible(obj))
-   if (is.character(obj)) {
-      return(cat(obj,sep="\n"))
-   }
-   if (!ursa:::.isKnitr())
-      return(browse(obj,...))
-   obj
   # if (!requireNamespace("widgetframe",quietly=.isPackageInUse()))
   #    return(browse(obj))
   # widgetframe::frameWidget(obj)
+   if (is.null(obj))
+      return(invisible(obj))
+   if (!.isKnitr()) {
+      if (is.character(obj)) {
+         return(cat(obj,sep="\n"))
+      }
+      return(browse(obj,...))
+   }
+   if (!inherits(obj,c("htmlwidget","knitr_kable")))
+      return(browse(obj,...))
+   obj
 }
 'browse' <- '.open' <- function(...) {
    arglist <- list(...)
@@ -134,12 +137,12 @@
          md5 <- tools::md5sum(ftemp)
          file.remove(ftemp)
          if (is.null(output))
-            output <- .ursaCacheDir()
+            output <- file.path(.ursaCacheDir(),"knit")
          else {
            # TODO 'if (length(grep("\\.html$",output)))...' 
             output <- normalizePath(output)
          }
-         libdir <- file.path(output,"htmlwidgets")
+         libdir <- file.path(output,"site_libs")
          fname <- file.path(output,paste0("htmlwidget_",unname(md5),".html"))
          if (!file.exists(fname)) {
            # obj <- htmlwidgets::prependContent(obj,htmltools::HTML("<style>iframe {border: 3px solid magenta;}</style>"))
@@ -188,7 +191,7 @@
                         ,", echo=F"
                        # ,if (!is.null(oname)) paste0(", fig.cap=",dQuote(oname[k]))
                         ,if (T | !nchar(cap)) paste0(", fig.cap=",dQuote(cap))
-                        ,paste0(", out.extra=",dQuote("style='class=\\\"reset\\\"'"))
+                        ,paste0(", out.extra=",dQuote("class=\\\'reset\\\'"))
                         ,"}")
                  ##~ ,paste0("knitr::include_url(",dQuote(fname)
                                             ##~ #,",height=",dQuote(paste0(round(4.8*96,1),"px"))

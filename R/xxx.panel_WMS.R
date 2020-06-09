@@ -92,6 +92,10 @@
                         ,verbose=FALSE,summarize=FALSE)
          ind3a <- ind3[dist3$ind]
          desc <- data.frame(Layer=md[ind2a+1],Title=md[ind3a+1])
+         if (TRUE) {
+            desc <- unique(desc)
+            rownames(desc) <- NULL
+         }
          n1 <- max(nchar(desc$Layer))
          n2 <- max(nchar(desc$Title))
          n <- 77-n1-n2
@@ -169,8 +173,48 @@
    ind2 <- nchar(as.character(styles))>0
    if ((ind1)||(ind2)) {
       if (ind1) {
-         src <- sapply(strsplit(src,split="&"),function(x)
-            paste(.grep("^style(s)*=",x,invert=TRUE,value=TRUE),collapse="&"))
+         if (!ind2) {
+            src1 <- gsub("\\?\\&","?",src1) ## move to upper level
+            if (cache)
+               dst <- .ursaCacheDownload(src1,mode="wt",quiet=!verbose)
+            else {
+               dst <- tempfile(fileext=".xml") 
+               download.file(src1,dst,mode="wt",quiet=!verbose)
+            }
+            if (!isMetadata)
+               isMetadata <- TRUE
+            md <- .parse_wms(dst,verbose=verbose)
+            ind1 <- .grep("<Name(>|\\s)",md)
+            layer <- unlist(strsplit(paste(layers,collapse=","),split=","))#[1]
+            if (length(layer)==1) {
+               ind2 <- match(layer,md[ind1+1])
+               if (is.na(ind2))
+                  indS <- integer()
+               else {
+                  ind1 <- ind1[ind2]
+                  ind2 <- .grep("</Layer>",md)
+                  ind2 <- ind2[ind2>ind1][1]
+                  md1 <- md[ind1:(ind2-1)]
+                 # indS <- .grep("epsg:\\d+$",md1)#+ind1-1L
+                 # epsgL <- unique(.gsub("^.*epsg:","",.grep("epsg",md1[indL],value=TRUE)))
+                  ind1 <- .grep("<Style>",md1)
+                  if ((length(ind1))&&(!anyNA(ind1))) {
+                     ind2 <- .grep("<Name>",md1[ind1+1])
+                     if (length(ind2)==length(ind1)) {
+                        valueStyle <- md1[ind1+2]
+                        message("Image style is not specified. Available formats:")
+                        message("Supported values (argument 'styles'):")
+                        print(valueStyle)
+                        toStop <- toStop+16L
+                     }
+                  }
+               }
+            }
+         }
+         else {
+            src <- sapply(strsplit(src,split="&"),function(x)
+               paste(.grep("^style(s)*=",x,invert=TRUE,value=TRUE),collapse="&"))
+         }
       }
       src <- paste0(src,"&styles=",as.character(styles))
    }
@@ -216,12 +260,16 @@
          layer <- unlist(strsplit(paste(layers,collapse=","),split=","))#[1]
          if (length(layer)==1) {
             ind2 <- match(layer,md[ind1+1])
-            ind1 <- ind1[ind2]
-            ind2 <- .grep("</Layer>",md)
-            ind2 <- ind2[ind2>ind1][1]
-            md1 <- md[ind1:(ind2-1)]
-            indL <- .grep("epsg:\\d+$",md1)#+ind1-1L
-            epsgL <- unique(.gsub("^.*epsg:","",.grep("epsg",md1[indL],value=TRUE)))
+            if (is.na(ind2))
+               indL <- integer()
+            else {
+               ind1 <- ind1[ind2]
+               ind2 <- .grep("</Layer>",md)
+               ind2 <- ind2[ind2>ind1][1]
+               md1 <- md[ind1:(ind2-1)]
+               indL <- .grep("epsg:\\d+$",md1)#+ind1-1L
+               epsgL <- unique(.gsub("^.*epsg:","",.grep("epsg",md1[indL],value=TRUE)))
+            }
          }
          else
             indL <- integer()
@@ -241,6 +289,7 @@
          else
             epsgG <- character()
          ind1 <- c(indL,indG)
+         cat("----------\n")
          if (length(ind1)) {
             epsgG <- unique(epsgG)
             if (length(indL)) {
@@ -387,13 +436,19 @@
       if (length(layer)==1) {
          ind1 <- .grep("<Name(>|\\s)",md)
          ind2 <- match(layer,md[ind1+1])
-         ind1 <- ind1[ind2]
-         ind2 <- .grep("</Layer>",md)
-         ind2 <- ind2[ind2>ind1][1]
-         md2 <- md[ind1:(ind2-1)]
-         ind <- .grep("(boundingbox)",md2)
-         if (length(ind))
-            md <- md2
+         if (is.na(ind2)) {
+            message("Layer ",dQuote(layer)," is not found")
+           # q()
+         }
+         else {
+            ind1 <- ind1[ind2]
+            ind2 <- .grep("</Layer>",md)
+            ind2 <- ind2[ind2>ind1][1]
+            md2 <- md[ind1:(ind2-1)]
+            ind <- .grep("(boundingbox)",md2)
+            if (length(ind))
+               md <- md2
+         }
       }
       ind1 <- .grep("<(EX_Geographic|LatLon)BoundingBox",md)
       bboxLL <- FALSE
@@ -811,8 +866,9 @@
             a <- try(as.array(read_gdal(dst),permute=TRUE,flip=TRUE))
             session_grid(NULL)
          }
-         if (inherits(a,"try-error"))
+         if (inherits(a,"try-error")) {
             error <- paste(readLines(dst),collapse="\n")
+         }
         # file.remove(dst)
          if (inherits(a,"try-error")) {
             message(error)
@@ -878,8 +934,9 @@
                logo2 <- try(as.array(read_gdal(dst),permute=TRUE,flip=TRUE))
                session_grid(NULL)
             }
-            if (inherits(logo2,"try-error"))
+            if (inherits(logo2,"try-error")) {
                error <- paste(readLines(dst),collapse="\n")
+            }
            # file.remove(dst)
             if (inherits(logo2,"try-error")) {
                message(error)
@@ -927,8 +984,9 @@
                   logo[[i]] <- try(as.array(read_gdal(dst),permute=TRUE,flip=TRUE))
                   session_grid(NULL)
                }
-               if (inherits(logo[[i]],"try-error"))
+               if (inherits(logo[[i]],"try-error")) {
                   error <- paste(readLines(dst),collapse="\n")
+               }
               # file.remove(dst)
                if (inherits(logo[[i]],"try-error")) {
                   if (verbose) {
@@ -1036,7 +1094,7 @@
    ind>=4
 }
 '.parse_wms' <- function(dst,verbose=FALSE) {
-   opW <- options(warn=1)
+   opW <- options(warn=ifelse(verbose,1,-1))
    md <- readLines(dst)
    options(opW)
    md <- paste(md,collapse=" ")

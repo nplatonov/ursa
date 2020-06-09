@@ -59,6 +59,7 @@
       str(list(obj=obj,panel=panel,col=col,fill=fill,detail=detail
               ,density=density,angle=angle
               ,land=land,lwd=lwd,lty=lty,fail180=fail180))
+   g1 <- session_grid()
    if (!is.null(obj)) {
       isPoly <- inherits(obj,c("sf","SpatialPolygonsDataFrame"))
       if ((is.matrix(obj))&&(ncol(obj)==2))
@@ -115,7 +116,7 @@
       {
          shadow <- unname(col2rgb(fill,alpha=TRUE)[4,1])
          options(ursaPngShadow=ifelse(shadow %in% c(0,255),"",fill))
-         res <- list(coast_xy=coast_xy,panel=panel
+         res <- list(coast_xy=coast_xy,grid=g1,detail=detail,panel=panel
                     ,col=col,fill=fill,shadow=shadow,land=land
                     ,density=density,angle=angle,lwd=lwd,lty=lty)
          class(res) <- "ursaCoastLine"
@@ -123,7 +124,6 @@
          return(res)
       }
    }
-   g1 <- session_grid()
    isLongLat <- .lgrep("(\\+proj=longlat|epsg:4326)",g1$proj4)>0
    isMerc <- .lgrep("\\+proj=merc",g1$proj4)>0
    isCea <- .lgrep("\\+proj=cea",g1$proj4)>0
@@ -495,8 +495,8 @@
   # print(summary(coast_xy[ind,1]))
    shadow <- unname(col2rgb(fill,alpha=TRUE)[4,1])
    options(ursaPngShadow=ifelse(shadow %in% c(0,255),"",fill))
-   res <- list(coast_xy=coast_xy,panel=panel,col=col,fill=fill,shadow=shadow
-              ,land=land,density=density,angle=angle,lwd=lwd,lty=lty)
+   res <- list(coast_xy=coast_xy,grid=g1,detail=detail,panel=panel,col=col,fill=fill
+              ,shadow=shadow,land=land,density=density,angle=angle,lwd=lwd,lty=lty)
    class(res) <- "ursaCoastLine"
    options(ursaPngCoastLine=res)
    res
@@ -530,6 +530,7 @@
       ##~ isFound <- FALSE
    if (!coastline)
       return(NULL)
+   g1 <- session_grid()
   # if (!isFound)
    obj <- .getPrm(arglist,class="ursaCoastLine",default=NULL)
    figure <- getOption("ursaPngFigure")
@@ -537,8 +538,19 @@
       return(NULL)
    if (is.null(obj)) {
       obj <- getOption("ursaPngCoastLine")
-      if (is.null(obj))
+      if (!is.null(obj)&&(any(obj$panel))&&(!(figure %in% obj$panel)))
+         return(NULL)
+      if ((is.null(obj))||(!identical(g1,obj$grid))) {
+         options(ursaPngCoastLine=NULL)
          obj <- compose_coastline(...)
+      }
+      else {
+         detail <- .getPrm(arglist,name="detail",kwd=kwd,default=obj$detail)
+         if (!identical(detail,obj$detail)) {
+            options(ursaPngCoastLine=NULL)
+            obj <- compose_coastline(...)
+         }
+      }
    }
    if ((any(obj$panel))&&(!(figure %in% obj$panel)))
       return(NULL)
@@ -560,7 +572,7 @@
    with(obj,{
       shadow <- unname(col2rgb(fill,alpha=TRUE)[4,1])
       if (verbose)
-         str(list(col=col,fill=fill,shadow=shadow#,detail=detail
+         str(list(col=col,fill=fill,shadow=shadow,detail=detail
                  ,density=density,angle=angle,land=land,lwd=lwd,lty=lty))
       if ((TRUE)&&(shadow==0)|| ## 20171214 changed 'shadow!=255'
           ((!is.na(angle[1]))&&(!is.na(density[1])))) ## more quick

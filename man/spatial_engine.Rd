@@ -99,7 +99,9 @@ is_spatial_points(obj, verbose = FALSE)
 is_spatial_lines(obj, verbose = FALSE)
 is_spatial_polygons(obj, verbose = FALSE)
 
-spatial_intersection(x, y, verbose = FALSE)
+spatial_intersection(x, y,
+                     geometry=c("default", "polygons", "lines", "points", "all"),
+                     verbose = FALSE)
 spatial_symdifference(x, y, verbose = FALSE)
 spatial_union(x, y, byid=NA, verbose = FALSE)
 
@@ -159,6 +161,9 @@ Character. Filename (source or packed) of spatial data.
 }
   \item{each}{
 Logical. Whether result will be returned for each record (\code{TRUE}) or generalized (\code{FALSE}). Default is \code{FALSE}.
+}
+  \item{geometry}{
+Character. Desired output geometry for \code{engine="sf"}. If \code{"default"} then output geometry is defined internally (e.g., \code{"polygons"} for polygons intersection). If \code{"all"} then no output subsetting. Default is \code{"default"}.
 }
 
   \item{reason}{

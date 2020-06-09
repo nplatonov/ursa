@@ -1,6 +1,16 @@
-2020-04-20
+2020-06-09
 
 ### version 3.8.20
+
+-   New argument `engine` in function `read_gdal` for optional importind
+    data via `sf::gdal_read()` function.
+
+-   Consistence with suggested package **`sf`** (0.9-3) is in progress.
+
+-   New argument `geometry` in `spatial_intersecion()` for desired
+    output geometry of spatial features intersection (`enfine="sf"`).
+
+-   New function `consistent_grid()` for regrid keeping dimension ratio.
 
 -   Zero tail of GTiff palettes are cropped for plotting.
 

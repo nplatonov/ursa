@@ -11,9 +11,9 @@
                    ,'4'="MODIS_Terra_CorrectedReflectance_TrueColor"
                    ,'5'="VIIRS_SNPP_CorrectedReflectance_TrueColor"
                    ,'6'="Coastlines")
-   epsg3413 <- paste("","+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1"
+   epsg3413 <- paste("+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1"
                  ,"+x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs")
-   epsg3857 <- paste("","+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0"
+   epsg3857 <- paste("+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0"
                     ,"+x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null"
                     ,"+wktext +no_defs")
    if ((length(bbox)==1)&&(is.na(bbox))) {

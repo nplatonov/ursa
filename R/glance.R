@@ -148,7 +148,7 @@
    invisible(0L)
 }
 '.glance' <- function(dsn,layer=".*",grid=NULL,field=".+",size=NA,expand=1
-                        ,border=27,lat0=NA,lon0=NA,resetProj=FALSE
+                        ,border=27,lat0=NA,lon0=NA,resetProj=FALSE,resetGrid=FALSE
                         ,style="auto"
                         ,feature=c("auto","field","geometry"),alpha=NA
                         ,basemap.order=c("after","before"),basemap.alpha=NA
@@ -195,7 +195,9 @@
                    ,place=place,area=area,grid=grid,size=size
                   # ,expand=expand,border=border
                    ,expand=expand,border=0
-                   ,lat0=lat0,lon0=lon0,resetProj=resetProj,style=style#,zoom=NA
+                   ,lat0=lat0,lon0=lon0
+                   ,resetProj=resetProj,resetGrid=resetGrid
+                   ,style=style#,zoom=NA
                    ,verbose=verbose)
    if (inherits(obj,"NULL"))
       return(invisible(NULL))
