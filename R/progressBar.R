@@ -173,6 +173,6 @@
    if (p["current"]==p["max"]) {
       setUrsaProgressBar(con,unname(p["max"]))
    }
-   NextMethod("close",object,...)
+   NextMethod("close",con,...)
 }
 # 'close.ursaProgressBar' <- function(con,...) close(con,...)

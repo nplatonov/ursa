@@ -110,12 +110,12 @@
                         ct <- ursa(x,"category")
                         if (!is.null(ct)) {
                            o <- paste(ct,collapse=", ")
-                           if (nchar(o)>72)
-                              o <- paste0(substr(o,1,71),"\u2026")
+                           if (nchar(o)>66)
+                              o <- paste0(substr(o,1,65),"\u2026")
                            cat("   Classes: ",o,"\n")
                         }
                      }
-                     ret
+                     invisible(ret)
                   }
                })
             }

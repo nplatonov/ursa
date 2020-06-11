@@ -1,6 +1,7 @@
 'polygonize' <- function(obj,fname,engine=c("native","sp","sf")
                         ,verbose=NA,...) {
-   class(obj) ## keep`session_grid` from reset in `a <- polygonize(envi_read())`
+  # class(obj)
+   missing(obj) ## keep`session_grid` from reset in `a <- polygonize(envi_read())`
    engine <- match.arg(engine)
    if (engine=="sp") {
       isSF <- FALSE
@@ -117,12 +118,17 @@
       if (!onlyGeometry) {
          if (verbose)
             cat("3 of 3: assign data to geometry...")
-         sa <- sf::st_sf(b,coords=sa,crs=if (nchar(g1$proj4)) g1$proj4 else sf::NA_crs_)
+         p4s <- if (nchar(g1$proj4)) g1$proj4 else sf::NA_crs_
+         sa <- sf::st_sf(b,coords=sa,crs=p4s)
          if (verbose)
             cat(" done!\n")
       }
-      else
-         sf::st_crs(sa) <- g1$proj4
+      else {
+         if (verbose)
+            cat("3 of 3: assign data to geometry... skipped!\n")
+         sf::st_crs(sa) <- .p4s2epsg(g1$proj4)
+        # spatial_crs(sa,verbose=TRUE) <- g1$proj4 ## alt
+      }
       if ((TRUE)&&(!onlyGeometry)) { ## ++ 20171128
          colnames(sa)[head(seq(ncol(sa)),-1)] <- colnames(b)
       }
@@ -149,7 +155,7 @@
       }
       if (verbose)
          close(pb)
-      sa <- sp::SpatialPolygons(sa,proj4string=sp::CRS(prj))
+      sa <- sp::SpatialPolygons(sa,proj4string=sp::CRS(prj,doCheckCRSArgs=FALSE))
       if (!onlyGeometry) {
          b <- b[,3:ncol(b),drop=FALSE]
          for (i in seq(ncol(b)))
@@ -157,8 +163,6 @@
                b[,i] <- as.integer(b[,i])
          sa <- sp::SpatialPolygonsDataFrame(sa,data=b,match.ID=FALSE)
       }
-      if (verbose)
-         close(pb)
    }
    if (!missing(fname)) {
      # return(.shp.write(sa,fname,...))

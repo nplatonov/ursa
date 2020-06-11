@@ -583,8 +583,8 @@
                         ,"?width={w}&height={h}&z={z}&clng={lon}&clat={lat}")
          ,google=paste0("https://maps.googleapis.com/maps/api/staticmap"
                        ,"?center={lat},{lon}&zoom={z}&size={w}x{h}")
-         ,openstreetmap=paste0("http://staticmap.openstreetmap.de/staticmap.php"
-                              ,"?center={lat},{lon}&zoom={z}&size={w}x{h}")
+         ,openstreetmap=paste0("https://staticmap.openstreetmap.de/staticmap.php"
+                              ,"?center={lat},{lon}&zoom={z}&size={w}x{h}") ## &maptype=mapnik
          )
      # php <- switch(art,google="http://maps.googleapis.com/maps/api/staticmap"
      #        ,openstreetmap="http://staticmap.openstreetmap.de/staticmap.php")
@@ -641,7 +641,9 @@
             }
            # fname <- tempfile()
            # download.file(src,fname,mode="wb",quiet=!verbose)
-            fname <- .ursaCacheDownload(src,mode="wb",quiet=!verbose)
+            fname <- .ursaCacheDownload(src,mode="wb"
+                                       ,quiet=!verbose
+                                       )
             j <- if (i==1) 0 else sum(col2[seq(i-1)])
             img[,j+seq(col2[i]),] <- png::readPNG(fname)
            # file.remove(fname)
@@ -671,10 +673,16 @@
             src <- .gsub("^=","",paste(names(src),src,sep="=",collapse="&"))
          }
          if (cache)
-            fname <- .ursaCacheDownload(src,mode="wb",quiet=!verbose)
+            fname <- .ursaCacheDownload(src,mode="wb"
+                                       ,headers=list(NULL
+                                                   # ,'Referer Page'="https://www.r-project.org"
+                                                    ,'referer'="r-ursa package"
+                                                    )
+                                       ,quiet=!verbose)
          else {
             fname <- tempfile()
-            download.file(src,fname,mode="wb",quiet=!verbose)
+            download.file(src,fname,mode="wb"
+                         ,quiet=!verbose)
          }
          basemap <- as.integer(255L*as.ursa(png::readPNG(fname)
                                            ,aperm=TRUE,flip=TRUE))

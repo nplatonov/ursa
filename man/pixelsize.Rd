@@ -74,9 +74,10 @@ invisible({
       ice[ice==251] <- 250 ## consider 100\% ice at Pole
       ice <- ice/2.5 ## uncategorize
       ice[ice<15] <- 0 ## not ice, if less 15\%
-      extent1 <- band_sum(ice*1e-2*with(g1,resx*resy*1e-6))*1e-6
+      ice[ice>0] <- 100
+      extent1 <- band_sum(ice*1e-2*ursa(ice,"cell")^2*1e-6)*1e-6
       extent2 <- band_sum(ice*1e-2*pixelsize(ice))*1e-6
-      message(paste("Near real-time Arctic sea ice extent(NASA Team algorithm, NSIDC)"))
+      message(paste("Near real-time Arctic sea ice extent (NASA Team algorithm, NSIDC)"))
       message(sprintf("   Direct area calculation:         \%5.2f*1e6 km^2.",extent1))
       message(sprintf("   Distortion in area is corrected: \%5.2f*1e6 km^2.",extent2))
    }

@@ -103,24 +103,17 @@ session_grid(NULL)
    compose_close(bpp=8)
 
 # example no.4 -- length distortion in the Transverse Mercator projection
-\donttest{ ## internet connection is required; namespace of package 'ggmap' is required
-if (requireNamespace("ggmap")) {
-  # m2 <- ggmap::get_openstreetmap(bbox=c(left=42,bottom=70,right=70,top=82)
-  #                               ,format="png",messaging=TRUE
-  #                               ,scale=34942642,filename="ggmapTempMy")
-   m2 <- try(ggmap::get_googlemap(center=c(lon=56,lat=77.5),zoom=4,scale=1
-                                 ,size=c(320,640),format="png8",messaging=TRUE))
-   if (!inherits(m2,"try-error")) {
-      res <- as.ursa(m2)
-      compose_open(res,legend=NULL,scale=1,pointsize=12)
-      panel_new()
-      panel_raster(res)
-      panel_graticule(decor=TRUE)
-      for (p in c("bottom","center","top"))
-         panel_scalebar(pos=p,w=100)
-      compose_close()
-   }
-}}
+   a1 <- regrid(setbound=c(10,65,71,83),dim=c(100,100),crs=4326)
+   a2 <- polygonize(ursa_bbox(a1))
+   a3 <- spatial_transform(a2,3857)
+   a4 <- regrid(setbound=spatial_bbox(a3),res=20000,crs=spatial_crs(a3))
+   compose_open(legend=NULL)
+   panel_new("white")
+   panel_coastline(fill="#00000010")
+  # panel_graticule()
+   for (p in c("bottom","center","top"))
+      panel_scalebar(pos=p,w=200)
+   compose_close()
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

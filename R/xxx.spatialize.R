@@ -319,15 +319,17 @@
             }
            # else
            #    obj <- NULL
-            if (limLonLat)
+            if (limLonLat) {
                sp::proj4string(obj) <- sp::CRS("+init=epsg:4326")
+            }
             else if (!is.null(proj4)) {
-               sp::proj4string(obj) <-  sp::CRS(proj4)
+               sp::proj4string(obj) <-  sp::CRS(proj4,doCheckCRSArgs=FALSE)
                style <- proj4
                session_grid(NULL)
             }
-            else
-               sp::proj4string(obj) <- sp::CRS(session_proj4())
+            else {
+               sp::proj4string(obj) <- sp::CRS(session_proj4(),doCheckCRSArgs=FALSE)
+            }
          }
          else if (inherits(dsn,"data.frame")) {
             obj <- dsn
@@ -514,7 +516,7 @@
             if (isSP) {
                sp::coordinates(obj) <- ~x+y
                if (!is.null(p4s))
-                  sp::proj4string(obj) <- sp::CRS(p4s)
+                  sp::proj4string(obj) <- sp::CRS(p4s,doCheckCRSArgs=FALSE)
             }
             hasOpened <- TRUE
            # display(a)
@@ -775,7 +777,7 @@
    }
    projClass <- c("longlat","stere","laea","merc")
    projPatt <- paste0("(",paste(projClass,collapse="|"),")")
-   staticMap <- c("openstreetmap","google","sputnikmap")
+   staticMap <- c("openstreetmap","sputnikmap","google")
    tilePatt <- paste0("(",paste0(unique(c(staticMap,.tileService())),collapse="|"),")")
    retina <- getOption("ursaRetina",1)
    len <- 640L # as.integer(round(640*getOption("ursaRetina",1)))
@@ -857,10 +859,7 @@
   # isWeb <- isOSM | isGoogle | tryTile
    if ((is.null(g0))||(is.numeric(lon0))||(is.numeric(lat0))) {
   # if ((resetProj)||(is.ursa(g0,"grid"))||(is.numeric(lon0))||(is.numeric(lat0))) {
-      if (isSF)
-         proj4 <- sf::st_crs(obj)$proj4string
-      if (isSP)
-         proj4 <- sp::proj4string(obj)
+      proj4 <- spatial_crs(obj)
       if ((is.na(proj4))&&(nchar(style))&&(.lgrep("\\+proj=.+",style))) { ## ++ 20180530
          proj4 <- style
         # isPROJ4 <- FALSE
@@ -1107,7 +1106,8 @@
                }
             }
             if (isSP) {
-               obj <- sp::spTransform(obj,t_srs)
+              # obj <- sp::spTransform(obj,t_srs)
+               obj <- spatial_transform(obj,t_srs)
                if ((TRUE)&&(.lgrep("\\+proj=longlat",t_srs))&&(max(lon2)>180)) {
                   if (verbose)
                      .elapsedTime("lon+360 -- start")
@@ -1189,17 +1189,36 @@
         # opE <- options(show.error.messages=TRUE)
         # print(sf::st_bbox(obj))
          src0 <- sf::st_crs(obj)$proj4string
-         if (!is.na(src0))
-            obj <- sf::st_transform(obj,t_srs)
+         if (!is.na(src0)) {
+            t_srs <- spatial_crs(t_srs)
+            g0$proj4 <- t_srs
+            if (!identical(src0,t_srs))
+               obj <- sf::st_transform(obj,t_srs)
+         }
         # print(sf::st_crs(obj)$proj4string)
         # print(sf::st_bbox(obj))
         # options(opE)
       }
       if (isSP) {
-         src0 <- sp::proj4string(obj)
+         if (FALSE)
+            src0 <- sp::proj4string(obj)
+         else if (FALSE) {
+            src0 <- methods::slot(obj,"proj4string")
+            if (methods::is(src0,"CRS"))
+               src0 <- methods::slot(src0,"projargs")
+         }
+         else
+            src0 <- spatial_crs(obj)
         # print(c(sp::bbox(obj)))
-         if (!is.na(src0))
-            obj <- sp::spTransform(obj,t_srs) ## not tested
+         if ((!is.na(src0))&&(T | !identical(src0,t_srs))) {
+            if (.lgrep("\\+init=epsg",t_srs)) {
+               t_srs <- .epsg2proj4(t_srs,force=TRUE)
+               if (.lgrep("\\+init=epsg",src0))
+                  src0 <- .epsg2proj4(src0,force=TRUE)
+               if (!identical(src0,t_srs))
+                 obj <- sp::spTransform(obj,t_srs) ## not tested
+            }
+         }
         # print(sp::proj4string(obj))
         # print(c(sp::bbox(obj)))
       }

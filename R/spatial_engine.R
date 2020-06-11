@@ -7,17 +7,27 @@
    isSF <- .isSF(obj)
    isSP <- .isSP(obj)
    if (verbose)
-      print(data.frame(ursa=isUrsa,sf=isSF,sp=isSP,row.names="engine"))
+      print(data.frame(ursa=isUrsa,sf=isSF,sp=isSP,prm=isPrm,row.names="engine"))
    if (isSF) {
       return(sf::st_crs(obj)$proj4string)
    }
    if (isSP) {
-      return(sp::proj4string(obj))
+      if (FALSE) ## `sp`<1.4-2
+         return(sp::proj4string(obj))
+      spCRS <- methods::slot(obj,"proj4string")
+      if (methods::is(spCRS,"CRS")) {
+         wkt <- comment(spCRS)
+         ret <- methods::slot(spCRS,"projargs")
+         if (FALSE) ## possible for future use
+            comment(ret) <- wkt
+         return(ret)
+      }
+      return(NA_character_)
    }
    if (isUrsa)
       return(ursa_proj4(obj))
    if (isPrm) {
-      return(.epsg2proj4(obj,force=TRUE))
+      return(.epsg2proj4(obj,verbose=verbose,force=TRUE))
    }
    return(NULL)
 }
@@ -27,12 +37,12 @@
    if (verbose)
       print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
    if (isSF) {
-      sf::st_crs(obj) <- sf::NA_crs_
-      sf::st_crs(obj) <- value
+      sf::st_crs(obj) <- sf::NA_crs_ ## ??? comment it?
+      sf::st_crs(obj) <- .p4s2epsg(value)
    }
    if (isSP) {
       if (is.numeric(value))
-         value <- .epsg2proj4(value,force=FALSE)
+         value <- .epsg2proj4(value,force=!TRUE)
       sp::proj4string(obj) <- NA_character_
       sp::proj4string(obj) <- value
    }
@@ -277,7 +287,16 @@
          crs <- .epsg2proj4(crs,force=FALSE)
       else if (.isSP(crs))
          crs <- sp::proj4string(crs)
-      return(sp::spTransform(obj,crs,...)) ## sp::CRS(crs) ?
+      opW <- options(warn=ifelse(verbose,0,-1))
+      crs <- methods::slot(sp::CRS(crs,doCheckCRSArgs=TRUE),"projargs")
+      crs0 <- spatial_crs(obj)
+      if (.lgrep("\\+init=epsg\\:\\d+",crs0)) {
+         spatial_crs(obj) <- methods::slot(sp::CRS(crs0,doCheckCRSArgs=TRUE),"projargs")
+      }
+      ret <- sp::spTransform(obj,crs,...)
+      options(opW)
+      return(ret)
+     # return(sp::spTransform(obj,crs,...)) ## sp::CRS(crs) ?
    }
    return(NULL)
 }

@@ -170,7 +170,7 @@
       }
       else if (isSP) {
          bb1 <- sp::SpatialLines(list(sp::Lines(sp::Line(bb1),1L))
-                                ,proj4string=sp::CRS(g0$proj4))
+                                ,proj4string=sp::CRS(g0$proj4,doCheckCRSArgs=FALSE))
          bb2 <- sp::spTransform(bb1,proj4)
          bb2 <- c(sp::bbox(bb2))
          if (length(bb2)==6)

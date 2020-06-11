@@ -171,7 +171,7 @@
       geocode <- match.arg(geocode)
    projClass <- c("longlat","stere","laea","merc")
    projPatt <- paste0("(",paste(projClass,collapse="|"),")")
-   staticMap <- c("openstreetmap","google","sputnikmap")
+   staticMap <- c("openstreetmap","sputnikmap","google")
    tileClass <- c(staticMap,.tileService())
    tilePatt <- paste0("(",paste0(unique(c(staticMap,tileClass)),collapse="|"),")")
    basemap.order <- match.arg(basemap.order)

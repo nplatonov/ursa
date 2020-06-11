@@ -223,10 +223,10 @@
    }
    if (!is.na(setbound)[1]) {
       setbound <- rep(setbound,length=4)
-      g$minx <- setbound[1]
-      g$miny <- setbound[2]
-      g$maxx <- setbound[3]
-      g$maxy <- setbound[4]
+      g$minx <- unname(setbound[1])
+      g$miny <- unname(setbound[2])
+      g$maxx <- unname(setbound[3])
+      g$maxy <- unname(setbound[4])
       toDefine <- 0L
      # if ((is.na(g$columns))&&(!is.na(columns))) { ## -- 20170613
       if (!is.na(columns)) { ## ++ 20170613
@@ -456,12 +456,21 @@
       g$columns <- as.integer(round(g$columns))
       g$rows <- as.integer(round(g$rows))
    }
+  # str(list(crs=crs,proj4=proj4,'g$proj4'=g$proj4))
    if ((is.na(proj4))&&(!is.na(crs)))
       proj4 <- crs
-   if (is.character(proj4))
-      g$proj4 <- proj4
-   else if (is.numeric(proj4))
-      g$proj4 <- .epsg2proj4(proj4,force=!TRUE)
+   if (FALSE) {
+      if (is.character(proj4))
+         g$proj4 <- proj4
+      else if (is.numeric(proj4))
+         g$proj4 <- .epsg2proj4(proj4,force=!TRUE,verbose=verbose)
+   }
+   else if ((!is.na(proj4))&&(!identical(g$proj4,proj4))) {
+      g$proj4 <- spatial_crs(proj4)
+   }
+  # else {
+  #    message("skip")
+  # }
    if (is.na(g$proj4))
       g$proj4 <- ""
    if (any(border!=0))

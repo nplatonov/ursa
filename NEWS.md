@@ -1,11 +1,16 @@
-2020-06-09
+2020-06-11
 
 ### version 3.8.20
 
--   New argument `engine` in function `read_gdal` for optional importind
-    data via `sf::gdal_read()` function.
+-   Consistence with imported package **sp** (&gt;=1.4-0) and suggested
+    package **`sf`** (0.9-3) is in progress.
 
--   Consistence with suggested package **`sf`** (0.9-3) is in progress.
+<!--
++ Argument `doCheckCRSArgs` sometimes is `FALSE` in `sp::CRS()`.
+-->
+
+-   New argument `engine` in function `read_gdal()` for optional
+    importind data via `sf::gdal_read()` function.
 
 -   New argument `geometry` in `spatial_intersecion()` for desired
     output geometry of spatial features intersection (`enfine="sf"`).
@@ -22,8 +27,9 @@
     `device`/`type` for handled by **Cairo** package, which is added as
     suggested.
 
--   Package **`widgetframe`** is added as suggested for development
-    purpose.
+-   Packagae **`ggmap`** is removed from suggested list. Package
+    **`rmarkdown`** is added as suggested. Package **`widgetframe`** is
+    added as suggested for development purpose.
 
 -   In `allocate()` added argument `resetGrid` with default value
     `FALSE` for resetting session grid before raster formation.

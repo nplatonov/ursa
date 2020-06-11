@@ -90,7 +90,7 @@
          if (inv) {
             xy <- as.data.frame(xy)
             sp::coordinates(xy) <- ~x+y
-            sp::proj4string(xy) <- sp::CRS(proj)
+            sp::proj4string(xy) <- sp::CRS(proj,doCheckCRSArgs=FALSE)
             a <- .try(res <- sp::spTransform(xy,sp::CRS("+init=epsg:4326")))
             str(a)
             q()
@@ -128,40 +128,61 @@
       return(code)
    else
       stop(code)
+   loaded <- loadedNamespaces()
    if (!force) {
-      if (verbose)
-         message("force to use 'rgdal'")
-     # requireNamespace(c("sp","rgdal")[2],quietly=.isPackageInUse())
-      p4s <- p4epsg
+      if ("sf" %in% loaded) {
+         if (verbose)
+            message("force to use 'sf'")
+         p4s <- sf::st_crs(code)$proj4string
+      }
+      else {
+         if (verbose)
+            message("force to use 'sp/rgdal'")
+        # requireNamespace(c("sp","rgdal")[2],quietly=.isPackageInUse())
+         p4s <- p4epsg
+      }
    }
-   else {
+   else { ## force
       fail <- TRUE
-      loaded <- loadedNamespaces()
       if (any(c("sp","rgdal") %in% loaded)) {
          if (verbose)
-            message("'sp' loaded + 'rgdal' for reprojection")
-         p4s <- try(methods::slot(sp::CRS(p4epsg),"projargs"))
+            message("'sp' loaded + ('rgdal' for reprojection - SKIPPED)")
+         if (TRUE) {
+            opW <- options(warn=ifelse(verbose,0,-1))
+            p4s <- try(methods::slot(sp::CRS(p4epsg,doCheckCRSArgs=TRUE),"projargs"))
+            options(opW)
+         }
+         else {
+            ##~ p4s <- sp::CRS(p4epsg,doCheckCRSArgs=FALSE)
+            ##~ print(comment(p4s))
+            ##~ p4s <- meslot(p4s,"projargs")
+            ##~ str(p4s)
+           ##~ # sp::CRS(SRS_string=p4epsg)
+            ##~ q()
+            p4s <- try(methods::slot(sp::CRS(p4epsg,doCheckCRSArgs=FALSE),"projargs"))
+         }
          if (!inherits(p4s,"try-error")) {
             fail <- FALSE
-            if (!("rgdal" %in% loaded))
-               requireNamespace("rgdal",quietly=.isPackageInUse())
+           # if (!("rgdal" %in% loaded))
+           #    requireNamespace("rgdal",quietly=.isPackageInUse())
          }
       }
       if ((fail)&&("sf" %in% loaded)) {
          if (verbose)
             message("'sf' loaded")
-         p4s <- try(sf::st_crs(p4epsg)$proj4string)
+        # p4s <- try(sf::st_crs(as.integer(code))$proj4string) ## 'code', not 'p4epsg'
+         p4s <- try(sf::st_crs(.p4s2epsg(p4epsg))$proj4string)
          if (!inherits(p4s,"try-error"))
             fail <- FALSE
       }
       if (fail) {
          if (verbose)
-            message("Otherwise, use 'sp' + 'rgdal' for reprojection")
-         p4s <- try(methods::slot(sp::CRS(p4epsg),"projargs"))
+            message("Otherwise, use 'sp' + ('rgdal' for reprojection - SKIPPED)")
+         p4s <- try(methods::slot(sp::CRS(p4epsg,doCheckCRSArgs=FALSE),"projargs"))
          if (inherits(p4s,"try-error")) {
             fail <- TRUE
-            if (!("rgdal" %in% loaded))
-               requireNamespace("rgdal",quietly=.isPackageInUse())
+           # if (!("rgdal" %in% loaded))
+           #    requireNamespace("rgdal",quietly=.isPackageInUse())
          }
          else
             fail <- FALSE
@@ -189,4 +210,13 @@
    else if (length(ind <- which(xy[,1]<0)))
       xy[ind,1] <- xy[ind,1]+360
    xy
+}
+'.p4s2epsg' <- function(p4s) {
+   patt <- "\\+init=epsg\\:(\\d+)$"
+   if (!length(grep(patt,p4s)))
+      return(p4s)
+   code <- gsub(patt,"\\1",p4s)
+   if (code==p4s)
+      return(p4s)
+   as.integer(code)
 }

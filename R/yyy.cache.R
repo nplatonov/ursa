@@ -85,7 +85,8 @@
    .ursaCacheWrite(was0,append=FALSE)
    return(invisible(NULL))
 }
-'.ursaCacheDownload' <- function(src,dst,method,quiet=FALSE,cache=TRUE,mode="w") {
+'.ursaCacheDownload' <- function(src,dst,method,quiet=FALSE,cache=TRUE
+                                ,mode="w",headers=NULL) {
    enc <- "UTF-8"
    inventory <- .ursaCacheInventory()
    src0 <- src
@@ -114,9 +115,11 @@
          return(NULL)
       if (is.null(dst))
          dst <- if (cache) .ursaCacheFile() else tempfile()
+      str(headers)
       for (i in seq_along(src)) {
          ret <- try(download.file(url=URLencode(iconv(src[i],to="UTF-8")) 
-                      ,destfile=dst,method=method,quiet=quiet,mode=mode))
+                      ,destfile=dst,method=method,quiet=quiet,mode=mode
+                      ,headers=headers))
          if (!inherits(ret,"try-error"))
             break
       }
