@@ -1,6 +1,8 @@
-\name{ursa_proj}
+\name{ursa_crs}
+\alias{ursa_crs}
 \alias{ursa_proj}
 \alias{ursa_proj4}
+\alias{ursa_crs<-}
 \alias{ursa_proj<-}
 \alias{ursa_proj4<-}
 \title{
@@ -8,11 +10,11 @@ Extract and assign projection of raster images.
 %%  ~~function to do ... ~~
 }
 \description{
-Functions manipulate with \code{$proj4} item of the \code{\link[ursa:classGrid]{ursaGrid}} object, which is embedded in the \code{\link[ursa:classRaster]{ursaRaster}} object (obj$grid$proj4). Projection is specified in PROJ.4 notation.
+Functions manipulate with \code{$crs} item of the \code{\link[ursa:classGrid]{ursaGrid}} object, which is embedded in the \code{\link[ursa:classRaster]{ursaRaster}} object (\code{obj$grid$crs}). Projection is specified in PROJ.4 notation.
 }
 \usage{
-ursa_proj(obj)
-ursa_proj(obj, keepGrid = FALSE) <- value
+ursa_crs(obj)
+ursa_crs(obj, keepGrid = FALSE) <- value
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -26,13 +28,13 @@ Logical. Should sessional grid be changed after assignment. Default is \code{FAL
 Character sting in PROJ.4 format.
 }
 }
-%%~ \details{
-%%~ %%  ~~ If necessary, more details than the description above ~~
-%%~ }
+\details{
+Boath \emph{Extract} and \emph{Replace} functions \code{ursa_proj()} and \code{ursa_proj4()} are synonyms for \code{ursa_crs}.
+}
 \value{
-\emph{Extract} function \code{ursa_proj} returns character value of \code{$grid$proj4} item of \code{ursaRaster} object.
+\emph{Extract} function \code{ursa_crs} returns character value of \code{$grid$crs} item of \code{ursaRaster} object.
 
-\emph{Replace} function \code{ursa_proj<-} returns \code{ursaRaster} with modified \code{$grid$proj4} item.
+\emph{Replace} function \code{ursa_crs<-} returns \code{ursaRaster} with modified \code{$grid$crs} item.
 }
 %%~ \references{
 %%~ %% ~put references to the literature/web site here ~
@@ -52,14 +54,14 @@ Nikita Platonov \email{platonov@sevin.ru}
 \examples{
 session_grid(NULL)
 a <- ursa_dummy(nband=1)
-print(ursa_proj(a))
+print(ursa_crs(a))
 p4s <- "+init=epsg:3576"
-ursa_proj(a) <- p4s
-print(ursa_proj(a))
+ursa_crs(a) <- p4s
+print(ursa_crs(a))
 fname <- tempfile()
 write_envi(a,fname)
 a2 <- read_envi(fname,resetGrid=TRUE)
-print(ursa_proj(a2))
+print(ursa_crs(a2))
 try(print(rgdal::CRSargs(sp::CRS(p4s))))
 envi_remove(fname)
 }

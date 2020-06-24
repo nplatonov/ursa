@@ -3,11 +3,28 @@
 # http://b.sm.mapstack.stamen.com/(toner-background,$fff[difference],$fff[@23],$fff[hsl-saturation@20],toner-lines[destination-in])/9/273/172.png
 # https://pogoda1.ru/map/precipitation/7/77/40.png
 
+'.deg2numYa' <- function(lat,lon,zoom,verbose=FALSE) {
+   lat_rad <- lat*pi/180
+   lon_rad <- lon*pi/180
+  # n <- 2^zoom
+   a <- 6378137; ## a*pi==20037508.342789
+   k <- 0.0818191908426;
+   b <- 53.5865938
+   z1 <- tan(pi/4+lat_rad/2)/'^'(tan(pi/4 + asin(k*sin(lat_rad))/2),k)
+   ytile = floor((a*pi-a*log(z1))*b/'^'(2,23-zoom)/256)
+   xtile = floor((a*pi+a*lon_rad)*b/'^'(2,23-zoom)/256)
+  # xtile <- floor((lon+180)/360*2^zoom)
+   if (verbose)
+      print(data.frame(lon=lon,lat=lat,zoom=zoom,x=xtile,y=ytile))
+   c(xtile,ytile)
+}
 '.deg2num' <- function(lat,lon,zoom,verbose=FALSE) {
    lat_rad <- lat*pi/180
    n <- 2^zoom
    xtile <- floor((lon+180)/360*n)
    ytile <- floor((1-log(tan(lat_rad)+(1/cos(lat_rad)))/pi)/2*n)
+   if (verbose)
+      print(data.frame(lon=lon,lat=lat,zoom=zoom,x=xtile,y=ytile))
    if (TRUE)
       return(c(xtile,ytile))
    osm <- paste0("https://",letters[sample(seq(3),1)],".tile.openstreetmap.org")
@@ -28,7 +45,8 @@
    TFkey <- getOption("ThunderforestApiKey")
    BingKey <- getOption("BingMapsKey")
    mapsurferKey <- getOption("openrouteserviceToken")
-   googleCr <- "Google TERMS OF USE ARE VIOLATED"
+   googleCr <- "Google: TERMS OF USE ARE VIOLATED"
+   yandexCr <- "Yandex: TERMS OF USE ARE VIOLATED"
    s <- list()
    s$mapnik <- c("https://{abc}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 ,osmCr) ## # http://{abc}.tile.osm.org/{z}/{x}/{y}.png
@@ -56,11 +74,13 @@
                  ,paste0(osmCr,", \u0421\u043F\u0443\u0442\u043D\u0438\u043A \uA9 \u0420\u043E\u0441\u0442\u0435\u043B\u0435\u043A\u043E\u043C"))
   # http://cartodb-basemaps-c.global.ssl.fastly.net/light_all/6/37/21.png   
   # http://a.basemaps.cartocdn.com/light_only_labels/6/39/18.png
-   s$CartoDB <- c("http://{abcd}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
+   s$CartoDB <- c("https://{abcd}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
                  ,paste0(osmCr,", \uA9 CartoDB"))
-   s$'Positron' <- c("http://{abcd}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
+   s$'Positron' <- c("https://{abcd}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
                     ,paste0(osmCr,", \uA9 CartoDB"))
-   s$'Dark Matter' <- c("http://{abcd}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"
+   s$'Dark Matter' <- c("https://{abcd}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                       ,paste0(osmCr,", \uA9 CartoDB"))
+   s$'Voyager' <- c("https://{abcd}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
                        ,paste0(osmCr,", \uA9 CartoDB"))
    s$kosmosnimki <- c("http://{abcd}.tile.osm.kosmosnimki.ru/kosmo/{z}/{x}/{y}.png"
                      ,paste0(osmCr,", \uA9 ScanEx"))
@@ -85,7 +105,7 @@
                                 ,"app_id=",optHERE$id,"&app_code=",optHERE$code,"&lg=eng")
                      ,cite="Map \uA9 1987-2014 HERE"
                      ,ext="png")
-   s$'2gis' <- c("https://tile{0123}.maps.2gis.com/tiles?x={x}&y={y}&z={z}&v=1.2"
+   s$'2gis' <- c("https://tile{0123}.maps.2gis.com/tiles?x={x}&y={y}&z={z}" #&v=1.2"
                 ,paste0(osmCr,", API 2GIS")
                 ,"png")
    s$TF.Outdoors <- c(paste0("https://{abc}.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=",TFkey)
@@ -101,10 +121,32 @@
                         ,"jpg")
    s$opentopomap <- c("http://{abc}.tile.opentopomap.org/{z}/{x}/{y}.png"
                      ,paste0(osmCr,", \uA9 OpenTopoMap"))
+   s$wiki <- c("https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png"
+              ,"Wikimedia")
    s$polarmap <- c("https://{abc}.tiles.arcticconnect.ca/osm_{l}/{z}/{x}/{y}.png"
                   ,paste0("Map \uA9 ArcticConnect. Data ",osmCr))
+   s$ArcticConnect <- c("https://{abc}.tiles.arcticconnect.ca/osm_{l}/{z}/{x}/{y}.png"
+                  ,paste0("Map \uA9 ArcticConnect. Data ",osmCr))
+   s$ArcticSDI <- c(paste0("http://basemap.arctic-sdi.org/mapcache?"
+                   ,"&service=WMS"
+                   ,"&request=GetMap"
+                   ,"&layers=arctic_cascading"
+                   ,"&styles="
+                   ,"&format=image/jpeg"
+                   ,"&transparent=true"
+                   ,"&version=1.1.1"
+                   ,"&width=256&height=256"
+                   ,"&srs=EPSG:{l}"
+                   ,"&bbox={minx},{miny},{maxx},{maxy}"
+                   )
+                  ,paste0("ArcticSDI")
+                  ,"jpg")
    s$google.h <- c(paste0("https://mt{0123}.google.com/vt/lyrs=h" ## roads only
                                ,"&x={x}&y={y}&z={z}&hl=",language),googleCr)
+   s$google <- c(paste0("https://mt{0123}.google.com/vt/lyrs=m" ## standard roadmap
+                               ,"&x={x}&y={y}&z={z}&hl=",language),googleCr)
+   s$google.ru <- c(paste0("https://mt{0123}.google.com/vt/lyrs=m" ## standard roadmap
+                               ,"&x={x}&y={y}&z={z}&hl=","ru"),googleCr)
    s$google.m <- c(paste0("https://mt{0123}.google.com/vt/lyrs=m" ## standard roadmap
                                ,"&x={x}&y={y}&z={z}&hl=",language),googleCr)
    s$google.r <- c(paste0("https://mt{0123}.google.com/vt/lyrs=r" ## somehow altered roadmap
@@ -117,9 +159,21 @@
                                  ,"&x={x}&y={y}&z={z}&hl=",language),googleCr)
    s$google.p <- c(paste0("https://mt{0123}.google.com/vt/lyrs=p" ## terrain
                                  ,"&x={x}&y={y}&z={z}&hl=",language),googleCr)
+   s$'Yandex' <- c(paste0("https://vec0{1234}.maps.yandex.net/tiles?l=map" 
+                                 ,"&x={x}&y={y}&z={z}&scale={r}&lang="
+                                 ,switch(language,ru="ru_RU","en_US")),yandexCr)
+   s$'Yandex.Map' <- c(paste0("https://vec0{1234}.maps.yandex.net/tiles?l=map" 
+                                 ,"&x={x}&y={y}&z={z}&scale={r}&lang="
+                                 ,switch(language,ru="ru_RU","en_US")),yandexCr)
+   s$'Yandex.Satellite' <- c(paste0("https://vec0{1234}.maps.yandex.net/tiles?l=sat" 
+                                 ,"&x={x}&y={y}&z={z}&scale={r}&lang="
+                                 ,switch(language,ru="ru_RU","en_US")),yandexCr)
+  # '\u044f\u043d\u0434\u0435\u043a\u0441' 
+   s$'Yandex.ru' <- c(paste0("https://vec0{1234}.maps.yandex.net/"
+                              ,"tiles?l=map&x={x}&y={y}&z={z}&scale={r}&lang=ru_RU"),yandexCr)
   # http://a.maps.owm.io/map/precipitation_new/6/37/19?appid=b1b15e88fa797225412429c1c50c122a1   
    if (!sum(nchar(server)))
-     return(names(s))
+     return(.grep(".*zzz(google|yandex).*",names(s),value=TRUE,invert=TRUE))
    if (!(server[1] %in% names(s))) {
       for (i in seq_along(s)) {
          if (.lgrep("http",server))
@@ -197,12 +251,21 @@
    tile
 }
 '.tileGet' <- function(z=4,x=10,y=3,minx=-2e7,miny=-2e7,maxx=2e7,maxy=2e7
-                      ,w=256,h=256,url,fileext,ursa=FALSE,cache=TRUE
+                      ,w=256,h=256,retina=NA,url,fileext,ursa=FALSE,cache=TRUE
                       ,verbose=FALSE) {
+   if (is.na(retina))
+      retina <- getOption("ursaRetina")
+   if (isFALSE(is.numeric(retina)))
+      retina <- 1
+   isRetina <- retina>1
    tile <- .gsub("{z}",z,.gsub("{y}",y,.gsub("{x}",x,url)))
    tile <- .gsub("{h}",h,.gsub("{w}",w,tile))
    tile <- .gsub("{maxy}",maxy,.gsub("{maxx}",maxx
           ,.gsub("{miny}",miny,.gsub("{minx}",minx,tile))))
+   if (.lgrep("maps.+yandex",tile)>0) 
+      tile <- .gsub("{r}",ifelse(isRetina,"2","1"),tile)
+   else
+      tile <- .gsub("{r}",ifelse(isRetina,"@2x",""),tile)
    if (.lgrep("{q}",tile)) {
       b1 <- b2 <- rep(0,z)
       for (i in seq(z)) {
@@ -223,6 +286,7 @@
    }
   # fname <- tempfile(fileext=".tile")
   # print(tile)
+  # q()
    fname <- .ursaCacheDownload(tile,mode="wb",cache=cache,quiet=!verbose)
    if (inherits(fname,"try-error")) {
       return(fname)
@@ -277,26 +341,31 @@
       return(a)
    }
   # file.remove(fname)
-   if (TRUE) {
+   dima <- dim(a)
+   dimb <- c(h,w)*ifelse(isRetina,2,1)
+   reduce <- (TRUE)&&((dima[1]!=dimb[1])||(dima[2]!=dimb[2]))
+   ##~ print(dima)
+   ##~ print(dimb)
+   if (reduce) {
+      mul <- mean(dima[1:2]/dimb[1:2])
+     # print(mul)
+     # .elapsedTime("firstrun 0205a")
+      a <- as.array(regrid(as.ursa(a)
+            ,res=c(dima[1]/dimb[1],dima[2]/dimb[2])
+            ,resample=ifelse(mul>1,1,0.75)
+            ,cover=1e-6,verbose=0L))
       dima <- dim(a)
-      reduce <- (TRUE)&&((dima[1]!=256)||(dima[2]!=256))
-      if (reduce) {
-        # .elapsedTime("firstrun 0205a")
-         a <- as.array(regrid(as.ursa(a)
-               ,res=c(dima[1]/256,dima[2]/256),resample=1,cover=1e-6,verbose=0L))
-         dima <- dim(a)
-         if (isPNG)
-            png::writePNG(a/256,fname)
-         else if (isJPEG)
-            jpeg::writeJPEG(a/256,fname)
-         else
-            stop("unable to update file")
-         a <- .round(a)
-        # .elapsedTime("firstrun 0205b")
-      }
-      a <- as.integer(c(a))
-      dim(a) <- dima
+      if (isPNG)
+         png::writePNG(a/256,fname)
+      else if (isJPEG)
+         jpeg::writeJPEG(a/256,fname)
+      else
+         stop("unable to update file")
+      a <- .round(a)
+     # .elapsedTime("firstrun 0205b")
    }
+   a <- as.integer(c(a))
+   dim(a) <- dima
    if (!ursa)
       return(a)
    epsg3857 <- paste("+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0"
@@ -308,7 +377,7 @@
    xy <- .project(cbind(lon,rev(lat)),epsg3857)
    dima <- dim(a)
    g1 <- regrid(ursa_grid(),setbound=c(xy)[c(1,3,2,4)]
-               ,columns=dima[2],rows=dima[1],proj4=epsg3857)
+               ,columns=dima[2],rows=dima[1],crs=epsg3857)
    b <- as.integer(255/255*as.ursa(a,aperm=TRUE,flip=TRUE))
    ursa(b,"grid") <- g1
    attr(b,"copyright") <- "For personal use only"

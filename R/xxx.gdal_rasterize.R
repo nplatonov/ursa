@@ -147,7 +147,7 @@
    }
    lname <- .lname
    rm(.lname)
-   if (proj4!=g0$proj4) {
+   if (proj4!=g0$crs) {
      # if (verbose)
      #   message("REPROJECT")
       shpname <- .maketmp()
@@ -164,13 +164,13 @@
          bb1 <- cbind(x,y)
       }
       if (isSF) {
-         bb1 <- sf::st_sfc(sf::st_multilinestring(list(bb1)),crs=g0$proj4)
+         bb1 <- sf::st_sfc(sf::st_multilinestring(list(bb1)),crs=g0$crs)
          bb2 <- sf::st_transform(bb1,proj4)
          bb2 <- sf::st_bbox(bb2)
       }
       else if (isSP) {
          bb1 <- sp::SpatialLines(list(sp::Lines(sp::Line(bb1),1L))
-                                ,proj4string=sp::CRS(g0$proj4,doCheckCRSArgs=FALSE))
+                                ,proj4string=sp::CRS(g0$crs,doCheckCRSArgs=FALSE))
          bb2 <- sp::spTransform(bb1,proj4)
          bb2 <- c(sp::bbox(bb2))
          if (length(bb2)==6)
@@ -183,7 +183,7 @@
       }
      ## http://www.gdal.org/ogr2ogr.html http://gis-lab.info/qa/ogr2ogr-examples.html
       g1 <- regrid(g0,border=5)
-      cmd <- paste("ogr2ogr","-t_srs",.dQuote(g0$proj4)
+      cmd <- paste("ogr2ogr","-t_srs",.dQuote(g0$crs)
               ,ifelse(noProj,paste("-s_srs",.dQuote(proj4)),"")
               ,"-sql",.dQuote(paste("select FID,* from",.dQuote(.dQuote(lname))))
               ,"-dialect",c("SQLITE","OGRSQL")[2]

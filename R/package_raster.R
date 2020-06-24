@@ -83,7 +83,7 @@
       res <- with(g1,raster::raster(nrows=rows,ncols=columns))
    }
    raster::extent(res) <- with(g1,c(minx,maxx,miny,maxy))
-   raster::crs(res) <- ursa_proj4(g1)
+   raster::crs(res) <- ursa_crs(g1)
    if (isGrid)
       return(res)
    nodata <- sapply(obj,ursa_nodata)

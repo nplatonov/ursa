@@ -50,7 +50,7 @@ It is required to call \code{panel_new} for every image panel. First calling sta
 
 The panel sequence is set in function \code{\link[ursa]{compose_design}}, which is called directly or indirectly from \code{\link[ursa]{compose_open}}, and keeps in the options (access via \code{getOption("ursaPngLayout")$layout}).
 
-Image background is formed via consecutive call of functions \code{\link[graphics]{plot}(...,type="n")}, and \code{\link[graphics]{rect}(...)}.
+Image background is formed via consecutive call of functions \code{\link[graphics:plot.default]{plot}(...,type="n")}, and \code{\link[graphics]{rect}(...)}.
 %%  ~~ If necessary, more details than the description above ~~
 }
 \value{

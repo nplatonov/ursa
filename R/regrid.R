@@ -185,26 +185,31 @@
    etol <- 1e-14
    zero <- match.arg(zero)
    if (missing(grid)) {
+      checkZero <- FALSE
       if (verbose)
          message("grid is missing")
       g <- session_grid()
    }
    else if (is.null(grid)) {
+      checkZero <- FALSE
       if (verbose)
          message("grid is NULL")
       g <- .grid.skeleton()
    }
    else if (is.ursa(grid)) {
+      checkZero <- TRUE
       if (verbose)
          message("grid from raster")
       g <- ursa_grid(grid)
    }
    else if ((is.character(grid))&&(envi_exists(grid,exact=TRUE))) {
+      checkZero <- TRUE
       if (verbose)
          message("grid from ENVI")
       g <- ursa_grid(grid)
    }
    else {
+      checkZero <- TRUE
       if (verbose)
          message("grid as is")
       g <- grid
@@ -394,26 +399,73 @@
          g$miny <- round(g$miny/g$resy)*g$resy
          g$maxy <- round(g$maxy/g$resy)*g$resy
       }
-      else if ((T)&&(zero=="keep")&&(!is.na(g2$minx))&&(!is.na(g2$maxx))&&
-                               (!is.na(g2$miny))&&(!is.na(g2$maxy))) {
+      else if ((T & checkZero)&&(zero=="keep")&&
+               (!is.na(g2$minx))&&(!is.na(g2$maxx))&&
+               (!is.na(g2$miny))&&(!is.na(g2$maxy))) {
          if (verbose)
             print("step2:zero=keep")
-        # message("g")
-        # print(g,digits=12)
-        # message("g2")
-        # print(g2,digits=12)
+         if (F) {
+            str(as.list(match.call()))
+            message("g")
+            print(g,digits=12)
+            message("g2")
+            print(g2,digits=12)
+         }
          x <- seq(g2,"x")
          y <- seq(g2,"y")
-         shift <- c(0,1)[1]
-         indMinX <- which(x<=g$minx-shift*g$resx/2)
-         indMaxX <- which(x>=g$maxx+shift*g$resx/2)
-         indMinY <- which(y<=g$miny-shift*g$resy/2)
-         indMaxY <- which(y>=g$maxy+shift*g$resy/2)
-         if ((length(indMinX))&&(length(indMaxX))&&(length(indMinY))&&(length(indMaxY))) {
-            g$minx <- max(x[indMinX])-g$resx/2
-            g$maxx <- min(x[indMaxX])+g$resx/2
-            g$miny <- max(y[indMinY])-g$resy/2
-            g$maxy <- min(y[indMaxY])+g$resy/2
+         if (verbose) {
+            comment(verbose) <- "seq"
+            print(series(x))
+            print(series(y))
+         }
+         if (!TRUE) {
+            indX <- which(x>=g$minx-g$resx/2 & x<=g$maxx+g$resx/2)
+            indY <- which(y>=g$miny-g$resy/2 & y<=g$maxy+g$resy/2)
+            if ((length(indX))&&(length(indY))) {
+               if (verbose)
+                  message("matched")
+              # print(range(x[indX])+c(-1,1)*g$resx/2)
+              # print(range(y[indY])+c(-1,1)*g$resy/2)
+               g$minx <- min(x[indX])-g$resx/2
+               g$maxx <- max(x[indX])+g$resx/2
+               g$miny <- min(y[indY])-g$resy/2
+               g$maxy <- max(y[indY])+g$resy/2
+               if (F) {
+                  x <- seq(g,"x")
+                  y <- seq(g,"y")
+                  print(series(x))
+                  print(series(y))
+               }
+            }
+            else if (verbose)
+               message("unmatched")
+         }
+         else { ## deprecated
+            shift <- c(0,1)[1]
+            indMinX <- which(x<=g$minx-shift*g$resx/2)
+            indMaxX <- which(x>=g$maxx+shift*g$resx/2)
+            indMinY <- which(y<=g$miny-shift*g$resy/2)
+            indMaxY <- which(y>=g$maxy+shift*g$resy/2)
+            if ((length(indMinX))&&(length(indMaxX))&&(length(indMinY))&&(length(indMaxY))) {
+               if (verbose)
+                  message("matched")
+               ##~ print(indMinX)
+               ##~ print(indMaxX)
+               ##~ print(indMinY)
+               ##~ print(indMaxY)
+               g$minx <- max(x[indMinX])-g$resx/2
+               g$maxx <- min(x[indMaxX])+g$resx/2
+               g$miny <- max(y[indMinY])-g$resy/2
+               g$maxy <- min(y[indMaxY])+g$resy/2
+               if (F) {
+                  x <- seq(g,"x")
+                  y <- seq(g,"y")
+                  print(series(x))
+                  print(series(y))
+               }
+            }
+            else if (verbose)
+               message("unmatched")
          }
       }
       c0 <- with(g,(maxx-minx)/resx)
@@ -455,24 +507,28 @@
       }
       g$columns <- as.integer(round(g$columns))
       g$rows <- as.integer(round(g$rows))
+      if ((verbose)&&(is.character(comment(verbose)))&&(comment(verbose)=="seq")) {
+         print(seq(g,"x"))
+         print(seq(g,"y"))
+      }
    }
-  # str(list(crs=crs,proj4=proj4,'g$proj4'=g$proj4))
+  # str(list(crs=crs,crs=proj4,'g$crs'=g$crs))
    if ((is.na(proj4))&&(!is.na(crs)))
       proj4 <- crs
    if (FALSE) {
       if (is.character(proj4))
-         g$proj4 <- proj4
+         g$crs <- proj4
       else if (is.numeric(proj4))
-         g$proj4 <- .epsg2proj4(proj4,force=!TRUE,verbose=verbose)
+         g$crs <- .epsg2proj4(proj4,force=!TRUE,verbose=verbose)
    }
-   else if ((!is.na(proj4))&&(!identical(g$proj4,proj4))) {
-      g$proj4 <- spatial_crs(proj4)
+   else if ((!is.na(proj4))&&(!identical(g$crs,proj4))) {
+      g$crs <- spatial_crs(proj4)
    }
   # else {
   #    message("skip")
   # }
-   if (is.na(g$proj4))
-      g$proj4 <- ""
+   if (is.na(g$crs))
+      g$crs <- ""
    if (any(border!=0))
    {
       border <- round(rep(border,length=4))

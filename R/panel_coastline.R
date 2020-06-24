@@ -103,9 +103,9 @@
          else if (.lgrep("\\.rds$",obj)) {
             g1 <- session_grid()
             coast_xy <- readRDS(obj)
-            if (nchar(g1$proj)) {
+            if (nchar(g1$crs)) {
               # b <- attributes(coast_xy)
-               coast_xy <- .project(coast_xy,g1$proj4)
+               coast_xy <- .project(coast_xy,g1$crs)
               # attributes(coast_xy) <- b
             }
          }
@@ -124,11 +124,11 @@
          return(res)
       }
    }
-   isLongLat <- .lgrep("(\\+proj=longlat|epsg:4326)",g1$proj4)>0
-   isMerc <- .lgrep("\\+proj=merc",g1$proj4)>0
-   isCea <- .lgrep("\\+proj=cea",g1$proj4)>0
-   isUTM <- .lgrep("\\+proj=utm",g1$proj4)>0
-   proj <- g1$proj4
+   isLongLat <- .lgrep("(\\+proj=longlat|epsg:4326)",g1$crs)>0
+   isMerc <- .lgrep("\\+proj=merc",g1$crs)>0
+   isCea <- .lgrep("\\+proj=cea",g1$crs)>0
+   isUTM <- .lgrep("\\+proj=utm",g1$crs)>0
+   proj <- g1$crs
    proj <- proj[nchar(proj)==max(nchar(proj))]
    if ((any(is.na(proj)))||(nchar(proj)==0))
       return(NULL)
@@ -147,7 +147,7 @@
    {
       g2 <- with(g1,my.expand.grid(x=seq(minx,maxx,length=16)
                                   ,y=seq(miny,maxy,length=16)))
-      ll <- .project(with(g2,cbind(x,y)),g1$proj4,inv=TRUE)
+      ll <- .project(with(g2,cbind(x,y)),g1$crs,inv=TRUE)
       if (all(ll[,2]<65))
          return(NULL)
    }
@@ -184,7 +184,7 @@
       }
       else if (!isLoaded) {
          if (!requireNamespace("proj4",quietly=.isPackageInUse()))
-            requireNamespace("rgdal")
+            requireNamespace("rgdal",quietly=.isPackageInUse())
       }
    }
    else
@@ -654,7 +654,7 @@
    FID <- a$FID
    prj1 <- spatial_crs(a)
    lon0 <- 120
-   prj1 <- spatial_proj4(a)
+  # prj1 <- spatial_proj4(a) ## commented this 'x'-line after 'x-2' line assign 
    prj2 <- .gsub("(^.+)(\\s\\+lon_0=)(\\d+(\\.\\d+)*)(\\s.+$)"
                 ,paste0("\\1\\2",lon0,"\\5"),prj1)
    if (merge) {

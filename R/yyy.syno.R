@@ -25,5 +25,7 @@
       res <- c(res,as.character(sys.call(which=i))[1])
    }
    options(op)
+  # class(res) <- "parentFunc"
    res
 }
+# '.print.ParentFunc' <- function(x,...) message(paste(x[-1],collapse=" -> "))

@@ -17,7 +17,7 @@ glance(...)
         style = "auto", feature = c("auto", "field", "geometry"), alpha = NA,
         basemap.order = c("after", "before"), basemap.alpha = NA,
         engine = c("native", "sp", "sf"), geocode = "", place="",
-        area = c("bounding", "point"), zoom = NA, gdal_rasterize = FALSE,
+        area = c("bounding", "point", "shape"), zoom = NA, gdal_rasterize = FALSE,
         silent = FALSE, verbose = FALSE, ...)
 
 }

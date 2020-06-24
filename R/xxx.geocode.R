@@ -1,10 +1,10 @@
 # http://geo2tag.org/?page_id=671&lang=en_US
 # https://geocode-maps.yandex.ru/1.x/?geocode=metro Tretyakovskaya&results=100&format=json
-
 # geocodeList <- eval(as.list(args(.geocode))$service)
-'.geocode' <- function(loc=NULL,area=c("bounding","point"),place=""
+'.geocode' <- function(loc=NULL,area=c("bounding","point","shape"),place=""
                       ,select=c("top","expand","all")
-                      ,service=c("nominatim","google"),verbose=FALSE) {
+                      ,service=c("nominatim","pickpoint","google")
+                      ,cache=TRUE,verbose=FALSE) {
    if (is.null(loc)) {
       if (!TRUE) {
          dst <- tempfile()
@@ -26,13 +26,29 @@
    pSea <- "(Sea|\u043C\u043e\u0440\u0435)" ## 'MOPE' in Russian
    isSea <- .lgrep(paste0("(",pSea,"\\s|\\s",pSea,")"),loc)>0
    if ((area=="bounding")&&(isSea)&&(service=="nominatim")) {
-      cat("Redirecting to 'google' for 'sea' geocoding\n")
-      service <- "google"
+      cat("More faults with 'nominatim' for 'sea' geocoding\n")
+     # cat("Redirecting to 'google' for 'sea' geocoding\n")
+     # service <- "google"
    }
    select <- match.arg(select)
-   if (service=="nominatim") {
-       ## curl -H Accept-Language:de 'https://nominatim.openstreetmap.org......."
-      src <- paste0("https://nominatim.openstreetmap.org/search.php?q=",loc
+   shape <- NULL
+   if (service %in% c("nominatim","pickpoint")) {
+     ## curl -H Accept-Language:de 'https://nominatim.openstreetmap.org......."
+      if (service %in% "nominatim")
+         endpoint <- "https://nominatim.openstreetmap.org/search.php?"
+      else if (service %in% "pickpoint") {
+         key <- getOption("pickpointKey")
+         if (!is.character(key)) {
+            message(paste("Unable to get 'pickpoint' API key using"
+                         ,"`getOption(\"pickpointKey\")`."
+                         ,"Switched to 'nominatim' geocoding."))
+            service <- "nominatim"
+            endpoint <- "https://nominatim.openstreetmap.org/search.php?"
+         }
+         else
+            endpoint <- paste0("https://api.pickpoint.io/v1/forward?&key=",key,"&")
+      }
+      src <- paste0(endpoint,"q=",loc
                   # ,"&polygon_text=1"
                    ,"&format=xml","&bounded=0","&accept-language=en-US,ru")
      # dst <- tempfile() # "nominatim.xml" # tempfile()
@@ -85,6 +101,7 @@
       importance <- .grep("importance",xmlstring,value=TRUE)
       importance <- as.numeric(.gsub(".*\'(.+)\'.*","\\1",importance))
      # type <- NULL ## debug
+      typeInd <- integer()
       if ((is.character(place))&&(nchar(place))) {
          typeInd <- which(!is.na(match(ptype,place)))
          typeInd <- .grep(place,ptype)
@@ -106,31 +123,161 @@
       }
       if (select %in% c("expand","top")) {
          dg <- 1
-         if ((bounding[,"minx"]<=(-180+dg))&&(bounding[,"maxx"]>=(180-dg))) {
+         is180 <- (bounding[,"minx"]<=(-180+dg))&&(bounding[,"maxx"]>=(180-dg))
+         isShape <- "shape" %in% area
+         if ((isShape)||(is180)) {
             if (verbose)
-               .elapsedTime("correct bounds (180 degree) -- download")
-            src <- paste0("https://nominatim.openstreetmap.org/search.php?q=",loc
-                         ,"&polygon_text=1"
-                         ,"&format=xml","&bounded=0","&accept-language=en-US,ru")
-            dst <- .ursaCacheDownload(src,quiet=!verbose)
+               .elapsedTime("shape|180 -- download")
+            if (T & !isShape) { ## to deprecate
+               src <- paste0(endpoint,"q=",loc
+                            ,"&polygon_text=1"
+                            ,"&format=xml"
+                            ,"&bounded=0","&accept-language=en-US,ru")
+               dst <- .ursaCacheDownload(src,cache=cache,quiet=!verbose)
+               if (verbose)
+                  .elapsedTime("shape|180 -- parsing")
+               b <- readLines(dst,encoding="UTF-8",warn=FALSE)
+              # print(file.size(dst))
+               b <- unlist(strsplit(b,split="'"))
+               b <- .grep("(MULTI)*(POLYGON|LINESTRING)",b,value=TRUE,ignore.case=FALSE)
+               b <- .gsub("((MULTI)*(POLYGON|LINESTRING)|\\(|\\))"," ",b)
+               b <- .gsub("(^\\s+|\\s+$)","",b)
+               b <- lapply(b,function(b2) {
+                  b3 <- unlist(strsplit(b2,split=","))
+                  b3 <- unlist(strsplit(b3,split="\\s+"))
+                  b3 <- b3[nchar(b3)>0]
+                  b3 <- matrix(as.numeric(b3),ncol=2,byrow=TRUE)[,1]
+                  b4 <- b3
+                  ind <- b4<0
+                  if (length(ind))
+                     b4[ind] <- b4[ind]+360
+                  sd3 <- sd(b3)
+                  sd4 <- sd(b4)
+                  if (sd4<sd3)
+                     ret <- c(minx=min(b3[b3>0]),maxx=max(b3[b3<0]))
+                  else
+                     ret <- c(minx=min(b3),maxx=max(b3))
+                  ret
+               })
+               b <- do.call("rbind",b)
+               ##~ b <- unlist(strsplit(b,split=","))
+               ##~ b <- unlist(strsplit(b,split="\\s+"))
+               ##~ b <- b[nchar(b)>0]
+               ##~ b <- matrix(as.numeric(b),ncol=2,byrow=TRUE)[,1]
+              # bounding[,"minx"] <- min(b[b>0])
+              # bounding[,"maxx"] <- max(b[b<0])
+               if (select=="top")
+                  ind <- important
+               else if (length(typeInd))
+                  ind <- typeInd
+               else
+                  ind <- seq(nrow(bounding))
+               bounding[,c("minx","maxx")] <- b[ind,c("minx","maxx")]
+            }
+            else {
+               loaded <- loadedNamespaces()
+               isSF <- "sf" %in% loaded ||
+                  requireNamespace("sf",quietly=.isPackageInUse())
+               if (!isSF) {
+                  isSP <- "rgeos" %in% loaded || 
+                     requireNamespace("rgeos",quietly=.isPackageInUse())
+               }
+               else
+                  isSP <- FALSE
+               isWKT <- isSF || isSP
+               if (verbose)
+                  print(c('sf'=isSF,'sp+rgeos'=isSP,'wkt'=isWKT))
+               src <- paste0(endpoint,"q=",loc
+                            ,"&polygon_",ifelse(isWKT,"text=1","geojson=1")
+                            ,"&format=xml"
+                            ,"&bounded=0","&accept-language=en-US,ru")
+               dst <- .ursaCacheDownload(src,cache=cache,quiet=!verbose)
+               if (verbose)
+                  .elapsedTime("shape|180 -- parsing")
+              # str(dst)
+               b <- readLines(dst,encoding="UTF-8",warn=FALSE)[3]
+              # ind1 <- unlist(gregexpr("geojson)=\\'\\{",b))
+              # ind2 <- unlist(gregexpr("\\}\\'",b))
+               ##~ ind1 <- gregexpr("geo(text|json)=\\'",b)
+               ##~ ind2 <- gregexpr("(\\)|\\})\\'",b)
+               ind1 <- unlist(gregexpr("geo(text|json)=\\'",b))
+               ind2 <- unlist(gregexpr("(\\)|\\})\\'",b))
+               ind3 <- which(ind1>0)
+               ind4 <- which(ind2>0)
+               if ((ind3==ind4)&&(length(ind3)>0)) {
+                  ind1 <- ind1[ind3]
+                  ind2 <- ind2[ind4]
+                  shape <- lapply(seq_along(ind3),function(i) {
+                     n1 <- nchar(.gsub2("(geo(text|json)=\\')","\\1",b))
+                     b2 <- substr(b,ind1[i]+n1,ind2[i])
+                     if (F)
+                        return(b2)
+                     if (!isWKT) {
+                        if (T) ## or overwrite cached?
+                           dst <- tempfile(fileext=".geojson")
+                        Fout <- file(dst,encoding="UTF-8")
+                        writeLines(b2,Fout)
+                        close(Fout)
+                        d2 <- spatial_read(dst,engine="sf")
+                       # d2 <- sf::st_read(b2,quiet=TRUE)
+                     }
+                     else if (isSF) {
+                        d2 <- data.frame(id=seq_along(b2))
+                        d2$geom <- b2
+                        d2 <- spatial_geometry(sf::st_as_sf(d2,wkt="geom"))
+                     }
+                     else if (isSP) {
+                        d2 <- rgeos::readWKT(b2)
+                     }
+                     spatial_crs(d2) <- 4326
+                     if (("top" %in% select)&&(is_spatial_points(d2)))
+                        return(NULL)
+                     if ("shape" %in% area)
+                        return(d2)
+                     if (is180) {
+                        d2 <- spatialize(d2,style="merc")
+                        bb2 <- matrix(spatial_bbox(d2),ncol=2,byrow=TRUE)
+                        bb2 <- .project(bb2,spatial_crs(d2),inv=TRUE)
+                        bb2 <- c(t(bb2))
+                        names(bb2) <- c("xmin","ymin","xmax","ymax")
+                     }
+                     else
+                        bb2 <- spatial_bbox(d2)
+                    # print(bb2)
+                    # d2 <- sf::st_cast(d2,"POINT")
+                     bb2
+                  })
+                  if ("bounding" %in% area) {
+                    # shape <- t(list2DF(shape))
+                     if (T) {
+                       # bname <- rownames(bounding)
+                        bounding <- do.call("rbind",shape)
+                       # rownames(bounding) <- bname
+                     }
+                     else {
+                        bounding[,"minx"] <- shape[,"xmin"]
+                        bounding[,"maxx"] <- shape[,"xmax"]
+                     }
+                  }
+               }
+            }
             if (verbose)
-               .elapsedTime("correct bounds (180 degree) -- parsing")
-            b <- readLines(dst,encoding="UTF-8",warn=FALSE)
-            b <- unlist(strsplit(b,split="'"))
-            b <- .grep("MULTI(POLYGON|LINESTRING)",b,value=TRUE)
-            b <- .gsub("(MULTI(POLYGON|LINESTRING)|\\(|\\))"," ",b)
-            b <- .gsub("(^\\s+|\\s+$)","",b)
-            b <- unlist(strsplit(b,split=","))
-            b <- unlist(strsplit(b,split="\\s+"))
-            b <- b[nchar(b)>0]
-            b <- matrix(as.numeric(b),ncol=2,byrow=TRUE)[,1]
-            bounding[,"minx"] <- min(b[b>0])
-            bounding[,"maxx"] <- max(b[b<0])
-            if (verbose)
-               .elapsedTime("correct bounds (180 degree) -- finish")
+               .elapsedTime("shape|180 -- finish")
          }
          if (select=="top")
             ptype <- ptype[important]
+      }
+      if ((area=="shape")&&(!is.null(shape))) {
+         if ("top" %in% select) {
+            ind <- which(sapply(shape,function(x) !is.null(x)))
+            if (length(ind)) {
+               if ((length(typeInd))&&(!is.na(ind2 <- ind[typeInd])))
+                  ind <- ind2
+               shape <- shape[[ind[1]]]
+              # session_grid(shape)
+            }
+         }
+         return(shape)
       }
       if (area=="bounding") {
          bounding <- bounding[,c(3,1,4,2),drop=FALSE]
@@ -167,7 +314,7 @@
          if (is.character(apiKey))
             src <- paste0(src,"&key=",apiKey)
       }
-      dst <- .ursaCacheDownload(src,quiet=!verbose)
+      dst <- .ursaCacheDownload(src,cache=cache,quiet=!verbose)
       xmlstring <- scan(dst,character(),quiet=!verbose)
       istatus <- .grep("<status>",xmlstring)
       status <- .gsub("<status>(.+)</status>","\\1",xmlstring[istatus])

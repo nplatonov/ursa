@@ -10,6 +10,7 @@
    if (resetGrid)
       session_grid(NULL)
    toResetGrid <- 0L
+  # message(paste(.parentFunc(),collapse=" -> "))
   # print(c(expand=expand,border=border))
   # geocode <- match.arg(geocode)
    geocodeStatus <- FALSE
@@ -18,6 +19,7 @@
    if (is.na(resetProj))
       resetProj <- TRUE
    cpg <- NULL
+   jsonSF <- FALSE
    if (engine=="sp") {
       isSF <- FALSE
       isSP <- TRUE
@@ -36,7 +38,7 @@
          isSF <- requireNamespace("sf",quietly=.isPackageInUse())
       isSP <- !isSF
    }
-   if ((length(crs))&&(style=="auto"))
+   if ((length(crs))&&("auto" %in% style))
       style <- .epsg2proj4(crs)
    else {
       crs2 <- .epsg2proj4(style)
@@ -216,7 +218,7 @@
             message("process 'array' by 'sf' -- TODO (dilemma: raster is array)")
          }
          else if (is.numeric(dsn)) {
-            proj4 <- attr(dsn,"proj4")
+            proj4 <- attr(dsn,"crs")
             limLonLat <- all(dsn>=-360 & dsn<=+360)
             if (length(dsn)==2) { ## point
               # obj <- sf::st_sfc(sf::st_point(dsn))
@@ -254,7 +256,7 @@
                   session_grid(NULL)
                }
                else
-                  sf::st_crs(obj) <- session_proj4()
+                  sf::st_crs(obj) <- session_crs()
             }
             else
                rm(obj)
@@ -289,7 +291,7 @@
          }
       }
       else if ((nextCheck)&&(isSP)) { # if (isSP)
-         proj4 <- attr(dsn,"proj4")
+         proj4 <- attr(dsn,"crs")
          if (is.array(dsn))
             message("process 'array' by 'sp' -- TODO (dilemma: raster is array)")
          else if (is.numeric(dsn)) {
@@ -328,7 +330,7 @@
                session_grid(NULL)
             }
             else {
-               sp::proj4string(obj) <- sp::CRS(session_proj4(),doCheckCRSArgs=FALSE)
+               sp::proj4string(obj) <- sp::CRS(session_crs(),doCheckCRSArgs=FALSE)
             }
          }
          else if (inherits(dsn,"data.frame")) {
@@ -406,56 +408,76 @@
             }
             da <- try(.geocode(dsn,service=geocode[1],place=place
                           ,area=area,select="top",verbose=verbose))
-            if ((inherits(da,"try-error"))||((is.null(da))&&(length(geocode)==2))) {
+            if ((inherits(da,"try-error"))||((is.null(da))&&(length(geocode)>1))) {
                geocode <- geocode[2]
                da <- .geocode(dsn,service=geocode,area=area,select="top"
                              ,verbose=verbose)
             }
-            else if (length(geocode)==2)
+            else if (length(geocode)>1)
                geocode <- geocode[1]
             if (is.null(da)) {
                cat(paste("unable to geocode request",dQuote(dsn),"\n"))
                return(NULL)
             }
-            if (is.null(dim(da))) {
-               if (length(da)==4)
-                  da <- da[c("minx","miny","maxx","maxy")]
-               else if (length(da)==2) {
-                  arglist <- as.list(match.call())
-                  arglist$dsn <- da
-                  arglist[[1]] <- tail(as.character(arglist[[1]]),1)
-                  return(do.call(arglist[[1]],arglist[-1])) ## RECURSIVE!!!
+            if (is_spatial(da)) {
+              # obj <- data.frame(src=dsn)
+              # spatial_geometry(obj) <- da
+               obj <- da
+               geocodeStatus <- TRUE
+               hasOpened <- TRUE
+            }
+            else {
+               if (is.null(dim(da))) {
+                  if (length(da)==4)
+                     da <- da[c("minx","miny","maxx","maxy")]
+                  else if (length(da)==2) {
+                     arglist <- as.list(match.call())
+                     arglist$dsn <- da
+                     arglist[[1]] <- tail(as.character(arglist[[1]]),1)
+                     if ((TRUE)&&("auto" %in% style)) {
+                        arglist$style <- switch(geocode
+                                       ,nominatim="mapnik"
+                                       ,pickpoint="mapnik"
+                                       ,google="google terrain color"
+                                       ,"mapnik")
+                     }
+                     return(do.call(arglist[[1]],arglist[-1])) ## RECURSIVE!!!
+                  }
                }
+               else
+                  da <- da[,c("minx","miny","maxx","maxy")]
+               if (da[1]>da[3])
+                  da[3] <- da[3]+360
+               da <- matrix(da[c(1,2,1,4,3,4,3,2,1,2)],ncol=2,byrow=TRUE)
+               if (TRUE) {
+                  x <- da[,1]
+                  y <- da[,2]
+                  n <- 256
+                  x <- c(seq(x[1],x[2],len=n),seq(x[2],x[3],len=n)
+                        ,seq(x[3],x[4],len=n),seq(x[4],x[5],len=n))
+                  y <- c(seq(y[1],y[2],len=n),seq(y[2],y[3],len=n)
+                        ,seq(y[3],y[4],len=n),seq(y[4],y[5],len=n))
+                  da <- cbind(x,y)
+               }
+               if (isSF) {
+                  obj <- sf::st_sfc(sf::st_multilinestring(list(da)),crs=4326)
+                 # sf::st_write(obj,"rect.geojson");q()
+               }
+               if (isSP) {
+                  obj <- sp::SpatialLines(list(sp::Lines(sp::Line(da),1L))
+                                         ,proj4string=sp::CRS("+init=epsg:4326"))
+               }
+               geocodeStatus <- TRUE
+               hasOpened <- TRUE
             }
-            else
-               da <- da[,c("minx","miny","maxx","maxy")]
-            if (da[1]>da[3])
-               da[3] <- da[3]+360
-            da <- matrix(da[c(1,2,1,4,3,4,3,2,1,2)],ncol=2,byrow=TRUE)
-            if (TRUE) {
-               x <- da[,1]
-               y <- da[,2]
-               n <- 256
-               x <- c(seq(x[1],x[2],len=n),seq(x[2],x[3],len=n)
-                     ,seq(x[3],x[4],len=n),seq(x[4],x[5],len=n))
-               y <- c(seq(y[1],y[2],len=n),seq(y[2],y[3],len=n)
-                     ,seq(y[3],y[4],len=n),seq(y[4],y[5],len=n))
-               da <- cbind(x,y)
-            }
-            if (isSF) {
-               obj <- sf::st_sfc(sf::st_multilinestring(list(da)),crs=4326)
-              # sf::st_write(obj,"rect.geojson");q()
-            }
-            if (isSP) {
-               obj <- sp::SpatialLines(list(sp::Lines(sp::Line(da),1L))
-                                      ,proj4string=sp::CRS("+init=epsg:4326"))
-            }
-            geocodeStatus <- TRUE
-            hasOpened <- TRUE
          }
       }
       else {
-         if (isZip <- .lgrep("\\.zip$",dsn)>0) {
+         jsonSF <- (isSF)&&(.lgrep("\\.geojson",dsn))&&
+            (requireNamespace("geojsonsf",quietly=.isPackageInUse()))
+         if (jsonSF)
+            NULL
+         else if (isZip <- .lgrep("\\.zip$",dsn)>0) {
             ziplist <- unzip(dsn,exdir=tempdir());on.exit(file.remove(ziplist))
             dsn <- .grep("\\.(shp|sqlite|gpkg|geojson)$",ziplist,value=TRUE)
          }
@@ -506,10 +528,10 @@
                   indY <- 2L
                colnames(obj)[c(indX,indY)] <- c("x","y")
             }
-            p4s <- attr(obj,"proj4")
+            p4s <- attr(obj,"crs")
             if (isSF) {
                if (!is.null(p4s))
-                  obj <- sf::st_as_sf(obj,coords=c("x","y"),crs=attr(obj,"proj4"))
+                  obj <- sf::st_as_sf(obj,coords=c("x","y"),crs=attr(obj,"crs"))
                else
                   obj <- sf::st_as_sf(obj,coords=c("x","y"))
             }
@@ -523,62 +545,71 @@
          }
       }
       if ((!hasOpened)&&((!geocodeStatus)||(file.exists(dsn)))) {
-         opW <- options(warn=ifelse(isSP,-1,0))
-         if (isSF)
-            lname <- try(sf::st_layers(dsn)$name)
-         else {
-            lname <- try(rgdal::ogrListLayers(dsn))
-         }
-         if (inherits(lname,"try-error")) {
-            cat("Cannot get layers\n")
-            return(NULL)
-         }
-         if (!is.character(layer))
-            layer <- lname[layer[1]]
-         else
-            layer <- .grep(layer,lname,value=TRUE)
-         if (length(layer)>1) {
-            print(paste("Select only one layer:",paste(paste0(seq(layer),")")
-                                       ,.sQuote(layer),collapse=", ")),quote=FALSE)
-            return(NULL)
-         }
-         if (isSF) {
-           # opW2 <- options(warn=0)
-            obj <- sf::st_read(dsn,layer=layer,quiet=TRUE)
-           # options(opW2)
-            if (!spatial_count(obj))
-               return(obj)
-            if (TRUE)
-               obj <- sf::st_zm(obj,drop=TRUE)
+         if (jsonSF) {
+            obj <- geojsonsf::geojson_sf(paste(readLines(dsn),collapse=""))
          }
          else {
-            if (isSHP <- .lgrep("\\.shp$",dsn)>0) {
-               cpgname <- .gsub("\\.shp$",".cpg",dsn)
-               if (file.exists(cpgname)) {
-                  cpg <- readLines(cpgname,warn=FALSE)
-               }
-               else
-                  cpg <- "UTF-8"
+            opW <- options(warn=ifelse(isSP,-1,0))
+            if (isSF)
+               lname <- try(sf::st_layers(dsn)$name)
+            else {
+               lname <- try(rgdal::ogrListLayers(dsn))
+            }
+            if (inherits(lname,"try-error")) {
+               cat("Cannot get layers\n")
+               return(NULL)
+            }
+            if (!is.character(layer))
+               layer <- lname[layer[1]]
+            else
+               layer <- .grep(layer,lname,value=TRUE)
+            if (length(layer)>1) {
+               print(paste("Select only one layer:",paste(paste0(seq(layer),")")
+                                          ,.sQuote(layer),collapse=", ")),quote=FALSE)
+               return(NULL)
+            }
+            if (isSF) {
+              # opW2 <- options(warn=0)
+               obj <- sf::st_read(dsn,layer=layer,quiet=TRUE)
+              # options(opW2)
+               if (!spatial_count(obj))
+                  return(obj)
+               if (TRUE)
+                  obj <- sf::st_zm(obj,drop=TRUE)
             }
             else {
-               cpg <- "UTF-8"
+               if (isSHP <- .lgrep("\\.shp$",dsn)>0) {
+                  cpgname <- .gsub("\\.shp$",".cpg",dsn)
+                  if (file.exists(cpgname)) {
+                     cpg <- readLines(cpgname,warn=FALSE)
+                  }
+                  else
+                     cpg <- "UTF-8"
+               }
+               else {
+                  cpg <- "UTF-8"
+               }
+               ##~ obj <- rgdal::readOGR(dsn,layer,pointDropZ=TRUE,encoding=enc
+                                    ##~ ,use_iconv=!is.null(enc),verbose=FALSE)
+               obj <- rgdal::readOGR(dsn,layer,pointDropZ=TRUE,encoding=cpg
+                                    ,use_iconv=cpg %in% "UTF-8"
+                                    ,verbose=FALSE)
+                                    ## --20191112 use_iconv=!isSHP
+               if ((length(names(obj))==1)&&(names(obj)=="FID")) {
+                  info <- rgdal::ogrInfo(dsn,layer)
+                  if (info$nitems==0)
+                     methods::slot(obj,"data")$FID <- NULL
+               }
             }
-            ##~ obj <- rgdal::readOGR(dsn,layer,pointDropZ=TRUE,encoding=enc
-                                 ##~ ,use_iconv=!is.null(enc),verbose=FALSE)
-            obj <- rgdal::readOGR(dsn,layer,pointDropZ=TRUE,encoding=cpg
-                                 ,use_iconv=cpg %in% "UTF-8"
-                                 ,verbose=FALSE)
-                                 ## --20191112 use_iconv=!isSHP
-            if ((length(names(obj))==1)&&(names(obj)=="FID")) {
-               info <- rgdal::ogrInfo(dsn,layer)
-               if (info$nitems==0)
-                  methods::slot(obj,"data")$FID <- NULL
-            }
+            options(opW)
          }
-         options(opW)
+      }
+      if (geocodeStatus) {
+         isSP <- .isSP(obj)
+         isSF <- .isSF(obj)
       }
    }
-   if (style=="keep") {
+   if ("keep" %in% style) {
       crs <- spatial_crs(obj)
      # style <- crs
      # print(data.frame(style=style,crs=crs,isEPSG=isEPSG,isPROJ4=isPROJ4))
@@ -590,8 +621,9 @@
    if (nchar(subset)) {
       obj <- do.call("subset",list(obj,parse(text=subset)))
    }
-   if ((geocodeStatus)&&(style=="auto")) {
+   if ((geocodeStatus)&&("auto" %in% style)) {
       style <- switch(geocode,nominatim=c("mapnik","openstreetmap color")[1]
+                             ,pickpoint="mapnik"
                              ,google="google terrain color")
    }
    if ((toUnloadMethods)&&("package:methods" %in% search())) {
@@ -650,6 +682,11 @@
             da <- methods::slot(obj,"data")[,dname[i],drop=TRUE]
          }
          if (is.character(da)) {
+            if (jsonSF) {
+               ind <- which(Encoding(da) %in% c("unknown"))
+               if (length(ind))
+                  Encoding(da[ind]) <- "UTF-8"
+            }
            # str(dname[i])
             isDateTime <- FALSE
             skipParse <- TRUE
@@ -657,11 +694,22 @@
            #    str(da)
             nc <- try(nchar(na.omit(da)))
             if (inherits(nc,"try-error")) {
-               message("Data field ",.sQuote(dname[i])," has problem:")
-               str(da)
-               warning("Check specified encoding for input data table")
+               msg <- attr(nc,"condition")$message
+               if (.lgrep("element\\s\\d+",msg)) {
+                  ind <- as.integer(.gsub(".*element\\s(\\d+).*","\\1",msg))
+                  if (!is.na(ind))
+                     msg <- paste0(msg,": ",da[ind])
+               }
+               message("Data field ",.sQuote(dname[i]),": ",msg)
+              # str(da)
+              # print(c(warn=getOption("warn")))
+               if (F) {
+                  opW <- options(warn=ifelse(.isPackageInUse(),1,1))
+                  warning("Check specified encoding for input data table")
+                  options(opW)
+               }
             }
-            if ((dev <- TRUE)&&(length(unique(nc))==1)&&
+            else if ((dev <- TRUE)&&(length(unique(nc))==1)&&
                   (.lgrep("\\d{4}.*\\d{2}.*\\d{2}",da))) {
                nNA <- length(which(is.na(da)))
                s <- sapply(gregexpr("(-|\\.|/)",da),function(x) length(x[x>=0]))
@@ -833,7 +881,8 @@
    }
   # canTile <- .lgrep(art,eval(as.list(args(".tileService"))$server))>0
    canTile <- .lgrep(art,.tileService())>0
-   isTile <- .lgrep("(tile|polarmap)",style)>0 & canTile
+   isTile <- .lgrep("(tile|polarmap)",style)>0 & canTile | 
+      .lgrep("(ArcticSDI|ArcticConnect)",style)>0
    if ((!isStatic)&&(!isTile)) {
       if (art %in% staticMap)
          isStatic <- TRUE
@@ -844,14 +893,14 @@
    }
    tpat <- unlist(gregexpr("\\{[xyz]\\}",style))
    tpat <- length(tpat[tpat>0])
-   toZoom <- (isTile)||(isStatic)||(style=="web")||.lgrep("^tile",style)||
-             (style=="polarmap")||
+   toZoom <- (isTile)||(isStatic)||("web" %in% style)||.lgrep("^tile",style)||
+             ("polarmap" %in% style)||
              (tpat==3)
   # isColor <- .lgrep("colo(u)*r",style)>0
    isWeb <- .lgrep(tilePatt,art)
    if (verbose)
       print(data.frame(proj=proj,art=art,static=isStatic
-                      ,canTile=canTile,tile=isTile,web=isWeb))
+                      ,canTile=canTile,tile=isTile,web=isWeb,row.names="spatialize:"))
   # isOSM <- proj %in% "osm"
   # isGoogle <- proj %in% "google"
   # http://static-api.maps.sputnik.ru/v1/?width=400&height=400&z=6&clng=179&clat=70
@@ -1012,17 +1061,17 @@
          lon_0 <- if (is.numeric(lon0)) lon0 else round(theta2,4)
          lat_ts <- if (is.numeric(lat0)) lat0 else round(mean(lat2),4)
          lat_0 <- if (lat_ts>=0) 90 else -90
-         if (verbose)
-            print(c(lon0=lon_0,lat0=lat_0,lat_ts=lat_ts))
-         if ((!FALSE)&&(proj=="merc")&&(.lgrep("(polarmap|tile357[123456])",style)))
+         if (((proj=="merc")&&(.lgrep("(polarmap|ArcticConnect|ArcticSDI|tile357[123456])",style)>0))||
+               ((proj=="auto")&&("web" %in% style)&&(isTRUE(crs %in% 3571:3576)))) {
             proj <- "laea"
+         }
          else if (proj=="auto") {
             if (("web" %in% style)||(tpat==3))
            # if (style=="web")
                proj <- "merc"
             else if (.lgrep("tile3857",style))
                proj <- "merc"
-            else if (.lgrep("(polarmap|tile357[123456])",style))
+            else if (.lgrep("(polarmap|ArcticConnect|ArcticSDI|tile357[123456])",style))
                proj <- "laea"
             else if ((any(lat2<0))&&(any(lat2>0)))
                proj <- "merc"
@@ -1032,7 +1081,7 @@
                proj <- "stere"
          }
          if (verbose)
-            print(c(lon_0=lon_0,lat_ts=lat_ts))
+            print(data.frame(lon0=lon_0,lat0=lat_0,lat_ts=lat_ts,row.names=proj))
          if (proj=="stere") {
             t_srs <- paste("","+proj=stere"
                           ,paste0("+lat_0=",lat_0)
@@ -1041,7 +1090,7 @@
                           ,"+k=1","+x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs")
          }
          else if (proj=="laea") {
-            if (style=="polarmap") {
+            if (.lgrep("(polarmap|ArcticConnect|ArcticSDI|^web$)",style)) {
                if (length(crs)) {
                   lon_0 <- as.numeric(gsub(".*\\+lon_0=(\\S+)\\s.*","\\1"
                                           ,spatial_crs(crs)))
@@ -1106,8 +1155,11 @@
                }
             }
             if (isSP) {
+               print(t_srs)
               # obj <- sp::spTransform(obj,t_srs)
+               print(c(sp::bbox(obj)),digits=12)
                obj <- spatial_transform(obj,t_srs)
+               q()
                if ((TRUE)&&(.lgrep("\\+proj=longlat",t_srs))&&(max(lon2)>180)) {
                   if (verbose)
                      .elapsedTime("lon+360 -- start")
@@ -1184,14 +1236,14 @@
    }
   # else if (((isSF)&&(is.ursa(a,"grid")))||((isSP)&&(is.ursa(asp,"grid")))) {
    else if (is.ursa(g0,"grid")) {
-      t_srs <- g0$proj4
+      t_srs <- g0$crs
       if (isSF) {
         # opE <- options(show.error.messages=TRUE)
         # print(sf::st_bbox(obj))
          src0 <- sf::st_crs(obj)$proj4string
          if (!is.na(src0)) {
             t_srs <- spatial_crs(t_srs)
-            g0$proj4 <- t_srs
+            g0$crs <- t_srs
             if (!identical(src0,t_srs))
                obj <- sf::st_transform(obj,t_srs)
          }
@@ -1249,11 +1301,12 @@
    else {
       bbox <- spatial_bbox(obj)
       proj4 <- spatial_crs(obj)
-      obj_geom <- spatial_geometry(obj)
-      if (isSP)
+      if ((FALSE)&&(isSP)) {
+         obj_geom <- spatial_geometry(obj)
          obj_geom <- switch(geoType,POLYGON=methods::slot(obj_geom,"polygons")
                                       ,LINE=methods::slot(obj_geom,"lines")
                                      ,POINT=obj_geom)
+      }
    }
    if ((bbox["xmin"]==bbox["xmax"])||(bbox["ymin"]==bbox["ymax"]))
       bbox <- bbox+100*c(-1,-1,1,1)
@@ -1264,6 +1317,8 @@
       bbox[c(2,4)] <- mean(bbox[c(2,4)])+c(-1,1)*expand*diff(bbox[c(2,4)])/2
    }
    else {
+      if ((bbox[1]>0)&&(bbox[3]<0))
+         bbox[3] <- bbox[3]+360
       .sc <- (expand-1)*sqrt(diff(bbox[c(1,3)])*diff(bbox[c(2,4)]))/2
       bbox <- bbox+c(-1,-1,1,1)*.sc
    }
@@ -1271,7 +1326,7 @@
       if (!is.na(cell)) {
          res <- rep(cell,length=2)
          g0 <- regrid(bbox=unname(bbox[c("xmin","ymin","xmax","ymax")]),res=res
-                     ,proj4=proj4,border=0)
+                     ,crs=proj4,border=0)
       }
       else {
          res <- max(c(bbox["xmax"]-bbox["xmin"]),(bbox["ymax"]-bbox["ymin"]))/len
@@ -1279,7 +1334,7 @@
          res <- p[which.min(abs(res-p))]
          g1 <- ursa_grid()
          g1$resx <- g1$resy <- as.numeric(res)
-         g1$proj4 <- proj4
+         g1$crs <- proj4
          g0 <- regrid(g1,bbox=unname(bbox[c("xmin","ymin","xmax","ymax")])
                      ,border=0) ## border=border
       }
@@ -1288,7 +1343,7 @@
       res <- with(g0,sqrt(resx*resy))
       s <- 2*6378137*pi/(2^(1:21+8))
       zoom <- which.min(abs(s-res))
-      if ((style=="polarmap")&&(zoom>9)) {
+      if (("polarmap" %in% style)&&(zoom>9)) {
          znew <- 9
          g0 <- regrid(g0,res=s[znew],expand=ifelse(dev <-F ,2^(zoom-znew),1))
          zoom <- znew
@@ -1301,7 +1356,7 @@
    }
    if ((FALSE)&&(isWeb)) {
       bbox <- with(g0,.project(cbind(c(minx,maxx),c(miny,maxy))
-                              ,proj4,inv=TRUE))[c(1,3,2,4)]
+                              ,crs,inv=TRUE))[c(1,3,2,4)]
       basemap <- .geomap(bbox,border=0,style=style,verbose=verbose)
       g0 <- ursa(basemap,"grid")
       attr(obj,"basemap") <- basemap

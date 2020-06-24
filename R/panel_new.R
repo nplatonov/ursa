@@ -25,7 +25,7 @@
    angle <- .getPrm(arglist,name="angle",kwd=kwd,default=NA_real_)
    def.col <- if ((any(!is.na(density)))&&(any(!is.na(angle)))) "grey80" else "chessboard"
    col <- .getPrm(arglist,name="(^$|bg|blank|fill)",kwd=kwd
-                    ,default=ifelse(nchar(g1$proj4)>0,def.col,"white")) # grey90
+                    ,default=ifelse(nchar(g1$crs)>0,def.col,"white")) # grey90
    lwd <- .getPrm(arglist,name="lwd",kwd=kwd,default=1)
    lty <- .getPrm(arglist,name="lty",class=c("character","integer")
                  ,kwd=kwd,default=1)

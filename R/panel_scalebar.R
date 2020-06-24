@@ -16,9 +16,9 @@
    position <- .getPrm(arglist,name="pos(ition)*",kwd=kwd
                       ,class=list("character","numeric"),default="---")
    g0 <- session_grid()
-   canScale <- .lgrep("(epsg:3857|\\+proj=(merc|zzzzz)\\s)",g0$proj4)>0
+   canScale <- .lgrep("(epsg:3857|\\+proj=(merc|zzzzz)\\s)",g0$crs)>0
    if ((all(position=="---"))&&(canScale)) {
-      lat <- with(g0,.project(rbind(c(minx,miny),c(maxx,maxy)),proj4,inv=TRUE))[,2]
+      lat <- with(g0,.project(rbind(c(minx,miny),c(maxx,maxy)),crs,inv=TRUE))[,2]
       sc <- sort(1/cos(lat*pi/180))
       if (sc[2]/sc[1]>1.25)
          position <- c("bottomleft","topleft")
@@ -85,15 +85,15 @@
       options(opW)
       return(invisible(NULL))
    }
-   isLonLat <- .lgrep("(\\+proj=longlat|epsg:4326)",g1$proj4)>0
-   if ((isLonLat)||((TRUE)&&(!nchar(g1$proj4))))
+   isLonLat <- .lgrep("(\\+proj=longlat|epsg:4326)",g1$crs)>0
+   if ((isLonLat)||((TRUE)&&(!nchar(g1$crs))))
       return(invisible(NULL))
-   isGeo <- nchar(g1$proj4)>0
+   isGeo <- nchar(g1$crs)>0
    if ((indirect)&&(!isGeo))
       return(invisible(NULL))
    dx <- with(g1,maxx-minx)
    dy <- with(g1,maxy-miny)
-   isMerc <- .lgrep("(\\+proj=merc|epsg\\:3857)",g1$proj4)>0
+   isMerc <- .lgrep("(\\+proj=merc|epsg\\:3857)",g1$crs)>0
    if (isMerc) {
       x3 <- pos[1]
       if (pos[1]<0.1)
@@ -106,9 +106,9 @@
       else if (pos[2]>0.95)
          y3 <- 0.95
       lat <- with(g1,.project(cbind(minx+x3*(maxx-minx),miny+y3*(maxy-miny))
-                             ,g1$proj4,inv=TRUE))#[1,2]
-      lat_ts <- .gsub2("\\+lat_ts=(\\S+)\\s","\\1",g1$proj4)
-      lat_ts <- ifelse(lat_ts==g1$proj4,0,as.numeric(lat_ts))
+                             ,g1$crs,inv=TRUE))#[1,2]
+      lat_ts <- .gsub2("\\+lat_ts=(\\S+)\\s","\\1",g1$crs)
+      lat_ts <- ifelse(lat_ts==g1$crs,0,as.numeric(lat_ts))
       sc <- if (is.null(lat)) 1 else 1/cos((lat[1,2]-lat_ts)*pi/180)
    }
    else
@@ -214,7 +214,7 @@
         # print(un)
       }
    }
-   if (!nchar(g1$proj4))
+   if (!nchar(g1$crs))
       un <- ""
    w <- w*sc
    ##~ if (pos[1]<0.5) {

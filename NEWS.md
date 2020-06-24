@@ -1,13 +1,25 @@
-2020-06-11
+2020-06-21
+
+### version 3.9.1
+
+-   Additional value `shape` for `area` argument and additional value
+    `pickpoint` for `geocode` argument in function `.glance()`.
+
+-   Package **`geojsonsf`** is added as suggested for faster
+    `sf`/GeoJSON import/export.
+
+### version 3.9 (interim)
+
+-   MAJOR: Field `$proj4` in `ursaGrid` objects is renamed to `$crs` due
+    to activity with PROJ library, but **`ursa`** internally still
+    continues operating with PROJ4 strings. Projection (CRS) values can
+    be extracted or replaced by `ursa_crs()` (or `ursa_proj4()`, synonym
+    to `ursa_crs()`) functions.
 
 ### version 3.8.20
 
 -   Consistence with imported package **sp** (&gt;=1.4-0) and suggested
-    package **`sf`** (0.9-3) is in progress.
-
-<!--
-+ Argument `doCheckCRSArgs` sometimes is `FALSE` in `sp::CRS()`.
--->
+    package **`sf`** (&gt;=0.9-3) is in progress.
 
 -   New argument `engine` in function `read_gdal()` for optional
     importind data via `sf::gdal_read()` function.

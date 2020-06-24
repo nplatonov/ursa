@@ -7,7 +7,7 @@
    subset <- .getPrm(arglist,name="(^$|band|subset)",class=c("integer","character")
                     ,default=NULL)
    nodata <- .getPrm(arglist,name="(nodata|ignorevalue)",default=NaN)
-   cache <- .getPrm(arglist,name="cache",class=c("integer","logical"),default=0L)
+   cache <- .getPrm(arglist,name="cache",class=c("integer","logical","character"),default=0L)
    ref <- .getPrm(arglist,class=c("ursaRaster","ursaGrid"),default=NULL)
    resetGrid <- .getPrm(arglist,name="reset(Grid)*",default=FALSE)
    verbose <- .getPrm(arglist,name="verb(ose)*",default=FALSE)

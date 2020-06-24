@@ -40,7 +40,7 @@ This is a high-level function to create \code{ursaRaster} objects. The follwed c
    \code{\link[raster]{raster}} (\pkg{raster})\tab \code{\link[ursa]{ursa_new}}.\cr
    \code{\link[raster]{brick}} (\pkg{raster})\tab \code{\link[ursa]{ursa_new}}.\cr
    \code{\link[raster]{stack}} (\pkg{raster})\tab \code{\link[ursa]{ursa_new}}.\cr
-   \code{\link[magick:editing]{bitmap}} (\pkg{magick})\tab \code{\link[ursa]{ursa_new}}.\cr
+   \code{bitmap} (\pkg{magick})\tab \code{\link[ursa]{ursa_new}}.\cr
    \code{\link[base]{character}} (GDAL supported file name) \tab \code{\link[ursa:conn.read_gdal]{read_gdal}}.
 }
 Generally, \code{\link[ursa]{allocate}} is used for objects with non-regular grid, and \code{\link[ursa]{ursa_new}} is used for regular grids. The \link[ursa:classGrid]{raster grid} is defined from object properties or from \link[ursa:session]{sessional grid}.
@@ -98,7 +98,7 @@ b2a <- as.ursa(c2)
 print(b2a)
 
 session_grid(NULL)
-attr(c2,"proj4") <- NULL
+attr(c2,"crs") <- NULL
 b2b <- as.ursa(c2)
 print(b2b)
 print(ursa_grid(b2b))

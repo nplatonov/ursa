@@ -92,7 +92,7 @@ Nikita Platonov \email{platonov@sevin.ru}
 session_grid(NULL)
 a <- pixelsize()
 print(ursa_grid(a))
-ursa_grid(a)$proj4 <- gsub("\\\\.0+","",ursa_grid(a)$proj4)
+ursa_grid(a)$crs <- gsub("\\\\.0+","",ursa_grid(a)$crs)
 print(ursa_grid(a))
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

@@ -70,7 +70,7 @@
          xy <- .project(c(-176.682000,61.327000),spatial_crs(3413))
          g1 <- .grid.skeleton()
          g1$resx <- g1$resy <- 1004.1
-         g1$proj4 <- spatial_crs(3413)
+         g1$crs <- spatial_crs(3413)
          g1$columns <- g0$columns
          g1$rows <- g0$rows
          g1$minx <- round(xy[,1])-g1$resx/2
@@ -123,9 +123,9 @@
    g1$resy <- a1[7]
    g1$maxx <- with(g1,minx+resx*columns)
    g1$maxy <- with(g1,miny+resy*rows)
-   g1$proj4 <- attr(a,"projection")
-   if (is.na(g1$proj4))
-      g1$proj4 <- ""
+   g1$crs <- attr(a,"projection")
+   if (is.na(g1$crs))
+      g1$crs <- ""
    b1 <- attr(a,"mdata")
    ln <- .gsub("^Band_\\d+=\\t*(.+)$","\\1",.grep("band",b1,value=TRUE))
    c1 <- attr(a,"df")

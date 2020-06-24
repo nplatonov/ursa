@@ -1,21 +1,24 @@
 '.geomap' <- function(loc=NULL,style="",geocode="",place="",size=NA,zoom="0"
-                     ,border=27,cache=TRUE,verbose=FALSE) {
+                     ,border=27,retina=NA,cache=TRUE,verbose=FALSE) {
   # if (!nchar(style))
   #    style <- "google static"
    geocodeList <- eval(as.list(args(.geocode))$service)
    tileList <- .tileService()
    if (!nchar(geocode))
-      geocode <- if (.lgrep("google",style)) "google" else "nominatim"
+      geocode <- if (.lgrep("google-deprecated",style)) "google" else "nominatim"
    geocode <- match.arg(geocode,geocodeList)
    if (!sum(nchar(style)))
-      style <- paste(switch(geocode,nominatim="openstreetmap",google="google"
-                           ,"mapnik"),"color")
+      style <- paste(switch(geocode,nominatim="openstreetmap",pickpoint="openstreetmap"
+                           ,google="google","mapnik"),"color")
    if (is.na(zoom))
       zoom <- "0"
+   isWGS84 <- .lgrep("(maps\\.yandex|^(Yandex|\u042f\u043d\u0434\u0435\u043a\u0441)$)"
+                       ,style,ignore.case=TRUE)
    staticMap <- c("openstreetmap","google$","sputnikmap")
    tilePatt <- paste0("(",paste0(unique(c(staticMap,tileList))
                                 ,collapse="|"),")")
    tilePatt <- .gsub("\\.","\\\\.",tilePatt)
+   artPatt <- .gsub("\\.","\\\\.",tilePatt)
    if (!.lgrep(tilePatt,style))
       art <- "none"
    else {
@@ -23,6 +26,8 @@
          art <- "none"
       else if (style %in% tileList)
          art <- style
+      else if ((artStyle <- gsub("\\s(color|gr[ae](scale)*)","",style)) %in% tileList)
+         art <- artStyle
       else
          art <- .gsub2(tilePatt,"\\1",style)
      # print(art);q()
@@ -59,6 +64,11 @@
       else
          art <- "none"
    }
+   if ("ArcticSDI" %in% style)
+      art <- style
+   isPolar <- .lgrep("(polarmap|ArcticSDI|ArcticConnect)",art)>0
+   if ((isPolar)&&(!isTile))
+      isTile <- TRUE
   # else if (isUrl)
   #    style <- "custom"
    isColor <- if (isUrl) TRUE else .lgrep("colo(u)*r",style)>0
@@ -68,7 +78,7 @@
    isWeb <- .lgrep(tilePatt,art)>0 | isUrl
    if (verbose)
       print(data.frame(art=art,color=isColor,grey=isGrey,static=isStatic
-                      ,canTile=canTile,tile=isTile,web=isWeb))
+                      ,canTile=canTile,tile=isTile,web=isWeb,row.names="geomap:"))
    geocodeStatus <- FALSE
    if (.isSP(loc)) {
       proj4 <- sp::proj4string(loc)
@@ -101,9 +111,9 @@
          if (notYetGrid)
             loc <- c(-179,-82,179,82)
          else {
-            loc <- with(g0,.project(rbind(c(minx,miny),c(maxx,maxy)),proj4,inv=TRUE))
+            loc <- with(g0,.project(rbind(c(minx,miny),c(maxx,maxy)),crs,inv=TRUE))
             loc <- c(loc)[c(1,3,2,4)]
-            if ((art=="polarmap")&&(loc[1]>loc[3]))
+            if ((isPolar)&&(loc[1]>loc[3]))
                loc <- loc[c(3,2,1,4)]
          }
       }
@@ -139,11 +149,11 @@
          x[1] <- x[1]-2*B
          lon_0 <- round(180*mean(x)/B,6)
       }
-      else if ((TRUE)&&(!is.null(g3))&&(.lgrep("\\+proj=(merc|laea)",g0$proj4))) ## ++20180325
-         lon_0 <- as.numeric(.gsub(".*\\+lon_0=(\\S+)\\s.*","\\1",g0$proj4))
+      else if ((TRUE)&&(!is.null(g3))&&(.lgrep("\\+proj=(merc|laea)",g0$crs))) ## ++20180325
+         lon_0 <- as.numeric(.gsub(".*\\+lon_0=(\\S+)\\s.*","\\1",g0$crs))
       else
          lon_0 <- round(180*mean(x)/B,6)
-      if (art=="polarmap") {
+      if (isPolar) {
         # 180\{deg}W, 150\{deg}W, 100\{deg}W, 40\{deg}W, 10\{deg}E, and 90\{deg}E.
          lon_0[lon_0<(-165) || lon_0>=(+135)] <- -180
          lon_0[lon_0>=(-165) && lon_0<(-125)] <- -150
@@ -172,16 +182,20 @@
          res <- max(c((bbox["xmax"]-bbox["xmin"])/size[1]
               ,(bbox["ymax"]-bbox["ymin"])/size[2]))
          if (!FALSE) ## PolarMap.js
-            B <- 11000000 + 9036842.762 + 667
+            B <- 11000000+9036842.762+667
          else
             B <- 6378137*pi
          s <- 2*B/(2^(1:19+8))
       }
       else {
-         proj4 <- paste("+proj=merc +a=6378137 +b=6378137"
-                       ,"+lat_ts=0.0",paste0("+lon_0=",lon_0)
-                       ,"+x_0=0.0 +y_0=0 +k=1.0"
-                       ,"+units=m +nadgrids=@null +wktext +no_defs")
+         if (isWGS84)
+            proj4 <- paste("+proj=merc",paste0("+lon_0=",lon_0)
+                          ,"+k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs")
+         else
+            proj4 <- paste("+proj=merc +a=6378137 +b=6378137"
+                          ,"+lat_ts=0.0",paste0("+lon_0=",lon_0)
+                          ,"+x_0=0.0 +y_0=0 +k=1.0"
+                          ,"+units=m +nadgrids=@null +wktext +no_defs")
          bbox <- matrix(bbox,ncol=2,byrow=TRUE)
          bbox <- .project(bbox,proj4)
          bbox <- c(xmin=bbox[1,1],ymin=bbox[1,2],xmax=bbox[2,1],ymax=bbox[2,2])
@@ -207,11 +221,11 @@
             break
          res <- s[i]
          if (FALSE) { ## 20170918
-            g0 <- regrid(ursa_grid(),res=res,proj4=proj4,border=border
+            g0 <- regrid(ursa_grid(),res=res,crs=proj4,border=border
                         ,setbound=unname(bbox[c("xmin","ymin","xmax","ymax")]))
          }
          else {
-            g0 <- regrid(ursa_grid(),res=res,proj4=proj4
+            g0 <- regrid(ursa_grid(),res=res,crs=proj4
                         ,setbound=unname(bbox[c("xmin","ymin","xmax","ymax")]))
             g0 <- regrid(g0,border=border)
          }
@@ -231,9 +245,9 @@
          else if ((g0$columns<=size[1])&&(g0$rows<=size[2]))
             break
       }
-      if ((art=="polarmap")&&(!notYetGrid)) { ## more accurate checking is required
-         m1 <- gsub(".*\\+proj=laea\\s.+\\+lon_0=(\\S+)\\s.*","\\1",g0$proj4)
-         m2 <- gsub(".*\\+proj=laea\\s.+\\+lon_0=(\\S+)\\s.*","\\1",g3$proj4)
+      if ((isPolar)&&(!notYetGrid)) { ## more accurate checking is required
+         m1 <- gsub(".*\\+proj=laea\\s.+\\+lon_0=(\\S+)\\s.*","\\1",g0$crs)
+         m2 <- gsub(".*\\+proj=laea\\s.+\\+lon_0=(\\S+)\\s.*","\\1",g3$crs)
          m3 <- !is.na(.is.near(g0$resx,g3$resx))
          m4 <- !is.na(.is.near(g0$resy,g3$resy))
          m <- m1==m2 & m3 & m4
@@ -316,25 +330,27 @@
    }
    else {
       g0 <- session_grid()
-      proj4 <- g0$proj4
+      proj4 <- g0$crs
    }
    cxy <- with(g0,c(minx+maxx,miny+maxy)/2)
    center <- c(.project(cxy,proj4,inv=TRUE))
-   bound <- .project(with(g0,rbind(c(minx,miny),c(maxx,maxy))),g0$proj4
+   bound <- .project(with(g0,rbind(c(minx,miny),c(maxx,maxy))),g0$crs
                      ,inv=TRUE)
    xr <- with(g0,seq(minx,maxx,len=32))
    yr <- rep(with(g0,(miny+maxy)/2),length(xr))
-   lr <- .project(cbind(xr,yr),g0$proj4,inv=TRUE)[,1]
+   lr <- .project(cbind(xr,yr),g0$crs,inv=TRUE)[,1]
    cross180 <- length(which(diff(lr)<0))
-  # print(g0)
+   isRetina <- FALSE
    if (isTile) {
      # proj <- c("cycle","mapsurfer","sputnik")[2]
-      if (art=="polarmap") {
-        # B <- 6378137*pi
-         B <- 11000000 + 9036842.762 + 667
+      if (isPolar) { # (art=="polarmap")
+         if (art %in% "ArcticSDI")
+            B <- 6378137*pi
+         else
+            B <- 11000000+9036842.762+667
          dz <- 2^(zoom)
          res <- 2*B/dz ## '2*' - patch
-         g1 <- regrid(ursa_grid(),setbound=c(-B,-B,B,B),res=res,proj=g0$proj4)
+         g1 <- regrid(ursa_grid(),setbound=c(-B,-B,B,B),res=res,proj=g0$crs)
          session_grid(g1)
          a <- ursa_new()
          cr <- coord_xy(a,x=c(g0$minx,g0$maxx),y=c(g0$maxy,g0$miny))
@@ -354,7 +370,11 @@
          tgr$maxy <- xy["y",]+res/2
          h <- sort(unique(tgr[,"x"]))
          v <- sort(unique(tgr[,"y"]))
-         g1 <- with(g0,regrid(g1,bbox=c(minx,miny,maxx,maxy),proj=proj4))
+        # print(g1)
+         g1 <- with(g0,regrid(g1,bbox=c(minx,miny,maxx,maxy),crs=proj4
+                             ,zero="keep",verbose=FALSE))
+        # print(g1)
+        # q()
          g1 <- regrid(g1,res=ursa(g0,"cell"))
       }
       else {
@@ -365,21 +385,25 @@
          dx0 <- lon_0*pi/180*B0
          minx <- g0$minx+dx0
          maxx <- g0$maxx+dx0
-         epsg3857 <- paste("+proj=merc +a=6378137 +b=6378137"
-                          ,"+lat_ts=0.0 +lon_0=0.0"
-                          ,"+x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null"
-                          ,"+wktext  +no_defs")
+         if (isWGS84)
+            epsgWeb <- paste("+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0"
+                            ,"+datum=WGS84 +units=m +no_defs")
+         else
+            epsgWeb <- paste("+proj=merc +a=6378137 +b=6378137"
+                             ,"+lat_ts=0.0 +lon_0=0.0"
+                             ,"+x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null"
+                             ,"+wktext  +no_defs")
          if (FALSE) {
             g2 <- regrid(g0,res=2*pi*B0/dz)
             xr <- with(g2,seq(minx,maxx,by=resx)[-1]-resx/2)+dx0
             yr <- rev(with(g2,seq(miny,maxy,by=resy)[-1]-resy/2))
-            g2 <- regrid(g2,res=c(g0$resx,g0$resy),proj4=g0$proj4)
+            g2 <- regrid(g2,res=c(g0$resx,g0$resy),crs=g0$crs)
            # g2 <- regrid(g2,minx=g2$minx-dx0,maxx=g2$maxx-dx0)
          }
          else {
-            g1 <- regrid(g0,setbound=c(minx,g0$miny,maxx,g0$maxy),proj=epsg3857)
+            g1 <- regrid(g0,setbound=c(minx,g0$miny,maxx,g0$maxy),proj=epsgWeb)
             g1 <- regrid(g1,res=2*pi*B0/dz)
-            g1 <- regrid(g1,res=c(g0$resx,g0$resy),proj4=g0$proj4)
+            g1 <- regrid(g1,res=c(g0$resx,g0$resy),crs=g0$crs)
             g1$minx <- g1$minx-dx0
             g1$maxx <- g1$maxx-dx0
          }
@@ -394,12 +418,19 @@
          for (j in seq_along(dx)) {
             tX <- NULL
             xr <- seq(sx[j]+1e-6,sx[j+1]-1e-6,len=dr)
-            gr <- .project(as.matrix(expand.grid(x=xr,y=yr)),g0$proj4,inv=TRUE)
+            gr <- .project(as.matrix(expand.grid(x=xr,y=yr)),g0$crs,inv=TRUE)
             gr[,1] <- gr[,1]-lon_0
            # print(unique(gr[,1]))
            # print(unique(gr[,2]))
-            for (i in seq(nrow(gr))) {
-               tX <- rbind(tX,.deg2num(lon=gr[i,1],lat=gr[i,2],zoom=zoom))
+            if (isWGS84) {
+               for (i in seq(nrow(gr))) {
+                  tX <- rbind(tX,.deg2numYa(lon=gr[i,1],lat=gr[i,2],zoom=zoom))
+               }
+            }
+            else {
+               for (i in seq(nrow(gr))) {
+                  tX <- rbind(tX,.deg2num(lon=gr[i,1],lat=gr[i,2],zoom=zoom))
+               }
             }
             ind <- which(tX[,1]<0)
             if (length(ind))
@@ -428,8 +459,8 @@
          lon2 = (tgr[,"x"]+1)/n*360-180
          lat1 = atan(sinh(pi*(1-2*(tgr[,"y"]+1)/n)))*180/pi
          lat2 = atan(sinh(pi*(1-2*(tgr[,"y"]+0)/n)))*180/pi
-         xy1 <- .project(cbind(lon1,lat1),epsg3857)
-         xy2 <- .project(cbind(lon2,lat2),epsg3857)
+         xy1 <- .project(cbind(lon1,lat1),epsgWeb)
+         xy2 <- .project(cbind(lon2,lat2),epsgWeb)
          tgr <- cbind(tgr
                      #,lon1=lon1,lat1=lat1,lon2=lon2,lat2=lat2
                      ,minx=xy1[,1],miny=xy1[,2],maxx=xy2[,1],maxy=xy2[,2]
@@ -491,7 +522,7 @@
          print(tgr)
       }
       tile <- if (isUrl) .tileService(style) else .tileService(art)
-      if (art=="polarmap") {
+      if (isPolar) {
          epsg <- switch(as.character(lon_0),'-180'=3571,'180'=3571,'-150'=3572
                                ,'-100'=3573,'-40'=3574,'10'=3575,'90'=3576
                                ,stop("non-standard central longitude"))
@@ -517,7 +548,7 @@
          img1[[i]] <- .tileGet(z=zoom,x=tgr[i,"x"],y=tgr[i,"y"]
                               ,minx=tgr[i,"minx"],miny=tgr[i,"miny"]
                               ,maxx=tgr[i,"maxx"],maxy=tgr[i,"maxy"]
-                              ,url=tile$url
+                              ,retina=retina,url=tile$url
                               ,fileext=tile$fileext,cache=cache,verbose=verbose)
       nb <- sapply(img1,function(x) {
          if (!is.array(x))
@@ -535,13 +566,21 @@
             if (dima[3]==nbmax)
                return(x)
             dim(x) <- c(dima[1]*dima[2],dima[3])
-            for (i in (dima[3]+1L):nbmax)
-               x <- cbind(x,255L)
+            if ((dima[3]==1)&&(all(c(x)==0)))
+               fv <- 0L
+            else
+               fv <- 255L
+            for (i in (dima[3]+1L):nbmax) {
+               x <- cbind(x,fv)
+            }
+           # apply(x,2,function(y) print(summary(y)))
             dim(x) <- c(dima[1],dima[2],nbmax)
             x
          })
       }
-      img <- array(0L,dim=c(256*length(v),256*length(h),nbmax))
+     # str(lapply(img1,dim))
+      dimb <- apply(list2DF(lapply(img1,dim)),1,max)
+      img <- array(0L,dim=c(dimb[1]*length(v),dimb[2]*length(h),nbmax))
       for (i in sample(seq(nrow(tgr)))) {
         # img[igr[i,"y"]*256L+seq(256),igr[i,"x"]*256+seq(256),] <- img2[,,1:3]
         # img[igr[i,"y"]*256L+seq(256),igr[i,"x"]*256+seq(256),] <- img2[,,seq(nb)]
@@ -550,14 +589,31 @@
          if (inherits(img2,"try-error"))
             next
          dima <- dim(img2)
-         if (!((dima[1]==256)&&(dima[2]==256))) {
+         if (!((dima[1]==dimb[1])&&(dima[2]==dimb[1]))) {
            # .elapsedTime("everytime 0205a")
-            img2 <- as.array(regrid(as.ursa(img2),res=c(dima[1]/256,dima[2]/256)))
+            img2 <- as.array(regrid(as.ursa(img2),res=c(dima[1]/dimb[1],dima[2]/dimb[1])))
            # .elapsedTime("everytime 0205b")
          }
-         img[igr[i,"y"]*256L+seq(256),igr[i,"x"]*256+seq(256),] <- img2
+         img[igr[i,"y"]*dimb[2]+seq(dimb[1]),igr[i,"x"]*dimb[2]+seq(dimb[1]),] <- img2
       }
       basemap <- as.ursa(img,aperm=TRUE,flip=TRUE)
+      if (FALSE) { ## already
+         str(g0$crs)
+         q()
+         lon0 <- .gsub2("\\+lon_0=(\\S+)\\s+","\\1",g0$crs)
+         crs <- paste0("+proj=merc +lon_0=",lon0," +k=1 +x_0=0 +y_0=0"
+                      ," +datum=WGS84 +units=m +no_defs")
+         g0$crs <- g1$crs <- crs
+      }
+      dimc <- dim(basemap)[1:2]
+      if (!identical(dim(g1),dimc)) {
+         mul <- sqrt(prod(dimc/dim(g1)))
+        # g1 <- regrid(g1,dim=dimc)
+         g1 <- regrid(g1,mul=mul)
+         g0 <- regrid(g0,mul=mul)
+         if (mul>2-1e-11)
+            isRetina <- TRUE
+      }
       ursa(basemap,"grid") <- g1
      # basemap <- as.integer(regrid(basemap,g0,resample=FALSE))
       if (art=="zzzpolarmap") {
@@ -570,9 +626,21 @@
       }
      # cr <- coord_xy(basemap,x=101234,y=-1001234)
      # print(coord_cr(basemap,c=cr[1,],r=cr[2,]),digits=12)
-      if (art=="polarmap")
+      if (art=="polarmap") {
+        # str(g0)
+        # cat("-----------------------------------------\n")
          g0 <- regrid(g1,bbox=with(g0,c(minx,miny,maxx,maxy)),zero="node")
+      }
+     # str(g1)
+     # str(g0)
+     # cat("-----------------------------------------\n")
       basemap <- regrid(basemap,g0,resample=0)
+      if (F) {
+         str(identical(ursa_grid(basemap),g1))
+         str(g1)
+         str(g0)
+         q()
+      }
      # cr <- coord_xy(basemap,x=101234,y=-1001234)
      # print(coord_cr(basemap,c=cr[1,],r=cr[2,]),digits=12)
       session_grid(basemap)
@@ -674,9 +742,8 @@
          }
          if (cache)
             fname <- .ursaCacheDownload(src,mode="wb"
-                                       ,headers=list(NULL
-                                                   # ,'Referer Page'="https://www.r-project.org"
-                                                    ,'referer'="r-ursa package"
+                                       ,headers=list(#'Referer Page'="https://www.r-project.org"
+                                                    'referfer'="r-ursa package"
                                                     )
                                        ,quiet=!verbose)
          else {
@@ -711,5 +778,7 @@
    }
    session_grid(g0)
    ursa(basemap,"nodata") <- NA
+   if (isRetina)
+      attr(basemap,"retina") <- TRUE
    basemap
 }

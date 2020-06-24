@@ -622,7 +622,15 @@
       }
    }
    if (!length(align)) {
-      width <- max(strwidth(label,units="inches",cex=cex,family=family))
+      width <- try(max(strwidth(label,units="inches",cex=cex,family=family)))
+      if (inherits(width,"try-error")) {
+         labE <- Encoding(label)
+         if (all(c("unknown","UTF-8") %in% unique(labE))) {
+            Encoding(label) <- "unknown"
+            width <- max(strwidth(label#[labE %in% "unknown"]
+                        ,units="inches",cex=cex,family=family))
+         }
+      }
    }
    else
       width <- max(strwidth(align,units="inches",cex=cex))

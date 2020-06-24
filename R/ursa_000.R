@@ -7,7 +7,7 @@
          if (.lgrep("grid",obj))
             return(session_grid())
          if (.lgrep("(proj|crs)",obj))
-            return(session_proj4())
+            return(session_crs())
          if (.lgrep("(cell)",obj))
             return(session_cellsize())
          if (.lgrep("(dummy)",obj))
@@ -42,7 +42,7 @@
          return(with(ursa_grid(obj),sqrt(resx*resy)))
       if (.lgrep("^(extent|bbox)",attr)) {
          res <- with(ursa_grid(obj),c(xmin=minx,ymin=miny,xmax=maxx,ymax=maxy))
-         attr(res,"proj4") <- ursa_proj(obj)
+         attr(res,"crs") <- ursa_crs(obj)
          return(res)
       }
       if (.lgrep("(ncol|columns|samples)",attr))
@@ -119,7 +119,7 @@
       return(obj)
    }
    if (.lgrep("(proj|crs)",attr)) {
-      ursa_proj(obj) <- value
+      ursa_crs(obj) <- value
       return(obj)
    }
    if (.lgrep("val",attr)) {

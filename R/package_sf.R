@@ -28,7 +28,7 @@
       miny <- maxy-rows*resy
    }
    g1 <- regrid(minx=minx,maxx=maxx,miny=miny,maxy=maxy,columns=columns,rows=rows
-               ,proj4=a$proj4string)
+               ,crs=a$proj4string)
    session_grid(g1)
    res <- ursa(attr(sf::gdal_read(fname,read_data=TRUE),"data"),flip=TRUE)
    if (length(bname)==length(res))

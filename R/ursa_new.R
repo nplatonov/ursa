@@ -72,7 +72,7 @@
             grid$maxx <- as.numeric(dima[1])
             grid$miny <- 0
             grid$maxy <- as.numeric(dima[2])
-            grid$proj4 <- ""
+            grid$crs <- ""
             session_grid(grid)
          }
         # str(grid)

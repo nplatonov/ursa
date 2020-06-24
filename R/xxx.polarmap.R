@@ -98,7 +98,7 @@
       if (z>9)
          z <- 9
       if (F) {
-         ll <- c(with(g1,.project(cbind((maxx+minx)/2,(maxy+miny)/2),proj4,inv=TRUE)))
+         ll <- c(with(g1,.project(cbind((maxx+minx)/2,(maxy+miny)/2),crs,inv=TRUE)))
       }
       else {
          bbox <- spatial_bbox(obj)

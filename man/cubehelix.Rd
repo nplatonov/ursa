@@ -84,7 +84,7 @@ Dave Green, Robin Evans
 }
 
 \seealso{
-Original source code \code{\link[rje:cubeHelix]{rje::cubeHelix}} (clickable correctly if package \pkg{rje} is installed), or see CRAN reference.
+Original source code \code{\link[rje:cubeHelix]{rje::cubeHelix}} (valid link if package \pkg{rje} is installed), or see CRAN reference.
 }
 \examples{
 session_grid(NULL)

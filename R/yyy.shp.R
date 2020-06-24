@@ -45,7 +45,7 @@
    options(opW)
    if (verbose>1)
       .elapsedTime("readOGR:finish")
-   proj4 <- session_grid()$proj4
+   proj4 <- session_grid()$crs
    if ((reproject)&&(nchar(proj4))&&(!is.na(sp::proj4string(res)))) {
       if (verbose>1)
          .elapsedTime("spTransform:start")
@@ -178,7 +178,7 @@
    }
    if (verbose>1)
       .elapsedTime("st_read:finish")
-   proj4 <- session_grid()$proj4
+   proj4 <- session_grid()$crs
    if ((reproject)&&(nchar(proj4))&&(!is.na(sf::st_crs(res)))) {
       if (verbose>1)
          .elapsedTime("st_transform:start")

@@ -75,7 +75,7 @@
          language <- Sys.getenv("LANGUAGE")
    }
    g1 <- session_grid()
-   proj4 <- g1$proj4
+   proj4 <- g1$crs
    isProj <- nchar(proj4)>0
    projClass <- if (isProj) .gsub(".*\\+proj=(\\S+)\\s.+","\\1",proj4) else ""
    isLonLat <- .lgrep("(\\+proj=longlat|epsg:4326)",proj4)>0
@@ -158,8 +158,8 @@
          ##~ g2 <- expand.grid(x=seq(minx,maxx,length=2),y=seq(miny,maxy,length=2)
                           ##~ ,KEEP.OUT.ATTRS=FALSE,stringsAsFactors=FALSE)
          ##~ g2 <- cbind(g2$x,g2$y)[c(1,4),]
-         ##~ g2a <- proj4::project(g2,g1$proj4,inv=TRUE)
-         ##~ g2b <- rgdal::project(g2,g1$proj4,inv=TRUE)
+         ##~ g2a <- proj4::project(g2,g1$crs,inv=TRUE)
+         ##~ g2b <- rgdal::project(g2,g1$crs,inv=TRUE)
          ##~ print(g2)
          ##~ print(g2a)
          ##~ print(g2b)
@@ -176,12 +176,12 @@
       ##~ if (FALSE) { ## known reprojection issues
          ##~ xy0 <- as.data.frame(xy)
          ##~ sp::coordinates(xy0) <- ~x+y
-         ##~ sp::proj4string(xy0) <- g1$proj4
+         ##~ sp::proj4string(xy0) <- g1$crs
          ##~ xy2 <- sp::coordinates(sp::spTransform(xy0,"+init=epsg:4326"))
          ##~ print(apply(xy2,2,range))
       ##~ }
       if (!isLonLat) {
-         xy <- .project(with(g2,cbind(x,y)),g1$proj4,inv=TRUE)
+         xy <- .project(with(g2,cbind(x,y)),g1$crs,inv=TRUE)
          if (is.null(xy)) {
             xy <- with(g2,cbind(x,y))
             minx <- min(xy[,1])
@@ -193,7 +193,7 @@
             maxx <- max(xy[,1])
             miny <- min(xy[,2])
             maxy <- max(xy[,2])
-            xy <- .project(xy,g1$proj4,inv=TRUE)
+            xy <- .project(xy,g1$crs,inv=TRUE)
             if (is.null(xy)) {
                cat("Likely, reprojection is failed.\n")
                res <- list(gridline=NULL,margin=NULL)
@@ -467,7 +467,7 @@
    }
    outframe <- NULL
    alim <- 15 ## critical anlge (degree) between border line and grid line
-   projclass <- .gsub(".+proj=(\\S+)\\s.+","\\1",g1$proj4)
+   projclass <- .gsub(".+proj=(\\S+)\\s.+","\\1",g1$crs)
    for (j in seq_along(lonList))
    {
       lonSet <- unique(round(lonList[[j]],11))
@@ -503,10 +503,10 @@
          }
       }
       if (isMerc) {
-         B <- .getMajorSemiAxis(g1$proj4)*pi
-         lon_0 <- as.numeric(.gsub(".*\\+lon_0=(\\S+)\\s.*","\\1",g1$proj4))
-         lat_ts <- .gsub2("\\+lat_ts=(\\S+)\\s","\\1",g1$proj4)
-         lat_ts <- ifelse(lat_ts==g1$proj4,0,as.numeric(lat_ts))
+         B <- .getMajorSemiAxis(g1$crs)*pi
+         lon_0 <- as.numeric(.gsub(".*\\+lon_0=(\\S+)\\s.*","\\1",g1$crs))
+         lat_ts <- .gsub2("\\+lat_ts=(\\S+)\\s","\\1",g1$crs)
+         lat_ts <- ifelse(lat_ts==g1$crs,0,as.numeric(lat_ts))
       }
       for (lon in lonSet)
       {
@@ -519,9 +519,9 @@
          i <- i+1L
          ll <- cbind(rep(lon,length(lat)),lat)
         # proj4a <- "+proj=merc +lon_0=48 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs "
-        # gridline[[i]] <- if (isProj & !isLonLat) proj4::project(t(ll),g1$proj4) else ll
+        # gridline[[i]] <- if (isProj & !isLonLat) proj4::project(t(ll),g1$crs) else ll
          if (isProj & !isLonLat) {
-            gridline[[i]] <- .project(ll,g1$proj4)
+            gridline[[i]] <- .project(ll,g1$crs)
            # gridline[[i]] <- .project(ll,proj4a)
             if ((FALSE)&&(isMerc)) {
                x <- gridline[[i]][1,1]
@@ -567,9 +567,9 @@
          else {
             ll <- cbind(lon,rep(lat,length(lon)))
            # print(series(ll,3))
-           # gridline[[i]] <- if (isProj & !isLonLat) proj4::project(t(ll),g1$proj4) else ll
+           # gridline[[i]] <- if (isProj & !isLonLat) proj4::project(t(ll),g1$crs) else ll
             if (isProj & !isLonLat) {
-               ll <- .project(ll,g1$proj4)
+               ll <- .project(ll,g1$crs)
                if (projclass %in% "merc") {
                   ll <- ll[order(ll[,1]),]
                   ll[1,1] <- ll[1,1]-1e8

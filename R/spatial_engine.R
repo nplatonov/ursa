@@ -1,7 +1,6 @@
 # wrappers to spatial (not raster) objects
-# wrappers to spatial (not raster) objects
-
-'spatial_crs' <- 'spatial_proj4' <- function(obj,verbose=FALSE) {
+#.syn('spatial_crs',0,...)
+'spatial_proj4' <- 'spatial_proj' <- 'spatial_crs' <- function(obj,verbose=FALSE) {
    isUrsa <- is.ursa(obj) | is.ursa(obj,"grid")
    isPrm <- is.numeric(obj) | is.character(obj)
    isSF <- .isSF(obj)
@@ -25,13 +24,14 @@
       return(NA_character_)
    }
    if (isUrsa)
-      return(ursa_proj4(obj))
+      return(ursa_crs(obj))
    if (isPrm) {
       return(.epsg2proj4(obj,verbose=verbose,force=TRUE))
    }
    return(NULL)
 }
-'spatial_crs<-' <- 'spatial_proj4<-' <- function(obj,verbose=FALSE,value) {
+#.syn('spatial_crs<-',0,...)
+'spatial_proj4<-' <- 'spatial_proj<-' <- 'spatial_crs<-' <- function(obj,verbose=FALSE,value) { 
    isSF <- .isSF(obj)
    isSP <- .isSP(obj)
    if (verbose)
@@ -109,12 +109,14 @@
    isSP <- .isSP(obj)
    if (verbose)
       print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
-   if (T & .lgrep("\\+proj=longlat",spatial_crs(obj))) {
+   res <- NULL
+   isLongLat <- .lgrep("\\+proj=longlat",spatial_crs(obj))>0
+   if (F & isLongLat) {
       xy <- spatial_coordinates(obj)
       if (F & isSF) {
          xy <- spatial_coordinates(sf::st_cast(spatial_geometry(obj),"POINT"))
          res <- c(xmin=min(xy[,1]),ymin=min(xy[,2]),xmax=max(xy[,1]),ymax=max(xy[,2]))
-         return(res)
+        # return(res)
       }
       if (T | isSP) {
          xy <- spatial_coordinates(obj)
@@ -123,24 +125,80 @@
          if (is.list(xy)) ## deprecated and resored 20190930
             xy <- do.call(rbind,xy)
          res <- c(xmin=min(xy[,1]),ymin=min(xy[,2]),xmax=max(xy[,1]),ymax=max(xy[,2]))
-         return(res)
+        # return(res)
       }
    }
-   if (isSF) {
+   if ((is.null(res))&&(isSF)) {
       res <- sf::st_bbox(obj)
       rname <- names(res)
       res <- as.numeric(res)
       names(res) <- rname
-      return(res)
+     # return(res)
    }
-   if (isSP) {
+   if ((is.null(res))&&(isSP)) {
       res <- c(sp::bbox(obj))
       if (length(res)==6)
          res <- res[c(1,2,4,5)]
       names(res) <- c("xmin","ymin","xmax","ymax")
-      return(res)
+     # return(res)
    }
-   NULL
+   ##~ cat("----------------\n")
+   ##~ if ((isLongLat)&&(res["xmin"]<(-180+1e-6))&&(res["xmax"]>(180-1e-6))) {
+      ##~ print("HERE")
+   ##~ }
+   ##~ print(res)
+   ##~ cat("----------------\n")
+   ##~ q()
+  # return(res)
+   if (!is.null(res)) {
+      if (!isLongLat)
+         return(res)
+      dg180 <- 0.1
+      is180 <- (res["xmin"]<=(-180+dg180))&&(res["xmax"]>=(180-dg180))
+      if (!is180)
+         return(res)
+      dg90 <- -1e-6
+      is90 <- (res["ymin"]<=(-90+dg90))||(res["ymax"]>=(90-dg90))
+      if (is90)
+         return(res)
+      if (skip_dev <- !TRUE)
+         return(res)
+     # if ((TRUE)&&(res["xmin"]>0)&&(res["xmax"]<0))
+     #    res["xmax"] <- res["xmax"]+360
+      if (T) {
+         xy <- unname(spatial_coordinates(obj))
+         repeat({
+            if (isFALSE(all(sapply(xy,is.list))))
+               break
+            xy <- unlist(xy,recursive=FALSE)
+         })
+         if (is.list(xy))
+            xy <- do.call("rbind",xy)
+         x1 <- xy[,1]
+         x2 <- x1
+         ind <- which(x2<(0))
+         if (length(x2))
+            x2[ind] <- x2[ind]+360
+         sd1 <- sd(x1)
+         sd2 <- sd(x2)
+         if (verbose) {
+            print(summary(x1))
+            print(summary(x2))
+            print(c(sd1=sd1,sd2=sd2))
+         }
+         if (sd1<sd2)
+            return(res)
+         res[c(1,3)] <- range(x2)
+      }
+      else {
+         d2 <- spatialize(obj,style="merc",verbose=verbose) ## sp: failed for 90.0N 
+         res <- matrix(spatial_bbox(d2),ncol=2,byrow=FALSE)
+         res <- .project(res,spatial_crs(d2),inv=TRUE)
+         res <- c(t(res))
+         names(res) <- c("xmin","ymin","xmax","ymax")
+      }
+   }
+   res
 }
 'spatial_bbox<-' <- function(obj,verbose=FALSE,value) {
    isSF <- .isSF(obj)
@@ -224,8 +282,11 @@
       if (inherits(obj,"sfc"))
          return(NULL)
      # res <- obj
-     # sf::st_geometry(res) <- NULL
-     # attributes(res) <- attributes(res)[c("names","row.names","class")]
+      ##~1 sf::st_geometry(res) <- NULL
+      ##~1 attributes(res) <- attributes(res)[c("names","row.names","class")]
+      ##~2 res[[attr(res,"sf_column")]] <- NULL
+      ##~2 attr(res,"sf_column") <- NULL
+      ##~2 class(res) <- grep("^(sf|sfc)$",class(res),value=TRUE,invert=TRUE)
       res <- sf::st_set_geometry(obj,NULL)
    }
    else if (isSP) {
@@ -274,7 +335,7 @@
    isSF <- .isSF(obj)
    isSP <- .isSP(obj)
    if (missing(crs))
-      crs <- session_proj4()
+      crs <- session_crs()
    else if ((is.ursa(crs))||(is.ursa(crs,"grid")))
       crs <- ursa(crs,"crs")
    if (verbose)
@@ -574,7 +635,7 @@
       }
       else {
          res <- sp::SpatialLinesLengths(obj
-                         ,longlat=.lgrep("\\+proj=longlat",spatial_proj4(obj))>0)
+                         ,longlat=.lgrep("\\+proj=longlat",spatial_crs(obj))>0)
       }
       return(res)
    }

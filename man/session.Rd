@@ -1,5 +1,6 @@
 \name{session}
 \alias{session_grid}
+\alias{session_proj}
 \alias{session_proj4}
 \alias{session_crs}
 \alias{session_cellsize}

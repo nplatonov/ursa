@@ -9,9 +9,9 @@
       session_grid(NULL)
       g1 <- session_grid()
    }
-   if (.lgrep("\\+proj=stere",g1$proj4))
+   if (.lgrep("\\+proj=stere",g1$crs))
       return(.pxlsize.stere(g1,verbose=verbose))
-   if (.lgrep("\\+proj=merc",g1$proj4))
+   if (.lgrep("\\+proj=merc",g1$crs))
       return(.pxlsize.merc(g1,verbose=verbose))
    mul <- if (with(g1,resx*resy)<1e5) c("sq.m"=1) else c("sq.km"=1e-6)
    ursa_new(value=with(g1,resx*resy*mul)
@@ -21,14 +21,14 @@
    mul <- if (with(g,resx*resy)<1e5) c("sq.m"=1) else c("sq.km"=1e-6)
    a <- ursa_new(value=0,bandname=paste0("Pixel Size (",names(mul),")"))
    da <- as.data.frame(a)
-   lat <- .project(with(da,cbind(x,y)),g$proj4,inv=TRUE)[,2]
+   lat <- .project(with(da,cbind(x,y)),g$crs,inv=TRUE)[,2]
   # ursa_value(a) <- with(g,resx*resy*mul/cos(lat*pi/180))
    a$value[] <- with(g,resx*resy*mul/cos(lat*pi/180))
    a
 }
 '.pxlsize.stere' <- function(g,verbose=FALSE) {
    '.pow' <- function(x,y) x^y
-   proj4 <- g$proj4
+   proj4 <- g$crs
    if (FALSE)
       semi <- c("6378137","6356752.3") ## low-precision
    if (.lgrep("\\+datum=WGS84",proj4))

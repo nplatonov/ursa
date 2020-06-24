@@ -41,7 +41,7 @@
    if ((simple)) {
       if ((!FALSE)||("ursa" %in% loadedNamespaces())) {
          g1 <- ursa(x,"grid")
-         ursa(x,"grid") <- regrid(g1,setbound=c(0,0,g1$columns,g1$rows),proj4="")
+         ursa(x,"grid") <- regrid(g1,setbound=c(0,0,g1$columns,g1$rows),crs="")
       }
    }
    x$con <- .create.con(x,arglist)
@@ -79,7 +79,7 @@
    if (x$con$driver=="ENVI")
       .write.hdr(x)
    else if (x$con$driver=="GDAL") {
-      rgdal::GDALcall(x$con$handle,"SetProject",x$grid$proj)
+      rgdal::GDALcall(x$con$handle,"SetProject",x$grid$crs)
       rgdal::GDALcall(x$con$handle,"SetGeoTransform"
                                   ,with(x$grid,c(minx,resx,0,maxy,0,-resy)))
       nodata <- ursa_nodata(x)
@@ -470,7 +470,7 @@
    con$lines <- grid$rows
    con$samples <- grid$columns
   # con$offset <- as.integer(5*4+8*8+sum(nchar(obj$name))+length(obj$name)+
-  #                          nchar(obj$grid$proj4)+1+
+  #                          nchar(obj$grid$crs)+1+
   #                          4*obj$dim[2]+con$sizeof)
    if ((length(con$offset)>1)||(is.na(con$offset)))
       con$offset <- 0L
@@ -674,7 +674,7 @@
    projection_ellipse <- "unknown"
    projection_units <- "units=meters"
    projection_info <- ""
-   proj4 <- grid$proj4[1]
+   proj4 <- grid$crs[1]
    p <- NULL
    if (nchar(proj4))
    {

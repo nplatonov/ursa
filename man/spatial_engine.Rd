@@ -2,6 +2,8 @@
 \alias{spatial_engine}
 \alias{spatial_crs}
 \alias{spatial_crs<-}
+\alias{spatial_proj}
+\alias{spatial_proj<-}
 \alias{spatial_proj4}
 \alias{spatial_proj4<-}
 \alias{spatial_bbox}
@@ -49,9 +51,11 @@ These wrappers return iniform properties or do consimilar manipulations for spat
 spatial_engine(obj, verbose = FALSE)
 
 spatial_crs(obj, verbose = FALSE)
+spatial_proj(obj, verbose = FALSE)
 spatial_proj4(obj, verbose = FALSE)
 
 spatial_crs(obj, verbose = FALSE) <- value
+spatial_proj(obj, verbose = FALSE) <- value
 spatial_proj4(obj, verbose = FALSE) <- value
 
 spatial_bbox(obj, verbose = FALSE)

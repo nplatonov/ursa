@@ -74,7 +74,7 @@
       vadj <- ifelse(any(as.numeric(unlist(gregexpr("\\\n",label)))<0),vadj0,0.5)
    }
    if ((!anyNA(lon))&&(!anyNA(lat))) {
-      xy <- .project(cbind(lon,lat),g1$proj)
+      xy <- .project(cbind(lon,lat),g1$crs)
       pos <- c((xy[1,1]-minx)/(maxx-minx),(xy[1,2]-miny)/(maxy-miny))
    }
    else if ((!is.na(x))&&(!is.na(y))) {

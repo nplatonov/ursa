@@ -29,7 +29,7 @@
    if ((!missing(obj))&&(is.numeric(obj))&&(length(obj)==4)&&
        ((!anyNA(match(names(obj),c("minx","maxx","miny","maxy"))))||
         (!anyNA(match(names(obj),c("xmin","xmax","ymin","ymax")))))) {
-      obj <- regrid(bbox=unname(obj),dim=c(1,1),proj4=session_crs())
+      obj <- regrid(bbox=unname(obj),dim=c(1,1),crs=session_crs())
    }
    onlyGeometry <- missing(obj) || .is.grid(obj)
    isList <- !onlyGeometry && .is.ursa_stack(obj)
@@ -118,7 +118,7 @@
       if (!onlyGeometry) {
          if (verbose)
             cat("3 of 3: assign data to geometry...")
-         p4s <- if (nchar(g1$proj4)) g1$proj4 else sf::NA_crs_
+         p4s <- if (nchar(g1$crs)) g1$crs else sf::NA_crs_
          sa <- sf::st_sf(b,coords=sa,crs=p4s)
          if (verbose)
             cat(" done!\n")
@@ -126,8 +126,8 @@
       else {
          if (verbose)
             cat("3 of 3: assign data to geometry... skipped!\n")
-         sf::st_crs(sa) <- .p4s2epsg(g1$proj4)
-        # spatial_crs(sa,verbose=TRUE) <- g1$proj4 ## alt
+         sf::st_crs(sa) <- .p4s2epsg(g1$crs)
+        # spatial_crs(sa,verbose=TRUE) <- g1$crs ## alt
       }
       if ((TRUE)&&(!onlyGeometry)) { ## ++ 20171128
          colnames(sa)[head(seq(ncol(sa)),-1)] <- colnames(b)

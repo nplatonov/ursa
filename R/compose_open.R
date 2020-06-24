@@ -42,7 +42,7 @@
          scale <- 1
       }
    }
-   else if ((.lgrep("\\+proj=merc",session_proj4()))&&
+   else if ((.lgrep("\\+proj=merc",session_crs()))&&
            (!is.na(.is.near(session_cellsize(),2*6378137*pi/(2^(1:21+8)))))) {
      # print("WEB #2")
       arglist <- as.list(match.call())
@@ -126,9 +126,9 @@
       if (nchar(.s0))
          .s <- .s/100000
       .s0 <- ifelse(nchar(.s0),as.numeric(.s0),1)
-      if (.lgrep("\\+proj=merc",g1$proj4)) {
+      if (.lgrep("\\+proj=merc",g1$crs)) {
          lat <- with(session_grid(),.project(cbind(0.5*(maxx+minx),0.5*(maxy+miny))
-                                        ,proj4,inv=TRUE))[1,2]
+                                        ,crs,inv=TRUE))[1,2]
          sc <- 1/cos(lat*pi/180)
       }
       else
@@ -169,7 +169,9 @@
    dpiscale <- scale*(2.54/dpi)
    mainc <- g1$columns*dpiscale
    mainr <- g1$rows*dpiscale
-  # print(c(v=scale1,h=scale2,autoscale=autoscale,scale=scale,c=g1$columns,r=g1$rows))
+   if (verbose)
+      print(c(v=scale1,h=scale2,autoscale=autoscale,scale=scale,c=g1$columns,r=g1$rows
+             ,retina=retina,digits=3))
    pointsize0 <- ifelse(.isKnitr(),12,round(12*retina,0))
    if (is.na(pointsize)) {
      # print(c(pointsize0=pointsize0,dpi=dpi,scale=scale,scale0=autoscale))

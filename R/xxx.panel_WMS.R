@@ -12,6 +12,7 @@
                           ,extend=TRUE
                           ,cache=TRUE
                           ,verbose=FALSE,...) {
+   isCache <- (is.logical(cache))&&(isTRUE(cache))||(is.character(cache))
    src <- unlist(src)
   # dst <- if (.isPackageInUse()) tempfile(fileext=".xml") 
   #        else paste0(.argv0name(),".xml")
@@ -68,8 +69,8 @@
         # else if ((verbose)&&(!isMetadata))
         #    message(src1)
          src1 <- gsub("\\?\\&","?",src1)
-         if (cache)
-            dst <- .ursaCacheDownload(src1,mode="wt",quiet=!verbose)
+         if (isCache)
+            dst <- .ursaCacheDownload(src1,mode="wt",cache=cache,quiet=!verbose)
          else {
             dst <- tempfile(fileext=".xml") 
             download.file(src1,dst,mode="wt",quiet=!verbose)
@@ -141,8 +142,8 @@
         # else if ((verbose)&&(!isMetadata))
         #    message(src1)
          src1 <- gsub("\\?\\&","?",src1)
-         if (cache)
-            dst <- .ursaCacheDownload(src1,mode="wt",quiet=!verbose)
+         if (isCache)
+            dst <- .ursaCacheDownload(src1,mode="wt",cache=cache,quiet=!verbose)
          else {
             dst <- tempfile(fileext=".xml") 
             download.file(src1,dst,mode="wt",quiet=!verbose)
@@ -175,8 +176,8 @@
       if (ind1) {
          if (!ind2) {
             src1 <- gsub("\\?\\&","?",src1) ## move to upper level
-            if (cache)
-               dst <- .ursaCacheDownload(src1,mode="wt",quiet=!verbose)
+            if (isCache)
+               dst <- .ursaCacheDownload(src1,cache=cache,mode="wt",quiet=!verbose)
             else {
                dst <- tempfile(fileext=".xml") 
                download.file(src1,dst,mode="wt",quiet=!verbose)
@@ -232,8 +233,8 @@
    ind <- .grep("&[cs]rs=",src)
    if (!length(ind)) {
       src1 <- gsub("\\?\\&","?",src1)
-      if (cache)
-         dst <- .ursaCacheDownload(src1,mode="wt",quiet=!verbose)
+      if (isCache)
+         dst <- .ursaCacheDownload(src1,mode="wt",cache=cache,quiet=!verbose)
       else {
          dst <- tempfile(fileext=".xml") 
          download.file(src1,dst,mode="wt",quiet=!verbose)
@@ -324,8 +325,8 @@
      # else if ((verbose)&&(!isMetadata))
      #    message(src1)
       src1 <- gsub("\\?\\&","?",src1)
-      if (cache)
-         dst <- .ursaCacheDownload(src1,mode="wt",quiet=!verbose)
+      if (isCache)
+         dst <- .ursaCacheDownload(src1,mode="wt",cache=cache,quiet=!verbose)
       else {
          dst <- tempfile(fileext=".xml") 
          download.file(src1,dst,mode="wt",quiet=!verbose)
@@ -422,8 +423,8 @@
      # else if ((verbose)&&(!isMetadata))
      #    message(src1)
       src1 <- gsub("\\?\\&","?",src1)
-      if (cache)
-         dst <- .ursaCacheDownload(src1,mode="wt",quiet=!verbose)
+      if (isCache)
+         dst <- .ursaCacheDownload(src1,mode="wt",cache=cache,quiet=!verbose)
       else {
          dst <- tempfile(fileext=".xml") 
          download.file(src1,dst,mode="wt",quiet=!verbose)
@@ -647,6 +648,10 @@
                         else "{minx},{miny},{maxx},{maxy}"
       src <- paste0(src,"&bbox=",bbox)
    }
+   if (length(arglist)) {
+      if (length(ind <- grep("(^fileout$|^scale$)",names(arglist))))
+         arglist <- arglist[-ind]
+   }
    if (length(arglist))
       src <- paste0(src,paste(paste0("&",names(arglist)),as.character(arglist)
                              ,sep="=",collapse=""))
@@ -680,6 +685,7 @@
       arglist$extend <- FALSE
    }
    srclist <- unlist(do.call(".compose_wms",arglist[-1]))#[1]
+   isCache <- (is.logical(cache))&&(isTRUE(cache))||(is.character(cache))
    g0 <- session_grid()
    res <- vector("list",length(src))
    names(res) <- names(src)
@@ -696,10 +702,10 @@
       if (!nchar(Sys.which("gdalwarp")))
          message("'gdalwarp' is required to be in search paths")
    }
-   proj4s <- unlist(strsplit(g0$proj4,split="\\s+"))
+   proj4s <- unlist(strsplit(g0$crs,split="\\s+"))
    ind <- .grep("\\+(proj=merc|[ab]=6378137|[xy]_0=0|k=1|units=m|lat_ts=0)",proj4s)
    isMerc <- ((length(ind)==8)&&(!gdalwarp))
-   isLonLat <- .lgrep("\\+proj=longlat",g0$proj4)>0
+   isLonLat <- .lgrep("\\+proj=longlat",g0$crs)>0
    sc <- getOption("ursaPngScale")
    g3 <- g0
    if ((is.numeric(sc))&&(sc<1e11+0.75)) {
@@ -724,7 +730,7 @@
          proj4s[ind] <- "+lon_0=0.000000"
          g2 <- g3
          g3 <- regrid(g2,minx=g2$minx+dx0,maxx=g2$maxx+dx0
-                     ,proj4=paste(proj4s,collapse=" "),zero="keep")
+                     ,crs=paste(proj4s,collapse=" "),zero="keep")
       }
    }
    if (gdalwarp) {
@@ -735,7 +741,7 @@
       requireNamespace(c("sp","rgdal")[2],quietly=.isPackageInUse())
       dg <- 16
       xy <- with(g3,expand.grid(x=seq(minx,maxx,len=dg),y=seq(miny,maxy,len=dg)))
-      ll <- .project(xy,g3$proj4,inv=TRUE)
+      ll <- .project(xy,g3$crs,inv=TRUE)
       p4s <- .epsg2proj4(p4epsg)
       xy <- .project(ll,p4s)
      # .elapsedTime("b")
@@ -743,7 +749,7 @@
       g3 <- regrid(ursa_grid()
                   ,setbound=c(min(xy[,1]),min(xy[,2]),max(xy[,1]),max(xy[,2]))
                   ,res=c(1,1)
-                  ,proj4=p4s)
+                  ,crs=p4s)
      # print(g3)
       sc <- ifelse(isLonLat,3.3,1.5)*nm/max(g3$columns,g3$rows)
       g3 <- regrid(g3,mul=sc,border=5)
@@ -852,8 +858,8 @@
         # dst <- tempfile()
         # download.file(src2,dst,mode="wb",quiet=!verbose)
          src2 <- gsub("\\?\\&","?",src2)
-         if (cache)
-            dst <- .ursaCacheDownload(src2,mode="wb",quiet=!verbose)
+         if (isCache)
+            dst <- .ursaCacheDownload(src2,mode="wb",cache=cache,quiet=!verbose)
          else {
             dst <- tempfile() 
             download.file(src2,dst,mode="wb",quiet=!verbose)
@@ -865,6 +871,12 @@
          else {
             a <- try(as.array(read_gdal(dst),permute=TRUE,flip=TRUE))
             session_grid(NULL)
+         }
+         if (inherits(a,"try-error")) {
+            if (isPNG)
+               a <- try(jpeg::readJPEG(dst))
+            else if (isJPEG)
+               a <- try(png::readPNG(dst))
          }
          if (inherits(a,"try-error")) {
             error <- paste(readLines(dst),collapse="\n")
@@ -917,8 +929,8 @@
         # dst <- tempfile()
         # if (.try(download.file(reqL,dst,mode="wb",quiet=!verbose))) {
          reqL <- gsub("\\?\\&","?",reqL)
-         if (cache)
-            dst <- try(.ursaCacheDownload(reqL,mode="wb",quiet=!verbose))
+         if (isCache)
+            dst <- try(.ursaCacheDownload(reqL,mode="wb",cache=cache,quiet=!verbose))
          else {
             dst <- tempfile()
             a <- try(download.file(reqL,dst,mode="wb",quiet=!verbose))
@@ -967,8 +979,8 @@
          reqL <- gsub("\\?\\&","?",reqL)
          for (i in seq_along(logo)) {
            # if (.try(download.file(reqL[i],dst,mode="wb",quiet=!verbose))) {
-            if (cache)
-               dst <- try(.ursaCacheDownload(reqL,mode="wb",quiet=!verbose))
+            if (isCache)
+               dst <- try(.ursaCacheDownload(reqL,mode="wb",cache=cache,quiet=!verbose))
             else {
                dst <- tempfile()
                a <- try(download.file(reqL[i],dst,mode="wb",quiet=!verbose))

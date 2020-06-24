@@ -85,6 +85,23 @@
    .ursaCacheWrite(was0,append=FALSE)
    return(invisible(NULL))
 }
+'.ursaCacheExprire' <- function(value) {
+   if (is.character(value)) {
+      if (!.lgrep("\\-",value))
+         value <- paste0("-",value)
+      if (!.lgrep("\\d\\s\\D",value))
+         value <- gsub("(^.*\\d)(\\D.+$)","\\1 \\2",value)
+      expire <- as.integer(tail(seq(Sys.time(),len=2,by=value),1))
+     # expire <- as.POSIXlt(tail(seq(Sys.time(),len=2,by=value),1),tz="UTC")
+      attr(expire,"cache") <- TRUE
+   }
+   else {
+      expire <- as.integer(tail(seq(Sys.time(),len=2,by="-1 month"),1))
+     # expire <- as.POSIXlt(tail(seq(Sys.time(),len=2,by="-1 month"),1),tz="UTC")
+      attr(expire,"cache") <- value
+   }
+   expire
+}
 '.ursaCacheDownload' <- function(src,dst,method,quiet=FALSE,cache=TRUE
                                 ,mode="w",headers=NULL) {
    enc <- "UTF-8"
@@ -97,6 +114,18 @@
    }
    if (missing(dst))
       dst <- NULL
+   expire <- .ursaCacheExprire(cache)
+   cache <- attr(expire,"cache")
+   ##~ if (is.character(cache)) {
+      ##~ if (!.lgrep("\\-",cache))
+         ##~ cache <- paste0("-",cache)
+      ##~ if (!.lgrep("\\d\\s\\D",cache))
+         ##~ cache <- gsub("(^.*\\d)(\\D.+$)","\\1 \\2",cache)
+      ##~ expire <- as.POSIXlt(tail(seq(Sys.time(),len=2,by=cache),1),tz="UTC")
+      ##~ cache <- TRUE
+   ##~ }
+   ##~ else
+      ##~ expire <- as.POSIXlt(tail(seq(Sys.time(),len=2,by="-7 days"),1),tz="UTC")
    if (cache) {
       if (file.exists(inventory)) {
          was <- utils::read.table(inventory,sep=",",encoding=enc)
@@ -104,9 +133,11 @@
          if (is.character(dst)) {
             stop("dst")
          }
-         ind <- match(src0,was$src)
+         ind <- tail(which(!is.na(match(was$src,src0))),1) ## match(src0,was$src)
          if ((length(ind))&&(!is.na(ind))) {
-            dst <- file.path(.ursaCacheDir(),was$dst[ind[1]])
+           # t2 <- as.POSIXlt(was$time[ind],format="%Y-%m-%dT%H:%M:%SZ",tz="UTC")
+            if (was$stamp[ind]>=expire) ## t2>=expire
+               dst <- file.path(.ursaCacheDir(),was$dst[ind])
          }
       }
    }
@@ -115,7 +146,6 @@
          return(NULL)
       if (is.null(dst))
          dst <- if (cache) .ursaCacheFile() else tempfile()
-      str(headers)
       for (i in seq_along(src)) {
          ret <- try(download.file(url=URLencode(iconv(src[i],to="UTF-8")) 
                       ,destfile=dst,method=method,quiet=quiet,mode=mode

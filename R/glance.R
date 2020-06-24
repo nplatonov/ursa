@@ -35,7 +35,9 @@
             arglist$extend <- FALSE
             arglist$verbose <- !.isPackageInUse()
            # .panel_wms(s2[i],tile=1e5,legend=TRUE,verbose=!TRUE)
-            try(do.call(".panel_wms",arglist))
+            a <- try(do.call(".panel_wms",arglist))
+            if (inherits(a,"try-error"))
+               cat(as.character(a))
             arglist$verbose <- FALSE
             if (length(sname))
                panel_annotation(sname[i],pos="bottomright")
@@ -96,10 +98,10 @@
                colnames(obj)[c(indX,indY)] <- c("x","y")
             }
             stop("Development has been stopped")
-            ##~ p4s <- attr(obj,"proj4")
+            ##~ p4s <- attr(obj,"crs")
             ##~ if (isSF) {
                ##~ if (!is.null(p4s))
-                  ##~ obj <- sf::st_as_sf(obj,coords=c("x","y"),crs=attr(obj,"proj4"))
+                  ##~ obj <- sf::st_as_sf(obj,coords=c("x","y"),crs=attr(obj,"crs"))
                ##~ else
                   ##~ obj <- sf::st_as_sf(obj,coords=c("x","y"))
             ##~ }
@@ -153,7 +155,7 @@
                         ,feature=c("auto","field","geometry"),alpha=NA
                         ,basemap.order=c("after","before"),basemap.alpha=NA
                         ,engine=c("native","sp","sf")
-                        ,geocode="",place="",area=c("bounding","point")
+                        ,geocode="",place="",area=c("bounding","point","shape")
                         ,zoom=NA,gdal_rasterize=FALSE
                         ,silent=FALSE,verbose=FALSE,...) {
    arglist <- list(...)
@@ -179,6 +181,7 @@
    before <- basemap.order %in% "before"
    feature <- match.arg(feature)
    engine <- match.arg(engine)
+  # area <- match.arg(area)
   # print(c(dsn=class(dsn)))
   # obj <- spatialize(dsn)
    if (missing(dsn)) {
@@ -227,9 +230,11 @@
        ((isSP)&&(!inherits(obj,paste0("Spatial",c("Points","Lines","Polygons")
                                      ,"DataFrame"))))
    toColor <- ((is.numeric(dsn))||(noAttr))||(TRUE)
-   if ((toColor)&&(!.lgrep("(colo(u)*r|gr[ae]y(scale)*)",style)))
+   if ((toColor)&&(!.lgrep("(colo(u)*r|gr[ae]y(scale)*)",style))&&
+          (length(style)==1))
       style <- paste(style,"color")
-   else if ((!toColor)&&(!.lgrep("(colo(u)*r|gr[ae]y(scale)*)",style)))
+   else if ((!toColor)&&(!.lgrep("(colo(u)*r|gr[ae]y(scale)*)",style)&&
+          (length(style)==1)))
       style <- paste(style,"greyscale")
    if (!.lgrep(projPatt,style))
       proj <- "auto"
@@ -263,10 +268,11 @@
   # attr(obj,"toUnloadMethods") <- NULL
   # attr(obj,"dname") <- NULL
    #attr(obj,"geocodeStatus") <- NULL
+   basemapRetina <- FALSE
    if (isWeb) {
       bbox <- with(g0,c(minx,miny,maxx,maxy))
       lim <- c(.project(matrix(bbox,ncol=2,byrow=TRUE)
-                                               ,g0$proj4,inv=TRUE))[c(1,3,2,4)]
+                                               ,g0$crs,inv=TRUE))[c(1,3,2,4)]
       ostyle <- unlist(strsplit(style,split="\\s+"))
       isStatic <- ostyle[1] %in% staticMap
       ustyle <- ""#ostyle[1]
@@ -277,10 +283,11 @@
          nextStyle <- .grep(ostyle[1],c("mapnik","mapsurfer","cartoDB","opentopomap")
                            ,invert=TRUE,value=TRUE)[seq(3)]
       nsize <- length(nextStyle)+1
+      cache <- .getPrm(arglist,"cache",class=c("logical","character"),default=TRUE)
       for (i in seq(nsize)) {
          opE <- options(show.error.messages=TRUE)
          basemap <- try(.geomap(lim,style=style,size=size,zoom=zoom
-                       ,border=border,verbose=verbose))
+                       ,border=border,cache=cache,verbose=verbose))
          options(opE)
          if (!inherits(basemap,"try-error"))
             break
@@ -298,18 +305,59 @@
          print(lim)
          basemap <- NULL
       }
-      else
+      else {
+         basemapRetina <- isTRUE(attr(basemap,"retina"))
          g0 <- ursa(basemap,"grid") ## 0605 TODO
+      }
      # print(g0)
    }
-   else
+   else {
       basemap <- NULL
+      zrel <- zabs <- NA
+      if (isTRUE(is.numeric(zoom))) { ## absolute
+         zabs <- zoom
+      }
+      else if (isTRUE(is.character(zoom))) { ## relative
+         if (nchar(gsub("\\d+","",zoom))==0)
+            zabs <- as.integer(gsub("\\D","",zoom))
+         else {
+            zrel <- gregexpr("^(\\+)+$",zoom)[[1]]
+            if ((length(zrel)==1)&&(zrel==1))
+               zrel <- attr(zrel,"match.length")
+            else {
+               zrel <- gregexpr("^(\\-)+$",zoom)[[1]]
+               if ((length(zrel)==1)&&(zrel==1))
+                  zrel <- 1/attr(zrel,"match.length")
+               else if (.lgrep("^(\\+|\\-)\\d$",zoom)) {
+                  zrel <- eval(parse(text=paste0("",zoom)))
+               }
+               else
+                  zrel <- NA
+            }
+         }
+      }
+     # print(c(zabs=zabs,zrel=zrel))
+      if ((!is.na(zabs))||(!is.na(zrel))) {
+         ps <- ursa(g0,"cellsize")
+         if (!is.na(zabs)) {
+           # print(g0)
+            z1 <- 2*6378137/(2^(seq(21)+8))
+            z2 <- 2^c(24,25)[1]/(2^(seq(21)+8))
+            ##~ print(format(z1,sci=FALSE),quote=FALSE)
+            ##~ print(format(z2,sci=FALSE),quote=FALSE)
+            res <- if (!is.na(.is.near(ps,z1))) z1[round(zabs)] else z2[zabs]
+         }
+         else if (!is.na(zrel))
+            res <- ps*2^zrel
+         g0 <- regrid(g0,res=res,expand=res/ps)
+      }
+   }
    if ((is.null(basemap))&&(border>0)) {
       g0 <- regrid(g0,border=border)
    }
    attr(obj,"grid") <- g0
    session_grid(g0)
-  # xy <- with(g0,.project(rbind(c(minx,miny),c(maxx,maxy)),proj4,inv=TRUE))
+  # xy <- with(g0,.project(rbind(c(minx,miny),c(maxx,maxy)),crs,inv=TRUE))
   # display(blank="white",col="black");q()
    if (verbose)
       print(c(sf=isSF,sp=isSP))
@@ -317,7 +365,7 @@
       geoType <- unique(as.character(sf::st_geometry_type(obj)))
       obj_geom <- sf::st_geometry(obj)
      # bbox <- c(sf::st_bbox(obj))
-     # proj4 <- sf::st_crs(obj)$proj4string
+     # crs <- sf::st_crs(obj)$proj4string
    }
    if (isSP) {
       geoType <- switch(class(sp::geometry(obj))
@@ -329,7 +377,7 @@
                                   ,POINT=sp::geometry(obj))
      # bbox <- c(sp::bbox(obj))
      # names(bbox) <- c("xmin","ymin","xmax","ymax")
-     # proj4 <- sp::proj4string(obj)
+     # crs <- sp::proj4string(obj)
    }
    toCoast <- !isWeb | isWeb & .getPrm(list(...),name="coast",default=FALSE)
    if ((FALSE)&&(.lgrep("POLYGON",geoType))&&(isSF)) {
@@ -367,7 +415,7 @@
   # print(unname(ct$colortable[ct$ind]))
   # require(methods)
    if (geocodeStatus) { ## move to 'visualization' block
-      if (style=="auto") {
+      if ("auto" %in% style) {
          if (geocode=="google")
             style <- "google static"
          else if (geocode=="nominatim")
@@ -375,8 +423,10 @@
          else
             style <- "openstreetmap static"
       }
-      basemap.alpha <- 1
-      alpha <- 0
+      if ((is_spatial_lines(obj))&&("bounding" %in% area)) {
+         basemap.alpha <- 1
+         alpha <- 0
+      }
    }
    if ((isWeb)&&(is.na(basemap.alpha)))
       basemap.alpha <- ifelse(before,0.5,0.35)
@@ -420,7 +470,12 @@
             res <- list(geometry=ursa_new())
       }
       if (isWeb) {
-         compose_open(res,scale=1,retina=1,...)
+        # retina1 <- getOption("ursaRetina")
+         retina2 <- .getPrm(arglist,"retina",default=NA_integer_)
+         retina3 <- 1L+as.integer(basemapRetina)
+        # print(c(retina1=retina1,retina2=retina2,retina3=retina2))
+         retina <- ifelse(is.na(retina2),retina3,retina2)
+         compose_open(res,scale=1,retina=retina,...)
       }
       else
          compose_open(res,...)
@@ -525,7 +580,7 @@
             else
                y <- c(g0$miny,g0$maxy)
             sc <- 1/cos(.project(cbind((g0$minx+g0$maxx)/2,y)
-                                ,g0$proj4,inv=TRUE)[,2]*pi/180)
+                                ,g0$crs,inv=TRUE)[,2]*pi/180)
            # x <- 0#ifelse(((isWeb)&&(isStatic)&&(isGoogle)),0.5,0)
            # print(art)
             x <- ifelse(any(art %in% "google"),0.5,0)

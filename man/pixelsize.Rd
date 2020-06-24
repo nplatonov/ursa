@@ -64,9 +64,9 @@ invisible({
    }
    if (isOK) {
       g1 <- regrid(bbox=c(-385,-535,375,585)*1e4,res=25*1e3
-                  ,proj4=paste("+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45"
-                              ,"+k=1 +x_0=0 +y_0=0 +a=6378273 +b=6356889.449"
-                              ,"+units=m +no_defs"))
+                  ,crs=paste("+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45"
+                            ,"+k=1 +x_0=0 +y_0=0 +a=6378273 +b=6356889.449"
+                            ,"+units=m +no_defs"))
       session_grid(g1)
       b <- readBin(dst,integer(),size=1L,n=136492L,signed=FALSE)
       ice <- ursa_new(value=tail(b,-300))

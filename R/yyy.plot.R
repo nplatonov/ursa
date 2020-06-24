@@ -20,7 +20,7 @@
 }
 '.repairForScatterPlot' <- function() {
    g1 <- session_grid()
-   if ((nchar(g1$proj4)==0)||(is.na(g1$proj4)))
+   if ((nchar(g1$crs)==0)||(is.na(g1$crs)))
    {
       cexx <- cexy <- 1
       x <- seq(g1,"x")

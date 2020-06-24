@@ -1,3 +1,4 @@
+# stop("Under development")
 '.undoc_functions' <- function() {
   # list1 <- readLines(system.file("NAMESPACE",package="ursa"))
    list1 <- readLines(file.path("./ursa","NAMESPACE"))

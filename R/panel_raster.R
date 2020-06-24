@@ -8,7 +8,7 @@
                  ,class=list(c("list","ursaRaster"),"ursaRaster","ggmap","character"))
    verbose <- .getPrm(arglist,name="verb(ose)*",kwd=kwd,default=FALSE)
    if (is.character(obj)) {
-      cache <- .getPrm(arglist,name="cache",default=TRUE)
+      cache <- .getPrm(arglist,name="cache",class=c("logical","character"),default=TRUE)
       obj <- .geomap(style=obj,cache=cache,verbose=verbose)
    }
    if (inherits(obj,"ggmap"))

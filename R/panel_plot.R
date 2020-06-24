@@ -25,7 +25,7 @@
             op <- options(warn=0)
             requireNamespace("rgdal",quietly=.isPackageInUse())
             a <- .shp.read(obj)
-           # a <- spTransform(a,session_grid()$proj4)
+           # a <- spTransform(a,session_grid()$crs)
            # ret <- .panel_plot(a,add=TRUE,...)
             ret <- sp::plot(a,add=TRUE,...)
             options(op)
@@ -41,7 +41,7 @@
          ret <- panel_raster(read_gdal(obj),...)
       }
       else if ((getOption("ursaPngScale")==1)&&
-             (.lgrep("\\+proj=merc",session_proj4())>0)&&
+             (.lgrep("\\+proj=merc",session_crs())>0)&&
              ((TRUE)||(.lgrep(obj,.tileService())))) {
          ret <- panel_raster(obj,...)
       }
@@ -52,8 +52,8 @@
       ct <- panel_raster(obj,...)
    }
    else if (is_spatial(obj)) {
-      oprj <- spatial_proj4(obj)
-      sprj <- session_proj4()
+      oprj <- spatial_crs(obj)
+      sprj <- session_crs()
       if (nchar(sprj)>2) {
          oprj2 <- .gsub("\\+wktext\\s","",oprj)
          sprj2 <- .gsub("\\+wktext\\s","",sprj)

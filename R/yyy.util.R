@@ -398,7 +398,17 @@
 }
 '.isRscript' <- function() .lgrep("^(--file=|-f$|-e$|--slave$)",commandArgs(FALSE))>=2
 #'.isPackageInUse.deprecated' <- function() "ursa" %in% loadedNamespaces()
-'.isPackageInUse' <- function() "package:ursa" %in% search()
+'.isPackageInUse' <- function(verbose=FALSE) {
+   cond1 <- "package:ursa" %in% search()
+   cond2 <- "ursa" %in% loadedNamespaces()
+   ret <- (cond1)&&(cond2)
+   if (verbose) {
+       print(search())
+       print(loadedNamespaces())
+       print(c(cond1=cond1,cond2=cond2,ret=ret))
+   }
+   ret
+}
 '.argv0path' <- function() {
    arglist <- commandArgs(FALSE)
    if (length(ind <- .grep("^--file=.+",arglist,ignore.case=FALSE))==1)
@@ -490,8 +500,8 @@
    !anyNA(res)
 }
 '.is.equal.crs' <- function(obj1,obj2=NULL) {
-   oprj <- spatial_proj4(obj1)
-   sprj <- if (is.null(obj2)) session_proj4() else spatial_proj4(obj2)
+   oprj <- spatial_crs(obj1)
+   sprj <- if (is.null(obj2)) session_crs() else spatial_crs(obj2)
    if (nchar(sprj)<3)
       return(FALSE)
    oprj2 <- .gsub("\\+wktext\\s","",oprj)

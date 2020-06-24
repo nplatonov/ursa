@@ -18,13 +18,13 @@
                     ,"+wktext +no_defs")
    if ((length(bbox)==1)&&(is.na(bbox))) {
       g0 <- session_grid()
-      if (.lgrep("\\+proj=merc",g0$proj4)) {
-         ll <- with(g0,.project(cbind(c(minx,maxx),c(miny,maxy)),proj4,inv=TRUE))
+      if (.lgrep("\\+proj=merc",g0$crs)) {
+         ll <- with(g0,.project(cbind(c(minx,maxx),c(miny,maxy)),crs,inv=TRUE))
         # bbox <- c(min(ll[,1]),min(ll[,2]),max(ll[,1]),max(ll[,2]))
          bbox <- c(ll[1,1],ll[1,2],ll[2,1],ll[2,2])
         # stop("A")
       }
-      else if (.gsub("(^\\s|\\s$)","\\1",g0$proj4)==.gsub("(^\\s|\\s$)","\\1",epsg3413)) {
+      else if (.gsub("(^\\s|\\s$)","\\1",g0$crs)==.gsub("(^\\s|\\s$)","\\1",epsg3413)) {
         # stop("B")
          bbox <- with(g0,c(minx,miny,maxx,maxy))
       }
@@ -78,7 +78,7 @@
       g0 <- attr(spatialize(bbox,geocode=geocode,expand=expand,border=border
                           ,verbose=verbose),"grid")
       xy <- with(g0,cbind(c(minx,maxx),c(miny,maxy)))
-      ll <- with(g0,.project(xy,proj4,inv=TRUE))
+      ll <- with(g0,.project(xy,crs,inv=TRUE))
      # bbox <- c(min(ll[,1]),min(ll[,2]),max(ll[,1]),max(ll[,2]))
       bbox <- c(ll)[c(1,3,2,4)]
       if (length(bbox)!=4)
@@ -169,7 +169,7 @@
    if ((nband(b)==4)&&(global_min(b[4])==255)&&(global_max(b[4])==255))
       b <- b[-4]
    attr(b,"copyright") <- "Global Imagery Browse Services, NASA/GSFC/ESDIS"
-   cond1 <- .lgrep("\\+proj=merc\\s",g1$proj4) & .lgrep("\\+proj=merc\\s",g4$proj4)
+   cond1 <- .lgrep("\\+proj=merc\\s",g1$crs) & .lgrep("\\+proj=merc\\s",g4$crs)
    cond2 <- g1$columns==g4$columns & g1$rows==g4$rows &
             .is.near(g1$miny,g4$miny) & .is.near(g1$maxy,g4$maxy) &
             .is.near(g1$resx,g4$resx) & .is.near(g1$resy,g4$resy) &

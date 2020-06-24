@@ -58,9 +58,9 @@
       g1$maxy <- e@ymax
       g1$columns <- raster::ncol(obj)
       g1$rows <- raster::nrow(obj)
-      g1$proj4 <- raster::projection(obj)
-      if (is.na(g1$proj4))
-         g1$proj4 <- ""
+      g1$crs <- raster::projection(obj)
+      if (is.na(g1$crs))
+         g1$crs <- ""
       g1$resx <- with(g1,(maxx-minx)/columns)
       g1$resy <- with(g1,(maxy-miny)/rows)
       session_grid(g1)
@@ -156,11 +156,11 @@
          miny <- interim
       }
       prm <- list(minx=minx,maxx=maxx,miny=miny,maxy=maxy,columns=columns,rows=rows
-                  ,proj4=obj$crs$proj4string)
+                  ,crs=obj$crs$proj4string)
       ##~ g1 <- regrid(minx=minx,maxx=maxx,miny=miny,maxy=maxy,columns=columns,rows=rows
-                  ##~ ,proj4=obj$crs$proj4string)
+                  ##~ ,crs=obj$crs$proj4string)
       g1 <- regrid(setbound=c(minx,miny,maxx,maxy),dim=c(rows,columns)
-                  ,proj4=obj$crs$proj4string)
+                  ,crs=obj$crs$proj4string)
       session_grid(g1)
      # hasData <- inherits("NULL",class(attr(obj,"data")))
       hasData <- !inherits(attr(obj,"data"),"NULL")
@@ -220,11 +220,11 @@
       maxx <- minx+columns*resx
       miny <- maxy-rows*resy
       ##~ prm <- list(minx=minx,maxx=maxx,miny=miny,maxy=maxy,columns=columns,rows=rows
-                  ##~ ,proj4=md$x$refsys)
+                  ##~ ,crs=md$x$refsys)
       ##~ g1 <- regrid(minx=minx,maxx=maxx,miny=miny,maxy=maxy,columns=columns,rows=rows
-                  ##~ ,proj4=md$x$refsys)
+                  ##~ ,crs=md$x$refsys)
       g1 <- regrid(setbound=c(minx,miny,maxx,maxy),dim=c(rows,columns)
-                  ,proj4=md$x$refsys$proj4string)
+                  ,crs=md$x$refsys$proj4string)
       session_grid(g1)
       isHomo <- length(obj)==0 ##
       if (isHomo) {
@@ -270,9 +270,9 @@
                    ,"Try to change 'tolerance'",paste0("(",tolerance,")")))
       g$columns <- as.integer(round(g$columns))
       g$rows <- as.integer(round(g$rows))
-      p <- attr(obj,"proj4")
+      p <- attr(obj,"crs")
       if ((is.character(p))&&(nchar(p)))
-         g$proj4 <- p
+         g$crs <- p
       g2 <- getOption("ursaSessionGrid")
       session_grid(g)
       arglist <- list(...)
@@ -339,7 +339,7 @@
             }
          }
       }
-      g1$proj4 <- .epsg3857
+      g1$crs <- .epsg3857
       g1$resx <- with(g1,(maxx-minx)/columns)
       g1$resy <- with(g1,(maxy-miny)/rows)
       stopifnot(with(g1,abs((resx-resy)/(resx+resy)))<1e-3)
@@ -391,8 +391,8 @@
          aname <- names(b1)
          indx <- .grep("^(x$|lon)",aname)
          indy <- .grep("^(y$|lat)",aname)
-         proj4 <- .grep("proj4",aname)
-         aname <- .grep("proj4",aname,value=TRUE,invert=TRUE)
+         proj4 <- .grep("(crs|proj4)",aname)
+         aname <- .grep("(crs|proj4)",aname,value=TRUE,invert=TRUE)
          indz <- which(is.na(match(seq_along(aname),c(indx,indy))))
          if ((length(indx))&&(length(indy))) {
             x <- b1[[indx]]
@@ -406,10 +406,10 @@
             g1$columns <- length(x)
             g1$rows <- length(y)
             if ((length(proj4))&&(nchar(b1[[proj4]]))) {
-               g1$proj4 <- p
+               g1$crs <- p
             }
             else if (.lgrep("(lon|lat)",aname)==2)
-               g1$proj4 <- "+proj=longlat +datum=WGS84 +no_defs"
+               g1$crs <- "+proj=longlat +datum=WGS84 +no_defs"
             session_grid(g1)
          }
          if (length(indz)==1)

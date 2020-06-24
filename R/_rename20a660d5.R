@@ -13,22 +13,45 @@
    if (!FALSE) {
      ## '\\.spatialize' --> 'spatialize'
      ## 'ursa:::spatialize' --> 'spatialize'
-      src <- "intepreted"
-      dst <- "interpreted"
+      if (stage1 <- F) {
+         src <- "\\$proj(4)*"
+         dst <- "$crs"
+      }
+      else if (stage2 <- F) {
+         src <- "crsstring"
+         dst <- "proj4string"
+      }
+      else if (stage3 <- F) {
+         src <- "proj4="
+         dst <- "crs="
+      }
+      else if (stage4 <- F) {
+         src <- "\\\"proj4\\\""
+         dst <- "\"crs\""
+      }
+      else if (stage5 <- F) {
+         src <- "crs=="
+         dst <- "ZZZ=="
+      }
+      else {
+         stop("please select stage")
+      }
       toWrite <- FALSE
-      ind <- "2" # as.character(c(1,2,3,4,5,6,7,8,9,10,11,12))
+      ind <- "1" # as.character(c(1,2,3,4,5,6,7,8,9,10,11,12))
       dpath1 <- c('1'="C:/platt/R/ursa-package/ursa/R"
                  ,'2'="C:/platt/R/ursa-package/ursa/man"
-                 ,'3'="C:/platt/R/ursa-package/ursa/example"
-                 ,'4'="C:/platt/R")
+                 ,'3'="C:/platt/R/ursa-package/example"
+                 ,'4'="C:/platt/R"
+                 )
       dpath2 <- c('5'="C:/platt/R/ursa-package/land-polygons"
                  ,'6'="C:/platt/R/ursa-package/run"
                  ,'7'="C:/platt/misc"
-                 ,'8'="D:/RAS/2018"
-                 ,'9'="D:/RAS/2017"
-                 ,'10'="D:/DATA"
-                 ,'11'="D:/NRT"
-                 ,'12'="D:/update")
+                 ,'8'="D:/DATA"
+                 ,'9'="D:/NRT"
+                 ,'10'="D:/update"
+                 ,'11'="D:/RAS/2020"
+                 ,'12'="D:/RAS/2019"
+                 )
       ind1 <- which(names(dpath1) %in% ind)
       ind2 <- which(names(dpath2) %in% ind)
       list1 <- list.files(path=dpath1[ind1],pattern="^[a-z].+\\.(R|Rd)$"

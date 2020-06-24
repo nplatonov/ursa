@@ -62,7 +62,7 @@
    }
    if (verbose)
       print(c(inMemory=inMemory,removeSrc=removeSrc,isNullGrid=is.null(grid)))
-   proj4 <- ursa_proj4(grid)
+   proj4 <- ursa_crs(grid)
    if (!nchar(proj4)) {
       opt <- c(opt,to="SRC_METHOD=NO_GEOTRANSFORM",to="DST_METHOD=NO_GEOTRANSFORM")
    }

@@ -258,7 +258,7 @@
          y <- x$val
       y
    })
-  # b$proj4 <- "" #ncdf4.helpers::nc.get.proj4.string(nc,varName)
+  # b$crs <- "" #ncdf4.helpers::nc.get.proj4.string(nc,varName)
    if (length(md$dimids)<2) {
       if (verbose)
          message("one-dimensional variable")
@@ -435,7 +435,7 @@
    if (verbose)
       print(object.size(nc))
    if (!is.null(b)) {
-      b$proj4 <- ""
+      b$crs <- ""
       g1 <- .grid.skeleton()
       aname <- names(b)
       indx <- .grep("^(x$|lon|west|east)",aname)
@@ -471,10 +471,10 @@
          g1$columns <- length(x)
          g1$rows <- length(y)
          if ((length(proj4))&&(nchar(b[[proj4]]))) {
-            g1$proj4 <- b[[proj4]] # code lost: 'g1$proj4 <- p'
+            g1$crs <- b[[proj4]] # code lost: 'g1$crs <- p'
          }
          else if (.lgrep("(lon|lat)",aname)==2)
-            g1$proj4 <- "+proj=longlat +datum=WGS84 +no_defs"
+            g1$crs <- "+proj=longlat +datum=WGS84 +no_defs"
          if (TRUE)
             g1 <- with(g1,regrid(g1,setbound=c(minx,miny,maxx,maxy)
                                    ,dim=c(rows,columns)))

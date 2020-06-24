@@ -181,9 +181,9 @@
       maxx <- max(x)+resx/2
       maxy <- max(y)+resy/2
      # g0 <- regrid(minx=minx,miny=miny,maxx=maxx,maxy=maxy,resx=resx,resy=resy
-     #             ,columns=(maxx-minx)/resx,rows=(maxy-miny)/resy,proj4=proj4)
+     #             ,columns=(maxx-minx)/resx,rows=(maxy-miny)/resy,crs=proj4)
       g0 <- regrid(minx=minx,miny=miny,maxx=maxx,maxy=maxy,resx=resx,resy=resy
-                  ,proj4=proj4,verbose=verbose)
+                  ,crs=proj4,verbose=verbose)
      # g0 <- regrid(setbound=)
       session_grid(g0)
    }

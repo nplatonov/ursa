@@ -727,7 +727,7 @@
                   col <- pal(n)
             }
             else if (is.character(pal)) {
-               if ((length(pal)==1)&&
+               if ((length(pal)==1)&&(!.lgrep("^#[0-9A-F]+$",pal)>=0)&&
                    (requireNamespace("RColorBrewer",quietly=.isPackageInUse()))) {
                   available <- RColorBrewer::brewer.pal.info
                   if (!is.na(ind <- match(pal,rownames(available)))) {

@@ -30,7 +30,7 @@ panel_segments(...)
   \item{obj}{\R object.}
   \item{\dots}{
 %%     ~~Describe \code{\dots} here~~
-   In \code{panel_plot} arguments are passed to function \code{\link[graphics]{plot}}.\cr
+   In \code{panel_plot} arguments are passed to function \code{\link[graphics:plot.default]{plot}}.\cr
    In \code{panel_box} arguments are passed to function \code{\link[graphics]{box}}.\cr
    In \code{panel_lines} arguments are passed to function \code{\link[graphics]{lines}}.\cr
    In \code{panel_points} arguments are passed to function \code{\link[graphics]{points}}.\cr
@@ -48,7 +48,7 @@ Generally, for spatial objects argument \code{add=TRUE} is used in \code{panel_p
 %%~ If object of class \code{ursaRaster} is found among arguments of function \code{panel_contour}, then this object is converted to a suitable list \code{\link[ursa:classRaster_as.matrix]{as.matrix(obj,coords=TRUE)}}, and argument \code{add} for function \code{\link[graphics]{contour}} is forced to value \code{TRUE}. 
 }
 \value{
-Function \code{panel_plot} returns value of function \code{\link[graphics]{plot}}.\cr
+Function \code{panel_plot} returns value of function \code{\link[graphics:plot.default]{plot}}.\cr
 Function \code{panel_box} returns value of function \code{\link[graphics]{box}}.\cr
 Function \code{panel_lines} returns value of function \code{\link[graphics]{lines}}.\cr
 Function \code{panel_points} returns value of function \code{\link[graphics]{points}}.\cr
@@ -73,7 +73,7 @@ For plotted elements it is possible to create legend for colors using color bars
 \code{\link[ursa:panel_contour]{panel_contour}}
 
 %% ~~objects to See Also as \code{\link{help}}, ~~~
-Package \pkg{graphics} (\code{help(package="graphics")}) and functions \code{\link[graphics]{plot}}, \code{\link[graphics]{box}}, \code{\link[graphics]{lines}}, \code{\link[graphics]{points}}, \code{\link[graphics]{text}}, \code{\link[graphics]{abline}}, \code{\link[graphics]{polygon}}, \code{\link[graphics]{segments}}.
+Package \pkg{graphics} (\code{help(package="graphics")}) and functions \code{\link[graphics:plot.default]{plot}}, \code{\link[graphics]{box}}, \code{\link[graphics]{lines}}, \code{\link[graphics]{points}}, \code{\link[graphics]{text}}, \code{\link[graphics]{abline}}, \code{\link[graphics]{polygon}}, \code{\link[graphics]{segments}}.
 }
 \examples{
 session_grid(NULL)

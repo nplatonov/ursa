@@ -55,7 +55,7 @@
 'ursa_ncol' <- 'ursa_samples' <- 'ursa_columns' <- function(obj) ursa_grid(obj)$columns
 'ursa_extent' <- 'ursa_bbox' <- function(obj) {
    res <- with(ursa_grid(obj),c(xmin=minx,ymin=miny,xmax=maxx,ymax=maxy))
-   attr(res,"proj4") <- ursa_proj(obj)
+   attr(res,"crs") <- ursa_crs(obj)
    res
 }
 'consistent_grid' <- function(obj,ref,border=rep(0,4)) {
@@ -73,7 +73,7 @@
       obj <- g0
    if (identical(obj,ref))
       return(obj)
-   isWeb <- ((.lgrep("\\+proj=merc",session_proj4()))&&
+   isWeb <- ((.lgrep("\\+proj=merc",session_crs()))&&
       (!is.na(.is.near(ursa(obj,"cellsize"),2*6378137*pi/(2^(1:21+8))))))
    if (is_ursa(ursa_grid(ref),"grid"))
       d2 <- unname(ursa(ref,"dim"))

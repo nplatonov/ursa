@@ -61,9 +61,9 @@
    g1$resy <- a1[7]
    g1$maxx <- with(g1,minx+resx*columns)
    g1$maxy <- with(g1,miny+resy*rows)
-   g1$proj4 <- attr(a,"projection")
-   if (is.na(g1$proj4))
-      g1$proj4 <- ""
+   g1$crs <- attr(a,"projection")
+   if (is.na(g1$crs))
+      g1$crs <- ""
    b1 <- .grep("band",attr(a,"mdata"),value=TRUE)
    patt <- "^Band_(\\d+)=\\t*(.+)$"
    bname <- .gsub(patt,"\\2",b1)

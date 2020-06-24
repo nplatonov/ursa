@@ -34,12 +34,15 @@
    }
    if (is_spatial(obj)) {
       bbox <- spatial_bbox(obj)
+      crs <- spatial_crs(obj)
+      if ((.lgrep("\\+proj=longlat",crs))&&(bbox["xmax"]<0)&&(bbox["xmin"]>0))
+         bbox["xmax"] <- bbox["xmax"]+360
       nc <- (bbox["xmax"]-bbox["xmin"])
       nr <- (bbox["ymax"]-bbox["ymin"])
       res <- max(nc,nr)/640
       p <- pretty(res)
       res <- p[which.min(abs(res-p))]
-      g1 <- regrid(setbound=unname(bbox),proj4=spatial_proj4(obj),res=res)
+      g1 <- regrid(setbound=unname(bbox),crs=spatial_crs(obj),res=res)
       return(session_grid(g1))
    }
    if ((!envi_exists(obj))&&(nchar(Sys.getenv("R_IDRISI")))&&(exists("read.idr"))) {
@@ -71,7 +74,8 @@
 #   session_grid(value)
 #  # return(session_grid())
 #}
-'session_proj4' <- 'session_crs' <- function() session_grid()$proj4
+# .syn('session_crs',0)
+'session_proj' <- 'session_proj4' <- 'session_crs' <- function() session_grid()$crs
 'session_cellsize' <- function() with(session_grid(),sqrt(resx*resy))
 'session_bbox' <- function() with(session_grid()
                                  ,c(minx=minx,miny=miny,maxx=maxx,maxy=maxy))

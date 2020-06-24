@@ -27,15 +27,17 @@
       cl <- sapply(obj,inherits,c("sf","sfc","SpatialLinesDataFrame"
                           ,"SpatialPointsDataFrame","SpatialPolygonsDataFrame"
                           ,"SpatialLines","SpatialPoints","SpatialPolygons"))
-      cl2 <- sapply(obj,function(x) {
-         if (.isSF(x))
-            return("sf")
-         if (.isSP(x))
-            return("s")
-         return("unknown")
-      })
-      allSF <- all(cl2 %in% "sf")
-      allSP <- all(cl2 %in% "sp")
+      if (FALSE) {
+         cl2 <- sapply(obj,function(x) {
+            if (.isSF(x))
+               return("sf")
+            if (.isSP(x))
+               return("s")
+            return("unknown")
+         })
+         allSF <- all(cl2 %in% "sf")
+         allSP <- all(cl2 %in% "sp")
+      }
       if (any(!cl))
          isList <- FALSE
    }
@@ -317,7 +319,8 @@
          file.remove(f)
       }
       if (driver %in% c("GeoJSON","KML","GPX")) {
-         obj <- sf::st_transform(obj,4326)
+         if (!identical(spatial_crs(obj),spatial_crs(4326)))
+            obj <- sf::st_transform(obj,4326)
       }
       opW <- options(warn=1)
       if ((interim)&&(interimExt=="shp")) {
@@ -332,7 +335,15 @@
                 ,delete_dsn=file.exists(fname) & !appendlayer
                 ,append=appendlayer))
       }
-      if (utils::packageVersion("sf")>="0.9-0") {
+      jsonSF <- (isSF)&&(driver=="GeoJSON")&&
+         (requireNamespace("geojsonsf",quietly=.isPackageInUse()))
+      if (jsonSF) {
+         if (inherits(obj,"sfc"))
+            writeLines(geojsonsf::sfc_geojson(obj),fname)
+         else
+            writeLines(geojsonsf::sf_geojson(obj,atomise=T,simplify=F),fname)
+      }
+      else if (utils::packageVersion("sf")>="0.9-0") {
          sf::st_write(obj,dsn=fname,layer=lname,driver=driver
                      ,dataset_options=dopt,layer_options=lopt
                      ,delete_layer=file.exists(fname) & !appendlayer
