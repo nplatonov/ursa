@@ -1,12 +1,20 @@
-2020-06-21
+2020-11-10
 
 ### version 3.9.1
+
+-   Consistence with imported package **sp** (&gt;=1.4-4) and suggested
+    package **`sf`** (&gt;=0.9-6) is in progress.
 
 -   Additional value `shape` for `area` argument and additional value
     `pickpoint` for `geocode` argument in function `.glance()`.
 
--   Package **`geojsonsf`** is added as suggested for faster
-    `sf`/GeoJSON import/export.
+-   Package **`geojsonsf`** (&gt;=2.0.0) is added as suggested for
+    faster `sf`/GeoJSON import/export.
+
+-   `update_coastline()`: merging of splitted by meridian 180 polygons
+    is changed.
+
+-   Coastline is updated to version 2020-11-08T06:14
 
 ### version 3.9 (interim)
 

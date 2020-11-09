@@ -51,6 +51,15 @@
             str(dimx)
          }
       }
+      if (is.list(proj)) {
+         if ("input" %in% names(proj)) {
+            proj <- proj$input
+         }
+         else {
+            str(proj)
+            stop("undefined handling for `proj` specification")
+         }
+      }
       if ((!is.character(proj))||(.lgrep("\\+init=epsg\\:\\d+",proj))) {
          if (verbose)
             message("   EPSG->proj4string conversion")
@@ -183,6 +192,8 @@
       p4epsg <- paste0("+init=",code)
    else if (.lgrep("^(\\s+)*\\+init=epsg:\\d+",code))
       p4epsg <- .gsub("^\\s+","",code)
+   else if ((force)&&(.lgrep("^ESRI\\:",code,ignore.case=FALSE)))
+      p4epsg <- code
    else if (is.character(code))
       return(code)
    else

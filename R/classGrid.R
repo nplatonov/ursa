@@ -3,7 +3,7 @@
    g1 <- list(columns=NA_integer_,rows=NA_integer_,resx=NA_real_,resy=NA_real_
              ,minx=NA_real_,maxx=NA_real_,miny=NA_real_,maxy=NA_real_
              ,seqx=numeric(0),seqy=numeric(0)
-             ,crs="")
+             ,crs="",retina=NA)
   # class(g1$crs) <- c("character","ursaProjection")
    class(g1) <- "ursaGrid"
    g1
@@ -15,6 +15,8 @@
       x$seqx <- NULL
    if (!length(x$seqy))
       x$seqy <- NULL
+   if (is.na(x$retina))
+      x$retina <- NULL
    str(x,formatNum=function(x) format(x,scientific=FALSE),...)
 }
 'str.ursaGrid' <- function(object,...) {
@@ -34,6 +36,8 @@
       object$seqx <- NULL
    if (!length(object$seqy))
       object$seqy <- NULL
+   if ((!is.null(object$retina))&&(is.na(object$retina)))
+      object$retina <- NULL
    str(object,...)#,formatNum=function(x) format(x,scientific=FALSE),...)
   # do.call("str",lx,...)#,formatNum=function(x) format(x,scientific=FALSE),...)
 }

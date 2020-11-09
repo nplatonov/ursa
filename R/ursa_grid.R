@@ -58,7 +58,8 @@
    attr(res,"crs") <- ursa_crs(obj)
    res
 }
-'consistent_grid' <- function(obj,ref,border=rep(0,4)) {
+'consistent_grid' <- function(obj,ref,expand=1,border=rep(0,4)) {
+   verbose <- F # .isPackageInUse()
    g0 <- getOption("ursaSessionGrid")
   # if (identical(obj,g0))
    if (missing(ref)) {
@@ -75,21 +76,42 @@
       return(obj)
    isWeb <- ((.lgrep("\\+proj=merc",session_crs()))&&
       (!is.na(.is.near(ursa(obj,"cellsize"),2*6378137*pi/(2^(1:21+8))))))
+   if (is_spatial(ref))
+      ref <- spatial_grid(ref)
    if (is_ursa(ursa_grid(ref),"grid"))
       d2 <- unname(ursa(ref,"dim"))
-   else if ((is.numeric(ref))&&(length(ref)==2))
+   else if ((is.numeric(ref))&&(length(ref)==2)) {
       d2 <- unname(ref)
+      if (!is.na(g0$retina))
+         d2 <- g0$retina*d2
+   }
+   if (missing(d2))
+      stop("Unable to detect reference grid. Check 'ref' argument)")
    d1 <- unname(ursa(obj,"dim"))
-   ##~ print(d1)
-   ##~ print(d2)
    d <- min(d2/d1)
-   ##~ print(d)
-   if (d>1)
-      g2 <- regrid(obj,expand=d)
-   else
-      g2 <- regrid(obj,mul=ifelse(isWeb,1/2,d))
+   if (d>1) {
+      d <- d*expand
+     # cat("---------\n")
+     # str(obj)
+     # g2 <- regrid(obj,expand=d) ## ifelse(isWeb,2^(trunc(log(d)/log(2))+1),d)
+      g2 <- regrid(obj,mul=1/ifelse(isWeb,2^(trunc(log(d)/log(2))+1),d))
+     # str(g2)
+     # cat("---------\n")
+     # g2$retina <- NA
+   }
+   else {
+      d <- d/expand
+      g2 <- regrid(obj,mul=ifelse(isWeb,2^(trunc(log(d)/log(2))-1),d))
+     # g2$retina <- NA
+   }
    d3 <- c(ursa(g2,"nrow"),ursa(g2,"ncol"))
-   ##~ print(d3)
+   if (verbose) {
+      print(c(web=isWeb))
+      print(c('d1:'=d1))
+      print(c('d2:'=d2))
+      print(c(d=d,d.less=2^(trunc(log(d)/log(2))-1)))
+      print(c('d3:'=d3))
+   }
    d4 <- d2-d3
    dx <- rep(floor(d4[1]/2),2)
    dy <- rep(floor(d4[2]/2),2)

@@ -808,10 +808,11 @@ void readBsqLineDouble(char **fname,int *dim,int *index,int *nindex,int *dtype
    int n=count*samples;
    for (i=0;i<bands;i++)
    {
-      Rprintf("ind=%lld\n",(long long int)(i*lines+index[0]-1)*samples*datasize);
+     // Rprintf("ind=%lld\n",(long long int)(i*lines+index[0]-1)*samples*datasize);
      // fileseek(Fin,(long long int)(i*lines+index[0]-1)*samples*datasize,SEEK_SET);
      // fileseek(Fin,(i*lines+index[0]-1)*samples*datasize,SEEK_SET);
-      Rprintf("seek=%d\n",fileseek(Fin,(long long int)(i*lines+index[0]-1)*samples*datasize,SEEK_SET));
+     // Rprintf("seek=%d\n",fileseek(Fin,(long long int)(i*lines+index[0]-1)*samples*datasize,SEEK_SET));
+      fileseek(Fin,(long long int)(i*lines+index[0]-1)*samples*datasize,SEEK_SET);
       if (fread(buf1,datasize,n,Fin)) {};
       for (j=0;j<samples*count;j++)
       {

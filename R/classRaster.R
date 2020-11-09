@@ -58,7 +58,16 @@
    }
    if (!Rgrid)
       object$grid <- NULL
+   else {
+     # if (is.na(object$grid$retina))
+     #    object$grid$retina <- NULL
+   }
+   if (is.na(object$grid$retina))
+      object$grid$retina <- NULL
    object$object.size <- format(os,units="MB")
+   metadata <- attr(object,"metadata")
+   if (!is.null(metadata))
+      attr(object,"metadata") <- TRUE
    class(object) <- paste0(".",class(object))
    NextMethod("str",object,...)
 }

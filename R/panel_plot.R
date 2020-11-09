@@ -54,13 +54,19 @@
    else if (is_spatial(obj)) {
       oprj <- spatial_crs(obj)
       sprj <- session_crs()
-      if (nchar(sprj)>2) {
-         oprj2 <- .gsub("\\+wktext\\s","",oprj)
-         sprj2 <- .gsub("\\+wktext\\s","",sprj)
-         oprj2 <- .gsub("(^\\s|\\s$)","",oprj2)
-         sprj2 <- .gsub("(^\\s|\\s$)","",sprj2)
-         if (!identical(oprj2,sprj2)) {
-            obj <- spatial_transform(obj,sprj)
+      if (!identical(oprj,sprj)) {
+         if ((is.list(oprj))&&("input" %in% names(oprj)))
+            oprj <- oprj[["input"]]
+         if ((is.list(sprj))&&("input" %in% names(sprj)))
+            sprj <- sprj[["input"]]
+         if (nchar(sprj)>2) {
+            oprj2 <- .gsub("\\+wktext\\s","",oprj)
+            sprj2 <- .gsub("\\+wktext\\s","",sprj)
+            oprj2 <- .gsub("(^\\s|\\s$)","",oprj2)
+            sprj2 <- .gsub("(^\\s|\\s$)","",sprj2)
+            if (!identical(oprj2,sprj2)) {
+               obj <- spatial_transform(obj,sprj)
+            }
          }
       }
       geoType <- spatial_geotype(obj)
@@ -162,6 +168,11 @@
                   }
                }
             }
+            alpha <- .getPrm(arglist2,"alpha",default=1)
+            if (alpha<1) {
+               val <- t(grDevices::col2rgb(col,alpha=TRUE))
+               col <- grDevices::rgb(val[,1],val[,2],val[,3],val[,4]*alpha,max=255)
+            }
             if (!is.null(col))
                arglist2$col <- unclass(col)
          }
@@ -172,7 +183,9 @@
             arglist2$col <- ct$colortable[ct$index]
          }
          else
-            arglist2$col <- ifelse(is_spatial_lines(obj),"black","transparent")
+            arglist2$col <- ifelse(is_spatial_lines(obj),"black"
+                                  ,ifelse(T,ursa_colortable(colorize("",alpha=0.2))
+                                           ,"transparent"))
          if (.lgrep("point",geoType)) {
             if (!.isPackageInUse())
                message("'ursa'-dev: check 'https://github.com/exaexa/scattermore' for points plot")
@@ -192,6 +205,8 @@
             if (!.lgrep("lwd",names(arglist2))) {
                arglist2$lwd <- 0.5
             }
+            arglist2$col <- "black"
+            str(arglist2)
          }
          else if (.lgrep("lines",geoType)) {
             if (!.lgrep("lwd",names(arglist2))) {
@@ -351,7 +366,7 @@
    if ((TRUE)&&(.isSF(obj))&&(.lgrep("(dens|angl)",names(arglist)))) {
      # arglist$add <- NULL
       if (!.isPackageInUse())
-         message("'sf' cannot deal with fill patterns; converted to 'Spatial'")
+         message("'sf' doesn't deal with fill patterns; converted to 'Spatial'")
       if (TRUE)
          obj <- sf::as_Spatial(obj)
       else if (FALSE) {

@@ -33,6 +33,45 @@
      # print(art);q()
      # proj <- "merc"
    }
+   if ((art=="none")&&(length(style)==1)&&
+         (requireNamespace("leaflet",quietly=.isPackageInUse()))) {
+     # p <- leaflet::providers
+      cname <- file.path(.ursaCacheDir(),"leaflet_providers.rds")
+      if (!file.exists(cname))
+         saveRDS(leaflet.providers::get_providers(),cname)
+      p <- readRDS(cname)$providers_details
+     # style <- "Stadia" ## devel
+      spatt <- "^(\\w+)(\\.(\\w+))*$"
+      s1 <- gsub(spatt,"\\1",style)
+      s2 <- gsub(spatt,"\\3",style)
+      if (s1 %in% names(p)) {
+         p1 <- p[[s1]]
+         sUrl <- p1$url
+         sAttr <- p1$options$attribution
+         t1 <- unlist(gregexpr("<",sAttr))
+         t2 <- unlist(gregexpr(">",sAttr))
+         if ((length(t1)>0)&&(length(t1)==length(t2))) {
+            t2 <- c(1,t2+1)
+            t1 <- c(t1-1,nchar(sAttr))
+            res <- character()
+            for (i in seq_along(t1))
+               res <- c(res,substr(sAttr,t2[i],t1[i]))
+            sAttr <- paste(res,collapse="")
+            sAttr <- gsub("&copy;","\uA9",sAttr)
+         }
+         if (nchar(s2)>0) {
+            if (s2 %in% names(p1$variants)) {
+               p2 <- p1$variants[[s2]]
+               sUrl <- p2$url
+            }
+         }
+        # print(c(url=sUrl,attr=sAttr))
+         style <- c(sUrl,"png",sAttr)
+        # art <- style
+      }
+   }
+  # print(art)
+  # print(style)
    isStatic <- .lgrep("static",style)>0
   # if ((!isStatic)&&("ursa" %in% loadedNamespaces())) {
   #    stop("Operation is prohibited: unable to display attribution.")
@@ -111,6 +150,12 @@
          if (notYetGrid)
             loc <- c(-179,-82,179,82)
          else {
+            if (!is.na(g0$retina)) {
+               g0 <- regrid(g0,mul=1/g0$retina)
+               retina <- g0$retina
+            }
+            else
+               retina <- 1
             loc <- with(g0,.project(rbind(c(minx,miny),c(maxx,maxy)),crs,inv=TRUE))
             loc <- c(loc)[c(1,3,2,4)]
             if ((isPolar)&&(loc[1]>loc[3]))
@@ -332,6 +377,9 @@
       g0 <- session_grid()
       proj4 <- g0$crs
    }
+   ##~ cat("------------- geomap ---------------\n")
+   ##~ print(g0)
+   ##~ cat("------------- geomap ---------------\n")
    cxy <- with(g0,c(minx+maxx,miny+maxy)/2)
    center <- c(.project(cxy,proj4,inv=TRUE))
    bound <- .project(with(g0,rbind(c(minx,miny),c(maxx,maxy))),g0$crs
@@ -341,6 +389,7 @@
    lr <- .project(cbind(xr,yr),g0$crs,inv=TRUE)[,1]
    cross180 <- length(which(diff(lr)<0))
    isRetina <- FALSE
+   mul <- NA
    if (isTile) {
      # proj <- c("cycle","mapsurfer","sputnik")[2]
       if (isPolar) { # (art=="polarmap")
@@ -450,8 +499,12 @@
          }
          dim1 <- unname(dim(g1)/256L)
          dim2 <- c(length(v),length(h))
-         changeH <- dim1[2]!=dim2[2]
-         changeV <- dim1[1]!=dim2[1]
+         if (verbose) {
+            str(dim1)
+            str(dim2)
+        }
+         changeH <- !.is.eq(dim1[2],dim2[2]) # dim1[2]!=dim2[2]
+         changeV <- !.is.eq(dim1[1],dim2[1]) # dim1[1]!=dim2[1]
         # changeDim <- !all(dim1==dim2)
          tgr <- expand.grid(z=zoom,y=v,x=h)
          n <- 2^zoom
@@ -631,6 +684,8 @@
         # cat("-----------------------------------------\n")
          g0 <- regrid(g1,bbox=with(g0,c(minx,miny,maxx,maxy)),zero="node")
       }
+      if ((!is.na(mul))&&(mul>1))
+         g0$retina <- mul
      # str(g1)
      # str(g0)
      # cat("-----------------------------------------\n")
@@ -756,10 +811,11 @@
          if (!cache)
             file.remove(fname)
       }
-      mul <- unique(c(ursa_ncol(basemap)/ursa_ncol(g0)
+      mul2 <- unique(c(ursa_ncol(basemap)/ursa_ncol(g0)
                      ,ursa_nrow(basemap)/ursa_nrow(g0)))
-      if (length(mul)==1)
-         g0 <- regrid(g0,mul=mul)
+      if (length(mul2)==1) {
+         g0 <- regrid(g0,mul=mul2)
+      }
       ursa(basemap,"grid") <- g0
    }
    if (isGrey) {
@@ -776,6 +832,10 @@
    else
       attr(basemap,"copyright") <- "   "
    }
+  # if ((FALSE)&&(!is.na(mul))&&(mul>1)) ## ++ 20200906
+  #    g0 <- regrid(g0,mul=1/mul)
+   if (isRetina)
+      g0$retina <- mul
    session_grid(g0)
    ursa(basemap,"nodata") <- NA
    if (isRetina)

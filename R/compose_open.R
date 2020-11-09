@@ -1,6 +1,6 @@
 'compose_open' <- function(...) {
-   if (F & .isKnitr())
-      retina0 <- 1
+   if (T & .isKnitr())
+      retina0 <- 2
    else {
       retina0 <- getOption("ursaRetina")
       if (!is.numeric(retina0))
@@ -12,7 +12,8 @@
    retina <- .getPrm(arglist,name="retina",default=ifelse(nchar(fileout),1,retina0))
    if ((!is.numeric(retina))||(is.na(retina)))
       retina <- retina0
-   dpi <- .getPrm(arglist,name="dpi",default=ifelse(.isKnitr(),150L,as.integer(round(96*retina))))
+   dpi <- .getPrm(arglist,name="dpi"
+                 ,default=ifelse(.isKnitr(),3*96L,as.integer(round(96*retina))))
    pointsize <- .getPrm(arglist,name="pointsize",default=NA_real_)
    scale <- .getPrm(arglist,name="^scale$",class="",default=NA_real_)
    width <- .getPrm(arglist,name="width",class=list("integer","character"),default=NA_real_)
@@ -172,7 +173,7 @@
    if (verbose)
       print(c(v=scale1,h=scale2,autoscale=autoscale,scale=scale,c=g1$columns,r=g1$rows
              ,retina=retina,digits=3))
-   pointsize0 <- ifelse(.isKnitr(),12,round(12*retina,0))
+   pointsize0 <- ifelse(.isKnitr(),round(12*retina,0),round(12*retina,0))
    if (is.na(pointsize)) {
      # print(c(pointsize0=pointsize0,dpi=dpi,scale=scale,scale0=autoscale))
      # pointsize <- pointsize0*96/dpi*scale/autoscale ## removed 20161217

@@ -205,6 +205,11 @@
 }
 '.panel_attribution' <- function(pos=ifelse(vertical,"bottomright","bottomright")
                                 ,vertical=TRUE) {
+   g0 <- getOption("ursaSessionGrid_prev")
+   g1 <- getOption("ursaSessionGrid")
+   prev <- !identical(g0,g1)
+   if (prev)
+      session_grid(g0)
    isWindows <- (.Platform$OS.type=="ZZZwindows")&&(getOption("ursaPngDevice")=="ZZZwindows")
    if (isWindows) {
       wf <- do.call("grDevices::windowsFont",list("TT Arial Narrow"))
@@ -217,5 +222,7 @@
                       ,font=ifelse(getOption("ursaPngDevice")=="windows"
                                   ,par("family"),"Arial Narrow")
                       ,fg=sprintf("#000000%s","4F"),vertical=vertical)
+   if (prev)
+      session_grid(g1)
    options(ursaPngCopyright=NULL)
 }

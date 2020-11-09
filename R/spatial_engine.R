@@ -1,13 +1,19 @@
 # wrappers to spatial (not raster) objects
 #.syn('spatial_crs',0,...)
 'spatial_proj4' <- 'spatial_proj' <- 'spatial_crs' <- function(obj,verbose=FALSE) {
+   if (!is.null(attr(obj,"crs"))) {
+      res <- attr(obj,"crs")
+      if (inherits(res,"crs"))
+         return(res$proj4string)
+      return(res)
+   }
    isUrsa <- is.ursa(obj) | is.ursa(obj,"grid")
    isPrm <- is.numeric(obj) | is.character(obj)
    isSF <- .isSF(obj)
    isSP <- .isSP(obj)
    if (verbose)
       print(data.frame(ursa=isUrsa,sf=isSF,sp=isSP,prm=isPrm,row.names="engine"))
-   if (isSF) {
+   if ((isSF)||(inherits(obj,"crs"))) {
       return(sf::st_crs(obj)$proj4string)
    }
    if (isSP) {
@@ -28,6 +34,10 @@
    if (isPrm) {
       return(.epsg2proj4(obj,verbose=verbose,force=TRUE))
    }
+   if (isTRUE(all(sapply(obj,.isSF))))
+      return(lapply(obj,spatial_crs,verbose=verbose))
+   if (isTRUE(all(sapply(obj,.isSP))))
+      return(lapply(obj,spatial_crs,verbose=verbose))
    return(NULL)
 }
 #.syn('spatial_crs<-',0,...)
@@ -59,6 +69,10 @@
    if (isSP) {
       return(sp::geometry(obj))
    }
+   if (isTRUE(all(sapply(obj,.isSF))))
+      return(lapply(obj,spatial_geometry,verbose=verbose))
+   if (isTRUE(all(sapply(obj,.isSP))))
+      return(lapply(obj,spatial_geometry,verbose=verbose))
    return(NULL)
 }
 'spatial_geometry<-' <- function(obj,verbose=FALSE,value) {
@@ -107,6 +121,11 @@
 'spatial_bbox' <- function(obj,verbose=FALSE) {
    isSF <- .isSF(obj)
    isSP <- .isSP(obj)
+   if ((!isSF)&&(!isSP)&&(is.list(obj))) {
+      if (isTRUE(all(sapply(obj,function(o) isTRUE(.isSF(o)) | isTRUE(.isSP(o)))))) {
+         return(lapply(obj,spatial_bbox,verbose=verbose))
+      }
+   }
    if (verbose)
       print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
    res <- NULL
@@ -133,6 +152,7 @@
       rname <- names(res)
       res <- as.numeric(res)
       names(res) <- rname
+      attr(res,"crs") <- spatial_crs(obj)
      # return(res)
    }
    if ((is.null(res))&&(isSP)) {
@@ -140,6 +160,7 @@
       if (length(res)==6)
          res <- res[c(1,2,4,5)]
       names(res) <- c("xmin","ymin","xmax","ymax")
+      attr(res,"crs") <- spatial_crs(obj)
      # return(res)
    }
    ##~ cat("----------------\n")
@@ -167,11 +188,22 @@
      #    res["xmax"] <- res["xmax"]+360
       if (T) {
          xy <- unname(spatial_coordinates(obj))
-         repeat({
-            if (isFALSE(all(sapply(xy,is.list))))
-               break
-            xy <- unlist(xy,recursive=FALSE)
-         })
+         if (T) {
+            for (i in seq(4)) {
+               if (isFALSE(any(sapply(xy,is.list))))
+                  break
+               if (length(ind <- which(sapply(xy,is.list)))) {
+                  xy <- c(xy[-ind],unlist(xy[ind],recursive=FALSE))
+               }
+            }
+         }
+         else {
+            repeat({
+               if (isFALSE(any(sapply(xy,is.list))))
+                  break
+               xy <- unlist(xy,recursive=FALSE)
+            })
+         }
          if (is.list(xy))
             xy <- do.call("rbind",xy)
          x1 <- xy[,1]
@@ -196,6 +228,7 @@
          res <- .project(res,spatial_crs(d2),inv=TRUE)
          res <- c(t(res))
          names(res) <- c("xmin","ymin","xmax","ymax")
+         attr(res,"crs") <- spatial_crs(obj)
       }
    }
    res
@@ -232,6 +265,11 @@
 'spatial_fields' <- 'spatial_colnames' <- function(obj,verbose=FALSE) {
    isSF <- .isSF(obj)
    isSP <- .isSP(obj)
+   if ((!isSF)&&(!isSP)&&(is.list(obj))) {
+      if (isTRUE(all(sapply(obj,function(o) isTRUE(.isSF(o)) | isTRUE(.isSP(o)))))) {
+         return(lapply(obj,spatial_fields,verbose=verbose))
+      }
+   }
    if (verbose)
       print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
    if (isSF) {
@@ -264,9 +302,15 @@
       print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
    if (isSF) {
       oldvalue <- names(attr(obj,"agr"))
-      colnames(obj)[match(oldvalue,colnames(obj))] <- value
-     # colnames(obj)[-match(attr(obj,"sf_column"),colnames(obj))] <- value
-      names(attr(obj,"agr")) <- value
+      if (!is.null(oldvalue)) {
+         colnames(obj)[match(oldvalue,colnames(obj))] <- value
+        # colnames(obj)[-match(attr(obj,"sf_column"),colnames(obj))] <- value
+         names(attr(obj,"agr")) <- value
+      }
+      else {
+         ind <- grep(attr(obj,"sf_column"),names(obj),invert=TRUE,value=FALSE)
+         colnames(obj)[ind] <- value
+      }
    }
    if (isSP) {
       colnames(spatial_data(obj)) <- value 
@@ -276,6 +320,11 @@
 'spatial_data' <- function(obj,subset=".+",drop=NA,verbose=FALSE) {
    isSF <- .isSF(obj)
    isSP <- .isSP(obj)
+   if ((!isSF)&&(!isSP)&&(is.list(obj))) {
+      if (isTRUE(all(sapply(obj,function(o) isTRUE(.isSF(o)) | isTRUE(.isSP(o)))))) {
+         return(lapply(obj,spatial_data,subset=subset,drop=drop,verbose=verbose))
+      }
+   }
    if (verbose)
       print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
    if (isSF) {
@@ -334,6 +383,11 @@
 'spatial_transform' <- function(obj,crs,verbose=FALSE,...) {
    isSF <- .isSF(obj)
    isSP <- .isSP(obj)
+   if ((!isSF)&&(!isSP)&&(is.list(obj))) {
+      if (isTRUE(all(sapply(obj,function(o) isTRUE(.isSF(o)) | isTRUE(.isSP(o)))))) {
+         return(lapply(obj,spatial_transform,crs=crs,verbose=verbose))
+      }
+   }
    if (missing(crs))
       crs <- session_crs()
    else if ((is.ursa(crs))||(is.ursa(crs,"grid")))
@@ -876,7 +930,12 @@
       if (inherits(y,"sf"))
          sf::st_agr(y) <- "constant"
      # x_
-      res <- sf::st_intersection(x,y)
+      res <- try(sf::st_intersection(x,y))
+      if (inherits(res,"try-error")) {
+         if (length(grep("st_crs\\(x\\) == st_crs\\(y\\) is not TRUE"
+                        ,as.character(res))))
+         res <- sf::st_intersection(x,spatial_transform(y,x))
+      }
       if (FALSE) {
         # spatial_geometry(res) <- sf:::st_cast_sfc_default(spatial_geometry(res))
       }
@@ -912,9 +971,13 @@
             if (length(na.omit(match(unique(geotype)
                                     ,c("POLYGON","MULTIPOLYGON"))))==2) {
                if (length(ind2 <- .grep("collection",geotype))) {
-                  res <- spatial_bind(res[-ind2,]
-                               ,sf::st_collection_extract(res[ind2,],"POLYGON"))
-                  geotype <- as.character(spatial_geotype(res,each=TRUE))
+                  opWC <- options(warn=-1)
+                  res2 <- sf::st_collection_extract(res[ind2,],"POLYGON")
+                  options(opWC)
+                  if (spatial_count(res2)) {
+                     res <- spatial_bind(res[-ind2,],res2)
+                     geotype <- as.character(spatial_geotype(res,each=TRUE))
+                  }
                }
                res <- sf::st_cast(res[grep("POLYGON",geotype),],"MULTIPOLYGON")
             }
@@ -1005,7 +1068,12 @@
          sf::st_agr(x) <- "constant"
       if (inherits(y,"sf"))
          sf::st_agr(y) <- "constant"
-      res <- sf::st_difference(x,y)
+      res <- try(sf::st_difference(x,y))
+      if (inherits(res,"try-error")) {
+         if (length(grep("st_crs\\(x\\) == st_crs\\(y\\) is not TRUE"
+                        ,as.character(res))))
+         res <- sf::st_difference(x,spatial_transform(y,x))
+      }
       return(res)
    }
    else if (isSP) {
@@ -1032,7 +1100,12 @@
          sf::st_agr(x) <- "constant"
       if (inherits(y,"sf"))
          sf::st_agr(y) <- "constant"
-      res <- sf::st_sym_difference(x,y)
+      res <- try(sf::st_sym_difference(x,y))
+      if (inherits(res,"try-error")) {
+         if (length(grep("st_crs\\(x\\) == st_crs\\(y\\) is not TRUE"
+                        ,as.character(res))))
+         res <- sf::st_sym_difference(x,spatial_transform(y,x))
+      }
       return(res)
    }
    else if (isSP) {
@@ -1270,4 +1343,27 @@
    attr(obj,"dsn") <- NULL
    attr(obj,basename(tempfile())) <- NULL ## dummy
    obj
+}
+'spatial_grid' <- function(obj) {
+   if ((is.numeric(obj))&&(length(obj)==4)) {
+      bbox <- obj
+      if (!is.null(attr(obj,"crs")))
+         crs <- attr(obj,"crs")
+      else
+         crs <- session_crs()
+   }
+   else {
+      bbox <- spatial_bbox(obj)
+      if ((bbox["xmin"]==bbox["xmax"])||(bbox["ymin"]==bbox["ymax"]))
+         bbox <- bbox+100*c(-1,-1,1,1)
+      crs <- spatial_crs(obj)
+   }
+   if ((.lgrep("\\+proj=longlat",crs))&&(bbox["xmax"]<0)&&(bbox["xmin"]>0))
+      bbox["xmax"] <- bbox["xmax"]+360
+   nc <- (bbox["xmax"]-bbox["xmin"])
+   nr <- (bbox["ymax"]-bbox["ymin"])
+   res <- max(nc,nr)/640
+   p <- pretty(res)
+   res <- p[which.min(abs(res-p))]
+   regrid(setbound=unname(bbox),crs=crs,res=res)
 }

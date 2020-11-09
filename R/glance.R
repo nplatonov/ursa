@@ -300,6 +300,7 @@
          message(paste("failed to get map; change service:"
                       ,.sQuote(.style),"->",.sQuote(style)))
       }
+     # str(basemap)
       if (inherits(basemap,"try-error")) {
          message(paste("failed to get map; cancel"))
          print(lim)
@@ -322,14 +323,18 @@
             zabs <- as.integer(gsub("\\D","",zoom))
          else {
             zrel <- gregexpr("^(\\+)+$",zoom)[[1]]
-            if ((length(zrel)==1)&&(zrel==1))
-               zrel <- attr(zrel,"match.length")
+            if ((length(zrel)==1)&&(zrel==1)) {
+              # str(zrel)
+               zrel <- 2^(-attr(zrel,"match.length"))
+            }
             else {
                zrel <- gregexpr("^(\\-)+$",zoom)[[1]]
-               if ((length(zrel)==1)&&(zrel==1))
-                  zrel <- 1/attr(zrel,"match.length")
+               if ((length(zrel)==1)&&(zrel==1)) {
+                 # str(zrel)
+                  zrel <- 2^(+attr(zrel,"match.length"))
+               }
                else if (.lgrep("^(\\+|\\-)\\d$",zoom)) {
-                  zrel <- eval(parse(text=paste0("",zoom)))
+                  zrel <- 2^(-eval(parse(text=paste0("",zoom))))
                }
                else
                   zrel <- NA
@@ -348,8 +353,19 @@
             res <- if (!is.na(.is.near(ps,z1))) z1[round(zabs)] else z2[zabs]
          }
          else if (!is.na(zrel))
-            res <- ps*2^zrel
-         g0 <- regrid(g0,res=res,expand=res/ps)
+            res <- ps*zrel # ps*2^zrel
+         if (FALSE) {
+           # g0 <- regrid(g0,mul=1/m,expand=m)
+            g0 <- regrid(g0,res=res,expand=res/ps)
+         }
+         else {
+            m <- res/ps
+            bbox <- with(g0,c(minx,miny,maxx,maxy))
+            m2 <- if (m<1) 1 else with(g0,sqrt((maxx-minx)*(maxy-miny)))/2
+           # print(c(m=m,m2=m2,ps=ps,res=res,expand=m*m2))
+           # g0 <- regrid(g0,mul=1/m,bbox=bbox+0*c(-1,-1,1,1)*m*m2)
+            g0 <- regrid(g0,res=res,bbox=bbox+c(-1,-1,1,1)*m*m2)
+         }
       }
    }
    if ((is.null(basemap))&&(border>0)) {
@@ -357,6 +373,7 @@
    }
    attr(obj,"grid") <- g0
    session_grid(g0)
+  # str(g0)
   # xy <- with(g0,.project(rbind(c(minx,miny),c(maxx,maxy)),crs,inv=TRUE))
   # display(blank="white",col="black");q()
    if (verbose)

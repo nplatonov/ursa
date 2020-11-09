@@ -100,6 +100,8 @@
                       ,"\uA9 ESRI World Hillshade")
    s$Esri.Satellite <- c("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.jpg"
                       ,"\uA9 ESRI Satellite")
+   s$Esri.WorldImagery <- c("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.jpg"
+                      ,"Tiles \uA9 Esri - Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community")
    s$HERE.Aerial <- c(url=paste0("https://{1234}.aerial.maps.cit.api.here.com/maptile"
                                 ,"/2.1/maptile/newest/satellite.day/{z}/{x}/{y}/256/png8?"
                                 ,"app_id=",optHERE$id,"&app_code=",optHERE$code,"&lg=eng")
@@ -172,8 +174,10 @@
    s$'Yandex.ru' <- c(paste0("https://vec0{1234}.maps.yandex.net/"
                               ,"tiles?l=map&x={x}&y={y}&z={z}&scale={r}&lang=ru_RU"),yandexCr)
   # http://a.maps.owm.io/map/precipitation_new/6/37/19?appid=b1b15e88fa797225412429c1c50c122a1   
-   if (!sum(nchar(server)))
-     return(.grep(".*zzz(google|yandex).*",names(s),value=TRUE,invert=TRUE))
+   if (!sum(nchar(server))) {
+     # print(.grep(".*zzz(google|yandex).*",names(s),value=TRUE,invert=TRUE))
+      return(.grep(".*zzz(google|yandex).*",names(s),value=TRUE,invert=TRUE))
+   }
    if (!(server[1] %in% names(s))) {
       for (i in seq_along(s)) {
          if (.lgrep("http",server))
@@ -285,7 +289,8 @@
       tile <- .gsub("{.+}",sample(dom,1),tile)
    }
   # fname <- tempfile(fileext=".tile")
-  # print(tile)
+   if (!.isPackageInUse())
+      print(tile)
   # q()
    fname <- .ursaCacheDownload(tile,mode="wb",cache=cache,quiet=!verbose)
    if (inherits(fname,"try-error")) {
@@ -344,8 +349,8 @@
    dima <- dim(a)
    dimb <- c(h,w)*ifelse(isRetina,2,1)
    reduce <- (TRUE)&&((dima[1]!=dimb[1])||(dima[2]!=dimb[2]))
-   ##~ print(dima)
-   ##~ print(dimb)
+  # print(dima)
+  # print(dimb)
    if (reduce) {
       mul <- mean(dima[1:2]/dimb[1:2])
      # print(mul)

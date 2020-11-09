@@ -209,6 +209,7 @@
       on.exit(file.remove(list2),add=TRUE)
       lname <- basename(shpname)
       shpname <- .grep("\\.shp$",list2,value=TRUE)
+      proj4 <- g0$crs
    }
    else
       shpname <- dsn

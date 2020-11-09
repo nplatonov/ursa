@@ -3,6 +3,7 @@
 \alias{ursa-package}
 \alias{ursula}
 \alias{about}
+\alias{index}
 
 \docType{package}
 

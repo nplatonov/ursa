@@ -85,22 +85,22 @@
    .ursaCacheWrite(was0,append=FALSE)
    return(invisible(NULL))
 }
-'.ursaCacheExprire' <- function(value) {
+'.ursaCacheExpired' <- function(value) {
    if (is.character(value)) {
       if (!.lgrep("\\-",value))
          value <- paste0("-",value)
       if (!.lgrep("\\d\\s\\D",value))
          value <- gsub("(^.*\\d)(\\D.+$)","\\1 \\2",value)
-      expire <- as.integer(tail(seq(Sys.time(),len=2,by=value),1))
+      expired <- as.integer(tail(seq(Sys.time(),len=2,by=value),1))
      # expire <- as.POSIXlt(tail(seq(Sys.time(),len=2,by=value),1),tz="UTC")
-      attr(expire,"cache") <- TRUE
+      attr(expired,"cache") <- TRUE
    }
    else {
-      expire <- as.integer(tail(seq(Sys.time(),len=2,by="-1 month"),1))
-     # expire <- as.POSIXlt(tail(seq(Sys.time(),len=2,by="-1 month"),1),tz="UTC")
-      attr(expire,"cache") <- value
+      expired <- as.integer(tail(seq(Sys.time(),len=2,by="-1 month"),1)) ## not '+'
+     # expired <- as.POSIXlt(tail(seq(Sys.time(),len=2,by="-1 month"),1),tz="UTC")
+      attr(expired,"cache") <- value
    }
-   expire
+   expired
 }
 '.ursaCacheDownload' <- function(src,dst,method,quiet=FALSE,cache=TRUE
                                 ,mode="w",headers=NULL) {
@@ -114,20 +114,25 @@
    }
    if (missing(dst))
       dst <- NULL
-   expire <- .ursaCacheExprire(cache)
-   cache <- attr(expire,"cache")
+   expired <- .ursaCacheExpired(cache)
+  # message("expired:")
+  # str(expired)
+  # str(as.POSIXct(expired,origin=.origin()))
+   cache <- attr(expired,"cache")
    ##~ if (is.character(cache)) {
       ##~ if (!.lgrep("\\-",cache))
          ##~ cache <- paste0("-",cache)
       ##~ if (!.lgrep("\\d\\s\\D",cache))
          ##~ cache <- gsub("(^.*\\d)(\\D.+$)","\\1 \\2",cache)
-      ##~ expire <- as.POSIXlt(tail(seq(Sys.time(),len=2,by=cache),1),tz="UTC")
+      ##~ expired <- as.POSIXlt(tail(seq(Sys.time(),len=2,by=cache),1),tz="UTC")
       ##~ cache <- TRUE
    ##~ }
    ##~ else
-      ##~ expire <- as.POSIXlt(tail(seq(Sys.time(),len=2,by="-7 days"),1),tz="UTC")
+      ##~ expired <- as.POSIXlt(tail(seq(Sys.time(),len=2,by="-7 days"),1),tz="UTC")
    if (cache) {
+     # message("use cache")
       if (file.exists(inventory)) {
+        # message("check inventory")
          was <- utils::read.table(inventory,sep=",",encoding=enc)
          colnames(was) <- c("time","stamp","visits","size","src","dst")
          if (is.character(dst)) {
@@ -135,13 +140,19 @@
          }
          ind <- tail(which(!is.na(match(was$src,src0))),1) ## match(src0,was$src)
          if ((length(ind))&&(!is.na(ind))) {
+           # message("found in inventory")
+           # str(was$stamp[ind])
+           # str(as.POSIXct(was$stamp[ind],origin=.origin()))
            # t2 <- as.POSIXlt(was$time[ind],format="%Y-%m-%dT%H:%M:%SZ",tz="UTC")
-            if (was$stamp[ind]>=expire) ## t2>=expire
+            if (was$stamp[ind]>=expired) { ## t2>=expired
+              # message("not expired")
                dst <- file.path(.ursaCacheDir(),was$dst[ind])
+            }
          }
       }
    }
    if ((is.null(dst))||(!file.exists(dst))) {
+     # message("download is required")
       if (!length(src))
          return(NULL)
       if (is.null(dst))

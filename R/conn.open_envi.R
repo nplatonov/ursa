@@ -615,6 +615,59 @@
             con$nodata <- sign(con$nodata)*1.7976931348623e+308
       }
    }
+   res <- NULL
+   if (!is.null(metadata)) {
+      ind1 <- grep("<PAMRasterBand",metadata)
+      ind2 <- grep("</PAMRasterBand",metadata)
+      if ((length(ind1))&&(length(ind1)==length(ind2))) {
+         res <- vector("list",length(ind1))
+        # names(res) <- rep("___",length(ind1))
+         names(res) <- as.character(seq(length(ind1)))
+         patt1 <- "^.*<MDI key=\"(.+)\">(.+)</MDI>.*$"
+         patt2 <- "^.*<Description>(.+)</Description>.*$"
+         for (i in seq_along(ind1)) {
+            md <- metadata[ind1[i]:ind2[i]]
+            if (length(ind4 <- grep(patt2,md)))
+               desc <- gsub(patt2,"\\1",md[ind4])
+            else
+               desc <- character()
+            ord <- as.integer(gsub("^.*band=\"(\\d+)\".*$","\\1",md[1]))
+            ind3 <- grep(patt1,md)
+            if (length(ind3)) {
+               name <- gsub(patt1,"\\1",md[ind3])
+               value <- as.list(gsub(patt1,"\\2",md[ind3]))
+               names(value) <- name
+               if (length(desc))
+                  names(res)[ord] <- desc
+               res[[ord]] <- value
+            }
+         }
+        # str(head(res,3))
+        # q()
+      }
+   }
+   res2 <- NULL
+   ind1 <- grep("<PAMDataset",metadata)
+   ind2 <- grep("</PAMDataset",metadata)
+   if ((length(ind1)==1)&&(length(ind2)==1)) {
+      patt1 <- "^.*<MDI key=\"(.+)\">(.+)</MDI>.*$"
+      md <- metadata[seq(ind1+1L,ind2-1L)]
+      ind3 <- grep(patt1,md)
+      if (length(ind3)) {
+         name <- gsub(patt1,"\\1",md[ind3])
+         value <- as.list(gsub(patt1,"\\2",md[ind3]))
+         names(value) <- name
+         res2 <- list(value)
+         names(res2) <- "Dataset metadata (unstructured)"
+        # if (length(desc))
+        #    names(res)[ord] <- desc
+        # res[[ord]] <- value
+      }
+   }
+   res <- c(res2,res)
+   if (!is.null(res)) {
+      attr(obj,"metadata") <- res
+   }
    if (is.null(grid$crs))
       grid$crs <- ""
    if ((!nchar(grid$crs))&&(nchar(wkt)))

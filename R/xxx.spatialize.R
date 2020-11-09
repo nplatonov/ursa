@@ -1,6 +1,6 @@
 'spatialize' <- function(dsn,engine=c("native","sp","sf")
                          ,layer=".*",field=".+",coords=c("x","y"),crs=character()
-                         ,geocode="",place="",area=c("bounding","point")
+                         ,geocode="",place="",area=c("bounding","point","shape")
                          ,grid=NULL,size=NA,cell=NA,expand=1,border=NA
                          ,lat0=NA,lon0=NA,resetProj=FALSE,resetGrid=FALSE
                          ,style="auto" ## auto none internal keep
@@ -546,7 +546,60 @@
       }
       if ((!hasOpened)&&((!geocodeStatus)||(file.exists(dsn)))) {
          if (jsonSF) {
-            obj <- geojsonsf::geojson_sf(paste(readLines(dsn),collapse=""))
+            epsg <- "XXXXXXXXX"
+            inMemory <- FALSE
+            a <- dsn
+            opGeoW <- options(warn=-1)
+            if (T | .lgrep("\\.(gz|bz2|xz)$",a)) {
+               a <- readLines(a)
+               inMemory <- TRUE
+            }
+            obj <- try(geojsonsf::geojson_sf(a),silent=TRUE)
+            if (inherits(obj,"try-error")) {
+               if (!inMemory) {
+                  a <- readLines(a)
+                  inMemory <- TRUE
+                  obj <- try(geojsonsf::geojson_sf(a),silent=TRUE)
+               }
+            }
+            if (inherits(obj,"try-error")) {
+               a <- paste(a,collapse="")
+               obj <- try(geojsonsf::geojson_sf(a))
+            }
+            if (inherits(obj,"try-error")) {
+               obj <- sf::st_read(dsn,quiet=TRUE)
+               if (!spatial_count(obj))
+                  return(obj)
+            }
+            else {
+               if (T & inMemory) {
+                  if (length(a)==1)
+                     a2 <- substr(a,1,160)
+                  else
+                     a2 <- head(a,5)
+                  if (length(ind <- grep("\"crs\"\\:",a2))) {
+                     if (length(grep("EPSG",a2[ind])))
+                        epsg <- gsub(".*EPSG\\D+(\\d+)\\D+.*","\\1",a2[ind])
+                  }
+               }
+               if (nchar(epsg)<7)
+                  spatial_crs(obj) <- as.integer(epsg)
+            }
+            options(opGeoW)
+            if (length(ind <- which(sapply(obj,inherits,"character")))) {
+               for (i in ind) {
+                  a <- na.omit(obj[,i,drop=TRUE])
+                  if (length(grep("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z"
+                                 ,a))==length(a)) {
+                     d <- as.POSIXct(obj[,i,drop=TRUE],tz="UTC"
+                                    ,format="%Y-%m-%dT%H:%M:%SZ")
+                     obj[,i] <- as.POSIXct(as.numeric(d),origin=.origin())
+                  }
+                  else if (length(grep("\\d{4}-\\d{2}-\\d{2}",a))==length(a)) {
+                     obj[,i] <- as.Date(obj[,i,drop=TRUE,tz="UTC"])
+                  }
+               }
+            }
          }
          else {
             opW <- options(warn=ifelse(isSP,-1,0))
@@ -564,9 +617,20 @@
             else
                layer <- .grep(layer,lname,value=TRUE)
             if (length(layer)>1) {
-               print(paste("Select only one layer:",paste(paste0(seq(layer),")")
-                                          ,.sQuote(layer),collapse=", ")),quote=FALSE)
-               return(NULL)
+               if (prevBehaviour <- FALSE) {
+                  print(paste("Select only one layer:",paste(paste0(seq(layer),")")
+                                             ,.sQuote(layer),collapse=", ")),quote=FALSE)
+                  return(NULL)
+               }
+               else {
+                  arglist <- c(as.list(match.call()),list(...))
+                  ret <- lapply(layer,function(l) {
+                     arglist$layer <- l
+                     spatial_trim(do.call(as.character(arglist[[1]]),arglist[-1]))
+                  })
+                  names(ret) <- layer
+                  return(ret)
+               }
             }
             if (isSF) {
               # opW2 <- options(warn=0)
@@ -689,7 +753,7 @@
             }
            # str(dname[i])
             isDateTime <- FALSE
-            skipParse <- TRUE
+            skipParse <- TRUE # .isPackageInUse()
            # if (dname[i]=="time")
            #    str(da)
             nc <- try(nchar(na.omit(da)))
@@ -795,6 +859,11 @@
    }
    if (!exists("obj")) {
       stop("Object cannot be recognized as spatial")
+   }
+   if (jsonSF) {
+      cname <- spatial_colnames(obj)
+      Encoding(cname) <- "UTF-8"
+      spatial_colnames(obj) <- cname
    }
    if (isSF) {
       if (TRUE) { ## not tested for multiple geometries POLYGON/MULTIPOLYGON
@@ -987,8 +1056,8 @@
          }
          if (verbose)
             print(summary(xy))
-         lon2 <- xy[,1]
-         lat2 <- xy[,2]
+         lon2 <- na.omit(xy[,1])
+         lat2 <- na.omit(xy[,2])
          if (nrow(xy)>1) {
            # x <- cos(lon2*pi/180)
            # y <- sin(lon2*pi/180)
@@ -1155,11 +1224,10 @@
                }
             }
             if (isSP) {
-               print(t_srs)
+              # print(t_srs)
               # obj <- sp::spTransform(obj,t_srs)
-               print(c(sp::bbox(obj)),digits=12)
+              # print(c(sp::bbox(obj)),digits=12)
                obj <- spatial_transform(obj,t_srs)
-               q()
                if ((TRUE)&&(.lgrep("\\+proj=longlat",t_srs))&&(max(lon2)>180)) {
                   if (verbose)
                      .elapsedTime("lon+360 -- start")
@@ -1268,7 +1336,14 @@
                if (.lgrep("\\+init=epsg",src0))
                   src0 <- .epsg2proj4(src0,force=TRUE)
                if (!identical(src0,t_srs))
-                 obj <- sp::spTransform(obj,t_srs) ## not tested
+                  obj <- sp::spTransform(obj,t_srs) ## not tested
+            }
+            else {
+               if (!identical(src0,t_srs)) {
+                  opW <- options(warn=ifelse(.isPackageInUse(),-1,1))
+                  obj <- sp::spTransform(obj,sp::CRS(t_srs,doCheckCRSArgs=FALSE))
+                  options(opW)
+               }
             }
          }
         # print(sp::proj4string(obj))
@@ -1353,6 +1428,12 @@
    }
    if (any(border!=0)) {
       g0 <- regrid(g0,border=border)
+   }
+   if ((isWeb)||("web" %in% style)) {
+      if (retina>1) {
+         g0 <- regrid(g0,mul=retina)
+         g0$retina <- retina
+      }
    }
    if ((FALSE)&&(isWeb)) {
       bbox <- with(g0,.project(cbind(c(minx,maxx),c(miny,maxy))

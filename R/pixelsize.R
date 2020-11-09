@@ -27,6 +27,7 @@
    a
 }
 '.pxlsize.stere' <- function(g,verbose=FALSE) {
+  # https://en.wikibooks.org/wiki/PROJ.4
    '.pow' <- function(x,y) x^y
    proj4 <- g$crs
    if (FALSE)
@@ -37,23 +38,32 @@
       semi <- c("6378137","6356752.314245179")
    else if (.lgrep("\\+ellps=krass",proj4))
       semi <- c("6378245","6356863.018773047")
-   else
+   else {
       semi <- c(.gsub2("\\s\\+a=(\\S+)\\s","\\1",proj4)
-               ,.gsub2("\\s\\+b=(\\S+)\\s","\\1",proj4))
+               ,.gsub2("\\s\\+b=(\\S+)\\s","\\1",proj4)
+               ,.gsub2("\\s\\+rf=(\\S+)\\s","\\1",proj4)
+               )
+      semi <- semi[nchar(semi)<nchar(proj4)]
+   }
    semi <- as.numeric(semi)
    lat_ts <- as.numeric(.gsub2("\\s\\+lat_ts=(\\S+)\\s","\\1",proj4))
    lat0 <- as.numeric(.gsub2("\\s\\+lat_0=(\\S+)\\s","\\1",proj4))
    lon0 <- as.numeric(.gsub2("\\s\\+lon_0=(\\S+)\\s","\\1",proj4))
    x0 <- as.numeric(.gsub2("\\s\\+x_0=(\\S+)\\s","\\1",proj4))
    y0 <- as.numeric(.gsub2("\\s\\+y_0=(\\S+)\\s","\\1",proj4))
-   scale <- as.numeric(.gsub2("\\s\\+k=(\\S+)\\s","\\1",proj4))
+   if (.lgrep("\\s\\+k=(\\S+)\\s",proj4))
+      scale <- as.numeric(.gsub2("\\s\\+k=(\\S+)\\s","\\1",proj4))
+   else
+      scale <- 1
    major <- max(semi)
    minor <- min(semi)
+   if (minor<6300000)
+      minor <- major*(1-1/minor) ## +rf=298.278...
    ecentr2 <- 1-minor*minor/(major*major)
    ecentr <- sqrt(ecentr2)
    if (verbose)
-       print(c(lat0=lat0,lat_ts=lat_ts,lon0=lon0,k=scale,x0=x0,y0-y0
-              ,a=major,b=minor))
+       print(c(lat0=lat0,lat_ts=lat_ts,lon0=lon0,k=scale,x0=x0,y0=y0
+              ,a=major,b=minor),digits=16)
    xlon <- 0
    ylat <- 90
    xlon <- pi*xlon/180.0

@@ -5,11 +5,11 @@
   # print("resize")
    arglist <- list(...)
    if (missing(x)) {
-      res <- .regrid(...)
+      result <- .regrid(...)
       resetGrid <- .getPrm(arglist,name="^reset",default=TRUE)
       if (resetGrid)
-         session_grid(res)
-      return(res)
+         session_grid(result)
+      return(result)
    }
    fun <- "resize" #as.character(match.call())[1]
    if (.is.ursa_stack(x)) {
@@ -181,6 +181,9 @@
       border <- 0
   # print("regrid")
   # verbose <- TRUE
+   if (length(arglist <- list(...))) {
+      res <- .getPrm(arglist,name="cell",default=as.numeric(res)) ## cell, cellsize -> res
+   }
    mtol <- 1e5 # [1e2->1e5 20170720]
    etol <- 1e-14
    zero <- match.arg(zero)
@@ -285,7 +288,7 @@
       g$resx <- g$resx/mul
       g$resy <- g$resy/mul
    }
-   else if (is.numeric(res))
+   else if ((!is.na(res))&&(is.numeric(res)))
    {
       if (length(res)==2)
       {

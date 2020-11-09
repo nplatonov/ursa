@@ -40,6 +40,7 @@
 \alias{spatial_buffer}
 \alias{spatial_trim}
 \alias{spatial_valid}
+\alias{spatial_grid}
 \title{
 Wrapper functions for manipulation with non-raster spatial objects
 }
@@ -114,6 +115,9 @@ spatial_buffer(obj, dist = 0, quadsegs = 30L, verbose = FALSE)
 spatial_trim(obj)
 
 spatial_valid(obj, each = FALSE, reason = FALSE, verbose = FALSE)
+
+spatial_grid(obj)
+
 
 }
 %- maybe also 'usage' for other objects documented here.
@@ -240,6 +244,8 @@ Further arguments passed to \code{sf::st_transform} or to \code{sp::spTransform}
 \code{spatial_union} returns combined geometry without internal boundaries.
 
 \code{spatial_trim} returns spatial object without extra attributes added by \pkg{ursa} package.
+
+\code{spatial_grid} generates suitable spatial grid from input vector and returns object of class \code{ursaGrid}.
 
 }
 \references{

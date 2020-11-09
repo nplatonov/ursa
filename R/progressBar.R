@@ -10,7 +10,7 @@
    }
   # if (.isKnitr())
   #    return(NULL)
-   if (!.try(kind0 <- match.arg(kind))) {
+   if (!.try(kind0 <- match.arg(kind),silent=TRUE)) {
       n <- length(kind)
       max <- if ((n==1)&&(is.numeric(kind))&&(.is.integer(kind))) kind else n
       kind <- head(eval(formals()$kind),1)

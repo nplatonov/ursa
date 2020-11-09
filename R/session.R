@@ -20,6 +20,7 @@
       return(ref)
    }
   # above - 'Extract' (visible), below - 'Replace' (invisible)
+   options(ursaSessionGrid_prev=getOption("ursaSessionGrid"))
    if (is.null(obj))
       return(options(ursaSessionGrid=NULL))
    if (.is.grid(obj)) {
@@ -33,19 +34,10 @@
       return(invisible(obj$grid))
    }
    if (is_spatial(obj)) {
-      bbox <- spatial_bbox(obj)
-      crs <- spatial_crs(obj)
-      if ((.lgrep("\\+proj=longlat",crs))&&(bbox["xmax"]<0)&&(bbox["xmin"]>0))
-         bbox["xmax"] <- bbox["xmax"]+360
-      nc <- (bbox["xmax"]-bbox["xmin"])
-      nr <- (bbox["ymax"]-bbox["ymin"])
-      res <- max(nc,nr)/640
-      p <- pretty(res)
-      res <- p[which.min(abs(res-p))]
-      g1 <- regrid(setbound=unname(bbox),crs=spatial_crs(obj),res=res)
-      return(session_grid(g1))
+      return(session_grid(spatial_grid(obj)))
    }
-   if ((!envi_exists(obj))&&(nchar(Sys.getenv("R_IDRISI")))&&(exists("read.idr"))) {
+   if ((length(obj)==1)&&(!envi_exists(obj))&&
+       (nchar(Sys.getenv("R_IDRISI")))&&(exists("read.idr"))) {
       g1 <- do.call("read.idr",list((obj)))$grid
       options(ursaSessionGrid=g1)
       return(invisible(g1))
@@ -58,9 +50,29 @@
          a <- open_gdal(obj)
       }
       g1 <- a$grid
-      close(a)
+      if (is_ursa(a))
+         close(a)
       if (!.is.grid(g1))
          return(NULL)
+      options(ursaSessionGrid=g1)
+      return(invisible(g1))
+   }
+   if ((is.numeric(obj))&&(length(obj)==2)) {
+      ref <- round(obj)
+      g1 <- .grid.skeleton()
+      g1$columns <- as.integer(ref[2])
+      g1$rows <- as.integer(obj[1])
+      g1$minx <- 0
+      g1$miny <- 0
+      g1$maxx <- obj[2]
+      g1$maxy <- obj[1]
+      g1$resx <- with(g1,(maxx-minx)/columns)
+      g1$resy <- with(g1,(maxy-miny)/rows)
+      if (!FALSE) {
+         retina <- getOption("ursaRetina")
+         if ((is.numeric(retina))&&(retina>1))
+            g1$retina <- retina
+      }
       options(ursaSessionGrid=g1)
       return(invisible(g1))
    }
@@ -75,8 +87,14 @@
 #  # return(session_grid())
 #}
 # .syn('session_crs',0)
+#'.session_crs<-' <- function(x,value) {
+#   a <- session_grid()
+#   a$crs <- .epsg2proj4(value,force=TRUE)
+#   session_grid(a)
+#}
 'session_proj' <- 'session_proj4' <- 'session_crs' <- function() session_grid()$crs
 'session_cellsize' <- function() with(session_grid(),sqrt(resx*resy))
+'session_dim' <- function() with(session_grid(),c(lines=rows,samples=columns))
 'session_bbox' <- function() with(session_grid()
                                  ,c(minx=minx,miny=miny,maxx=maxx,maxy=maxy))
 'session_pngviewer' <- function(allow=NA) {

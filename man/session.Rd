@@ -5,6 +5,7 @@
 \alias{session_crs}
 \alias{session_cellsize}
 \alias{session_bbox}
+\alias{session_dim}
 \alias{session_pngviewer}
 \alias{session_tempdir}
 \alias{session_use_experimental_functions}
@@ -31,6 +32,7 @@ session_proj4()
 session_crs()
 session_cellsize()
 session_bbox()
+session_dim()
 
 session_pngviewer(allow = NA)
 session_tempdir(dst = character())
@@ -90,9 +92,11 @@ NULL
 
 \code{session_cellsize} returns squared root from multiplication of cell dimension: \code{sqrt(resx*resy)}.
 
-\code{sessiong_pngviewer} returns value of \code{getOption("ursaAllowPngViewer")}.
+\code{session_pngviewer} returns value of \code{getOption("ursaAllowPngViewer")}.
 
-\code{sessiong_bbox} returns named numeric of lenght 4: minimal x-coodrinate (\code{xmin}), minimal y-coordinate (\code{ymin}), maximal x-coordinate  (\code{xmax}), maximal y-coordinate  (\code{ymax}).
+\code{session_bbox} returns named numeric of length 4: minimal x-coodrinate (\code{xmin}), minimal y-coordinate (\code{ymin}), maximal x-coordinate  (\code{xmax}), maximal y-coordinate  (\code{ymax}).
+
+\code{session_dim} returns named integer of length 2: number of rows (\code{lines}) and number of columns (\code{samples}).
 
 \code{session_use_experimental_functions} added some non-public functions to current namespaces and returns invisile list of function names.
 

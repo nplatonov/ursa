@@ -5,6 +5,14 @@
    if (.skipPlot(TRUE))
       return(NULL)
    arglist <- list(...)
+   if (is_spatial(arglist[[1]])) {
+      obj <- spatial_transform(arglist[[1]],session_crs())
+      xy <- spatial_coordinates(obj)
+      da <- spatial_data(obj)[[1]]
+      return(lapply(seq_len(spatial_count(obj)),function(i) {
+         do.call(panel_annotation,c(x=xy[i,1],y=xy[i,2],label=da[i],arglist[-1]))
+      }))
+   }
    kwd <- "(caption|ann(otation)*)"
    annotation <- .getPrm(arglist,name=kwd,default=TRUE)
    if (!is.logical(annotation))
@@ -111,6 +119,7 @@
    }
    if (length(pos)==1)
       pos <- c(1,1)
+  # print(pos)
    if (!length(pos)) {
       cat("Unable to detect position for annotation\n")
       return(invisible(NULL))
@@ -155,6 +164,7 @@
       height <- .w*1.05
       rm(.w)
    }
+  # print(c(width=width,height=height))
    coord <- c(NA,NA,NA,NA)
   # rect(coord[1],coord[2],coord[3],coord[4],col="red")
    coord[1] <- minx+pos[1]*(maxx-minx)-0.5*width
@@ -168,7 +178,7 @@
    }
    if (coord[3]>maxx)
    {
-      coord[3] <- maxx+ifelse(isE,width/3.5,0)
+      coord[3] <- maxx+ifelse(isE,0,0) ## ifelse(isE,width/3.5,0)
       coord[1] <- coord[3]-width
    }
    if (coord[2]<miny)
@@ -178,7 +188,7 @@
    }
    if (coord[4]>maxy)
    {
-      coord[4] <- maxy-ifelse(isE,height,0)
+      coord[4] <- maxy-ifelse(isE,height/6,0) # ifelse(isE,height,0)
       coord[2] <- coord[4]-height
    }
   # rect(coord[1],coord[2],coord[3],coord[4],col="#0000FF50")

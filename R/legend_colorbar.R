@@ -65,11 +65,12 @@
       ct <- obj
    else
       stop("Unclear coercion 'object' -> colorbar") ## return(NULL)
-   .legend_colorbar(ct,units=units,labels=labels,align=align,shift=shift
-                            ,cex=cex,adj=adj,las=las,forceLabel=forceLabel
-                            ,lomar=lomar,himar=himar,turn=turn
-                            ,useRaster=useRaster,trim=trim,abbrev=abbrev
-                            ,opacity=opacity,verbose=verbose)
+   ret <- .legend_colorbar(ct,units=units,labels=labels,align=align,shift=shift
+                          ,cex=cex,adj=adj,las=las,forceLabel=forceLabel
+                          ,lomar=lomar,himar=himar,turn=turn
+                          ,useRaster=useRaster,trim=trim,abbrev=abbrev
+                          ,opacity=opacity,verbose=verbose)
+   ret
 }
 '.legend_colorbar' <- function(ct,units="",labels=NA,align=NULL,shift=1 # labels=11L
                             ,cex=1,adj=NA,las=1

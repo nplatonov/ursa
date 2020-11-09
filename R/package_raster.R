@@ -19,6 +19,7 @@
 'as.Raster.ursaStack' <- function(obj) .as.Raster(obj)
 # 'as.Raster.ursaBrick' <- function(obj) .as.Raster(obj)
 'as.Raster.NULL' <- function(obj) .as.Raster(session_grid())
+#'as.Raster.NULL' <- function(obj) .as.Raster(ursa())
 '.as.Raster' <- function(obj) {
   # suppressMessages({
       requireNamespace("methods",quietly=.isPackageInUse())
@@ -53,6 +54,7 @@
    isBrick <- !isGrid && !isStack && !isLayer
   # print(c(isGrid=isGrid,isLayer=isLayer,isBrick=isBrick,isStack=isStack))
    if (isLayer) {
+      a <- as.array(obj,permute=TRUE,flip=TRUE,drop=TRUE)
       res <- raster::raster(as.array(obj,permute=TRUE,flip=TRUE,drop=TRUE))
       .addColorTable(res) <- ursa_colortable(obj)
    }
@@ -83,7 +85,9 @@
       res <- with(g1,raster::raster(nrows=rows,ncols=columns))
    }
    raster::extent(res) <- with(g1,c(minx,maxx,miny,maxy))
-   raster::crs(res) <- ursa_crs(g1)
+   opC <- options(warn=0)
+   raster::crs(res) <- sp::CRS(ursa_crs(g1),doCheckCRSArgs=FALSE)
+   options(opC)
    if (isGrid)
       return(res)
    nodata <- sapply(obj,ursa_nodata)
