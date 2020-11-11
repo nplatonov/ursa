@@ -498,7 +498,7 @@
       if (.lgrep("\\.tif(f)*$",fname))
          driver <- "GTiff"
       else if (.lgrep("\\.img$",fname))
-         driver <- "HFA" # http://www.gdal.org/frmt_hfa.html
+         driver <- "HFA" # https://gdal.org/frmt_hfa.html
       else if (.lgrep("\\.png$",fname))
          driver <- "PNG"
       else if (.lgrep("\\.jp(e)*g$",fname))

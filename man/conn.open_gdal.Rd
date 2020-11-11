@@ -27,7 +27,7 @@ Logical. \code{verbose=TRUE} provides some additional information on console. De
 
 \code{open_gdal} doesn't read data. Data can be read later using \emph{\link[ursa:classRaster.Extract]{Extract}} operator \code{\link[ursa:classRaster.Extract]{[}}.
 
-If argument \code{fname} is \href{http://www.gdal.org/frmt_various.html#ENVI}{ENVI .hdr Labelled Raster} then either \code{open_gdal} or \code{\link[ursa:conn.open_envi]{open_envi}} can be used. The former provides external implementation for data reading via GDAL in \pkg{rgdal} package.
+If argument \code{fname} is \href{https://gdal.org/frmt_various.html#ENVI}{ENVI .hdr Labelled Raster} then either \code{open_gdal} or \code{\link[ursa:conn.open_envi]{open_envi}} can be used. The former provides external implementation for data reading via GDAL in \pkg{rgdal} package.
 }
 \value{
    Returns object of class \code{ursaRaster}. Values are not in memory.

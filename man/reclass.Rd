@@ -56,7 +56,7 @@ If \code{dst} is \code{NULL} then object of class \code{ursaRaster} with empty c
 Nikita Platonov \email{platonov@sevin.ru}
 }
 \note{
-There were no a lot of tests how GIS software reads "ENVI .hdr Labelled Raster" files with color tables without color values (only \emph{categories}). At least, \href{http://www.gdal.org/frmt_various.html#ENVI}{GDAL} recognizes categories (\href{http://www.gdal.org/gdalinfo.html}{\code{gdalinfo}} utility).
+There were no a lot of tests how GIS software reads "ENVI .hdr Labelled Raster" files with color tables without color values (only \emph{categories}). At least, \href{https://gdal.org/frmt_various.html#ENVI}{GDAL} recognizes categories (\href{https://gdal.org/gdalinfo.html}{\code{gdalinfo}} utility).
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~

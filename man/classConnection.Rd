@@ -76,7 +76,7 @@ Non-public function \code{.con.skeleton()} is used to generate the blank \code{u
 %%  ~~ If necessary, more details than the description above ~~
 }
 \value{
-\code{ursaConnection} is a list. The most of names have a relation to specification of \href{http://www.harrisgeospatial.com/docs/ENVIHeaderFiles.html}{ENVI Header Files}. Items:
+\code{ursaConnection} is a list. The most of names have a relation to specification of \href{https://www.l3harrisgeospatial.com/docs/ENVIHeaderFiles.html}{ENVI Header Files}. Items:
 \item{driver}{Character. Keyword of supported image formats. Allowed "ENVI" or "GDAL".}
 \item{samples}{Integer. Number of image columns (samples)}
 \item{lines}{Integer. Number of image rows (lines)}

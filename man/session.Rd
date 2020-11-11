@@ -63,7 +63,7 @@ session_grid()
 }
 
 \value{
-Object of class \code{\link[ursa:classGrid]{ursaGrid}}. It is a list. Default values are grid parameters of NSIDC polar stereo gridded data of Northern hemispere with nominal gridded resolution 25 km (\url{http://nsidc.org/data/polar_stereo/ps_grids.html}).\preformatted{
+Object of class \code{\link[ursa:classGrid]{ursaGrid}}. It is a list. Default values are grid parameters of NSIDC polar stereo gridded data of Northern hemispere with nominal gridded resolution 25 km (\url{https://nsidc.org/data/polar-stereo/ps_grids.html}).\preformatted{
 List of 9
  $ columns: int 304
  $ rows   : int 448

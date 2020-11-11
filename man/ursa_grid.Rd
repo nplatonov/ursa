@@ -31,7 +31,7 @@ ursa_lines(obj)
 ursa_extent(obj)
 ursa_bbox(obj)
 
-consistent_grid(obj, ref, border = rep(0, 4))
+consistent_grid(obj, ref, expand = 1, border = rep(0, 4))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -43,6 +43,9 @@ consistent_grid(obj, ref, border = rep(0, 4))
 }
   \item{ref}{
 \code{\link[ursa:classGrid]{ursaGrid}} reference object.
+}
+  \item{expand}{
+Podsitive numeric. Multiplier of boundary box.
 }
   \item{border}{
 \code{integer} of length 1 or 4. If length 4, then vector (bottom, left, top, right) in cells for extent expand. If length <4, then value is repeated for length 4. Passed to \code{\link[ursa:regrid]{regrid()}}.

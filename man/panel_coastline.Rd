@@ -97,7 +97,7 @@ Source coastline data in EPSG:4326 are transformed to CRS projection, extracted 
 Nikita Platonov \email{platonov@sevin.ru}
 }
 \note{
-In the versions <=3.7-19 package \pkg{ursa} contained land polygons based on union of "GSHHS_l_L1.shp" and "GSHHS_l_L5.shp" data from Self-consistent Hierarchical High-resolution Geography Database (\href{https://www.soest.hawaii.edu/pwessel/gshhg}{GSHHG}), Version 2.3.3 (01 November 2014), distributed under the Lesser GNU Public License, Version 3 (29 June 2007). 
+In the versions <=3.7-19 package \pkg{ursa} contained land polygons based on union of "GSHHS_l_L1.shp" and "GSHHS_l_L5.shp" data from Self-consistent Hierarchical High-resolution Geography Database (\href{https://www.soest.hawaii.edu/pwessel/gshhg/}{GSHHG}), Version 2.3.3 (01 November 2014), distributed under the Lesser GNU Public License, Version 3 (29 June 2007). 
 
 }
 

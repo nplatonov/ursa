@@ -181,7 +181,7 @@
          bb2[1][bb2[1]<(-179)] <- -180
          bb2[3][bb2[3]>(179)] <- 180
       }
-     ## http://www.gdal.org/ogr2ogr.html http://gis-lab.info/qa/ogr2ogr-examples.html
+     ## https://gdal.org/ogr2ogr.html https://gis-lab.info/qa/ogr2ogr-examples.html
       g1 <- regrid(g0,border=5)
       cmd <- paste("ogr2ogr","-t_srs",.dQuote(g0$crs)
               ,ifelse(noProj,paste("-s_srs",.dQuote(proj4)),"")

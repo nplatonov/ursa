@@ -3,7 +3,8 @@
 ### version 3.9.1
 
 -   Consistence with imported package **sp** (&gt;=1.4-4) and suggested
-    package **`sf`** (&gt;=0.9-6) is in progress.
+    package **`sf`** (&gt;=0.9-6) is in progress with focus to
+    “proj4string” declaration of CRS.
 
 -   Additional value `shape` for `area` argument and additional value
     `pickpoint` for `geocode` argument in function `.glance()`.

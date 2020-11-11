@@ -288,7 +288,7 @@
       g$resx <- g$resx/mul
       g$resy <- g$resy/mul
    }
-   else if ((!is.na(res))&&(is.numeric(res)))
+   else if ((!is.na(res[1]))&&(is.numeric(res[1])))
    {
       if (length(res)==2)
       {

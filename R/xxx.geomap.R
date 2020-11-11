@@ -34,7 +34,8 @@
      # proj <- "merc"
    }
    if ((art=="none")&&(length(style)==1)&&
-         (requireNamespace("leaflet",quietly=.isPackageInUse()))) {
+         (requireNamespace("leaflet",quietly=.isPackageInUse()))&&
+         (requireNamespace("leaflet.providers",quietly=.isPackageInUse()))) {
      # p <- leaflet::providers
       cname <- file.path(.ursaCacheDir(),"leaflet_providers.rds")
       if (!file.exists(cname))
