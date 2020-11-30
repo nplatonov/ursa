@@ -1,8 +1,8 @@
 'session_grid' <- function(obj,...) {
-   arglist <- list(...)
-   ref <- getOption("ursaSessionGrid")
    if (missing(obj)) { ## 'Extract'
-      if ((is.null(ref))||(!.is.grid(ref))) {
+      ref <- getOption("ursaSessionGrid")
+      if ((is.null(ref))||(!.is.grid(ref)))
+      {
         # fname <- system.file("template","default.hdr",package="ursa")
          fname <- file.path(getOption("ursaRequisite"),"template.hdr")
          if (file.exists(fname)) {
@@ -14,20 +14,14 @@
          }
          options(ursaSessionGrid=ref)
       }
-      if (!length(arglist)) {
-        # return(invisible(ref))
-         return(ref)
-      }
-      else {
-         obj <- do.call(regrid,c(list(ref),arglist))
-         arglist <- NULL
-      }
+     # return(invisible(ref))
+      return(ref)
    }
   # above - 'Extract' (visible), below - 'Replace' (invisible)
-   options(ursaSessionGrid_prev=ref)
+   options(ursaSessionGrid_prev=getOption("ursaSessionGrid"))
    if (is.null(obj))
       return(options(ursaSessionGrid=NULL))
-   if (length(arglist)) {
+   if (length(arglist <- list(...))) {
      # if (is_spatial(obj))
       obj <- do.call(regrid,c(list(spatial_grid(obj)),arglist))
      # else

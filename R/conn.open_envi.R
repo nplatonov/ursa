@@ -413,7 +413,7 @@
          }
          if (solved) {
             con$connection <- "file"
-            con$compress <- ifelse(cache,0,-1L)
+            con$compress <- ifelse(cache,0L,-1L)
          }
       }
       if ((!solved)&&(!decompress)) {
@@ -429,15 +429,18 @@
    }
    else if ((file.exists(fname.envigz))&&(!file.info(fname.envigz)$isdir))
    {
-      verbose <- Sys.Date()<=as.Date("2018-01-31") & !.isPackageInUse()
+      verbose <- Sys.Date()<=as.Date("2020-11-15") & !.isPackageInUse()
       solved <- FALSE
       if (nchar(Sys.which("gzip"))) {
          if (cache) {
             if (verbose)
                message("trying cache")
+            srcname <- con$fname
             con$fname <- .ursaCacheRaster(fname.envigz
                               ,ifelse(decompress,"gzip","gzip"),reset=cache!=1)
             solved <- !is.null(con$fname)
+            if (F & solved)
+               attr(con$fname,"aux") <- c(fname.envigz,"gzfile","read")
          }
          else if (decompress) {
             if (verbose)
@@ -454,7 +457,7 @@
          }
          if (solved) {
             con$connection <- "file"
-            con$compress <- ifelse(cache,0,-1L)
+            con$compress <- ifelse(cache,0L,-1L)
          }
       }
       if ((!solved)&&(!decompress)) {
@@ -494,7 +497,7 @@
          }
          if (solved) {
             con$connection <- "file"
-            con$compress <- ifelse(cache,0,-1L)
+            con$compress <- ifelse(cache,0L,-1L)
          }
       }
       if ((!solved)&&(!decompress)) {

@@ -3,15 +3,15 @@
 'panel_annotation' <- function(...)
 {
    if (.skipPlot(TRUE))
-      return(NULL)
+      return(invisible(NULL))
    arglist <- list(...)
-   if (is_spatial(arglist[[1]])) {
+   if ((length(arglist))&&(is_spatial(arglist[[1]]))) {
       obj <- spatial_transform(arglist[[1]],session_crs())
       xy <- spatial_coordinates(obj)
       da <- spatial_data(obj)[[1]]
-      return(lapply(seq_len(spatial_count(obj)),function(i) {
+      return(invisible(lapply(seq_len(spatial_count(obj)),function(i) {
          do.call(panel_annotation,c(x=xy[i,1],y=xy[i,2],label=da[i],arglist[-1]))
-      }))
+      })))
    }
    kwd <- "(caption|ann(otation)*)"
    annotation <- .getPrm(arglist,name=kwd,default=TRUE)

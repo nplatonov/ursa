@@ -685,8 +685,9 @@
         # cat("-----------------------------------------\n")
          g0 <- regrid(g1,bbox=with(g0,c(minx,miny,maxx,maxy)),zero="node")
       }
-      if ((!is.na(mul))&&(mul>1))
+      if ((!is.na(mul))&&(mul>1)) {
          g0$retina <- mul
+      }
      # str(g1)
      # str(g0)
      # cat("-----------------------------------------\n")

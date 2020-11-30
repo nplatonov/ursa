@@ -235,6 +235,8 @@
          reset <- FALSE
    }
    if (unpack!="none") {
+      if ((!is.null(dst))&&(!envi_exists(dst)))
+         dst <- NULL
       if (is.null(dst)) {
          dst <- .ursaCacheFile()
          if (unpack %in% c("gzip","bzip2")) {

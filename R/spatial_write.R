@@ -31,7 +31,7 @@
          if (.isSF(x))
             return("sf")
          if (.isSP(x))
-            return("s")
+            return("sp")
          return("unknown")
       })
       allSF <- all(cl2 %in% "sf")
@@ -248,6 +248,17 @@
                cat(" ok!\n")
          }
       })
+   }
+   if (is.null(spatial_geometry(obj))) {
+      if ("sf" %in% loadedNamespaces()) {
+         sf::st_write(obj,dsn=fname,layer=lname,driver=driver
+                     ,dataset_options=dopt,layer_options=lopt
+                     ,delete_layer=file.exists(fname) & !appendlayer
+                     ,delete_dsn=file.exists(fname) & !appendlayer
+                     ,append=!file.exists(fname) | appendlayer ## append=T means replace=F
+                     ,quiet=!verbose)
+         return(invisible(NULL))
+      }
    }
    isSF <- inherits(obj,c("sf","sfc"))
    isSP <- !isSF

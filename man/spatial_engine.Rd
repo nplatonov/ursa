@@ -36,11 +36,14 @@
 \alias{is_spatial_polygons}
 \alias{spatial_intersection}
 \alias{spatial_symdifference}
+\alias{spatial_difference}
 \alias{spatial_union}
 \alias{spatial_buffer}
 \alias{spatial_trim}
 \alias{spatial_valid}
 \alias{spatial_grid}
+\alias{spatial_centroid}
+\alias{spatial_bind}
 \title{
 Wrapper functions for manipulation with non-raster spatial objects
 }
@@ -74,6 +77,7 @@ spatial_shape(obj, each = FALSE, verbose = FALSE)
 spatial_transform(obj, crs, verbose = FALSE, ...)
 
 spatial_coordinates(obj, verbose = FALSE)
+spatial_centroid(obj, verbose = FALSE)
 
 spatial_fields(obj, verbose = FALSE)
 spatial_colnames(obj, verbose = FALSE)
@@ -108,6 +112,7 @@ spatial_intersection(x, y,
                      geometry=c("default", "polygons", "lines", "points", "all"),
                      verbose = FALSE)
 spatial_symdifference(x, y, verbose = FALSE)
+spatial_difference(x, y, verbose = FALSE)
 spatial_union(x, y, byid=NA, verbose = FALSE)
 
 spatial_buffer(obj, dist = 0, quadsegs = 30L, verbose = FALSE)
@@ -118,6 +123,7 @@ spatial_valid(obj, each = FALSE, reason = FALSE, verbose = FALSE)
 
 spatial_grid(obj)
 
+spatial_bind(obj)
 
 }
 %- maybe also 'usage' for other objects documented here.
@@ -173,7 +179,6 @@ Logical. Whether result will be returned for each record (\code{TRUE}) or genera
   \item{geometry}{
 Character. Desired output geometry for \code{engine="sf"}. If \code{"default"} then output geometry is defined internally (e.g., \code{"polygons"} for polygons intersection). If \code{"all"} then no output subsetting. Default is \code{"default"}.
 }
-
   \item{reason}{
 Logical. If \code{TRUE}, then the reason for validity ("Valid Geomerty") or invalidity is returned. If \code{FALSE}, then logical value of validity is returned. Default is \code{FALSE}.
 }
@@ -181,7 +186,8 @@ Logical. If \code{TRUE}, then the reason for validity ("Valid Geomerty") or inva
 Logical. Value \code{TRUE} provides information on console. Default is \code{FALSE}.
 }
   \item{\dots}{
-Further arguments passed to \code{sf::st_transform} or to \code{sp::spTransform}}.
+1) Spatial objects for function \code{spatial_bind}; 2) Further arguments in function \code{spatial_transform} passed to \code{sf::st_transform} or to \code{sp::spTransform}.
+}
 }
 
 \value{
@@ -237,7 +243,9 @@ Further arguments passed to \code{sf::st_transform} or to \code{sp::spTransform}
 
 \code{spatial_intersection} returns intersection of two spatial objects.
 
-\code{spatial_symdifference} returns difference of two spatial objects.
+\code{spatial_difference} returns difference of two spatial objects.
+
+\code{spatial_symdifference} returns symmetric difference of two spatial objects.
 
 \code{spatial_buffer} returns buffered spatial object.
 
@@ -246,6 +254,10 @@ Further arguments passed to \code{sf::st_transform} or to \code{sp::spTransform}
 \code{spatial_trim} returns spatial object without extra attributes added by \pkg{ursa} package.
 
 \code{spatial_grid} generates suitable spatial grid from input vector and returns object of class \code{ursaGrid}.
+
+\code{spatial_centroid} returns spatial centroid.
+
+\code{spatial_bind} returns spatial object concatenated from input spatial objects.
 
 }
 \references{

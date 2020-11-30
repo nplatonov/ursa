@@ -142,7 +142,12 @@
                   substr(l[ind],b,b) <- ellipsis
                }
                f$name <- format(l)
-               return(print(f,quote=FALSE))
+               return({
+                  if (.isKnitr())
+                     knitr::kable(f,format="pandoc")
+                  else
+                     print(f,quote=FALSE)
+               })
             }
          }
       }

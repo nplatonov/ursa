@@ -34,6 +34,8 @@
    dev <- .getPrm(arglist,name="^dev$",default=FALSE)
    verbose <- .getPrm(arglist,name="verb(ose)*",kwd="open",default=FALSE)
    options(ursaPngWebCartography=FALSE)
+   if (is_spatial(mosaic))
+      session_grid(regrid(spatial_grid(mosaic),border=27))
    if (is.ursa(mosaic)) {
       cr <- attr(mosaic,"copyright")
       if ((is.character(cr))&&(nchar(cr)>1)) {
@@ -48,8 +50,17 @@
      # print("WEB #2")
       arglist <- as.list(match.call())
       if (!("scale" %in% names(arglist))) {
-         options(ursaPngWebCartography=TRUE)
+        # options(ursaPngWebCartography=TRUE) ## -- 20201125
          scale <- 1
+      }
+      if (.is.integer(scale)) ## ++ 20201125
+         options(ursaPngWebCartography=TRUE) 
+   }
+   if (isTRUE(getOption("ursaPngWebCartography"))) {
+      retina1 <- session_grid()$retina
+      if ((retina>1)&&(!is.na(retina1))&&(retina1>1)) {
+         dpi <- round(dpi*retina1/retina)
+         retina <- 2
       }
    }
    if ((is.character(mosaic))&&(mosaic=="rgb"))

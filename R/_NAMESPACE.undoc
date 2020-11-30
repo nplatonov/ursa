@@ -2,10 +2,7 @@ browse
 panel_legend
 panel_wind
 polarmap
-spatial_bind
-spatial_centroid
 spatial_clip
-spatial_difference
 spatial_dim<-
 spatial_fileext
 spatial_revise

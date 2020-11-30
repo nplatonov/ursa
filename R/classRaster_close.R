@@ -9,6 +9,10 @@
       if (!.is.con(con))
          next
       if (inherits(con$handle,"connection")) {
+         if ((F)&&(con$compress %in% c(0L,3L))&&(con$connection=="file")) {
+            str(args[[i]])
+            str(con)
+         }
          if (con$fname %in% showConnections()[,"description"])
             close(con$handle)
          con$handle <- NA
@@ -47,6 +51,30 @@
            # src <- paste0(con$fname,"gz")
            # dst <- file.path(dirname(src),.gsub("\\.bin",".gz",basename(con$fname)))
            # file.rename(src,dst)
+         }
+         else if (con$compress==3L) { ## compress==0 and at least one 'replace'
+            if (dirname(con$fname)==.ursaCacheDir()) {
+               was <- .ursaCacheRead()
+               if (!is.null(was)) {
+                  dst <- was$src[match(basename(con$fname),was$dst)]
+                  if (file.exists(dst)) {
+                     if ((.lgrep("(envi|bin|\\.)gz$",dst))&&
+                                                  (nchar(Sys.which("gzip")))) {
+                        system2("gzip",c("-f -9 -c -n",.dQuote(con$fname))
+                               ,stdout=dst,stderr=FALSE)
+                     }
+                     else if ((.lgrep("\\.bz2$",dst))&&
+                                                  (nchar(Sys.which("bzip2")))) {
+                        system2("bzip2",c("-f -9 -c -n",.dQuote(con$fname))
+                               ,stdout=dst,stderr=FALSE)
+                     }
+                  }
+               }
+            }
+           # print(.ursaCasheLoc())
+           # a <- .ursaCacheRead()
+           # ind <- match(con$fname,)
+           # str(a)
          }
       }
       else if (inherits(con$handle,"GDALTransientDataset")) {

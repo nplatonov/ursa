@@ -1,4 +1,8 @@
-2020-11-10
+2020-11-16
+
+### version 3.9.2
+
+-   ongoing….
 
 ### version 3.9.1
 
@@ -11,6 +15,8 @@
 
 -   Package **`geojsonsf`** (&gt;=2.0.0) is added as suggested for
     faster `sf`/GeoJSON import/export.
+
+-   Package **`leaflet.providers`** is added as suggested.
 
 -   `update_coastline()`: merging of splitted by meridian 180 polygons
     is changed.

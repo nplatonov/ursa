@@ -631,7 +631,9 @@
          stop("TODO#1")
       }
       if (x$con$compress==-1)
-         x$con$compress <- -2
+         x$con$compress <- -2L
+      else if (x$con$compress==0)
+         x$con$compress <- 3L
       return(x)
    }
    else

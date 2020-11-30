@@ -436,7 +436,10 @@
       geoType <- switch(class(sp::geometry(obj))
                        ,SpatialPolygons="POLYGON"
                        ,SpatialPoints="POINT"
-                       ,SpatialLines="LINESTRING")
+                       ,SpatialLines="LINESTRING"
+                       ,SpatialPixels="GRID"
+                       ,stop(class(sp::geometry(obj)))
+                       )
       if (!each)
          return(geoType)
       return(rep(geoType,spatial_count(obj)))
@@ -616,6 +619,11 @@
             else 
                stop(paste("Unimplemented POLYGON (sp) without holes"))
          })
+         names(ret) <- seq_along(ret)
+         return(ret)
+      }
+      if (geoType=="GRID") {
+         ret <- sp::coordinates(obj)
          names(ret) <- seq_along(ret)
          return(ret)
       }
@@ -1125,6 +1133,26 @@
 'spatial_buffer' <- function(obj,dist=0,quadsegs=30L,verbose=FALSE) {
    isSF <- .isSF(obj)
    isSP <- .isSP(obj)
+   if (is.character(dist)) {
+      if (is.null(sc <- getOption("ursaPngScale")))
+         sc <- 1
+      if (.lgrep("px$",dist)) {
+        # print(c(dist=dist))
+        # print(c(scale=sc))
+         dist <- session_cellsize()*as.numeric(gsub("px","",dist))/sc
+        # print(c(dist=dist))
+      }
+      else if (.lgrep("lwd$",dist)) {
+         dist <- as.numeric(gsub("lwd","",dist))
+         cell <- session_cellsize()
+         sc <- getOption("ursaPngScale")
+         dpi <- getOption("ursaPngDpi")/96
+         px <- cell/sc
+         res <- dist*(px*dpi)
+        # print(data.frame(dist=dist,cell=cell,dpi=dpi,sc=sc,px=px,res=res))
+         dist <- res
+      }
+   }
    if (verbose)
       print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
    if (isSF) {
@@ -1345,6 +1373,8 @@
    obj
 }
 'spatial_grid' <- function(obj) {
+   if (!is_spatial(obj))
+      return(ursa_grid(obj))
    if ((is.numeric(obj))&&(length(obj)==4)) {
       bbox <- obj
       if (!is.null(attr(obj,"crs")))

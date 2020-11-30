@@ -272,11 +272,21 @@
       cut <- rep(cut,length=4)
       bbox <- with(g,c(minx,miny,maxx,maxy))+cut
    }
-   if (!is.na(expand)) {
+   if (!anyNA(expand)) {
       x0 <- (g$minx+g$maxx)/2
       y0 <- (g$miny+g$maxy)/2
-      dx <- (expand[1])*(g$maxx-g$minx)/2
-      dy <- (expand[1])*(g$maxy-g$miny)/2
+      sx <- (g$maxx-g$minx)/2
+      sy <- (g$maxy-g$miny)/2
+      if (T) {
+         expand <- rep(expand,length.out=2)
+         s <- sqrt(sx*sy)
+         dx <- sx+s*(expand[1]-1)
+         dy <- sy+s*(expand[2]-1)
+      }
+      else {
+         dx <- (expand[1])*sx
+         dy <- (expand[1])*sy
+      }
      # print(with(g,c(minx,miny,maxx,maxy)))
       bbox <- c(x0-dx,y0-dy,x0+dx,y0+dy)
      # print(bbox)

@@ -19,7 +19,6 @@
    if (is.na(resetProj))
       resetProj <- TRUE
    cpg <- NULL
-   jsonSF <- FALSE
    if (engine=="sp") {
       isSF <- FALSE
       isSP <- TRUE
@@ -38,6 +37,7 @@
          isSF <- requireNamespace("sf",quietly=.isPackageInUse())
       isSP <- !isSF
    }
+   jsonSF <- FALSE
    if ((length(crs))&&("auto" %in% style))
       style <- .epsg2proj4(crs)
    else {
@@ -105,6 +105,9 @@
          if (isNative) {
             isSF <- TRUE
             isSP <- !isSF
+         }
+         else if (isSP) { ## cross-classes
+            dsn <- sf::as_Spatial(dsn)
          }
          obj <- dsn
          rm(dsn)
@@ -341,6 +344,12 @@
                sp::proj4string(obj) <- sp::CRS("+init=epsg:4326")
             dsn <- class(dsn)
          }
+         else if (inherits(dsn,"ursaGrid")) {
+            obj <- as.data.frame(dsn)
+            sp::coordinates(obj) <- c("x","y")
+            sp::proj4string(obj) <- sp::CRS(spatial_crs(dsn),doCheckCRSArgs=FALSE)
+            sp::gridded(obj) <- TRUE
+         }
          else {
             obj <- try(methods::as(dsn,"Spatial"))
          }
@@ -473,7 +482,7 @@
          }
       }
       else {
-         jsonSF <- (isSF)&&(.lgrep("\\.geojson",dsn))&&
+         jsonSF <- (engine %in% c("native"))&&(isSF)&&(.lgrep("\\.geojson",dsn))&&
             (requireNamespace("geojsonsf",quietly=.isPackageInUse()))
          if (jsonSF)
             NULL
@@ -865,6 +874,12 @@
       Encoding(cname) <- "UTF-8"
       spatial_colnames(obj) <- cname
    }
+   if ((isSF)&&(!sum(sapply(spatial_geometry(obj),length))))
+      return(spatial_data(obj))
+   ##~ if ((isSP)&&(!length(methods::slot(spatial_geometry(obj),"coords")))) {
+      ##~ stop("NULL geometry for Spatial class")
+      ##~ return(spatial_data(obj))
+   ##~ }
    if (isSF) {
       if (TRUE) { ## not tested for multiple geometries POLYGON/MULTIPOLYGON
          if (inherits(obj,"sfc"))
@@ -1058,7 +1073,10 @@
             print(summary(xy))
          lon2 <- na.omit(xy[,1])
          lat2 <- na.omit(xy[,2])
-         if (nrow(xy)>1) {
+         if (!length(lon2)) {
+            return(spatial_data(obj))
+         }
+         if ((nrow(xy)>1)&&(length(lon2))) {
            # x <- cos(lon2*pi/180)
            # y <- sin(lon2*pi/180)
            # x <- mean(x)
@@ -1444,8 +1462,11 @@
    }
    if (is.null(g2))
       session_grid(g0)
-   if (how_to_cancel_it <- !FALSE) {
-      attr(obj,"grid") <- g0
+   if (has_it_canceled <- !FALSE) {
+      if (!inherits(obj,"SpatialPixels"))
+         attr(obj,"grid") <- g0
+      else
+         attr(obj,"ursaGrid") <- g0
       attr(obj,"toUnloadMethods") <- toUnloadMethods
       attr(obj,"colnames") <- dname
       attr(obj,"style") <- style

@@ -533,7 +533,8 @@
    if (file.exists(aux <- paste0(con$fname,".aux.xml")))
       file.remove(aux)
    if (con$driver=="ENVI") {
-      if ((con$interleave %in% c("bil","bsq"))&&(con$seek)) #&&(!is.matrix(obj$value)))
+      if (((con$interleave %in% c("bil","bsq"))&&(con$seek))||
+         (con$connection %in% c("gzfile"))) #&&(!is.matrix(obj$value)))
       {
          nb <- ifelse(is.na(con$posZ[1]),con$bands,length(con$posZ))
          seek(con,origin="start"

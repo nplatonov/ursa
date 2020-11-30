@@ -188,7 +188,7 @@
                                            ,"transparent"))
          if (.lgrep("point",geoType)) {
             if (!.isPackageInUse())
-               message("'ursa'-dev: check 'https://github.com/exaexa/scattermore' for points plot")
+               message("'ursa'-dev: test 'scattermode' ('https://github.com/exaexa/scattermore') for points plot")
             if (!.lgrep("pch",names(arglist2))) {
                arglist2$pch <- 21
             }
@@ -205,8 +205,8 @@
             if (!.lgrep("lwd",names(arglist2))) {
                arglist2$lwd <- 0.5
             }
-            arglist2$col <- "black"
-            str(arglist2)
+            if (!.lgrep("col",names(arglist2)))
+               arglist2$col <- "black"
          }
          else if (.lgrep("lines",geoType)) {
             if (!.lgrep("lwd",names(arglist2))) {
@@ -219,6 +219,25 @@
          if (.lgrep("polygon",geoType)) {
             if (!.lgrep("lwd",names(arglist2))) {
                arglist2$lwd <- 0.1
+            }
+            else {
+               lwd <- arglist2$lwd
+               if ((is.character(lwd))&&(.lgrep("(km|m)$",lwd))) {
+                  if (.lgrep("km$",lwd))
+                     mul <- 1e3
+                  else if (.lgrep("m$",lwd))
+                     mul <- 1
+                  else
+                     mul <- 1
+                  lwd <- mul*as.numeric(gsub("\\D","",lwd))
+                  cell <- session_cellsize()
+                  sc <- getOption("ursaPngScale")
+                  dpi <- getOption("ursaPngDpi")/96
+                  px <- cell/sc
+                  res <- lwd/px/dpi
+                 # print(data.frame(lwd=lwd,cell=cell,sc=sc,px=px,res=res))
+                  arglist2$lwd <- res
+               }
             }
            # str(arglist2)
            # str(ct)

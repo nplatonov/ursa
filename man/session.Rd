@@ -27,7 +27,7 @@ Group of functions \code{session_proj4}, \code{session_crs}, \code{session_cells
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-session_grid(obj)
+session_grid(obj, ...)
 session_proj4()
 session_crs()
 session_cellsize()
@@ -44,6 +44,7 @@ session_use_experimental_functions()
   \item{obj}{Either missing, or \code{NULL}, or file name, or object of class \code{ursaRaster}, or object of class \code{\link[ursa:classGrid]{ursaGrid}}, or spatial object (simple features (\pkg{sf}), spatial abstracts (\pkg{sp})).}
   \item{allow}{Logical. If \code{TRUE} then it is allowed to use external software for viewing PNG files. \code{NA} is interpreted as \code{TRUE} in the case of "Rscript" usage, and interpreted as \code{FALSE} in the case of interactive session or "R CMD BATCH" usage. Default is \code{NA}.}
   \item{dst}{Character. Directory name for temporal files. Empty character or non-character is interpreted as \code{\link[base:getwd]{getwd()}} in the case of "Rscript" usage, and interpreted as \code{\link[base:tempfile]{tempdir()}} in the case of interactive session or "R CMD BATCH" usage. Default is \code{character()} (empty character).}
+  \item{\dots}{Optional arguments passing to \code{\link[ursa]{regrid}} at first.}
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
