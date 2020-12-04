@@ -211,9 +211,9 @@
          toE1 <- .try(abbreviate(xlab,minlength=2,strict=TRUE),silent=TRUE)
          toE2 <- .try(abbreviate(ylab,minlength=2,strict=TRUE),silent=TRUE)
          if (!toE1)
-            message(paste("Note: unable to make bold caption for",.dQuote(xlab)))
+            message(paste("Note (xlab): unable to make bold caption for",.dQuote(xlab)))
          if (!toE2)
-            message(paste("Note: unable to make bold caption for",.dQuote(ylab)))
+            message(paste("Note (ylab): unable to make bold caption for",.dQuote(ylab)))
          toE <- toE1 & toE2
          options(opWE)
       }

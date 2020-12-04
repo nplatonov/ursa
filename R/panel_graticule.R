@@ -896,22 +896,30 @@
       if ((!is.null(da1))&&(nrow(da1)))
          with(da1,{
             axis(side=1,at=at,labels=NA,tcl=-0.2,col=border,lwd=0,lwd.ticks=lwd)
-            mtext(side=1,at=at,text=lab,padj=0.5,adj=adj,cex=cex,col=border)
+            mtext(side=1,at=at,text=lab,padj=0.5,adj=adj,cex=cex,col=border
+                 ,family=getOption("ursaPngFamily")
+                 )
          })
       if ((!is.null(da2))&&(nrow(da2)))
          with(da2,{
             axis(side=2,at=at,labels=NA,tcl=-0.2,col=border,lwd=0,lwd.ticks=lwd)
-            mtext(side=2,at=at,text=lab,padj=0.4,adj=adj,line=0.6,cex=cex,col=border)
+            mtext(side=2,at=at,text=lab,padj=0.4,adj=adj,line=0.6,cex=cex,col=border
+                 ,family=getOption("ursaPngFamily")
+                 )
          })
       if ((!is.null(da3))&&(nrow(da3)))
          with(da3,{
             axis(side=3,at=at,labels=NA,tcl=-0.2,col=border,lwd=0,lwd.ticks=lwd)
-            mtext(side=3,at=at,text=lab,padj=-0.25,adj=adj,line=0,cex=cex,col=border)
+            mtext(side=3,at=at,text=lab,padj=-0.25,adj=adj,line=0,cex=cex,col=border
+                 ,family=getOption("ursaPngFamily")
+                 )
          })
       if ((!is.null(da4))&&(nrow(da4)))
          with(da4,{
             axis(side=4,at=at,labels=NA,tcl=-0.2,col=border,lwd=0,lwd.ticks=lwd)
-            mtext(side=4,at=at,text=lab,line=0,adj=adj,padj=0.4,cex=cex,col=border)
+            mtext(side=4,at=at,text=lab,line=0,adj=adj,padj=0.4,cex=cex,col=border
+                 ,family=getOption("ursaPngFamily")
+                 )
          })
      # options(opT)
    })

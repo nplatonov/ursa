@@ -22,7 +22,7 @@
          if (toE)
             txt <- as.expression(substitute(bold(u),list(u=text)))
          else {
-            message(paste("Note: unable to make bold label for",.dQuote(text)))
+            message(paste("Note (mtext): unable to make bold label for",.dQuote(text)))
             txt <- text
          }
       }

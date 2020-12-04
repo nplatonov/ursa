@@ -677,10 +677,14 @@
          }
          if (las %in% c(1,2)) ## horiz
             mtext(text=label,at=at1,las=las,line=0.6+cex*adj*width/height*1.0
-                 ,side=side,cex=cex,padj=ifelse(isRamp,0.5,0.4),adj=adj1,col=tcol)
+                 ,side=side,cex=cex,padj=ifelse(isRamp,0.5,0.4),adj=adj1,col=tcol
+                 ,family=getOption("ursaPngFamily")
+                 )
          else
             mtext(text=label,at=at1,las=las,line=0.1
-                 ,side=side,cex=cex,padj=0.5,adj=adj1,col=tcol)
+                 ,side=side,cex=cex,padj=0.5,adj=adj1,col=tcol
+                 ,family=getOption("ursaPngFamily")
+                 )
          ##~ mtext(text=label,at=at1,las=las,line=0.6+adj*width/height
               ##~ ,side=side,padj=ifelse(isRamp,0.5,0.4),adj=adj1,cex=cex,col="black")
       }
@@ -712,7 +716,9 @@
               ,side=side
               ,padj=ifelse(las %in% c(0,1),-0.25,0.4)
               ,adj=adj #ifelse(las==1,0.5,adj)
-              ,cex=cex,col=tcol)
+              ,cex=cex,col=tcol
+              ,family=getOption("ursaPngFamily")
+              )
       }
       else if (side==2)
       {
@@ -739,7 +745,9 @@
          }
          mtext(text=label,at=at1,las=las,line=0.4
               ,side=side,padj=ifelse(las %in% c(0,3),0.2,0.4)
-              ,adj=ifelse(las %in% c(0,3),0.5,adj),cex=cex,col=tcol)
+              ,adj=ifelse(las %in% c(0,3),0.5,adj),cex=cex,col=tcol
+              ,family=getOption("ursaPngFamily")
+              )
       }
       else if (side==1)
       {
@@ -768,7 +776,9 @@
               ,line=ifelse(las %in% c(0,1),0,0.3+(1-adj)*width/height)
               ,side=side,padj=0.5
               ,adj=adj # ifelse(las %in% c(0,1),0.5,adj)
-              ,cex=cex,col=tcol)
+              ,cex=cex,col=tcol
+              ,family=getOption("ursaPngFamily")
+              )
       }
    }
    if (getOption("ursaPngBox")) {
@@ -780,18 +790,19 @@
   # b <- 2*width+0.5+height
   # print(b)
   ## TODO: how to use UTF8 in "as.expressions" 
-   if (is.character(units)) {
-      if (getOption("ursaPngDevice") %in% c("windows"))
+   if (F & is.character(units)) {
+      if (getOption("ursaPngDevice") %in% c("windows","agg"))
          toE <- TRUE
       else {
          opWE <- options(warn=2)
          toE <- .try(abbreviate(units,minlength=2,strict=TRUE),silent=TRUE)
          options(opWE)
       }
-      if (toE)
+      if (toE <- !TRUE)
          units <- as.expression(substitute(bold(u),list(u=units)))
-      else
-         message(paste("Note: unable to make bold caption for",.dQuote(units)))
+     # else
+     #    message(paste("Note (colorbar): unable to make bold caption for",.dQuote(units)))
+      str(units)
    }
    else if (is.list(units))
       units <- as.expression(substitute(bold(u)
@@ -799,24 +810,36 @@
    if (side==4) {
       if (las %in% c(1,2))
          mtext(units,side=side,padj=0,adj=0.5,las=3,col=tcol,cex=cex
-              ,line=width/height+1.2)
+              ,line=width/height+1.2
+              ,font=2,family=getOption("ursaPngFamily")
+              )
       else
          mtext(units,side=side,padj=0,adj=0.5,las=3,col=tcol,cex=cex
-              ,line=height+2)
+              ,line=height+2
+              ,font=2,family=getOption("ursaPngFamily")
+              )
    }
    else if (side==3) {
       mtext(units,side=side,padj=0,adj=0.5,las=1,col=tcol,cex=cex
-           ,line=ifelse(las %in% c(0,1),1.5,width/height+0.7))
+           ,line=ifelse(las %in% c(0,1),1.5,width/height+0.7)
+           ,font=2,family=getOption("ursaPngFamily")
+           )
    }
    else if (side==2) {
       mtext(units,side=side,padj=0,adj=0.5,las=3,col=tcol,cex=cex
-           ,line=ifelse(las %in% c(1,2),0.8+width/height,height+1.5))
+           ,line=ifelse(las %in% c(1,2),0.8+width/height,height+1.5)
+           ,font=2,family=getOption("ursaPngFamily")
+           )
    }
    else if (side==1) {
       ##~ mtext(units,side=side,padj=1,adj=0.5,las=1,col=tcol,cex=cex
            ##~ ,line=0.85)
+     # units <- expression(degree~C)
+     # Encoding(units) <- "UTF-8"
       mtext(units,side=side,padj=1,adj=0.5,las=1,col=tcol,cex=cex
-           ,line=ifelse(las %in% c(0,1),0.85,1*width/height))
+           ,line=ifelse(las %in% c(0,1),0.85,1*width/height)
+           ,font=2,family=getOption("ursaPngFamily")
+           )
    }
    invisible(0L)
 }

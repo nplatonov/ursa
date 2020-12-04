@@ -1,8 +1,16 @@
-2020-11-16
+2020-12-03
 
 ### version 3.9.2
 
--   ongoing….
+-   ongoing…
+
+-   Argument `expand` in `regrid()` now supports length 1 or 2 (or,
+    coerced to length 2). Grid expansion is proportional to the side of
+    square, which area is equal to area inside of boundary box.
+
+-   Package **`ragg`** is added as suggested instead of package
+    **`CairoPNG`**, which is removed from suggested due to poor support
+    font families.
 
 ### version 3.9.1
 

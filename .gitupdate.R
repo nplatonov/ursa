@@ -8,5 +8,5 @@ if (!length(desc)) {
 }
 desc
 system("git add -A")
-#if (!system(paste0("git commit -m",dQuote(desc))))
-#   system("git push")
+if (!system(paste0("git commit -m",dQuote(desc))))
+   system("git push")

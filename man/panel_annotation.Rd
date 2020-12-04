@@ -56,7 +56,8 @@ panel_annotation(...)
    \item{bg}{Character. Color name or code for thin buffer around label's elements. Default is \code{NA}, which is interpreted as \code{"transparent"} for \emph{captions} and as \code{"#FFFFFF1F"} for \emph{annotations}.}
    \item{buffer}{Numeric. The relative width of buffer around label's elements. Default is \code{1}.}
    \item{fill}{Character. Color name or code for circumscribed rectangle around labels. Default is \code{NA}, which is interpreted as \code{"#FFFFFF7F"} for \emph{captions} and as \code{"transparent"} for \emph{annotations}.}
-   \item{font}{Character. Font family. Default is \code{par("family")}.}
+%%~    \item{font}{Character. Font family. Default is \code{par("family")}.}
+   \item{font}{Character. Font family. Default is \code{getOption("ursaPngFamily")}, which is specified by argument \code{font} (or \code{family}) in \code{compose_open()}.}
    \item{vertical}{Logical. Vertical orientation of label. If \code{FALSE}, then horizontal labeling. Default is \code{FALSE}.}
    \item{interpolate}{Logical. Passed as argument \code{interpolate} to function \code{\link[graphics:rasterImage]{rasterImage}} for logo annotation.}
    \item{resample}{Logical or numeric. Passed as argument \code{resample} to function \code{\link[ursa]{regrid}} for logo annotation. Default is \code{FALSE}. If \code{TRUE} , then resized logo is drawn smoothly.}

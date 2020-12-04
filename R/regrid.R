@@ -277,15 +277,21 @@
       y0 <- (g$miny+g$maxy)/2
       sx <- (g$maxx-g$minx)/2
       sy <- (g$maxy-g$miny)/2
-      if (T) {
+      if (length(expand)==1) {
          expand <- rep(expand,length.out=2)
          s <- sqrt(sx*sy)
-         dx <- sx+s*(expand[1]-1)
-         dy <- sy+s*(expand[2]-1)
+         if (T) {
+            dx <- sx+round(s*(expand[1]-1)/g$columns*2)*g$columns/2
+            dy <- sy+round(s*(expand[2]-1)/g$rows*2)*g$rows/2
+         }
+         else {
+            dx <- sx+s*(expand[1]-1)
+            dy <- sy+s*(expand[2]-1)
+         }
       }
       else {
          dx <- (expand[1])*sx
-         dy <- (expand[1])*sy
+         dy <- (expand[2])*sy
       }
      # print(with(g,c(minx,miny,maxx,maxy)))
       bbox <- c(x0-dx,y0-dy,x0+dx,y0+dy)
