@@ -125,6 +125,12 @@
          lambda <- rev(lambda)
      # print(round(lambda*255,1))
    }
+   if ((is.character(rotate))&&(.lgrep("circle|round",rotate))) {
+      if (n>2)
+         rotate <- 360*(1-1/n)
+      else
+         rotate <- NA
+   }
    if ((!is.na(rich))&&(!is.na(weak))) {
       rotate <- rich-weak
    }

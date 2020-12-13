@@ -123,7 +123,7 @@ spatial_valid(obj, each = FALSE, reason = FALSE, verbose = FALSE)
 
 spatial_grid(obj)
 
-spatial_bind(obj)
+spatial_bind(...)
 
 }
 %- maybe also 'usage' for other objects documented here.

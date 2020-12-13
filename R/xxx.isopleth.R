@@ -41,7 +41,7 @@
    da <- data.frame(level=sapply(cl,function(z) {z$level}))
    lev <- sort(unique(sapply(cl,function(z) {z$level})))
    print(lev)
-   ursa:::.elapsedTime("A")
+   .elapsedTime("A")
    if (isSF) {
       if (devel <- TRUE) {
          sa <- lapply(lev,function(l) {
@@ -93,7 +93,7 @@
    ##~ print(spatial_length(sl)*1e-3)
    ##~ print(spatial_geotype(sa))
    ##~ print(spatial_geotype(sl))
-   ##~ ursa:::.elapsedTime("B")
+   ##~ .elapsedTime("B")
   # spatial_write(sl,"res2_isopleth.geojson")
   # spatial_write(sa,"res2_polygon.geojson")
   # glance(sl)

@@ -281,10 +281,10 @@
          expand <- rep(expand,length.out=2)
          s <- sqrt(sx*sy)
          if (T) {
-            dx <- sx+round(s*(expand[1]-1)/g$columns*2)*g$columns/2
-            dy <- sy+round(s*(expand[2]-1)/g$rows*2)*g$rows/2
+            dx <- sx+round(s*(expand[1]-1)/g$resx*2)*g$resx/2
+            dy <- sy+round(s*(expand[2]-1)/g$resy*2)*g$resy/2
          }
-         else {
+         else { ## deprecated
             dx <- sx+s*(expand[1]-1)
             dy <- sy+s*(expand[2]-1)
          }

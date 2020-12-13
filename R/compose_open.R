@@ -13,7 +13,7 @@
    if ((!is.numeric(retina))||(is.na(retina)))
       retina <- retina0
    dpi <- .getPrm(arglist,name="dpi"
-                 ,default=ifelse(.isKnitr(),3*96L,as.integer(round(96*retina))))
+                 ,default=as.integer(round(ifelse(.isKnitr(),150*retina,96*retina))))
    pointsize <- .getPrm(arglist,name="pointsize",default=NA_real_)
    scale <- .getPrm(arglist,name="^scale$",class="",default=NA_real_)
    width <- .getPrm(arglist,name="width",class=list("integer","character"),default=NA_real_)
@@ -24,7 +24,7 @@
    box <- .getPrm(arglist,name="box",default=TRUE)
    delafter <- .getPrm(arglist,name="(del|remove)after",default=NA)
    wait <- .getPrm(arglist,name="wait",default=switch(.Platform$OS.type,windows=1,3))
-   dtype <- if (.Platform$OS.type=="windows") c("cairo","windows","agg")
+   dtype <- if (.Platform$OS.type=="windows") c("cairo","windows","agg","cairo-png")
             else c("cairo","cairo-png","Xlib","quartz")
    device <- .getPrm(arglist,name="^(device|type)",valid=dtype)
    antialias <- .getPrm(arglist,name="antialias",valid=c("default","none","cleartype"))
@@ -260,6 +260,12 @@
    else {
       if (device=="default")
          device <- "cairo"
+      if ((device %in% c("cairo","cairo-png"))&&(!capabilities("cairo"))) {
+         if (.Platform$OS.type=="windows")
+            device <- "windows"
+         else
+            device <- if (capabilities("aqua")) "quartz" else "Xlib"
+      }
       a <- try(png(filename=fileout,width=png_width,height=png_height,res=dpi
               ,bg=background,pointsize=pointsize
               ,type=device,antialias=antialias,family=font))
@@ -284,7 +290,8 @@
           ,ursaPngPlot=!dev,ursaPngPaperScale=paperScale 
           ,ursaPngFamily=font,ursaPngWaitBeforeRemove=wait
           ,ursaPngDevice=device,ursaPngShadow=""
-          ,ursaPngBackground=background,ursaPngPanel="",ursaPngSkip=FALSE)
+          ,ursaPngBackground=background,ursaPngPanel="",ursaPngSkip=FALSE
+          ,ursaPngPointsize=pointsize,ursaPngComposeGrid=session_grid())
   # if (.isKnitr()) {
   #   # if (knitr::opts_knit$get(""))
   #    fileout <- paste0("file:///",fileout)

@@ -77,6 +77,6 @@
              ,col=col,border="transparent",density=density,angle=an,lwd=lwd,lty=lty)
       par(opEnd)
    }
-   options(ursaPngPanel=col)
+   options(ursaPngPanel=col,ursaPngPanelGrid=session_grid())
    invisible(NULL)
 }

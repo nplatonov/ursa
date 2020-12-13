@@ -187,7 +187,7 @@
                                   ,ifelse(T,ursa_colortable(colorize("",alpha=0.2))
                                            ,"transparent"))
          if (.lgrep("point",geoType)) {
-            if (!.isPackageInUse())
+            if (F & !.isPackageInUse())
                message("'ursa'-dev: test 'scattermode' ('https://github.com/exaexa/scattermore') for points plot")
             if (!.lgrep("pch",names(arglist2))) {
                arglist2$pch <- 21

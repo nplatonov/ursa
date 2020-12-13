@@ -604,7 +604,7 @@
                                     ,format="%Y-%m-%dT%H:%M:%SZ")
                      obj[,i] <- as.POSIXct(as.numeric(d),origin=.origin())
                   }
-                  else if (length(grep("\\d{4}-\\d{2}-\\d{2}",a))==length(a)) {
+                  else if (length(grep("^\\d{4}-\\d{2}-\\d{2}$",a))==length(a)) {
                      obj[,i] <- as.Date(obj[,i,drop=TRUE,tz="UTC"])
                   }
                }
