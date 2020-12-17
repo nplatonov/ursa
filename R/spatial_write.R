@@ -347,11 +347,16 @@
                 ,delete_dsn=file.exists(fname) & !appendlayer
                 ,append=appendlayer))
       }
-      jsonSF <- (isSF)&&(driver=="GeoJSON")&&
+      jsonSF <- (isSF)&&(driver=="GeoJSON")&&(T | !inherits(obj,"sfc"))&&
          (requireNamespace("geojsonsf",quietly=.isPackageInUse()))
       if (jsonSF) {
-         if (inherits(obj,"sfc"))
-            writeLines(geojsonsf::sfc_geojson(obj,digits=6),fname)
+         if (inherits(obj,"sfc")) {
+            a <- geojsonsf::sfc_geojson(obj,digits=6)
+           # cl <- class(a)
+           # a <- c("{\"type\": \"FeatureCollection\",\"features\": [",a,"]}")
+           # class(a) <- cl
+            writeLines(a,fname)
+         }
          else {
             da <- spatial_data(obj)
             if (length(ind <- which(sapply(obj,inherits,"character")))) {

@@ -29,7 +29,8 @@
    device <- .getPrm(arglist,name="^(device|type)",valid=dtype)
    antialias <- .getPrm(arglist,name="antialias",valid=c("default","none","cleartype"))
   # font <- .getPrm(arglist,name="(font|family)",valid=ifelse(device=="windows","sans","Tahoma"))
-   font <- .getPrm(arglist,name="(^font$|family)",default=ifelse(device=="windows","sans","sans"))
+   font <- .getPrm(arglist,name="(^font$|family)"
+                  ,default=ifelse(device=="windows","sans","sans"))
    background <- .getPrm(arglist,name="(background|nodata)",default="white")
    dev <- .getPrm(arglist,name="^dev(el)*$",default=FALSE)
    verbose <- .getPrm(arglist,name="verb(ose)*",kwd="open",default=FALSE)
@@ -258,8 +259,8 @@
   #            ,antialias=antialias,family=font))
   # }
    else {
-      if (device=="default")
-         device <- "cairo"
+     # if (device=="default")
+     #    device <- "cairo"
       if ((device %in% c("cairo","cairo-png"))&&(!capabilities("cairo"))) {
          if (.Platform$OS.type=="windows")
             device <- "windows"
@@ -291,6 +292,7 @@
           ,ursaPngFamily=font,ursaPngWaitBeforeRemove=wait
           ,ursaPngDevice=device,ursaPngShadow=""
           ,ursaPngBackground=background,ursaPngPanel="",ursaPngSkip=FALSE
+          ,ursaPngRetina=retina
           ,ursaPngPointsize=pointsize,ursaPngComposeGrid=session_grid())
   # if (.isKnitr()) {
   #   # if (knitr::opts_knit$get(""))
