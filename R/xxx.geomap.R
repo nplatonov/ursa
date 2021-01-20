@@ -420,12 +420,18 @@
          tgr$maxy <- xy["y",]+res/2
          h <- sort(unique(tgr[,"x"]))
          v <- sort(unique(tgr[,"y"]))
-        # print(g1)
+         cat("-=---------------------------------------------\n")
          g1 <- with(g0,regrid(g1,bbox=c(minx,miny,maxx,maxy),crs=proj4
-                             ,zero="keep",verbose=FALSE))
-        # print(g1)
-        # q()
-         g1 <- regrid(g1,res=ursa(g0,"cell"))
+                             ,zero="keep",verbose=!FALSE))
+         if (TRUE) {
+            x <- seq(g1$minx,g1$maxx,by=g1$resx)
+            y <- seq(g1$miny,g1$maxy,by=g1$resy)
+            x <- range(x[which(!is.na(.is.near(x,sort(unique(c(tgr$minx,tgr$maxx))))))])
+            y <- range(y[which(!is.na(.is.near(y,sort(unique(c(tgr$miny,tgr$maxy))))))])
+            g1 <- regrid(g1,bbox=c(x[1],y[1],x[2],y[2]),res=ursa(g0,"cell"))
+         }
+         else
+            g1 <- regrid(g1,res=ursa(g0,"cell"))
       }
       else {
          B0 <- 6378137

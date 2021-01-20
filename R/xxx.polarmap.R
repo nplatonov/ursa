@@ -1,3 +1,5 @@
+# https://geoportal.arctic-sdi.org/
+# https://geoportal.arctic-sdi.org/action?action_route=GetLayerTile&id=1&layer=arctic_cascading&style=default&tilematrixset=3575&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=5&TileCol=20&TileRow=11
 '.webmap' <- function(obj) {
    for (pkg in c("leaflet","leafem","leafpop")) 
       if (!requireNamespace(pkg,quietly=.isPackageInUse()))
@@ -24,7 +26,11 @@
 }
 'polarmap' <- function(obj,epsg=NA,group=NULL,opacity=1
                       ,addFeature=TRUE,addHomeButton=TRUE
-                      ,addMouseCoordinates=TRUE,addScaleBar=TRUE) {
+                      ,addMouseCoordinates=TRUE,addScaleBar=TRUE
+                      ,addMeasure=FALSE
+                      ,style=c("Arctic Connect","Arctic SDI")) {
+   isSDI <- isTRUE(.lgrep("sdi",style[1])>0)
+   isConnect <- !isSDI
    if (missing(obj))
       obj <- spatialize(c(0,50,360,50))
    for (pkg in c("leaflet","leafem","leafpop")) 
@@ -58,45 +64,112 @@
    if (!addFeature)
       spatialize(obj,epsg=epsg,style="polarmap",resetGrid=TRUE)
    g1 <- session_grid()
+   bbox <- unname(spatial_bbox(spatial_transform(spatialize(spatial_bbox(obj)),4326)))
    obj <- spatial_transform(obj,4326)
    if ((.isSP(obj))&&(is.null(spatial_data(obj))))
       spatial_data(obj) <- data.frame(fid=seq(spatial_count(obj)))
    if ((!is.character(group))||(!nchar(group)))
       group <- "AOI" # "\u2302" # as.character(as.list(match.call())$obj)
-   extent <- 11000000 + 9036842.762 + 667
-   origin <- c(-extent, extent)
-   maxResolution <- 2*extent/256
-   bounds <- list(c(-extent,extent),c(extent,-extent))
-   resolutions <- sapply(0:18,function(x) maxResolution/(2^x))
-   crsArctic <- leaflet::leafletCRS(crsClass="L.Proj.CRS",code=paste0("EPSG:",epsg)
-                          ,proj4def=ursa::spatial_crs(epsg)
-                          ,resolutions=resolutions,origin=origin,bounds=bounds)
-   m <- leaflet::leaflet(options=leaflet::leafletOptions(crs=crsArctic,minZoom=3,maxZoom=12))
-   m <- leaflet::addTiles(m
-                         ,urlTemplate=paste0("https://{s}.tiles.arcticconnect.ca/osm_"
-                                            ,epsg,"/{z}/{x}/{y}.png")
-                         ,attribution=paste("Map: \uA9 ArcticConnect."
-                                           ,"Data: \uA9 OpenStreetMap contributors")
-                         ,options=leaflet::tileOptions(subdomains="abc"
-                                                      ,noWrap=TRUE
-                                                      ,continuousWorld=FALSE
-                                                      ,opacity=opacity
-                                                      ,minZoom=3,maxZoom=9
-                                                      )
-                         ,group=group
-                         )
+   if (isConnect) {
+      extent <- 11000000 + 9036842.762 + 667
+      origin <- c(-extent, extent)
+      maxResolution <- 2*extent/256
+      minZoom <- 3
+      maxZoom <- 9
+      bounds <- list(c(-extent,extent),c(extent,-extent))
+      resolutions <- sapply(0:18,function(x) maxResolution/(2^x))
+      crsArctic <- leaflet::leafletCRS(crsClass="L.Proj.CRS",code=paste0("EPSG:",epsg)
+                             ,proj4def=ursa::spatial_crs(epsg)
+                             ,resolutions=resolutions,origin=origin,bounds=bounds)
+      m <- leaflet::leaflet(options=leaflet::leafletOptions(crs=crsArctic,minZoom=3,maxZoom=12))
+      m <- leaflet::addTiles(m
+                            ,urlTemplate=paste0("https://{s}.tiles.arcticconnect.ca/osm_"
+                                               ,epsg,"/{z}/{x}/{y}.png")
+                            ,attribution=paste("Map: \uA9 ArcticConnect."
+                                              ,"Data: \uA9 OpenStreetMap contributors")
+                            ,options=leaflet::tileOptions(subdomains="abc"
+                                                         ,noWrap=TRUE
+                                                         ,continuousWorld=FALSE
+                                                         ,opacity=opacity
+                                                         ,minZoom=minZoom
+                                                         ,maxZoom=maxZoom
+                                                         )
+                            ,group="Arctic Connect"
+                            )
+   }
+   else {
+      extentASDI <- 4889334.802955
+      scale0 <- 136421171.96428573131561279297
+      resolutions <- 0.28*1e-3*scale0/(2^seq(0,18))
+      minZoom <- 1
+      maxZoom <- 10
+      crsASDI <- leaflet::leafletCRS(crsClass="L.Proj.CRS"
+                                    ,code=paste0("EPSG:",epsg)
+                                    ,proj4def=spatial_crs(epsg)
+                                    ,resolutions=resolutions
+                                    ,origin=c(-extentASDI,extentASDI)
+                                    ,bounds=list(c(-extentASDI,extentASDI)
+                                                ,c(extentASDI,-extentASDI))
+                                    )
+      m <- leaflet::leaflet(options=leaflet::leafletOptions(worldCopyJump=F
+                                                           ,minZoom=minZoom
+                                                           ,maxZoom=maxZoom
+                                                           ,crs=crsASDI
+                                                           ,center=c(90,0)
+                                                           )
+                  )
+      m <- leaflet::addTiles(m
+                            ,urlTemplate=paste0("https://geoportal.arctic-sdi.org/action?"
+                                               ,"&action_route=GetLayerTile"
+                                               ,"&id=1"
+                                               ,"&layer=arctic_cascading"
+                                               ,"&style=default"
+                                               ,"&Service=WMTS"
+                                               ,"&Request=GetTile"
+                                               ,"&Version=1.0.0"
+                                               ,"&Format=image/png"
+                                               ,"&tilematrixset={tileMatrix}"
+                                               ,"&TileMatrix={z}"
+                                               ,"&TileCol={x}"
+                                               ,"&TileRow={y}"
+                                               )
+                            ,options=leaflet::tileOptions(tileMatrix=epsg)
+                           # ,opacity=0.3 ## UNABLE
+                            ,attribution=paste0("<a href=https://arctic-sdi.org"
+                                               ,"/services/topografic-basemap/>"
+                                               ,"Arctic SDI Topographic Basemap"
+                                               ,"</a>")
+                            ,group="Arctic SDI"
+                            )
+   }
+  # m <- leaflet::setView(m,lat=89.999,lng=-110,zoom=2)
+  # sink("C:/tmp/res5-SDI.Rout")
+  # str(m)
+  # sink()
    if (addMouseCoordinates)
       m <- leafem::addMouseCoordinates(m)
+   if (T) {
+     # z <- which.min(abs(g1$resx-resolutions))
+     # z[z>maxZoom] <- maxZoom
+     # print(bbox)
+      if (T)
+         bbox <- unname(spatial_bbox(obj))
+     # print(bbox)
+     # ll <- unname(c((bbox[1]+bbox[3])/2,(bbox[2]+bbox[4])/2))
+     # m <- leaflet::setView(m,lng=ll[1],lat=ll[2],zoom=z)
+      m <- leaflet::fitBounds(m,lng1=bbox[1],lat1=bbox[2],lng2=bbox[3],lat2=bbox[4]
+                             ,options=list(maxZoom=maxZoom))
+   }
    if (addFeature) {
-      m <- leafem::addFeatures(m,data=obj,popup=leafpop::popupTable(obj)
+      m <- leafem::addFeatures(m,data=obj
+                              ,popup=leafpop::popupTable(obj)
                               ,weight=0.5
                               ,group=group
                               )
    }
-   else {
+   else if (F) {
       z <- which.min(abs(g1$resx-resolutions))
-      if (z>9)
-         z <- 9
+      z[z>maxZoom] <- maxZoom
       if (F) {
          ll <- c(with(g1,.project(cbind((maxx+minx)/2,(maxy+miny)/2),crs,inv=TRUE)))
       }
@@ -117,6 +190,9 @@
                                 ,ext=matrix(spatial_bbox(obj),ncol=2)
                                 ,group=group
                                 )
+   }
+   if (addMeasure) {
+      m <- leaflet::addMeasure(m,primaryLengthUnit="meters",primaryAreaUnit="sqmeters")
    }
    m
 }

@@ -57,7 +57,7 @@
       arglist[ind2] <- NULL
    }
    else
-      verbose <- !.isPackageInUse()
+      verbose <- FALSE # !.isPackageInUse()
    cl <- lapply(arglist,class)
    aname <- NULL
    if ((length(cl)==1)&&(cl=="list")) {
@@ -125,6 +125,10 @@
       }
       if (inherits(obj,"mapview"))
          obj <- methods::slot(obj,"map")
+     # if (inherits(obj,"tmap")) {
+     #    if (requireNamspace("tmap"))
+     #    obj <- tmap::tmap_leaflet(obj)
+     # }
       if (inherits(obj,c("tmapZZZZZZZ","htmlwidget"))) {
          isUrsaCache <- !identical(normalizePath(.ursaCacheDir()),tempdir())
          if (!isUrsaCache & is.null(output))
@@ -133,7 +137,8 @@
          if (!cond2)
             return(ret2)
          ftemp <- tempfile(fileext=".rds")
-         saveRDS(obj,ftemp)
+         o <- obj[grep("dependencies",names(obj),invert=TRUE)]
+         saveRDS(o,ftemp)
          md5 <- tools::md5sum(ftemp)
          file.remove(ftemp)
          if (is.null(output))

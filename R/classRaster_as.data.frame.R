@@ -41,8 +41,9 @@
          else
             indR <- which(apply(obj$value,1,function(x) any(!is.na(x))))
       }
-      else
+      else {
          indR <- which(!is.na(obj$value[,1]))
+      }
    }
    else
       indR <- seq(obj$dim[1])#*length(indZ))

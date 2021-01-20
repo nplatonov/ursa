@@ -205,7 +205,7 @@
 }
 '.panel_attribution' <- function(pos=ifelse(vertical,"bottomright","bottomright")
                                 ,vertical=TRUE) {
-   g0 <- getOption("ursaSessionGrid_prev")
+   g0 <- getOption("ursaPngPanelGrid") # getOption("ursaSessionGrid_prev")
    g1 <- getOption("ursaSessionGrid")
    prev <- !identical(g0,g1)
    if (prev)
@@ -221,7 +221,8 @@
       panel_annotation(ann,pos=pos,cex=0.7
                       ,font=ifelse(getOption("ursaPngDevice")=="windows"
                                   ,par("family"),"Arial Narrow")
-                      ,fg=sprintf("#000000%s","4F"),vertical=vertical)
+                      ,fg=sprintf("#000000%s","4F"),vertical=vertical
+                      )
    if (prev)
       session_grid(g1)
    options(ursaPngCopyright=NULL)

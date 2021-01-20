@@ -47,7 +47,7 @@ Logical. Value \code{TRUE} provides information about cube helix on console. Def
 }
 }
 \details{
-This is modified source code of function \code{cubeHelix} from package \pkg{rje} under GPL>=2 license.
+This is modified source code of function \code{cubeHelix()} from package \pkg{rje} under GPL>=2 license.
 
 The palette design is oriented that figures can be printed on white paper. Under this assumption, light color is for small values, and dark color is for big values. In some computer vision and GIS software black background is used, and in this case light color for big values, and dark color of small values looks more naturally. For some thematic maps big values are light, and small values are small (for example, sea ice concentration: open water is blue, close ice is white). RGB and Grayscale remote sensing and photo imagery use light colors for strong signal, and dark colors for weak signal.
 
@@ -66,7 +66,7 @@ Vector of RGB color specification.
 
 Green, D. A., 2011, `A colour scheme for the display of astronomical intensity images', Bulletin of the Astronomical Society of India, 39, 289. http://astron-soc.in/bulletin/11June/289392011.pdf \href{https://arxiv.org/pdf/1108.5083.pdf}{(pre-print at 'arxiv.org')}
 
-\pkg{rje} at CRAN: \url{https://CRAN.R-project.org/package=rje}
+\code{rje::cubeHelix()}; \pkg{rje} at CRAN: \url{https://CRAN.R-project.org/package=rje}
 }
 \author{
 Dave Green
@@ -83,9 +83,9 @@ Nikita Platonov \email{platonov@sevin.ru}
 Dave Green, Robin Evans
 }
 
-\seealso{
-Original source code \code{\link[rje:cubeHelix]{rje::cubeHelix}} (valid link if package \pkg{rje} is installed), or see CRAN reference.
-}
+%%~ \seealso{
+%%~ Original source code \code{\link[rje:cubeHelix]{rje::cubeHelix}} (valid link if package \pkg{rje} is installed), or see CRAN reference.
+%%~ }
 \examples{
 session_grid(NULL)
 set.seed(352)

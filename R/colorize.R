@@ -857,8 +857,17 @@
       n <- length(val)
       lo <- floor(n*tail[1])
       hi <- n-floor(n*tail[2])+1
-      minv <- if (lo>0) val[lo] else if (n) min(val) else 0
-      maxv <- if (hi<=n) val[hi] else if (n) max(val) else 1
+      if (T) { ## ++ 20210111
+         lo <- lo+1
+         hi <- hi-1
+      }
+      if ((lo<=1)||(hi>n)) {
+         rngv <- (c(lo,hi)-1)*(max(val)-min(val))/(n-1)+min(val)
+      }
+      minv <- if (lo>0) val[lo] else if (n) rngv[1] else 0
+      maxv <- if (hi<=n) val[hi] else if (n) rngv[2] else 1
+      if (verbose)
+         print(data.frame(n=n,lo=lo,hi=hi,minv=minv,maxv=maxv,min=min(val),max=max(val)))
       if (stretch %in% c("diff","slope"))
       {
          extv <- max(abs(minv),abs(maxv))

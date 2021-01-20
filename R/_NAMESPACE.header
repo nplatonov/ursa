@@ -6,10 +6,10 @@ importFrom("graphics", "abline", "axTicks", "axis", "contour",
            "filled.contour", "hist", "image", "mtext", "plot",
            "polygon", "rect", "strheight", "strwidth", "text", 
            "box", "layout", "layout.show", "lcm", "lines",
-           "par", "points", "segments", "legend")
+           "par", "points", "segments", "legend", "polypath")
 importFrom("stats", "aggregate", "density", "loess", "median", "pf",
-           "predict", "runif", "sd", "var", "na.omit")
+           "predict", "runif", "sd", "var", "na.omit", 
+           "as.dist", "cutree", "dist", "hclust")
 importFrom("utils", "str", "download.file", "head", "tail", "methods",
            "object.size", "unzip", "URLencode", "localeToCharset",
            "read.table", "write.table", "browseURL")
-

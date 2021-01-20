@@ -155,7 +155,7 @@
             if (!length(indX))
                indX <- .grep("^x$",mname)
             if (!length(indX))
-               indX <- .grep("^lon",mname)
+               indX <- .grep("^(lng$|lon)",mname)
             if (!length(indX))
                indX <- .grep("^east",mname)
             if (!length(indX))
@@ -187,6 +187,9 @@
             crsNow <- style
          else
             crsNow <- NA
+         if ((is.na(crsNow))&&
+            (.lgrep("^(lon|lng$)",coords[1])==1)&&(.lgrep("^lat",coords[2])==1))
+            crsNow <- "EPSG:4326"
          isCRS <- ((!is.na(crsNow))&&(nchar(crsNow)))
          if (isSF) {
             if (isCRS)
@@ -1330,7 +1333,7 @@
          if (!is.na(src0)) {
             t_srs <- spatial_crs(t_srs)
             g0$crs <- t_srs
-            if (!identical(src0,t_srs))
+            if ((!identical(src0,t_srs))&&(nchar(t_srs)>0))
                obj <- sf::st_transform(obj,t_srs)
          }
         # print(sf::st_crs(obj)$proj4string)
@@ -1357,7 +1360,7 @@
                   obj <- sp::spTransform(obj,t_srs) ## not tested
             }
             else {
-               if (!identical(src0,t_srs)) {
+               if ((!identical(src0,t_srs))&&(nchar(t_srs)>0)) {
                   opW <- options(warn=ifelse(.isPackageInUse(),-1,1))
                   obj <- sp::spTransform(obj,sp::CRS(t_srs,doCheckCRSArgs=FALSE))
                   options(opW)

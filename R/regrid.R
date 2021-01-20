@@ -429,6 +429,7 @@
             print(g,digits=12)
             message("g2")
             print(g2,digits=12)
+            q()
          }
          x <- seq(g2,"x")
          y <- seq(g2,"y")
@@ -459,15 +460,16 @@
             else if (verbose)
                message("unmatched")
          }
-         else { ## deprecated
+         else { ## deprecate???
             shift <- c(0,1)[1]
             indMinX <- which(x<=g$minx-shift*g$resx/2)
             indMaxX <- which(x>=g$maxx+shift*g$resx/2)
             indMinY <- which(y<=g$miny-shift*g$resy/2)
             indMaxY <- which(y>=g$maxy+shift*g$resy/2)
             if ((length(indMinX))&&(length(indMaxX))&&(length(indMinY))&&(length(indMaxY))) {
-               if (verbose)
+               if (verbose) {
                   message("matched")
+               }
                ##~ print(indMinX)
                ##~ print(indMaxX)
                ##~ print(indMinY)

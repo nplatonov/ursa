@@ -1,3 +1,4 @@
+# https://gis.stackexchange.com/questions/382131/r-how-to-write-crs-information-correctly-to-netcdf
 '.read_nc' <- function(fname,var="",level=NA,verbose=FALSE) {
    if (!is.character(fname))
       return(NULL)

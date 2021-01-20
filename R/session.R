@@ -53,15 +53,26 @@
       return(invisible(g1))
    }
    if (is.character(obj)) {
-      opW <- options(warn=2)
-      a <- try(open_envi(obj,resetGrid=TRUE,decompress=FALSE))
-      options(opW)
-      if (inherits(a,"try-error")) {
-         a <- open_gdal(obj)
+     # print(obj)
+     # print(spatial_dir(pattern=obj,recursive=FALSE))
+      if (T & length(spatial_dir(path=dirname(obj),pattern=basename(obj),recursive=FALSE))==1) {
+         a <- spatial_read(obj)
+         g1 <- spatial_grid(a)
+         rm(a)
       }
-      g1 <- a$grid
-      if (is_ursa(a))
-         close(a)
+      else {
+         opW <- options(warn=2)
+         a <- try(open_envi(obj,resetGrid=TRUE,decompress=FALSE))
+         options(opW)
+         if (inherits(a,"try-error")) {
+            if (file.exists(obj)) {
+               a <- open_gdal(obj)
+            }
+         }
+         g1 <- a$grid
+         if (is_ursa(a))
+            close(a)
+      }
       if (!.is.grid(g1))
          return(NULL)
       options(ursaSessionGrid=g1)
