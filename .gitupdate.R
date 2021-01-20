@@ -6,7 +6,6 @@ if (!length(desc)) {
    else
       desc <- "ongoing"
 }
-desc
 system("git add -A")
 if (!system(paste0("git commit -m",dQuote(desc))))
    system("git push")
