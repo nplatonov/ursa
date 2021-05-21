@@ -22,13 +22,21 @@
       vec <- as.data.frame(sp::coordinates(vec),stringsAsFactors=FALSE)
       colnames(vec) <- c("x","y")
    }
-   else if ((inherits(vec,c("sf","sfc")))&&
+   else if ((inherits(vec,c("sf")))&&
       (.grep("^sfc_.+$",class(vec[[attr(vec,"sf_column")]]),value=TRUE))=="sfc_POINT") {
       proj4 <- sf::st_crs(vec)$proj4string
       z <- vec
       sf::st_geometry(z) <- NULL
       lname <- colnames(z)
       vec <- as.data.frame(sf::st_coordinates(vec))
+      colnames(vec) <- c("x","y")
+   }
+   else if ((inherits(vec,c("sfc")))&&(inherits(vec,"sfc_POINT"))) {
+      spatial_data(vec) <- data.frame(value=1L)
+      z <- spatial_data(vec)
+      proj4 <- spatial_crs(vec)
+      lname <- spatial_colnames(vec)
+      vec <- data.frame(spatial_coordinates(vec))
       colnames(vec) <- c("x","y")
    }
    else {

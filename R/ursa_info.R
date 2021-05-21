@@ -46,6 +46,8 @@
       res$bandname <- res$bandname[obj$con$posZ]
    if (.is.colortable(obj$colortable))
       res$colortable <- obj$colortable
+   if (is.na(res$retina))
+      res$retina <- NULL
    class(res) <- "ursaMetadata"
    if (toClose)
       close(obj)

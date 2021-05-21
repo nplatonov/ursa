@@ -72,11 +72,11 @@ Nikita Platonov \email{platonov@sevin.ru}
  ## 2. Read 
  a <- open_envi(fname[1])
  chB <- chunk_band(a,2)
- print(str(chB))
+ str(chB)
  for (i in chB)
     print(a[i])
  chL <- chunk_line(a,2.5)
- print(str(chL))
+ str(chL)
  for (j in chL)
     print(a[,j])
  
@@ -94,6 +94,7 @@ Nikita Platonov \email{platonov@sevin.ru}
  close(a,b)
  envi_remove(fname)
  print(d1-d2)
+ print(round(d1-d2,4))
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

@@ -863,8 +863,58 @@
 '.panel_graticule' <- function(obj,marginalia=rep(TRUE,4),verbose=FALSE) {
    g1 <- getOption("ursaPngComposeGrid")
    g2 <- getOption("ursaPngPanelGrid")
+  # print(g1)
+  # print(g2)
   # internal <- isTRUE(comment(marginalia)=="internal")
    internal <- !identical(g1,g2)
+   if (internal) {
+      g1a <- g1
+      g2a <- g2
+     # g1a$crs <- NULL
+     # g2a$crs <- NULL
+      if (!identical(g1a,g2a)) {
+         res <- sapply(names(g1a),function(x) {
+           # if (x %in% c("retina"))
+           #    return(TRUE)
+            if ((is.null(g1a[[x]]))||(is.null(g2a[[x]])))
+               return(TRUE)
+            if ((isTRUE(is.na(g1a[[x]])))||(isTRUE(is.na(g2a[[x]]))))
+               return(TRUE)
+            ret <- identical(g1a[[x]],g2a[[x]])
+            if (!ret) {
+               if (is.numeric(g1a[[x]])) {
+                  ret <- .is.eq(g1a[[x]],g2a[[x]])
+               }
+               if (is.character(g1a[[x]])) {
+                  if (length(grep("\\+proj",g1a[[x]]))) {
+                     proj1 <- gsub(".*\\+proj=(\\S+)($|\\s+.*$)","\\1",g1a[[x]])
+                     proj2 <- gsub(".*\\+proj=(\\S+)($|\\s+.*$)","\\1",g2a[[x]])
+                     cond1 <- proj1==proj2
+                  }
+                  else
+                     cond1 <- TRUE
+                  if (length(grep("\\+lon_0",g1a[[x]]))) {
+                     lon1 <- gsub(".*\\+lon_0=(\\S+)($|\\s+.*$)","\\1",g1a[[x]])
+                     lon2 <- gsub(".*\\+lon_0=(\\S+)($|\\s+.*$)","\\1",g2a[[x]])
+                     cond2 <- lon1==lon2
+                  }
+                  else
+                     cond2 <- TRUE
+                  if (length(grep("\\+lat_0",g1a[[x]]))) {
+                     lat1 <- gsub(".*\\+lat_0=(\\S+)($|\\s+.*$)","\\1",g1a[[x]])
+                     lat2 <- gsub(".*\\+lat_0=(\\S+)($|\\s+.*$)","\\1",g2a[[x]])
+                     cond3 <- lat1==lat2
+                  }
+                  else
+                     cond3 <- TRUE
+                  ret <- cond1 & cond2 & cond3
+               }
+            }
+            ret
+         })
+         internal <- !all(res)
+      }
+   }
    with(obj,{
       if (verbose)
          str(list(col=col,lwd=lwd,lty=lty))
@@ -926,9 +976,9 @@
         # marginalia2 <- marginalia2-marginalia
          marginalia <- marginalia2+marginalia
          if ((marginalia2[4]==1)&&((marginalia2[2]==marginalia2[4])))
-            marginalia2[4] <- 0L
+            marginalia2[4] <- marginalia[4] <- 0L
          if ((marginalia2[3]==1)&&((marginalia2[1]==marginalia2[3])))
-            marginalia2[3] <- 0L
+            marginalia2[3] <- marginalia[3] <- 0L
          rm(layout2,isTop2,isBottom2,isLeft2,isRight2,panel2)
         # print(marginalia)
         # print(marginalia2)
@@ -943,6 +993,13 @@
       da3 <- if (marginalia[3]) margin[which(margin$side==3),] else NULL
       da4 <- if (marginalia[4]) margin[which(margin$side==4),] else NULL
      # opT <- par(family="Arial Narrow")
+      if (F & internal) {
+         print(c((!is.null(da1))&&(nrow(da1)&&(marginalia2[1]))
+                ,(!is.null(da2))&&(nrow(da2)&&(marginalia2[2]))
+                ,(!is.null(da3))&&(nrow(da3)&&(marginalia2[3]))
+                ,(!is.null(da4))&&(nrow(da4)&&(marginalia2[4]))
+                ))
+      }
       if ((!is.null(da1))&&(nrow(da1)))
          with(da1,{
             if ((internal)&&(marginalia2[1])) {

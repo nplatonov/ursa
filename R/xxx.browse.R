@@ -10,6 +10,8 @@
       }
       return(browse(obj,...))
    }
+   if (.isRemark())
+      return(browse(obj,...))
    if (!inherits(obj,c("htmlwidget","knitr_kable")))
       return(browse(obj,...))
    obj
@@ -58,6 +60,13 @@
    }
    else
       verbose <- FALSE # !.isPackageInUse()
+   if (length(ind <- .grep("(fig\\.cap|caption)",names(arglist)))) {
+      ind2 <- tail(ind,1)
+      cap <- arglist[[ind2]]
+      arglist[ind2] <- NULL
+   }
+   else
+      cap <- NULL
    cl <- lapply(arglist,class)
    aname <- NULL
    if ((length(cl)==1)&&(cl=="list")) {
@@ -76,6 +85,8 @@
       else
          oname <- NULL
    }
+   if ((is.null(oname))&&(!is.null(cap)))
+      oname <- cap
    if (is.null(reflab))
       reflab <- if (T) rep("",length(arglist))
                 else paste(sample(letters,4,replace=TRUE),collapse="")
@@ -141,14 +152,32 @@
          saveRDS(o,ftemp)
          md5 <- tools::md5sum(ftemp)
          file.remove(ftemp)
-         if (is.null(output))
-            output <- file.path(.ursaCacheDir(),"knit")
+         if (is.null(output)) {
+            if (!.isKnitr())
+               output <- file.path(.ursaCacheDir(),"knit")
+            else
+               output <- file.path(knitr::opts_chunk$get("fig.path"))
+         }
          else {
            # TODO 'if (length(grep("\\.html$",output)))...' 
             output <- normalizePath(output)
          }
-         libdir <- file.path(output,"site_libs")
-         fname <- file.path(output,paste0("htmlwidget_",unname(md5),".html"))
+         if (!dir.exists(output))
+            dir.create(output,recursive=TRUE)
+         if (!.isKnitr()) {
+            libdir <- file.path(output,"site_libs")
+            fname <- file.path(output,paste0("htmlwidget_",unname(md5),".html"))
+         }
+         else {
+            libdir <- file.path("libs")
+            fname <- file.path(output,paste0("widget_"
+                                            ,knitr::opts_current$get("label")
+                                            ,"_",unname(md5)
+                                            ,".html"))
+            caption <- knitr::opts_current$get("fig.cap")
+            if ((is.null(oname))&&(!is.null(caption)))
+               oname <- caption
+         }
          if (!file.exists(fname)) {
            # obj <- htmlwidgets::prependContent(obj,htmltools::HTML("<style>iframe {border: 3px solid magenta;}</style>"))
             if (requireNamespace("widgetframe",quietly=.isPackageInUse())) {
@@ -159,21 +188,24 @@
                                    ,knitrOptions=list(hello="World")
                                    )
          }
-         a <- readLines(fname)
-         a <- grep("application/json.+data-for=\\\"htmlwidget",a,value=TRUE)
-         id <- gsub("^.+visdat\\W+([0-9a-f]+)\\W+.+$","\\1",a)
-         if ((nchar(id)>4)&&(nchar(id)<36)) {
-            a <- gsub(id,"gggg",a)
-            a <- gsub("(^.+htmlwidget\\W+)([0-9a-f]+)(\\W+.+$)","\\1hhhhh\\3",a)
-            saveRDS(a,ftemp)
-            md5 <- unname(tools::md5sum(ftemp))
-            file.remove(ftemp)
-            ename <- fname
-            fname <- file.path(dirname(fname),paste0("htmlwidget-",md5,".html"))
-            file.rename(ename,fname)
+         if (!.isKnitr()) {
+            a <- readLines(fname,encoding="UTF-8")
+            a <- grep("application/json.+data-for=\\\"htmlwidget",a,value=TRUE)
+            id <- gsub("^.+visdat\\W+([0-9a-f]+)\\W+.+$","\\1",a)
+            if ((nchar(id)>4)&&(nchar(id)<36)) {
+               a <- gsub(id,"gggg",a)
+               a <- gsub("(^.+htmlwidget\\W+)([0-9a-f]+)(\\W+.+$)","\\1hhhhh\\3",a)
+               saveRDS(a,ftemp)
+               md5 <- unname(tools::md5sum(ftemp))
+               file.remove(ftemp)
+               ename <- fname
+               fname <- file.path(dirname(fname),paste0("htmlwidget-",md5,".html"))
+               file.rename(ename,fname)
+            }
          }
+        # oname <- "PUT YOUR CAPTION HERE"
          fname <- gsub("\\\\","/",fname)
-         if (.lgrep("^(/\\w|[A-Z\\:\\w])",fname))
+         if ((T | !.isKnitr())&&(length(grep("^(/\\w|[A-Z\\:\\w])",fname))))
             fname <- paste0("file:///",fname)
         # cap <- paste0("<a href=",URLencode(fname),">",oname[k],"</a>")
          if (link) {
@@ -196,7 +228,7 @@
                         ,", echo=F"
                        # ,if (!is.null(oname)) paste0(", fig.cap=",dQuote(oname[k]))
                         ,if (T | !nchar(cap)) paste0(", fig.cap=",dQuote(cap))
-                        ,paste0(", out.extra=",dQuote("class=\\\'reset\\\'"))
+                        ,paste0(", out.extra=",dQuote("class=\\\'ursa-widgetize\\\'"))
                         ,"}")
                  ##~ ,paste0("knitr::include_url(",dQuote(fname)
                                             ##~ #,",height=",dQuote(paste0(round(4.8*96,1),"px"))
@@ -207,15 +239,44 @@
                 # ,paste0("[link to widget](",fname,"){style=\"font-size: 75%;\"}")
                 # ,paste0("[&#128279;](",URLencode(fname),"){style=\"font-size: 75%; opacity: 0.6;\" class=\"noprint\"}")
                  )
+        # print(iframe)
+        # print(cmd)
+        # str(knitr::opts_current$get())
          if (!.isKnitr()) {
             if (verbose)
                cat(cmd,sep="\n")
             ret2 <- browseURL(fname)
          }
          else {
+            if (T) {
+               if (.isRemark()) {
+                  if (is.null(height))
+                     height <- knitr::opts_current$get("out.height")
+                  suffix <- paste0(" style=\"height:",height,"px\"")
+               }
+               else
+                  suffix <- ""
+               cmd <- c(paste0("<div class=\"framed\"",suffix,">"),cmd,"</div>")
+            }
            # writeLines(cmd,"c:/tmp/cap.Rmd")
            # knitr::asis_output(cmd)
-            cmd <- knitr::knit_child(text=cmd,quiet=TRUE)
+            if (!.isRemark())
+               cmd <- knitr::knit_child(text=cmd,quiet=TRUE)
+            else {
+               cmd <- paste0("<div class=\"figure\">\n"
+                            ,"<div class=\"framed\"",suffix,">\n"
+                            ,"<iframe src=",dQuote(fname)
+                            ," width=",dQuote(knitr::opts_current$get("out.width"))
+                            ," height=",dQuote(height)
+                            ," class=",dQuote("ursa-widgetize"),">"
+                            ,"</iframe>\n"
+                            ,"</div>\n"
+                            ,if (nchar(cap))
+                                paste0("<p class=",dQuote("caption"),">"
+                                      ,cap," </p>\n")
+                            ,"</div>")
+            }
+           # print(cmd)
             cat(cmd,sep="\n")
             ret2 <- invisible(NULL)
          }

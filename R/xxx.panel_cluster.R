@@ -1,12 +1,14 @@
-'panel_cluster' <- function(obj,cut=1,cex=1,overlap=1.05,ratio=0.2,col=NULL
+'panel_cluster' <- function(obj,overlap=1,cex=1,ratio=0.2,col=NULL
                            ,method=c("complete","centroid","single")
                            ,fun=c("count","sum","mean"),label=fun %in% "count"
-                           ,ngroup=NA,separate=FALSE,repel=20L,legend="bottomright") {
+                           ,ngroup=NA,separate=FALSE,repel=20L,legend="bottomright"
+                           ,title=NULL) {
    ##~ method <- c('1'="ward.D",'2'="ward.D2",'3'="single",'4'="complete"
               ##~ ,'5'="average",'6'="mcquitty",'7'="median"
               ##~ ,'8'="centroid")[4] ## 3 4! 8 
    method <- match.arg(method)
    fun <- match.arg(fun)
+   cutted <- 1.05
    da <- spatial_data(obj)
    if (!is.null(da)) {
       indCat <- which(sapply(colnames(da),function(x)
@@ -49,10 +51,12 @@
    dpi <- getOption("ursaPngDpi")
    ps <- getOption("ursaPngPointsize")
    retina <- getOption("ursaPngRetina")
-   s <- unname((cex*c(annotation=1.5))*cut*ps/scale*cell*dpi/96*sqrt(2))
+   s <- unname((cex*c(annotation=1.5))*overlap*ps/scale*cell*dpi/96*sqrt(2))
    if (!label)
       s <- s*0.5
-   print(data.frame(cell=cell,retina=retina,scale=scale,cut=cut,dpi=dpi,ps=ps,cex=cex,s=s))
+   if (!.isPackageInUse())
+      print(data.frame(cell=cell,retina=retina,scale=scale
+           ,overlap=overlap,dpi=dpi,ps=ps,cex=cex,s=s))
    if (isCat)
       bname <- if (is.factor(aname)) levels(aname) else unique(aname)
    else {
@@ -136,10 +140,10 @@
          }
          else {
             if ((bname!=".undefined")&&(fun %in% c("mean"))) {
-               lut[i,bname] <- mean(da2[[bname]])
+               lut[i,bname] <- mean(da2[[bname]],na.rm=TRUE)
             }
             else if ((bname!=".undefined")&&(fun %in% c("sum"))) {
-               lut[i,bname] <- sum(da2[[bname]])
+               lut[i,bname] <- sum(da2[[bname]],na.rm=TRUE)
             }
             else
                lut[i,bname] <- nrow(da2)
@@ -172,7 +176,7 @@
      # xy <- cbind(xy,S)
       d <- s/20
       iter <- 100
-      R2 <- 0.5*s*overlap
+      R2 <- 0.5*s*cutted
       k <- 0L
       isProgress <- FALSE
       repeat({
@@ -220,10 +224,14 @@
       spatial_write(p,"C:/platt/R/ursa-package/run/panel_cluster/mammal.geojson")
       q()
    }
-   if (is.character(col)) {
+   if (F & is.character(col)) {
       ct <- ursa_colortable(colorize(bname
                              ,pal=rep(col,length.out=length(bname)),alpha="A0"))
       ctInd <- ct
+   }
+   else if (F & is.list(col)) {
+     # do.call("colorize",c(list(body),col))
+      ct <- colorize(bname,pal=rep(col,length.out=length(bname)),alpha="A0")
    }
    else if (fun %in% c("count")) {
       ct <- colorize(bname,alpha="A0"
@@ -232,7 +240,16 @@
       ctInd <- ursa_colortable(ct)
    }
    else {
-      ct <- colorize(lut[[bname]],stretch="linear",alpha="FF")
+      if (is.list(col)) {
+         if (!length(grep("stretch",names(col))))
+            col$stretch <- "linear"
+         ct <- do.call("colorize",c(list(lut[[bname]]),col))
+      }
+      else if (is.character(col)) {
+         ct <- colorize(lut[[bname]],stretch="linear",alpha="A0",pal=col)
+      }
+      else
+         ct <- colorize(lut[[bname]],stretch="linear",alpha="A0")
       ctInd <- ursa_colortable(ct)[ursa_colorindex(ct)]
    }
    bg <- if (separate) "white" else ctInd
@@ -240,7 +257,7 @@
       bg <- rep(bg,length(ctInd))
    bg <- col2rgb(bg)/255
    bg <- rgb(bg[1,],bg[2,],bg[3,],alpha=0.2)
-   s2 <- s/ifelse(label,2,1.5)/cut
+   s2 <- s/ifelse(label,2,1.5)/overlap
    for (i in seq(nrow(lut))) {
       x <- lut$.x[i] # <- mean(da2$x)
       y <- lut$.y[i] # <- mean(da2$y)
@@ -275,15 +292,42 @@
             segments(x,y,da2$x[j],da2$y[j],col="#00000030",lwd=0.5)
       }
    }
-   if (!is.null(legend))
-      legend(legend,legend=bname
+   if (!is.null(legend)) {
+      legend(legend,legend=bname,title=title
             ,col=ctInd,cex=c(1,cex)[1]/par("cex")
-            ,pch=21,pt.lwd=1*2.4/par("cex"),pt.cex=1.8/par("cex")
-            ,box.lwd=0.1,bg="#FFFFFF7F"
+            ,pch=21,pt.lwd=ifelse(label,1,0)*2.4/par("cex"),pt.cex=1.8/par("cex")
+            ,box.lwd=0.1,bg="#FFFFFFAF"
            # ,pt.bg=ursa_colortable(colorize(seq_along(ctInd),pal=ctInd,alpha="30"))
             ,pt.bg=if (label) bg else ctInd
             )
-   return(invisible(ct)) ## colortable of obj[[indCat]]
+     # return(invisible(ct)) ## colortable of obj[[indCat]]
+      return(invisible(ursa_colortable(ct)))
+   }
+   ct <- ursa_colortable(ct)
+   if (F) 
+      ret <- list(name=names(ct)
+                 ,type="POLYGON"
+                 ,fill=as.character(ct)
+                 )
+   else {
+      ret <- .legend.skeleton()
+      ret$name=names(ct)
+      ret$col <- "white"
+      ret$border <- "transparent"
+      ret$pch <- 21
+      ret$pt.lwd <- ifelse(label,1,0)*2.4/par("cex")
+      ret$pt.cex <- 1.8/par("cex")
+      ret$pt.bg <- as.character(ct)
+   }
+   if (T) {
+      opR <- getOption("ursaPngLegend")
+      options(ursaPngLegend=if (is.null(opR)) list(ret) else c(opR,list(ret)))
+   }
+  # return(invisible(list(ret)))
+   return(invisible(ret))
+   ##~ ret <- list(name=oname,type="default"
+              ##~ ,col="transparent",border="transparent",lty=1,lwd=1,pch=0,cex=NA
+              ##~ ,fill="transparent",bg="transparent",density=NA,angle=45)
 }
 '.panel_pie' <- function(z,x=0,y=0,radius=1,edges=200,clockwise=TRUE,init.angle=90
                         ,col=NULL,bg="white"

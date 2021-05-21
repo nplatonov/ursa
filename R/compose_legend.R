@@ -57,6 +57,8 @@
       units <- names(obj)
    }
    else {
+      if (inherits(arglist[[1]],"ursaLegend"))
+         arglist[[1]] <- ursa_colortable(arglist[[1]])
       arglist[[1]] <- lapply(arglist[[1]],function(x1) {
          if (identical(c("index","colortable"),names(x1)))
             return(x1$colortable)

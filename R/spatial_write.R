@@ -8,7 +8,8 @@
       dir.create(dname,recursive=TRUE)
    fext <- .gsub("^.+\\.(.+)$","\\1",bname)
    wait <- 60
-   interimExt <- c("gpkg","geojson","shp","sqlite")[4]
+   isGeoJSON <- fext %in% c("geojson")
+   interimExt <- if (isGeoJSON) fext else c("gpkg","geojson","shp","sqlite")[4]
    driverList <- c(shp="ESRI Shapefile"
                   ,sqlite="SQLite",json="GeoJSON",geojson="GeoJSON",gpkg="GPKG"
                   ,tab="Mapinfo File",kml="KML")
@@ -60,7 +61,8 @@
       if ((!allSF)&&(!ogr2ogr))
          stop("'ogr2ogr' is requires to merge layers")
      # fname1 <- paste0("res",seq_along(obj),".gpkg")
-      fname1 <- .maketmp(length(obj),ext=interimExt)
+     # fname1 <- .maketmp(length(obj),ext=interimExt)
+      fname1 <- file.path("c:/tmp",paste0("interim",seq_along(obj),".",interimExt))
       if (!allSF)
          pb <- ursaProgressBar(min=0,max=2*length(obj),tail=TRUE)
       p4s <- sapply(obj,function(x){
@@ -98,8 +100,13 @@
          }
          iname[[i]] <- jname
          options(ursaSpatialMultiLayer=getOption("ursaSpatialMultiLayer")+1L)
-         if (allSF)
-            spatial_write(o,fname,layer=lname[i],verbose=verbose) ## RECURSIVE
+         if (allSF) {
+            if (isGeoJSON) {
+               spatial_write(o,fname1[i],verbose=verbose) ## RECURSIVE
+            }
+            else
+               spatial_write(o,fname,layer=lname[i],verbose=verbose) ## RECURSIVE
+         }
          else
             spatial_write(o,fname1[i],verbose=verbose) ## RECURSIVE
          if (!allSF)
@@ -108,8 +115,26 @@
             .elapsedTime(paste0("list:",i))
       }
       options(ursaSpatialMultiLayer=NULL)
-      if (allSF)
+      if (allSF) {
+         if (!isGeoJSON)
+            return(invisible(0L))
+         a <- lapply(fname1,function(src) {
+            a <- readLines(src,encoding="UTF-8")
+            a <- paste(a,collapse="")
+            ind2 <- regexpr("\"features\":\\s*\\[",a)
+            a <- substr(a,ind2+attr(ind2,"match.length"),nchar(a)-2)
+            a <- paste0(a,",")
+            a
+         })
+         a <- c("{","\"type\": \"FeatureCollection\", \"features\": [",do.call(c,a),"]}")
+         ind <- length(a)-1L
+         a[ind] <- substr(a[ind],1,nchar(a[ind])-1)
+         Fout <- file(fname,encoding="UTF-8")
+         writeLines(a,Fout)
+         close(Fout)
+         file.remove(fname1)
          return(invisible(0L))
+      }
       dopt <- character()
       lopt <- character()
       if (driver=="ESRI Shapefile")
@@ -145,6 +170,8 @@
          }
       })
       for (i in seq_along(fname1)) {
+         if (!allSF)
+            setUrsaProgressBar(pb)
          b <- paste(fname,fname1[i],"-nln",lname[i])
          if (length(dopt))
             b <- paste(paste("-dco",dopt),b)
@@ -178,7 +205,6 @@
             else if (file.exists(fname1[i]))
                file.remove(fname1[i])
          }
-         setUrsaProgressBar(pb)
          if (verbose)
             .elapsedTime(paste0("append:",i))
       }
@@ -331,8 +357,20 @@
          file.remove(f)
       }
       if (driver %in% c("GeoJSON","KML","GPX")) {
-         if (!identical(spatial_crs(obj),spatial_crs(4326)))
+         if (!identical(spatial_crs(obj),spatial_crs(4326))) {
+            if ((devel <- FALSE)&&(!.isPackageInUse())) {
+              ## ?rgdal::make_EPSG
+               print(spatial_crs(obj))
+              # epsg <- sf::st_crs(spatial_crs(obj))$epsg
+              # print(c(epsg=epsg))
+               print(sf::st_crs(3571)$proj4string)
+               print(sf::st_crs(spatial_crs(obj))$proj4string)
+               print(sf::st_crs(3571)$epsg)
+               print(sf::st_crs(spatial_crs(obj))$epsg)
+               q()
+            }
             obj <- sf::st_transform(obj,4326)
+         }
       }
       opW <- options(warn=1)
       if ((interim)&&(interimExt=="shp")) {
@@ -350,18 +388,22 @@
       jsonSF <- (isSF)&&(driver=="GeoJSON")&&(T | !inherits(obj,"sfc"))&&
          (requireNamespace("geojsonsf",quietly=.isPackageInUse()))
       if (jsonSF) {
+        # fromList <- length(tail(.parentFunc(),-1))>1
+        # enc2native(a);Encoding(a) <- "UTF-8"
+         Fout <- file(fname)#,encoding="UTF-8")
          if (inherits(obj,"sfc")) {
             a <- geojsonsf::sfc_geojson(obj,digits=6)
            # cl <- class(a)
            # a <- c("{\"type\": \"FeatureCollection\",\"features\": [",a,"]}")
            # class(a) <- cl
-            writeLines(a,fname)
+            writeLines(a,Fout)
          }
          else {
             da <- spatial_data(obj)
             if (length(ind <- which(sapply(obj,inherits,"character")))) {
                for (i in ind) {
-                  obj[,i] <- iconv(obj[,i,drop=TRUE],to="UTF-8")
+                 # obj[,i] <- iconv(obj[,i,drop=TRUE],to="UTF-8")
+                 # Encoding(obj[[i]]) <- "UTF-8"
                }
             }
             if (length(ind <- which(sapply(obj,inherits,"POSIXct")))) {
@@ -369,8 +411,12 @@
                   obj[,i] <- format(obj[,i,drop=TRUE],tz="UTC","%Y-%m-%dT%H:%M:%SZ")
                }
             }
-            writeLines(geojsonsf::sf_geojson(obj,atomise=F,simplify=F,digits=6),fname)
+            a <- geojsonsf::sf_geojson(obj,atomise=F,simplify=F,digits=6)
+           # a <- iconv(a,to="UTF-8")
+           # writeLines(a,Fout)
+            writeLines(a,Fout)
          }
+         close(Fout)
       }
       else if (utils::packageVersion("sf")>="0.9-0") {
          sf::st_write(obj,dsn=fname,layer=lname,driver=driver

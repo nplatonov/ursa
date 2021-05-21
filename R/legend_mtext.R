@@ -12,7 +12,7 @@
 '.legend_mtext' <- function(text="Annotation",cex=1) {
    '.mtext' <- function(text,...) {
       if (is.character(text)) {
-         if (getOption("ursaPngDevice") %in% c("windows"))
+         if (getOption("ursaPngDevice") %in% c("windows","agg"))
             toE <- TRUE
          else {
             opWE <- options(warn=2)

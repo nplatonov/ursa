@@ -8,32 +8,42 @@
                            ##~ ,plot=TRUE,ncol=1,horiz=FALSE,title=NULL
                            ##~ ,inset=0,xpd,title.col=text.col,title.adj=0.5
                            ##~ ,seg.len=2)
-'.shape_legend<-' <- function(obj,items,value) {
+'.shape_legend<-' <- function(obj,items,verbose,value) {
    res <- unlist(lapply(items,function(x) x[[value]]))
    if (!is.null(res)) {
-      str(value)
-      str(res)
+      if (verbose) {
+         str(value)
+         str(res)
+      }
       obj[[value]] <- res
    }
    obj
 }
 'panel_legend' <- function(items,...)
 {
+   verbose <- !.isPackageInUse()
    if (.skipPlot(TRUE))
       return(NULL)
    if (missing(items))
       items <- getOption("ursaPngLegend")
+  # if (length(items))(inherits(items,"ursaLegend"))
    items <- items[!sapply(items,is.null)]
    if (!length(items))
       return(invisible(NULL))
    arglist <- as.list(args(legend))
    items2 <- list(list(...))
-   message("-------")
-   str(items)
-   for (a in names(arglist)) {
-      .shape_legend(arglist,items) <- a
-      .shape_legend(arglist,items2) <- a
+   if (verbose) {
+      message("-------")
+      str(items)
    }
+   for (a in names(arglist)) {
+      .shape_legend(arglist,items,verbose) <- a
+      .shape_legend(arglist,items2,verbose) <- a
+   }
+   if (is.language(arglist[["lwd"]]))
+      arglist[["lwd"]] <- NULL
+   if (is.language(arglist[["lty"]]))
+      arglist[["lty"]] <- NULL
    if (is.language(arglist[["box.lwd"]]))
       arglist[["box.lwd"]] <- 0.1
    if (is.language(arglist[["pt.cex"]]))
@@ -42,18 +52,19 @@
       arglist[["pt.lwd"]] <- arglist[["lwd"]]
    if (!nchar(as.character(arglist[["x"]])))
       arglist[["x"]] <- "bottomright"
-   if (all(is.na(arglist[["lwd"]])))
+   if ((!is.null(arglist[["lwd"]]))&&(all(is.na(arglist[["lwd"]]))))
       arglist[["lwd"]] <- NULL
-   if (all(is.na(arglist[["lty"]])))
+   if ((!is.null(arglist[["lty"]]))&&(all(is.na(arglist[["lty"]]))))
       arglist[["lty"]] <- NULL
    if (all(is.na(arglist[["cex"]])))
-      arglist[["cex"]] <- NULL
+      arglist[["cex"]] <- 1
    arglist[["merge"]] <- FALSE ## '$merge : language do.lines && has.pch'
    for (a in names(arglist)) {
       if (is.language(arglist[[a]])) {
          if (!sum(nchar(as.character(arglist[[a]]))))
             next
-         message(a)
+         if (verbose)
+            message(a)
          res <- try(eval.parent(arglist[[a]]))
          if (inherits(res,"try-error")) {
             next
@@ -62,15 +73,17 @@
       }
    }
    arglist[["title.col"]] <- arglist[["text.col"]]
+   arglist[["cex"]] <- arglist[["cex"]]/par()$cex
    lname <- names(items)
-   iname <- sapply(items,function(x) x$name)
+   iname <- c(sapply(items,function(x) x$name))
    if (is.null(lname))
       lname <- iname
    else if (length(ind <- which(!nchar(lname))))
       lname[ind] <- iname[ind]
    arglist[["legend"]] <- lname
   # arglist[["pch"]] <- unname(sapply(items,function(x) x$pch))
-   str(arglist)
+   if (verbose)
+      str(arglist)
    ret <- do.call("legend",arglist)
    invisible(ret)
 }

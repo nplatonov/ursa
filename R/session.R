@@ -140,13 +140,18 @@
          dir.create(dst)
          options(opW)
       }
+     # options(ursaTempDir=normalizePath(dst,winslash="/",mustWork=FALSE))
       options(ursaTempDir=dst)
       return(invisible(dst))
    }
    opD <- getOption("ursaTempDir")
    if (length(opD))
       return(opD)
-   dst <- ifelse(.isRscript(),ifelse(T,.ursaCacheDir(),getwd()),tempdir()) ## "." <-> 'getwd()'
+   dst <- ifelse(.isRscript()
+                ,ifelse(T,.ursaCacheDir(),getwd())
+               # ,normalizePath(tempdir(),winslash="/")
+                ,tempdir()
+                ) ## "." <-> 'getwd()'
    options(ursaTempDir=dst)
    return(dst)
 }

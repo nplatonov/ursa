@@ -234,17 +234,19 @@
          res <- vector("list",length(obj))
          names(res) <- names(obj)
          for (i in seq_along(res)) {
-            if (R.Version()$arch %in% c("i386","x86_64")[1]) {
+            if (R.Version()$arch %in% c("i386","x86_64","zzz")[-3]) {
               # print("A")
-               a <- ursa()
+               dima <- dim(obj[[i]])
+               if (length(dima)==2)
+                  dima <- c(dima,band=1L)
+               a <- ursa(nband=dima[3])
                a$value <- obj[[i]]
-               dima <- dim(a)
                dim(a$value) <- c(prod(dima[1:2]),dima[3])
                class(a$value) <- "ursaNumeric"
                res[[i]] <- a
                rm(a)
             }
-            else { ## quicker for 'x86_64'
+            else { ## faster for 'x86_64' // 20210203 -- slower for any
               # print("B")
                res[[i]] <- as.ursa(obj[[i]],flip=TRUE) ## RECURSIVE!!!
             }

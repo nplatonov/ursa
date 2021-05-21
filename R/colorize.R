@@ -414,8 +414,18 @@
                                   ,significance=c("RdBu","PuOr")[2],aspect=".rainbow"
                                   ,grayscale="Greys",greyscale="Greys"
                           ,c("cubehelix","RdYlBu")[1]) ## default "RdYlBu"
-      else
-         palname <- "cubehelix"
+      else { ## rownames(RColorBrewer::brewer.pal.info)
+         if ((is.character(pal))&&(length(pal)==1)&&(pal %in% c("dummycolornamewhichisabsent"
+                        ,"BrBG","PiYG","PRGn","PuOr","RdBu","RdGy"    
+                        ,"RdYlBu","RdYlGn","Spectral","Accent","Dark2","Paired"  
+                        ,"Pastel1","Pastel2","Set1","Set2","Set3","Blues"   
+                        ,"BuGn","BuPu","GnBu","Greens","Greys","Oranges" 
+                        ,"OrRd","PuBu","PuBuGn","PuRd","Purples","RdPu"    
+                        ,"Reds","YlGn","YlGnBu","YlOrBr","YlOrRd")))
+            palname <- pal
+         else
+            palname <- "cubehelix"
+      }
    }
    if (stretch=="conc")
    {
@@ -600,12 +610,20 @@
       else
       {
          if (i2<(0)) {
+           # cat("--- RR2 begin\n")
+           # print(i2)
+           # print(v2)
+           # options(warn=-10)
            # label <- sprintf("%%f",as.double(round(v2,i2+1)))
            # label <- sprintf(sprintf("%%.0f",i2),as.double(round(v2,i2+1)))
-            label <- sprintf(sprintf("%%.0f",i2),as.double(v2))
+           # label <- sprintf(sprintf("%%.0f",i2),as.double(v2)) ## --20210520
+            label <- sprintf("%.0f",as.double(v2)) ## ++20210520 or
+           # label <- sprintf("%.0f",as.double(round(v2,i2+1))) ## ++20210520 or
+           # label <- sapply(as.double(v2),function(v9) sprintf(sprintf("%%.0f",i2),v9)) ##++
            # label <- format(v2,trim=TRUE,scientific=FALSE)
            # label <- label2
            # i2 <- 0
+           # cat("--- RR2 end\n")
          }
          else {
            # print(i2)
@@ -727,7 +745,7 @@
                   col <- pal(n)
             }
             else if (is.character(pal)) {
-               if ((length(pal)==1)&&(!.lgrep("^#[0-9A-F]+$",pal)>=0)&&
+               if ((length(pal)==1)&&(!.lgrep("^#[0-9A-F]+$",pal))&&
                    (requireNamespace("RColorBrewer",quietly=.isPackageInUse()))) {
                   available <- RColorBrewer::brewer.pal.info
                   if (!is.na(ind <- match(pal,rownames(available)))) {

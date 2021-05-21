@@ -1,6 +1,5 @@
 ## ?formals
-'panel_plot' <- function(obj,...)
-{
+'panel_plot' <- function(obj,...) {
    if (.skipPlot(TRUE))
       return(NULL)
    geoType <- ""
@@ -9,7 +8,7 @@
    arglist <- as.list(match.call())
    isLang <- is.language(arglist[["obj"]])
    if (isLang)
-      oname <- as.character(arglist[["obj"]])
+      oname <- as.character(arglist["obj"])
    else
       oname <- "*undetermed*"
   # str(lapply(arglist,class))
@@ -180,12 +179,14 @@
            # stop("II")
            # ct <- colorize(spatial_data(obj)[[1]])
             ct <- do.call("colorize",c(list(spatial_data(obj)[[1]]),arglist2))
-            arglist2$col <- ct$colortable[ct$index]
+           # arglist2$col <- ct$colortable ## ++ 20210520
+            arglist2$col <- ct$colortable[ct$index] ## -- 20210520
          }
-         else
+         else {
             arglist2$col <- ifelse(is_spatial_lines(obj),"black"
                                   ,ifelse(T,ursa_colortable(colorize("",alpha=0.2))
                                            ,"transparent"))
+         }
          if (.lgrep("point",geoType)) {
             if (F & !.isPackageInUse())
                message("'ursa'-dev: test 'scattermode' ('https://github.com/exaexa/scattermore') for points plot")
@@ -266,19 +267,19 @@
    aname <- names(arglist2)
   # str(arglist2)
    if (is_spatial_points(obj)) {
-      ret <- list(name=oname
-                 ,pt.col=arglist2$col
-                 ,pch=arglist2$pch
-                 ,pt.cex=arglist2$cex
-                 ,pt.lwd=arglist2$lwd
-                 ,pt.bg=arglist2$bg
-                 ,border="transparent"
-                 )
+      ret <- .legend.skeleton()
+      ret$name <- oname
+      ret$type <- "POINT"
+      ret$col <- arglist2$col
+      ret$pch <- arglist2$pch
+      ret$pt.cex <- arglist2$cex
+      ret$pt.lwd <- arglist2$lwd
+      ret$pt.bg <- arglist2$bg
+      ret$border <- "transparent"
    }
    else {
-      ret <- list(name=oname,type="default"
-                 ,col="transparent",border="transparent",lty=1,lwd=1,pch=0,cex=NA
-                 ,fill="transparent",bg="transparent",density=NA,angle=45)
+      ret <- .legend.skeleton()
+      ret$name <- oname
       rname <- names(ret)
       if (.lgrep("polygon",geoType)) { # 20171215 -- 'if (geoType %in% c("POLYGON","MULTIPOLYGON"))'
          ret$pch <- NA
@@ -303,11 +304,28 @@
          ret$fill <- ret$bg
       }
       if ((TRUE)&&(.lgrep("polygon",geoType))) {
-         ret$fill <- ret$col
+         if (F & is_ursa(ret$col,"colortable")) {
+           # rname <- unique(names(ret$col))
+            ret$fill <- unique(ret$col)
+            ret$name <- unique(names(ret$col))
+           # q()
+         }
+         else
+            ret$fill <- ret$col
          ret$col <- NA
          ret$lwd <- NA
          ret$lty <- NA
       }
+   }
+   if ((is_spatial(obj))&&(isLang)&&(length(spatial_colnames(obj))>0)) {
+      ##~ sink("C:/tmp/res1.out")
+      ##~ str(arglist)
+      ##~ str(obj)
+      ##~ str(eval.parent(arglist[["obj"]]))
+      ##~ str(eval(arglist[["obj"]]))
+      ##~ sink()
+     # ret$name <- spatial_data(eval(arglist[["obj"]]))[[1]]
+      ret$name <- spatial_data(eval.parent(arglist[["obj"]]))[[1]]
    }
    if (FALSE) {
       if (length(geoType)>1) {
@@ -315,13 +333,23 @@
         # spatial_write(obj,"res1.sqlite")
       }
    }
+   if (!is.null(ct)) {
+      ct <- ursa_colortable(ct)
+      ret$name <- names(ct)
+      if (is_spatial_polygons(obj))
+         ret$fill <- as.character(ct)
+      else if (is_spatial_points(obj)) {
+         ret$pt.bg <- as.character(ct)
+      }
+   }
+  # class(ret) <- "ursaLegend"
    if (any(nchar(geoType)>0)) {
       opR <- getOption("ursaPngLegend")
       options(ursaPngLegend=if (is.null(opR)) list(ret) else c(opR,list(ret)))
    }
-   if (!is.null(ct))
-      return(invisible(ct))
-   invisible(ret)
+  # if (!is.null(ct))
+  #    return(invisible(ct))
+   invisible(list(ret))
 }
 'panel_box' <- function(...){
    if (.skipPlot(FALSE))
@@ -409,4 +437,12 @@
    if (!is.null(opW))
       options(opW)
    ret
+}
+'.legend.skeleton' <- function()
+{
+   leg <- list(name="legend item",type="default"
+              ,col="transparent",border="transparent",lty=NULL,lwd=NULL,pch=0,cex=NA
+              ,fill="transparent",bg="transparent",density=NA,angle=45)
+   class(leg) <- "ursaLegend"
+   leg
 }

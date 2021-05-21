@@ -91,6 +91,9 @@
       return(NULL)
    if (missing(value))
       value <- unname(st["current"])-1
+   else
+      value <- value-1
+  # print(c(current=unname(st["current"]),value=value))
    ##~ if (st["current"]>st["max"])
       ##~ st["current"] <- st["max"]
   # if (value>=st["max"])

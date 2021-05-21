@@ -133,6 +133,10 @@
    }
    if (!nchar(pattern))
       return(character())
+   if (T) { ## ++ 20210521
+      path <- gsub("\\\\","/",path)
+      pattern <- gsub("\\\\","/",pattern)
+   }
    if (.lgrep("(/|\\\\)",pattern))
    {
       isDir <- file.info(pattern)$isdir
@@ -142,9 +146,13 @@
          full.names <- TRUE
       }
       else {
-         if (file.exists(dirname(pattern))) {
+         if (dirname(pattern) %in% "/") { ## ++ 20210125
+            NULL # path <- "."
+         }
+         else if (file.exists(dirname(pattern))) {
             path <- dirname(pattern)
-            pattern <- basename(pattern)
+            pattern <- gsub(paste0(path,"(/+|\\\\)"),"",pattern)
+           # pattern <- basename(pattern)
             recursive <- FALSE
             full.names <- TRUE
          }
@@ -161,6 +169,8 @@
       patt1 <- paste0("^",patt1,"$")
       patt2 <- paste0("^",patt2,"$")
    }
+  # patt1 <- gsub("\\\\","/",patt1)
+  # patt2 <- gsub("\\\\","/",patt2)
    list1 <- dir(path=path,pattern="\\.hdr$",all.files=all.files
                ,full.names=full.names,recursive=recursive
                ,ignore.case=ignore.case)

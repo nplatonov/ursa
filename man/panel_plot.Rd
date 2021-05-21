@@ -48,7 +48,8 @@ Generally, for spatial objects argument \code{add=TRUE} is used in \code{panel_p
 %%~ If object of class \code{ursaRaster} is found among arguments of function \code{panel_contour}, then this object is converted to a suitable list \code{\link[ursa:classRaster_as.matrix]{as.matrix(obj,coords=TRUE)}}, and argument \code{add} for function \code{\link[graphics]{contour}} is forced to value \code{TRUE}. 
 }
 \value{
-Function \code{panel_plot} returns value of function \code{\link[graphics:plot.default]{plot}}.\cr
+For spatial objects (simple features from \pkg{sf} or spatial abstract classes from \pkg{sp}) function \code{panel_plot} returns object of class \code{ursaLegend}. It is a list with items, which can be used to as arguments of \code{\link[graphics:legend]{legend()}}. This is intermediate step for experimental feature (not ready) to display colorbars on plot panel. For other objects function \code{panel_plot} returns value of function \code{\link[graphics:plot.default]{plot}}.
+
 Function \code{panel_box} returns value of function \code{\link[graphics]{box}}.\cr
 Function \code{panel_lines} returns value of function \code{\link[graphics]{lines}}.\cr
 Function \code{panel_points} returns value of function \code{\link[graphics]{points}}.\cr
@@ -65,6 +66,8 @@ Nikita Platonov \email{platonov@sevin.ru}
 }
 \note{
 For plotted elements it is possible to create legend for colors using color bars. No shapes kind and size, no line widths.
+
+To convert object \code{x} of class \code{ursaLegend} to object of class \code{ursaColorTable} please use \code{ursa_colortable(x)}.
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~

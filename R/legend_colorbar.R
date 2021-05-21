@@ -14,9 +14,14 @@
       return(NULL)
    obj <- .getPrm(arglist,name="",default=NULL
                  ,class=list(c("list","ursaRaster"),"ursaRaster"
-                            ,c("list","ursaColorTable"),"ursaColorTable"))
-   if (is.null(obj))
+                            ,c("list","ursaColorTable"),"ursaColorTable"
+                           # ,c("list","ursaLegend"),"ursaLegend"
+                            )
+                # ,verbose=TRUE
+                 )
+   if (is.null(obj)) {
       obj <- ursa_colortable(arglist[[1]])
+   }
    if (is.null(obj))
       return(invisible(NULL))
    if (!.is.colortable(obj)) {
@@ -70,7 +75,7 @@
                           ,lomar=lomar,himar=himar,turn=turn
                           ,useRaster=useRaster,trim=trim,abbrev=abbrev
                           ,opacity=opacity,verbose=verbose)
-   ret
+   invisible(ret)
 }
 '.legend_colorbar' <- function(ct,units="",labels=NA,align=NULL,shift=1 # labels=11L
                             ,cex=1,adj=NA,las=1

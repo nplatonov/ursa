@@ -1,8 +1,30 @@
-2020-12-13
+2021-05-21
 
 ### version 3.9.3
 
--   ongoing…
+-   Test building for R 4.1.0.
+
+-   New function `segmentize()` to connect sequence of spatial points to
+    line segments.
+
+-   New return value `ursaLegend` in function `panel_plot()` for spatial
+    objects (simple features, spatial abstrac class) instead of
+    `ursaColorTable`.
+
+-   New arguments `...` in function `session_grid()` for preliminary
+    passing to `regrid()`.
+
+-   New argument `connect` in function `segmentize()` for creating
+    either solid multi-segment or multiple consequent segments.
+
+-   Patterned argument `vertical` in function `panel_annnotation()` can
+    be numeric (degrees on label inclination).
+
+-   `panel_graticule()` puts marginal longitide/latitude captions at the
+    plot edge in the case when panel has no external border for
+    graticule labels and panel grids are not the same.
+
+-   Coastline is updated to version 2021-05-20T05:37.
 
 ### version 3.9.2
 

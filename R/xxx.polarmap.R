@@ -39,6 +39,19 @@
    if (is.character(epsg))
       epsg <- as.integer(epsg)
    style <- if (epsg %in% 3571:3576) epsg else "laea"
+   if (is_ursa(obj)) {
+      if (!addFeature)
+         obj <- polygonize(ursa_bbox(obj))
+      else if (F) {
+         obj <- colorize(obj,ramp=FALSE)
+         str(obj)
+         obj <- polygonize(obj)
+         str(obj)
+         obj <- aggregate(obj)
+         q()
+      }
+     # addFeature <- FALSE
+   }
    if (is.character(obj)) {
       if (file.exists(obj))
          layer <- spatial_basename(obj)

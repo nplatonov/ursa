@@ -27,7 +27,7 @@
    if ((!is.expression(label))&&(all(is.na(label))))
       return(NULL)
   # label <- .getPrm(arglist,name="label",kwd=kwd,default="May")
-   font <- .getPrm(arglist,name="font",kwd=kwd,default=par("family"))
+  # font <- .getPrm(arglist,name="font",kwd=kwd,default=par("family"))
    position <- .getPrm(arglist,name="pos(ition)*",kwd=kwd
                       ,class=list("character","numeric"),default="topright")
    cex <- .getPrm(arglist,name="cex",kwd=kwd,default=1.2-0.2)
@@ -42,7 +42,12 @@
    y <- .getPrm(arglist,name="y$",kwd=kwd,default=NA_real_)
   # font <- .getPrm(arglist,name="font",kwd=kwd,default=par("family"))
    font <- .getPrm(arglist,name="font",kwd=kwd,default=getOption("ursaPngFamily"))
-   vertical <- .getPrm(arglist,name="vert(ical)*",kwd=kwd,default=FALSE)
+   ##~ vertical <- .getPrm(arglist,name="vert(ical)*"
+                      ##~ ,class=c("logical","numeric"),kwd=kwd,default=FALSE)
+  # vertical <- .getPrm(arglist,name="vert(ical)*",kwd=kwd,default=FALSE)
+   vertical <- .getPrm(arglist,name="vert(ical)*",kwd=kwd,default=0)
+   if (vertical==1)
+      vertical <- 90
    alpha <- .getPrm(arglist,name="(alpha|transp(aren(cy)*)*)",kwd=kwd,default=1)
    interpolate <- .getPrm(arglist,name="interp(olate)*",kwd=kwd,default=FALSE)
    resample <- .getPrm(arglist,name="resample",kwd=kwd,default=FALSE)
@@ -74,7 +79,7 @@
    device <- getOption("ursaPngDevice")
    vadj0 <- if ((!is.null(device))&&(device=="windows")) 0.35 else 0.40
    isPicture <- inherits(label,c("array","matrix"))
-   srt <- ifelse(vertical,90,0)
+   srt <- if (is.logical(vertical)) ifelse(vertical,90,0) else vertical
    if (length(adjust)==2) {
       vadj <- adjust[2]
       adjust <- adjust[1]

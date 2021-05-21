@@ -51,6 +51,8 @@
    isList <- is.list(link[[i]])
    if (!is.list(class))
       class <- list(class)
+   if (verbose)
+      str(class)
    for (j in seq_along(class)) {
       toInteger <- FALSE
       toLogical <- FALSE
@@ -70,7 +72,7 @@
          return(link[[i]])
       cl2 <- .grep("list",cl2,value=TRUE,invert=TRUE)
       if (verbose) {
-         print(c(pat=name,arg=myname[i],cl=cl,cl2=cl2),quote=FALSE)
+         print(c(pat=name,arg=myname[i],cl=cl,'cl2:'=cl2),quote=FALSE)
       }
       if (("integer" %in% cl2)&&("numeric" %in% cl)) {
          toInteger <- TRUE
@@ -88,8 +90,11 @@
         # m2 <- all(sapply(link[[i]],function(x) class(x)) %in% cl2) ## removed 2016-06-10
          m2 <- all(sapply(link[[i]],function(x) any(class(x) %in% cl2))) ## added 2016-06-10
       }
-      else if ("numeric" %in% cl2){
-         toNumeric <- TRUE
+      else if ("numeric" %in% cl2) {
+         if (F & cl2[1]=="logical") ## added 20210425
+            toLogical <- TRUE
+         else
+            toNumeric <- TRUE ## before 20210425 always
          m2 <- is.numeric(link[[i]]) | is.logical(link[[i]])
       }
       else {

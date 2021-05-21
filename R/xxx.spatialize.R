@@ -61,7 +61,7 @@
    isNative <- engine=="native"
    if (is.character(dsn)) {
       if (length(dsn)>1) {
-         pattern <- "\\.(gpkg|tab|kml|json|geojson|mif|sqlite|shp|osm)(\\.(zip|rar|gz|bz2))*$"
+         pattern <- "\\.(gpkg|tab|kml|json|geojson|mif|sqlite|shp|osm|csv)(\\.(zip|rar|gz|bz2))*$"
          dsn <- dsn[.grep(pattern,basename(dsn))]
          if (length(dsn)!=1)
             stop("Either filename is not recognized or multiple files")
@@ -615,8 +615,9 @@
          }
          else {
             opW <- options(warn=ifelse(isSP,-1,0))
-            if (isSF)
+            if (isSF) {
                lname <- try(sf::st_layers(dsn)$name)
+            }
             else {
                lname <- try(rgdal::ogrListLayers(dsn))
             }
@@ -635,7 +636,30 @@
                   return(NULL)
                }
                else {
-                  arglist <- c(as.list(match.call()),list(...))
+                  rel <- as.list(match.call())
+                  rname <- names(rel)
+                  j <- NULL
+                  for (i in seq_along(rel)[-1]) {
+                     if (is.language(rel[[i]])) {
+                        res <- eval.parent(rel[[i]])
+                        if (is.null(res))
+                           j <- c(j,i)
+                        else if (is.language(res)) {
+                           res <- eval.parent(res)
+                           if (!is.language(res)) {
+                              assign(rname[i],res)
+                              rel[[i]] <- res
+                           }
+                           else
+                              stop("unable to evaluate agrument ",.sQuote(rname[i]))
+                        }
+                        else
+                           rel[[i]] <- res 
+                     }
+                  }
+                  if (length(j))
+                     rel <- rel[-j]
+                  arglist <- c(rel,list(...))
                   ret <- lapply(layer,function(l) {
                      arglist$layer <- l
                      spatial_trim(do.call(as.character(arglist[[1]]),arglist[-1]))
@@ -1465,7 +1489,25 @@
    }
    if (is.null(g2))
       session_grid(g0)
-   if (has_it_canceled <- !FALSE) {
+   geoMix <- (.lgrep("point",geoType)>0)+
+             (.lgrep("line",geoType)>0)+
+             (.lgrep("polygon",geoType)>0)>1
+   if (geoMix) {
+      geoEach <- spatial_geotype(obj,each=TRUE)
+      obj <- lapply(c("point","line","polygon"),function(gf) {
+         if (!length(ind <- .grep(gf,geoEach)))
+            return(NULL)
+         res <- obj[ind,]
+         da <- spatial_data(res)
+         ind <- rep(TRUE,ncol(da))
+         if (T)
+            for (i in seq_along(ind))
+               ind[i] <- !all(is.na(da[[i]]))
+         res[ind]
+      })
+      obj <- obj[sapply(obj,function(o) !is.null(o))]
+   }
+   if (i_am_not_ready_to_cancel_it <- !FALSE) {
       if (!inherits(obj,"SpatialPixels"))
          attr(obj,"grid") <- g0
       else

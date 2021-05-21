@@ -111,7 +111,7 @@
                }
                f$name <- format(l)
                return({
-                  if ((FALSE)||(.isKnitr()))
+                  if ((FALSE)&&(.isKnitr()))
                      print(knitr::kable(f,format="pandoc"))
                   else {
                      ret <- print(f,quote=FALSE)
@@ -143,7 +143,7 @@
                }
                f$name <- format(l)
                return({
-                  if (.isKnitr())
+                  if ((FALSE)&&(.isKnitr()))
                      knitr::kable(f,format="pandoc")
                   else
                      print(f,quote=FALSE)
@@ -153,7 +153,7 @@
       }
       digits <- 3
    }
-   if (.isKnitr())
+   if ((FALSE)&&(.isKnitr()))
       knitr::kable(format(e,digits=digits,...))
    else
       print(format(e,digits=digits,...),quote=FALSE)

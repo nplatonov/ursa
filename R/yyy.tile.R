@@ -44,9 +44,11 @@
    optHERE <- getOption("HEREapp")
    TFkey <- getOption("ThunderforestApiKey")
    BingKey <- getOption("BingMapsKey")
+   StadiaKey <- getOption("stadiamaps_api_key")
    mapsurferKey <- getOption("openrouteserviceToken")
    googleCr <- "Google: TERMS OF USE ARE VIOLATED"
    yandexCr <- "Yandex: TERMS OF USE ARE VIOLATED"
+   StadiaCr <- paste0("\uA9 Stadia Maps, \uA9 OpenMapTiles ",osmCr)
    s <- list()
    s$mapnik <- c("https://{abc}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 ,osmCr) ## # http://{abc}.tile.osm.org/{z}/{x}/{y}.png
@@ -173,6 +175,19 @@
   # '\u044f\u043d\u0434\u0435\u043a\u0441' 
    s$'Yandex.ru' <- c(paste0("https://vec0{1234}.maps.yandex.net/"
                               ,"tiles?l=map&x={x}&y={y}&z={z}&scale={r}&lang=ru_RU"),yandexCr)
+   s$mapy <- c("https://mapserver.mapy.cz/base-m/{r}/{z}-{x}-{y}","mapy.cz")
+   s$'Stadia.AlidateSmooth' <- c(paste0("https://tiles.stadiamaps.com/tiles/alidade_smooth"
+                                       ,"/{z}/{x}/{y}{r}.png","?api_key=",StadiaKey)
+                                ,StadiaCr)
+   s$'Stadia.AlidateSmoothDark' <- c(paste0("https://tiles.stadiamaps.com/tiles/alidade_smooth_dark"
+                                           ,"/{z}/{x}/{y}{r}.png","?api_key=",StadiaKey)
+                                ,StadiaCr)
+   s$'Stadia.OSMBright' <- c(paste0("https://tiles.stadiamaps.com/tiles/osm_bright"
+                                   ,"/{z}/{x}/{y}{r}.png","?api_key=",StadiaKey)
+                            ,StadiaCr)
+   s$'Stadia.Outdoors' <- c(paste0("https://tiles.stadiamaps.com/tiles/outdoors"
+                                  ,"/{z}/{x}/{y}{r}.png","?api_key=",StadiaKey)
+                           ,StadiaCr)
   # http://a.maps.owm.io/map/precipitation_new/6/37/19?appid=b1b15e88fa797225412429c1c50c122a1   
    if (!sum(nchar(server))) {
      # print(.grep(".*zzz(google|yandex).*",names(s),value=TRUE,invert=TRUE))
@@ -209,6 +224,8 @@
       message("'options(BingMapsKey=<api_key>)' is required")
    if ((.lgrep("mapsurfer",server))&&(is.null(mapsurferKey)))
       message("'options(openrouteserviceToken=<api_key>)' is required")
+   if ((.lgrep("^Stadia\\.",server))&&(is.null(StadiaKey)))
+      message("'options(Stadiamaps_api_key=<api_key>)' is required")
   # if (length(server)==1)
   #    style <- unlist(strsplit(server,split="\\s+"))
    tile <- list(name="custom",url="",copyright="   ",fileext="___")
@@ -268,7 +285,9 @@
           ,.gsub("{miny}",miny,.gsub("{minx}",minx,tile))))
    if (.lgrep("maps.+yandex",tile)>0) 
       tile <- .gsub("{r}",ifelse(isRetina,"2","1"),tile)
-   else
+   else if (.lgrep("mapy\\.cz",tile)>0)
+      tile <- .gsub("{r}",ifelse(isRetina,"retina",""),tile)
+   else 
       tile <- .gsub("{r}",ifelse(isRetina,"@2x",""),tile)
    if (.lgrep("{q}",tile)) {
       b1 <- b2 <- rep(0,z)

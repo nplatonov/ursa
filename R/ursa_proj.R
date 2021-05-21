@@ -2,8 +2,7 @@
 'ursa_proj4<-' <- function(obj,keepGrid=FALSE,value) .syn('ursa_crs<-',0,obj,keepGrid,value)
 'ursa_proj'   <- function(obj) .syn('ursa_crs',0,obj)
 'ursa_proj<-' <- function(obj,keepGrid=FALSE,value) .syn('ursa_crs<-',0,obj,keepGrid,value)
-'ursa_crs' <- function(obj)
-{
+'ursa_crs' <- function(obj) {
    if (is.ursa(obj,"stack"))
       return(obj[[1]]$grid$crs)
    if (is.ursa(obj)) {
@@ -25,8 +24,7 @@
    }
    NULL
 }
-'ursa_crs<-' <- function(obj,keepGrid=FALSE,value) 
-{
+'ursa_crs<-' <- function(obj,keepGrid=FALSE,value) {
    if ((is.numeric(value))&&(.is.integer(value)))
       value <- paste0("+init=epsg:",round(value))
    else if (inherits(value,"CRS"))
@@ -39,10 +37,10 @@
    if (!is.ursa(obj)) {
       if (!.is.grid(obj))
          return(NULL)
-      obj$crs <- ursa_proj(value)
+      obj$crs <- ursa_crs(value)
       return(obj)
    }
-   obj$grid$crs <- ursa_proj(value)
+   obj$grid$crs <- ursa_crs(value)
    if (!keepGrid)
       session_grid(obj)
    obj

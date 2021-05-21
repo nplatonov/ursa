@@ -1,6 +1,7 @@
 'compose_open' <- function(...) {
-   if (T & .isKnitr())
+   if (T & .isKnitr()) {
       retina0 <- 2
+   }
    else {
       retina0 <- getOption("ursaRetina")
       if (!is.numeric(retina0))
