@@ -33,7 +33,7 @@ lon <- rev(sort(runif(n,min=40,max=60)))
 lat <- sort(runif(n,min=30,max=50))
 pt <- data.frame(lon=lon,lat=lat,value=seq(n))
 sp::coordinates(pt) <- c("lon","lat")
-spatial_crs(pt) <- "EPSG:4326"
+sp::proj4string(pt) <- "+proj=longlat"
 ct <- ursa_colortable(colorize(pt$value))
 tr <- segmentize(pt)
 session_grid(pt,expand=1.1)

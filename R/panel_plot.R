@@ -239,6 +239,10 @@
                  # print(data.frame(lwd=lwd,cell=cell,sc=sc,px=px,res=res))
                   arglist2$lwd <- res
                }
+               else if ((is.numeric(lwd))&&(lwd<=0))
+                  arglist2$lwd <- 1e-6
+               else if ((is.na(lwd))||(is.null(lwd)))
+                  arglist2$lwd <- 1e-6
             }
            # str(arglist2)
            # str(ct)

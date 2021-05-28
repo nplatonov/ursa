@@ -832,7 +832,8 @@
       {
         # i2 <- i2+1 ## 
          if (i2<0) {
-            label <- sprintf(sprintf("%%f",i2),as.double(round(value,i2+1)))
+           # label <- sprintf(sprintf("%%f",i2),as.double(round(value,i2+1))) # --
+            label <- sprintf("%.0f",as.double(round(value,i2+1))) # ++ 20210524
             i2 <- 0
            # label <- sprintf(sprintf("%%f",i2),as.double(value))
          }

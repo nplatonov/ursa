@@ -114,7 +114,7 @@
       extentASDI <- 4889334.802955
       scale0 <- 136421171.96428573131561279297
       resolutions <- 0.28*1e-3*scale0/(2^seq(0,18))
-      minZoom <- 1
+      minZoom <- 2
       maxZoom <- 10
       crsASDI <- leaflet::leafletCRS(crsClass="L.Proj.CRS"
                                     ,code=paste0("EPSG:",epsg)
@@ -146,8 +146,10 @@
                                                ,"&TileCol={x}"
                                                ,"&TileRow={y}"
                                                )
-                            ,options=leaflet::tileOptions(tileMatrix=epsg)
-                           # ,opacity=0.3 ## UNABLE
+                            ,options=leaflet::tileOptions(tileMatrix=epsg
+                                                         ,opacity=opacity
+                                                         )
+                           # ,opacity=0.3 ## unused argument
                             ,attribution=paste0("<a href=https://arctic-sdi.org"
                                                ,"/services/topografic-basemap/>"
                                                ,"Arctic SDI Topographic Basemap"
