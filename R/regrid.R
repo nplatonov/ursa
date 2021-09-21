@@ -175,6 +175,7 @@
                              ,proj4=NA,crs=NA,border=0
                              ,zero=c("keep","node","center")
                              ,raster=FALSE,tolerance=NA #1e-10
+                             ,zoom=NA
                              ,verbose=FALSE,...)
 {
    if (is.character(border)) ## cuttof 'border' in 'plot' functions
@@ -266,6 +267,11 @@
    ##~ if (verbose) {
       ##~ print(g)
    ##~ }
+   if ((is.numeric(zoom))&&(!is.numeric(mul))&&(!is.numeric(expand))) {
+      expand <- zoom
+      mul <- 1/zoom
+      zoom <- NA
+   }
    if (!is.na(cut[1])) {
       if (length(cut)==1)
          cut <- cut*c(-1,-1,1,1)

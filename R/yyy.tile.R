@@ -104,6 +104,8 @@
                       ,"\uA9 ESRI Satellite")
    s$Esri.WorldImagery <- c("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.jpg"
                       ,"Tiles \uA9 Esri - Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community")
+   s$Esri.Clarity <- c("https://clarity.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                      ,"ESRI.Clarity")
    s$HERE.Aerial <- c(url=paste0("https://{1234}.aerial.maps.cit.api.here.com/maptile"
                                 ,"/2.1/maptile/newest/satellite.day/{z}/{x}/{y}/256/png8?"
                                 ,"app_id=",optHERE$id,"&app_code=",optHERE$code,"&lg=eng")

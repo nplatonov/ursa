@@ -11,16 +11,19 @@
    legend <- .getPrm(arglist,name="legend",class="",default=NA)
    side <- .getPrm(arglist,name="side",default=NA_integer_,valid=1L:4L)
    ratio <- .getPrm(arglist,name="ratio",default=(16+0.05)/(9+0.05))
+   fixed <- .getPrm(arglist,name="fixed",default=FALSE)
    verbose <- .getPrm(arglist,name="verb(ose)*",default=FALSE)
    .compose_design(obj=obj,layout=layout,byrow=byrow,skip=skip,legend=legend
-                  ,side=side,ratio=ratio,verbose=verbose)
+                  ,side=side,ratio=ratio,fixed=fixed,verbose=verbose)
 }
 '.compose_design' <- function(obj=NULL,layout=NA,byrow=TRUE,skip=NULL,legend=NA
-                             ,side=NA,ratio=(16+1)/(9+1),verbose=FALSE) {
+                             ,side=NA,ratio=(16+1)/(9+1),fixed=fixed,verbose=FALSE) {
+   if (is.na(ratio))
+      ratio <- (16+1)/(9+1)
    if (verbose)
       str(list(obj=if (is.list(obj)) sapply(obj,class) else class(obj)
               ,layout=layout,byrow=byrow,skip=skip,legend=legend
-              ,side=side,ratio=ratio))
+              ,side=side,ratio=ratio,fixed=fixed))
    if (is.null(legend)) {
       forcedLegend <- FALSE
       legend <- NA
@@ -54,8 +57,8 @@
      # session_grid(obj) ## added 2015-12-02 # removed 20161226
       if (is.null(g0 <- getOption("ursaSessionGrid"))) ## added 20161226
          session_grid(obj)
-      g1 <- session_grid()
       isList <- .is.ursa_stack(obj)
+      print(session_grid())
       if (isList)
       {
         # if ((all(is.na(layout)))&&(is.na(legend))) {
@@ -73,14 +76,23 @@
       }
       else {
          if (is.integer(obj)) {
-            if (length(obj)==1)
+            if (length(obj)==1) {
+               if (fixed) {
+                  ol <- .optimal_layout(obj,ratio=ratio,verbose=TRUE)
+                 # ratio <- unname(ol[2]/ol[1])
+                  layout <- ol
+                  g0 <- session_grid()
+               }
                fld <- rep(1L,obj)
-            else
+            }
+            else {
                fld <- rep(1L,length(obj))
+            }
          }
          else
             fld <- rep(1L,nband(obj))
       }
+      g1 <- session_grid()
       if (is.null(skip))
          skip <- which(!fld)
       else {
@@ -98,8 +110,7 @@
             layout[2] <- ceiling(length(fld)/layout[1])
          }
       }
-      if (any(is.na(layout)))
-      {
+      if (any(is.na(layout))) {
          nl <- length(fld)
          ##~ if (!isList) {
             ##~ nc <- obj$grid$columns
@@ -125,7 +136,7 @@
             }
             lc <- pc*nc
             lr <- pr*nr
-            s1 <- (lc/lr)/ratio#-1 ## ratio 1.5=15:10  16:9   4:3
+            s1 <- (lc/lr)/ratio #-1 ## ratio 1.5=15:10  16:9   4:3
             if (s1<1)
                s1 <- 1/s1
             s0[pr] <- s1-1
@@ -382,7 +393,8 @@
    else
       sLegend <- sapply(legend,function(x) length(x)>0)
    options(ursaPngSkipLegend=which(!sLegend)) ## ,ursaPngSkip=skip
-   res <- list(layout=mosaic,image=m
+  # print(c(panelc=panelc,panelr=panelr))
+   res <- list(layout=mosaic,image=m,dim=c(panelr,panelc)
               ,legend=ifelse(!forcedLegend,0L,sum(sLegend)))
   # if (!is.null(names(legend)))
   #    res$legendName=names(legend)
@@ -390,4 +402,36 @@
   #            ,legend=vector("list",length(legend)))
    class(res) <- "ursaLayout"
    res
+}
+'.optimal_layout' <- function(panels=1,ratio=10,grid=NULL,verbose=FALSE,...) {
+   if (.is.grid(grid))
+      grid <- with(grid,c(rows,columns))
+   if (!((is.numeric(grid))&&(length(grid)==2))) {
+      grid <- with(session_grid(),c(rows,columns))
+   }
+   if (verbose)
+      print(grid)
+  # grid <- c(1200,1600)
+   r1 <- ratio # max(grid)/min(grid)
+  # panels <- sample(2:15,1)
+   v2 <- data.frame(s=seq(panels),nrow=NA,r2=NA)
+   print(c(r1=r1))
+   for (i in seq(panels)) {
+      j <- ceiling(panels/i)
+      d2 <- round(c(r1*grid[2]/i,grid[1]/j))
+      print(d2)
+      v2$nrow[i] <- j
+      v2$r2[i] <- round(max(d2)/min(d2),2)
+   }
+   if (verbose)
+      print(v2)
+   v <- v2[which.min(v2$r2),"nrow"]
+   u <- ceiling(panels/v)
+   x <- round(grid[2]/u)
+   y <- round(grid[1]/v)
+   if (verbose)
+      print(data.frame(nr=v,nc=u,x=x,y=y))
+   session_grid(unname(c(y,x)))
+   c(nr=v,nc=u)
+  # cd <- compose_design(,scale=1,legend=NULL,r)
 }

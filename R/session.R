@@ -79,6 +79,7 @@
       return(invisible(g1))
    }
    if ((is.numeric(obj))&&(length(obj)==2)) {
+      obj <- unname(obj)
       ref <- round(obj)
       g1 <- .grid.skeleton()
       g1$columns <- as.integer(ref[2])

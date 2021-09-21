@@ -12,7 +12,7 @@ compose_design(\dots)
 
 %%~ ## for internal use
 %%~ .compose_design(obj = NULL, layout = NA, byrow = TRUE, skip = NULL, legend = NA,
-%%~                side = NA, ratio = (16 + 1)/(9 + 1), ...)
+%%~                side = NA, ratio = (16 + 1)/(9 + 1), fixed = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -25,6 +25,7 @@ compose_design(\dots)
       \item{\code{legend}}{The descripition of rules how color bars (legends) or panel captions are located in the layout. It is the list of embedded lists of two elements, which describe the color bars position in the layout. of Default is \code{NA}, it means using of internal rules. If \code{legend=NULL} then no plotting of color bars. If \code{legend} is positive integer in the range \code{1L:4L}, then sinlge color bar is used and legend's side is corresponded to margins of \R graphic system.}
       \item{\code{side}}{Positive integer \code{1L}, \code{2L}, \code{3L}, or \code{4L}. Default is \code{NA}. Simplification of color bar position in the case that single color bar is used. The value is corresponded to margins of \R graphic system. The synonym of integer value of \code{legend}.}
       \item{\code{ratio}}{Positive numeric. The desired ratio of layout sides (width per height). If \code{layout=NA} then the dimensions of layout matrix are defined internally to get the given ratio of layout's width per height. The default is \code{(16+1)/(9+1)} in the assumtion of optimal filling on the usual 16:9 screens.}
+      \item{\code{fixed}}{Logical. If \code{TRUE} then it is assuming that layout will have the same proportions as sessional grid sizes (rows and columns). For this case, argument \code{ratio} is reassigned as a desired ratio (width per height) for single panel. Default is \code{FALSE}.}
    }
 }
 %~   \item{obj}{
@@ -116,6 +117,7 @@ The resulting layout is a sparse matrix with zero values for each even row and e
 It is a list of class \code{ursaLayout}.
 \item{layout}{Integer matrix with dimension \code{c(2*nr+3, 2*nc+3)}, where \code{nr} and \code{nc} are number of rows and colunms of the layout matrix. The layout matrix of image panels is surrounded by colorbar panels. The original layout matrix is expanded by adding zero columns and rows. In the new matrix each even column has zero values, and each even row has zero values.}
 \item{image}{Nonnegative integer. Number of panels with images.}
+\item{dim}{Nonnegative integer of length two. Number of rows and number of columns for panel layout.}
 \item{legend}{Nonnegative integer. Number of panels with color bars (legends).}
 The returned value is passed to function \code{\link[ursa]{compose_open}} and further is kept in the \code{\link[base]{options}} until calling of \code{\link[ursa]{compose_close}}.
 }

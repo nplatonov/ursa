@@ -131,14 +131,19 @@
 }
 'names.ursaColorTable' <- function(x) NextMethod("names",x)
 'names<-.ursaColorTable' <- function(x,value) {
+   ##~ print("HERE")
+   ##~ str(x)
+   ##~ str(value)
+   ##~ print(c('is numeric?'=.is.numeric(value)))
    if (!is.null(value)) {
-      if (length(x)==length(value)+1) {
+      if ((.is.numeric(value))&&(length(x)==length(value)+1)) {
          n0 <- value
          if (length(n0)>1)
             value <- paste0("(",n0[-length(n0)],";",n0[-1],"]")
          value <- c(paste0("<= ",n0[1]),value,paste0("> ",n0[length(n0)]))
       }
    }
+   ##~ str(value)
    if (!FALSE)
       return(NextMethod("names<-",x))
    cl <- class(x)

@@ -452,6 +452,7 @@
       }
       coast_xy <- rbind(coast_xy[,1:2],c(NA,NA),ant_xy[,1:2])
    }
+   print(c(detail=detail))
    if (!isDetail) {
       inside <- with(g1,coast_xy[,1]>=minx & coast_xy[,1]<=maxx &
                             coast_xy[,2]>=miny & coast_xy[,2]<=maxy)

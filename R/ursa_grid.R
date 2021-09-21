@@ -1,7 +1,6 @@
 #'ursaGrid' <- function(...) .syn('ursa_grid',0,...)
 #'ursaGrid<-' <- function(...) .syn('ursa_grid<-',0,...)
-'ursa_grid' <- function(obj=NULL)
-{
+'ursa_grid' <- function(obj=NULL) {
    if (is.null(obj))
       return(.grid.skeleton())
    if (.is.ursa_stack(obj))
@@ -58,8 +57,7 @@
    }
    NULL
 }
-'ursa_grid<-' <- function(obj,value)
-{
+'ursa_grid<-' <- function(obj,value) {
    if (!is.ursa(obj))
       return(obj)
    if (!.is.grid(value))
@@ -133,11 +131,19 @@
       stop("Unable to detect reference grid. Check 'ref' argument)")
    d1 <- unname(ursa(obj,"dim"))
    d <- min(d2/d1)
-   d.web <- trunc(log(d)/log(2))
-   d.less <- 2^(d.web-1)
-   d.more <- 2^(d.web+1)
+   d.orig <- d
+   if (preD <- T & isWeb)
+      d <- ifelse(d>1,d/expand,d*expand)
+   d.web <- floor(log(d)/log(2)) ## trunc(use) round(dev) [trunc==floor for positive]
+  # d.web <- trunc(log(d)/log(2)) ## trunc(use) round(dev)
+   d.less <- 2^(d.web-1+1*1)
+   d.more <- 2^(d.web+0+1*1)
+   if (T)
+      print(c(d=d,d.orig=d.orig,d.more=d.more,d.less=d.less,d.web=2^d.web
+             ,d.raw=2^(log(d)/log(2)),expand=expand),digits=3)
    if (d>1) {
-      d <- d*expand
+      if (!preD)
+         d <- d/expand
      # cat("---------\n")
      # str(obj)
      # g2 <- regrid(obj,expand=d) ## ifelse(isWeb,2^(trunc(log(d)/log(2))+1),d)
@@ -147,8 +153,10 @@
      # g2$retina <- NA
    }
    else {
-      d <- d/expand
-      g2 <- regrid(obj,mul=ifelse(isWeb,1/d.more,d)) ## d.more d.less d.web
+      if (!preD)
+         d <- d/expand
+     # g2 <- regrid(obj,mul=ifelse(isWeb,d.more,d)) ## d.more d.less d.web
+      g2 <- regrid(obj,mul=ifelse(isWeb,d.less,d)) ## d.more d.less d.web
      # g2$retina <- NA
    }
   # cat("--------------\n")
@@ -160,7 +168,7 @@
       print(c('d1:'=d1))
       print(c('d2:'=d2))
       print(c('d2/d1:'=d2/d1))
-      print(c(d=d,d.less=d.less,d.web=d.web,d.more=d.more))
+      print(c(d=d,d.less=d.less,d.web=2^d.web,d.more=d.more))
       print(c('d3:'=d3))
    }
    d4 <- d2-d3
