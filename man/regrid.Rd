@@ -16,7 +16,7 @@ regrid(x, ...)
         columns = NA, rows = NA, dim = NA, bbox = NA, expand = NA,
         minx = NA, miny = NA, maxx = NA, maxy = NA, cut = NA, proj4 = NA, crs = NA,
         border = 0, zero = c("keep", "node", "center"), raster = FALSE, tolerance = NA,
-        verbose = FALSE, ...)
+        zoom = NA, verbose = FALSE, ...)
 
 }
 %- maybe also 'usage' for other objects documented here.
@@ -102,6 +102,9 @@ Positive \code{integer} of length 2. Dimenstion of raster image in the notation 
 }
   \item{tolerance}{
 \code{numeric}. Threshold for comparison float point numerics. Required for internal check of grid consistence. Default is \code{NA}; value \code{.Machine$double.eps} multiplied on maximal value of coordinates is used.
+}
+  \item{zoom}{
+\code{numeric}. Tweak for simultaneous change of \code{expand} and \code{mul}: \code{expand=zoom}, \code{mul=1/zoom}. Default is \code{NA}.
 }
   \item{verbose}{
 Reporting via \code{message} about violation and restoration of coordinate grid regilarity after non-consistence usage of parameters.
