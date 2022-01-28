@@ -452,7 +452,8 @@
       }
       coast_xy <- rbind(coast_xy[,1:2],c(NA,NA),ant_xy[,1:2])
    }
-   print(c(detail=detail))
+   if (!.isPackageInUse())
+      print(c(detail=detail))
    if (!isDetail) {
       inside <- with(g1,coast_xy[,1]>=minx & coast_xy[,1]<=maxx &
                             coast_xy[,2]>=miny & coast_xy[,2]<=maxy)
@@ -792,6 +793,22 @@
       a <- do.call("rbind",c(a,a180))
       .elapsedTime("merging - done")
    }
+   if (devel2 <- FALSE) {
+      sf::sf_use_s2(TRUE)
+      print("D")
+      a3 <- sf::st_area(a)
+      print("A")
+      str(a3)
+      str(attr(a3,"units"))
+     # u <- attr(a3,"units")$numerator
+      a1 <- sf::st_transform(a,crs=4326)
+      print("B")
+      a2 <- sf::st_area(a1)
+      print("C")
+      str(a2)
+      q()
+   }
+   sf::sf_use_s2(FALSE) ## ++ 20220125 
    pArea <- sf::st_area(sf::st_transform(a,crs=4326))
   # pArea <- as.numeric(units::set_units(pArea,km^2))
    u <- attr(pArea,"units")$numerator

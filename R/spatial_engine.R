@@ -1403,7 +1403,7 @@
    nc <- (bbox["xmax"]-bbox["xmin"])
    nr <- (bbox["ymax"]-bbox["ymin"])
    res <- max(nc,nr)/640
-   p <- pretty(res)
+   p <- as.numeric(pretty(res))
    res <- p[which.min(abs(res-p))]
    regrid(setbound=unname(bbox),crs=crs,res=res)
 }

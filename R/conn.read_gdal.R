@@ -51,6 +51,8 @@
    }
    else
       isSF <- FALSE
+   if (verbose)
+      print(c(isSF=isSF))
    if (isSF) {
      # str(md <- sf::gdal_metadata(fname,parse=!FALSE))
      # str(ds <- sf::gdal_subdatasets(fname,name=TRUE))

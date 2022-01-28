@@ -71,7 +71,12 @@
          res
       })
       p4s <- unname(p4s)
-      keepCRS <- ifelse(length(p4s)==1,TRUE,do.call("all.equal",as.list(p4s)))
+     # keepCRS <- ifelse(length(p4s)==1,TRUE,do.call("all.equal",as.list(p4s)))
+      keepCRS <- ifelse(length(p4s)==1,TRUE,{
+         p4ind <- expand.grid(seq_along(p4s),seq_along(p4s))
+         p4ind <- as.list(data.frame(t(as.matrix(p4ind[p4ind[,1]<p4ind[,2],]))))
+         all(sapply(p4ind,function(i) identical(p4s[i[1]],p4s[i[2]])))
+      })
       if (verbose)
          .elapsedTime("list:0")
       iname <- vector("list",length(fname1))
@@ -399,9 +404,22 @@
             writeLines(a,Fout)
          }
          else {
-            da <- spatial_data(obj)
+            aname <- spatial_colnames(obj)
+            if (length(ind <- which(Encoding(aname) %in% "unknown"))) {
+              # print(ind)
+              # print(aname[ind])
+              # print(Encoding(aname[ind]))
+               aname[ind] <- enc2utf8(aname[ind])
+               spatial_colnames(obj) <- aname
+              # print(Encoding(bname))
+              # bname <- iconv(aname[ind],from="unknown",to="UTF=8")
+              # bname <- iconv(iconv(aname,to="UTF=8"),to="native")
+              # print(bname)
+              # q()
+            }
             if (length(ind <- which(sapply(obj,inherits,"character")))) {
                for (i in ind) {
+                  obj[,i] <- enc2utf8(obj[,i,drop=TRUE])
                  # obj[,i] <- iconv(obj[,i,drop=TRUE],to="UTF-8")
                  # Encoding(obj[[i]]) <- "UTF-8"
                }
@@ -504,7 +522,7 @@
    if (verbose)
       cat("pack...")
    if ((.lgrep("gz",compress))&&(nchar(Sys.which("gzip"))))
-      system2("gzip",c("-f",fname))
+      system2("gzip",c("-9","-f",fname))
    else if (.lgrep("bz(ip)*2",compress)&&(nchar(Sys.which("bzip2"))))
       system2("bzip2",c("-f",fname))
    else if (.lgrep("xz",compress)&&(nchar(Sys.which("xz"))))

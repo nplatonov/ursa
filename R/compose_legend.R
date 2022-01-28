@@ -59,17 +59,19 @@
    else {
       if (inherits(arglist[[1]],"ursaLegend"))
          arglist[[1]] <- ursa_colortable(arglist[[1]])
-      arglist[[1]] <- lapply(arglist[[1]],function(x1) {
-         if (identical(c("index","colortable"),names(x1)))
-            return(x1$colortable)
-         if ((is.list(x1))&&(length(x1)==1)) {
-            if (is.ursa(x1))
+      if (!inherits(arglist[[1]],"ursaColorTable")) {
+         arglist[[1]] <- lapply(arglist[[1]],function(x1) {
+            if (identical(c("index","colortable"),names(x1)))
                return(x1$colortable)
-            else
-               return(x1[[1]])
-         }
-         x1
-      })
+            if ((is.list(x1))&&(length(x1)==1)) {
+               if (is.ursa(x1))
+                  return(x1$colortable)
+               else
+                  return(x1[[1]])
+            }
+            x1
+         })
+      }
       ind <- sapply(arglist[[1]],is.ursa,"colortable")
       if ((is.list(ind))&&(!length(ind)))
          return(invisible(NULL))

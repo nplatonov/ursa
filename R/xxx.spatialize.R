@@ -1476,6 +1476,10 @@
    }
    if ((isWeb)||("web" %in% style)) {
       if (retina>1) {
+         if (retina<2)
+            retina <- 2
+         else if ((retina>2)&&(retina<4))
+            retina <- 4
          g0 <- regrid(g0,mul=retina)
          g0$retina <- retina
       }

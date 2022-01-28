@@ -236,7 +236,7 @@
       return(FALSE)
    getOption("ursaPngSkip")
 }
-'.dist2' <- function(src,dst,summarize=!FALSE,positive=FALSE,verbose=TRUE)
+'.dist2' <- function(src,dst,summarize=!FALSE,positive=FALSE,verbose=!.isPackageInUse())
 {
    if (identical(src,dst))
       positive <- TRUE
@@ -254,19 +254,30 @@
       res
    }
    isUrsa <- FALSE
+   if ((is_spatial(src))&&((is_spatial(dst))))
+      stopifnot(identical(spatial_crs(src),spatial_crs(dst)))
    if (is_spatial(src)) {
-      src <- switch(spatial_geotype(src)
-                   ,POINT=spatial_coordinates(src)
-                   ,stop("'src': unimplemented for ",spatial_geotype(src)))
+      src <- spatial_coordinates(src)
+      if (is.list(src)) {
+         while(all(sapply(src,is.list)))
+            dst <- unlist(src,recursive=FALSE)
+         src <- do.call(rbind,src)
+      }
    }
    else if (is_ursa(src)) {
       src <- as.data.frame(src)[,1:2]
       isUrsa <- TRUE
    }
    if (is_spatial(dst)) {
-      dst <- switch(spatial_geotype(dst)
-                   ,POINT=spatial_coordinates(dst)
-                   ,stop("'dst': unimplemented for ",spatial_geotype(dst)))
+      ##~ dst <- switch(spatial_geotype(dst)
+                   ##~ ,POINT=spatial_coordinates(dst)
+                   ##~ ,stop("'dst': unimplemented for ",spatial_geotype(dst)))
+      dst <- spatial_coordinates(dst)
+      if (is.list(dst)) {
+         while(all(sapply(dst,is.list)))
+            dst <- unlist(dst,recursive=FALSE)
+         dst <- do.call(rbind,dst)
+      }
    }
    else if (is_ursa(dst)) {
       dst <- as.data.frame(dst)[,1:2]
@@ -648,3 +659,14 @@
    arglist
 }
 '.isColor' <- function(x) !inherits(try(col2rgb(x),silent=TRUE),"try-error")
+'.isWeb' <- function(grid) {
+   if (missing(grid))
+      grid <- session_grid()
+   crs <- ursa(grid,"crs")
+   v1 <- ursa(grid,"cellsize")
+   v2 <- 2*6378137*pi/(2^(1:21+8))
+   cond1 <- grepl("\\+proj=merc",crs)>0
+  # print(format(v2,sci=FALSE),quote=FALSE)
+   cond2 <- !is.na(.is.near(v1,v2))
+   cond1 & cond2
+}

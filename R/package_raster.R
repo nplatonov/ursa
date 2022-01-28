@@ -86,7 +86,7 @@
    }
    raster::extent(res) <- with(g1,c(minx,maxx,miny,maxy))
    opC <- options(warn=0)
-   raster::crs(res) <- sp::CRS(ursa_crs(g1),doCheckCRSArgs=FALSE)
+   raster::crs(res) <- sp::CRS(ursa_crs(g1),doCheckCRSArgs=!FALSE) ## 20220118 doCheck...=TRUE
    options(opC)
    if (isGrid)
       return(res)

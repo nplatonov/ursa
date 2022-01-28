@@ -12,6 +12,8 @@
    }
    if (.isRemark())
       return(browse(obj,...))
+   if (inherits(obj,c("datatables")))
+      return(browse(obj,...))
    if (!inherits(obj,c("htmlwidget","knitr_kable")))
       return(browse(obj,...))
    obj
@@ -39,6 +41,13 @@
    }
    else
       height <- NULL
+   if (length(ind <- grep("^width$",ignore.case=FALSE,names(arglist)))) {
+      ind2 <- tail(ind,1)
+      width <- arglist[[ind2]]
+      arglist[ind2] <- NULL
+   }
+   else
+      width <- NULL
    if (length(ind <- grep("^output$",ignore.case=FALSE,names(arglist)))) {
       ind2 <- tail(ind,1)
       output <- arglist[[ind2]]
@@ -266,7 +275,7 @@
                cmd <- paste0("<div class=\"figure\">\n"
                             ,"<div class=\"framed\"",suffix,">\n"
                             ,"<iframe src=",dQuote(fname)
-                            ," width=",dQuote(knitr::opts_current$get("out.width"))
+                            ," width=",dQuote(width)
                             ," height=",dQuote(height)
                             ," class=",dQuote("ursa-widgetize"),">"
                             ,"</iframe>\n"

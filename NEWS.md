@@ -1,8 +1,26 @@
-2021-05-23
+2022-01-24
 
 ### version 3.9.5
 
--   ongoing
+-   Test building for development R 4.2.0.
+
+-   Avoiding in code and examples comparions more than two objects using
+    `all.equal()`.
+
+-   Corrected index in `value_cr`, when number of columns and number in
+    argunents.
+
+-   New argument `zoom` in function `regrid()` simultaneously replaces
+    `expand=zoom` and `mul=1/zoom`.
+
+-   New argument `fixed` in function `compose_desing()` forms output
+    layout, which is close to session grid.
+
+-   New argument `verbose` in function `consistent_grid()` for verbose
+    output.
+
+-   New coersion (yet simplified) from `SpatRaster` class (package
+    **terra**).
 
 ### version 3.9.4
 
@@ -49,15 +67,15 @@
 
 ### version 3.9.1
 
--   Consistence with imported package **sp** (&gt;=1.4-4) and suggested
-    package **`sf`** (&gt;=0.9-6) is in progress with focus to
+-   Consistence with imported package **sp** (>=1.4-4) and suggested
+    package **`sf`** (>=0.9-6) is in progress with focus to
     “proj4string” declaration of CRS.
 
 -   Additional value `shape` for `area` argument and additional value
     `pickpoint` for `geocode` argument in function `.glance()`.
 
--   Package **`geojsonsf`** (&gt;=2.0.0) is added as suggested for
-    faster `sf`/GeoJSON import/export.
+-   Package **`geojsonsf`** (>=2.0.0) is added as suggested for faster
+    `sf`/GeoJSON import/export.
 
 -   Package **`leaflet.providers`** is added as suggested.
 
@@ -76,8 +94,8 @@
 
 ### version 3.8.20
 
--   Consistence with imported package **sp** (&gt;=1.4-0) and suggested
-    package **`sf`** (&gt;=0.9-3) is in progress.
+-   Consistence with imported package **sp** (>=1.4-0) and suggested
+    package **`sf`** (>=0.9-3) is in progress.
 
 -   New argument `engine` in function `read_gdal()` for optional
     importind data via `sf::gdal_read()` function.
@@ -111,13 +129,13 @@
 ### version 3.8.18
 
 -   `spatial_write()`: fixed deprecated (**`sf`** &gt;= 0.9-0) argument
-    `update`-&gt;`append` in suggested `sf::sf_write()`.
+    `update`->`append` in suggested `sf::sf_write()`.
 
 -   Re-check “don’t test” examples.
 
 ### version 3.8.17
 
--   Fixed for suggested package **`proj4`** (&gt;=1.0.10).
+-   Fixed for suggested package **`proj4`** (>=1.0.10).
 
 -   Tested on R-devel (r77878, r77936) and Rtools 4.0 (2020-02-05); no
     errors. For R-devel (r77936) suggested package **`raster`** should
@@ -206,7 +224,7 @@
     static map due to
     [limitations](http://staticmap.openstreetmap.de/staticmap.php).
 
--   Parsing of metadata from object of package **stars** (&gt;=0.2).
+-   Parsing of metadata from object of package **stars** (>=0.2).
 
 -   Domain changed from “arcticconnect.org” to “arcticconnect.ca” for
     `style=polarmap` in `glance()`
@@ -419,7 +437,7 @@
 
 -   fix layout in ‘compose\_design()’ for images like strips
 
--   in suggestion, sf (&gt;= 0.5-0)
+-   in suggestion, sf (>= 0.5-0)
 
 ### version 3.7-12
 

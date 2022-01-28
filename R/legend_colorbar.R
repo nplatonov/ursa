@@ -543,7 +543,9 @@
               ,z=matrix(z,ncol=1),axes=FALSE,col=shadow
               ,xlab="",ylab="",useRaster=useRaster,add=TRUE)
       }
-      if (!isTick)
+      if (length(at1)>191)
+         NULL
+      else if (!isTick)
          abline(v=z0[-1]-0.5,h=0,col=scol,lty=1,lwd=0.5)
       else {
          for (d in c(1,3))
@@ -569,6 +571,8 @@
               ,z=matrix(z,nrow=1),axes=FALSE,col=shadow
               ,xlab="",ylab="",useRaster=useRaster,add=TRUE)
       }
+      if (length(at1)>191)
+         NULL
       if (!isTick)
          abline(v=0,h=seq(col)[-1]-0.5,col=scol,lty=1,lwd=0.5)
       else {

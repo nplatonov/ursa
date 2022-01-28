@@ -49,6 +49,7 @@
    googleCr <- "Google: TERMS OF USE ARE VIOLATED"
    yandexCr <- "Yandex: TERMS OF USE ARE VIOLATED"
    StadiaCr <- paste0("\uA9 Stadia Maps, \uA9 OpenMapTiles ",osmCr)
+   StamenCr <- paste0("Map tiles by Stamen Design, CC BY 3.0 - Map data ",osmCr)
    s <- list()
    s$mapnik <- c("https://{abc}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 ,osmCr) ## # http://{abc}.tile.osm.org/{z}/{x}/{y}.png
@@ -128,7 +129,7 @@
    s$opentopomap <- c("http://{abc}.tile.opentopomap.org/{z}/{x}/{y}.png"
                      ,paste0(osmCr,", \uA9 OpenTopoMap"))
    s$wiki <- c("https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png"
-              ,"Wikimedia")
+              ,paste0("Wikimedia | ",osmCr))
    s$polarmap <- c("https://{abc}.tiles.arcticconnect.ca/osm_{l}/{z}/{x}/{y}.png"
                   ,paste0("Map \uA9 ArcticConnect. Data ",osmCr))
    s$ArcticConnect <- c("https://{abc}.tiles.arcticconnect.ca/osm_{l}/{z}/{x}/{y}.png"
@@ -190,6 +191,11 @@
    s$'Stadia.Outdoors' <- c(paste0("https://tiles.stadiamaps.com/tiles/outdoors"
                                   ,"/{z}/{x}/{y}{r}.png","?api_key=",StadiaKey)
                            ,StadiaCr)
+   s$'Stamen.Terrain' <- c(paste0("https://stamen-tiles-{abcd}.a.ssl.fastly.net/terrain"
+                                  ,"/{z}/{x}/{y}{r}.png")
+                          ,StamenCr)
+   s$'rumap' <- c("https://{abcd}tilecart.kosmosnimki.ru/rw/{z}/{x}/{y}.png"
+                 ,"\u0420\u435\u043b\u044c\u0435\u0444 \u0420\u0443\u043c\u0430\u043f Scanex")
   # http://a.maps.owm.io/map/precipitation_new/6/37/19?appid=b1b15e88fa797225412429c1c50c122a1   
    if (!sum(nchar(server))) {
      # print(.grep(".*zzz(google|yandex).*",names(s),value=TRUE,invert=TRUE))

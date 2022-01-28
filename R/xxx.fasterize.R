@@ -1,6 +1,6 @@
 '.fasterize' <- function(obj,by=NULL,fun="last") {
    for (pkg in c("sf","raster","fasterize")[3]) 
-      if (!requireNamespace(pkg,quietly=.isPackageInUse()))
+      if (!requireNamespace(pkg,quietly=.isPackageInUse(),partial=FALSE))
          stop(paste("Package",sQuote(pkg),"is required for this operation"))
   # if (is.character(obj))
    obj <- spatialize(obj,engine="sf")

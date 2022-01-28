@@ -126,7 +126,7 @@
      # print(round(lambda*255,1))
    }
    if ((is.character(rotate))&&(.lgrep("circle|round",rotate))) {
-      if (n>2)
+      if (n>1)
          rotate <- .sample(c(-1,1),1)*360*(1-1/n)
       else
          rotate <- NA

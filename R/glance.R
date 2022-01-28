@@ -300,6 +300,7 @@
          message(paste("failed to get map; change service:"
                       ,.sQuote(.style),"->",.sQuote(style)))
       }
+     # print(basemap)
      # str(basemap)
       if (inherits(basemap,"try-error")) {
          message(paste("failed to get map; cancel"))

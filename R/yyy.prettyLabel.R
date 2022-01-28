@@ -60,16 +60,20 @@
    }
    data.frame(at=finalY,lab=finalLabel)
 }
-'.deintervale' <- function(value,verbose=FALSE)
-{
+'.deintervale' <- function(value,verbose=FALSE) {
    if (is.ursa(value))
       value <- ursa_colortable(value)
    if (.is.colortable(value))
       value <- names(value)
    opW <- options(warn=-10);on.exit(options(opW))
-   ind <- .grep("^\\d{2}\\.\\d{2}$",value)
-   if (length(ind)==length(value)) ## date can be interpeted as numeric
-      return(value)
+   patt <- "^(\\d{2})\\.(\\d{2})$"
+   ind <- .grep(patt,value)
+   if (length(ind)==length(value)) {## date can be interpeted as numeric
+      b1 <- range(as.integer(gsub(patt,"\\1",value)))
+      b2 <- range(as.integer(gsub(patt,"\\2",value)))
+      if ((all(b1 %in% seq(12)))||(all(b2 %in% seq(12))))
+         return(value)
+   }
    res <- as.numeric(value)
    if (!anyNA(res)) {
       if (.lgrep("^0\\d.*",value))

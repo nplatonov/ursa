@@ -41,12 +41,18 @@
       if (!file.exists(cname))
          saveRDS(leaflet.providers::get_providers(),cname)
       p <- readRDS(cname)$providers_details
+      osmCr <- p$'OpenStreetMap'$options$attribution
+      osmCr <- gsub("(^.*)(<a\\s.+>)(.+)(</a>)(.*$)","\\1\\3\\5",osmCr)
+      osmCr <- gsub("&copy;","\uA9",osmCr)
      # style <- "Stadia" ## devel
       spatt <- "^(\\w+)(\\.(\\w+))*$"
       s1 <- gsub(spatt,"\\1",style)
       s2 <- gsub(spatt,"\\3",style)
       if (s1 %in% names(p)) {
          p1 <- p[[s1]]
+         ##~ cat('p1:--------\n')
+         ##~ str(p1)
+         ##~ cat('-----------\n')
          sUrl <- p1$url
          sAttr <- p1$options$attribution
          t1 <- unlist(gregexpr("<",sAttr))
@@ -59,20 +65,47 @@
                res <- c(res,substr(sAttr,t2[i],t1[i]))
             sAttr <- paste(res,collapse="")
             sAttr <- gsub("&copy;","\uA9",sAttr)
+            sAttr <- gsub("&mdash;","\u2014",sAttr)
          }
          if (nchar(s2)>0) {
             if (s2 %in% names(p1$variants)) {
                p2 <- p1$variants[[s2]]
-               sUrl <- p2$url
+               ##~ cat('p2:--------\n')
+               ##~ str(p2)
+               ##~ cat('-----------\n')
+               if (!is.null(p2$url))
+                  sUrl <- p2$url
+               if (isExt <- grepl("\\{ext\\}",sUrl))
+                  if (!is.null(p2$options$ext))
+                     sUrl <- gsub("\\{ext\\}",p2$options$ext,sUrl)
+               if (grepl("\\{variant\\}",sUrl))
+                  if (!is.null(p2$options$variant))
+                     sUrl <- gsub("\\{variant\\}",p2$options$variant,sUrl)
             }
          }
+         if (isExt <- grepl("\\{ext\\}",sUrl))
+            if (!is.null(p1$options$ext))
+               sUrl <- gsub("\\{ext\\}",p1$options$ext,sUrl)
+         if (grepl("\\{variant\\}",sUrl))
+            if (!is.null(p1$options$variant))
+               sUrl <- gsub("\\{variant\\}",p1$options$variant,sUrl)
+         if (grepl("\\{s\\}",sUrl))
+            if (!is.null(p1$options$subdomains))
+               sUrl <- gsub("\\{s\\}",paste0("{",p1$options$subdomains,"}"),sUrl)
+         if (grepl("^//",sUrl))
+            sUrl <- paste0("https:",sUrl)
+         if (grepl("\\{attribution\\.OpenStreetMap\\}",sAttr))
+            sAttr <- gsub("\\{attribution\\.OpenStreetMap\\}",osmCr,sAttr)
         # print(c(url=sUrl,attr=sAttr))
-         style <- c(sUrl,"png",sAttr)
+         if (isExt)
+            style <- c(sUrl,sAttr)
+         else
+            style <- c(sUrl,"png",sAttr)
         # art <- style
       }
    }
-  # print(art)
-  # print(style)
+   ##~ print(art)
+   ##~ print(style)
    isStatic <- .lgrep("static",style)>0
   # if ((!isStatic)&&("ursa" %in% loadedNamespaces())) {
   #    stop("Operation is prohibited: unable to display attribution.")
@@ -509,7 +542,7 @@
          if (verbose) {
             str(dim1)
             str(dim2)
-        }
+         }
          changeH <- !.is.eq(dim1[2],dim2[2]) # dim1[2]!=dim2[2]
          changeV <- !.is.eq(dim1[1],dim2[1]) # dim1[1]!=dim2[1]
         # changeDim <- !all(dim1==dim2)

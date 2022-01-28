@@ -227,6 +227,7 @@
                   ,crs=md$x$refsys$proj4string)
       session_grid(g1)
       isHomo <- length(obj)==0 ##
+     # print(c(isHomo=isHomo))
       if (isHomo) {
          res <- as.ursa(obj[[1]],flip=TRUE)
       }
@@ -252,6 +253,35 @@
             }
          }
       }
+      if (length(obj)==1)
+         return(res[[1]])
+      return(res)
+   }
+   if (inherits(obj,"SpatRaster")) { ## package `terra`
+      if (devel <- FALSE) {
+        # a1 <- obj@ptr$getCategories()
+        # a1 <- obj@ptr$getCatIndex()
+         ##~ ctname <- terra::levels(obj)
+         ##~ str(ctname)
+         ##~ ct <- terra::coltab(obj)
+         ##~ str(ct)
+         ##~ a1 <- obj@ptr$getColors()
+         ##~ str(a1)
+         ##~ print(a1)
+         ##~ str(a1[[1]]$finalize())
+         ##~ q()
+      }
+      bbox <- obj@ptr$extent$vector[c(1,3,2,4)]
+      res <- obj@ptr$res
+      crs <- obj@ptr$get_crs("proj4")
+      aname <- obj@ptr$names
+      g1 <- regrid(bbox=bbox,res=res,crs=crs)
+      if (identical(bbox,c(0,0,1,1)))
+         g1 <- regrid(bbox=c(0,0,rev(dim(g1))),res=1,crs=crs)
+     # g0 <- getOption("ursaSessionGrid")
+     # session_grid(g1)
+      res <- ursa(obj[])
+      names(res) <- aname
       return(res)
    }
    if (is.list(obj)) {

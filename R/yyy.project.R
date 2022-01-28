@@ -187,11 +187,12 @@
    if ((is.character(code))&&(!nchar(code)))
       return(code)
    if (!.lgrep("\\D",code))
-      p4epsg <- paste0("+init=epsg:",code)
+      p4epsg <- paste0(c("+init=epsg:","EPSG:")[2],code)
    else if (.lgrep("^epsg:\\d+",code))
-      p4epsg <- paste0("+init=",code)
+      p4epsg <- c(paste0("+init=",code),toupper(code))[2]
    else if (.lgrep("^(\\s+)*\\+init=epsg:\\d+",code))
-      p4epsg <- .gsub("^\\s+","",code)
+      p4epsg <- c(.gsub("^\\s+","",code),.gsub("^\\s+",""
+                 ,toupper(.gsub("\\+init=","",code))))[2]
    else if ((force)&&(.lgrep("^ESRI\\:",code,ignore.case=FALSE)))
       p4epsg <- code
    else if (is.character(code))
@@ -239,7 +240,7 @@
             ##~ str(p4s)
            ##~ # sp::CRS(SRS_string=p4epsg)
             ##~ q()
-            p4s <- try(methods::slot(sp::CRS(p4epsg,doCheckCRSArgs=FALSE),"projargs"))
+            p4s <- try(methods::slot(sp::CRS(p4epsg,doCheckCRSArgs=TRUE),"projargs"))  ## -- 20220124 FALSE
          }
          if (!inherits(p4s,"try-error")) {
             fail <- FALSE
@@ -263,7 +264,7 @@
             options(opW)
          }
          else {
-            p4s <- try(methods::slot(sp::CRS(p4epsg,doCheckCRSArgs=FALSE),"projargs"))
+            p4s <- try(methods::slot(sp::CRS(p4epsg,doCheckCRSArgs=TRUE),"projargs")) ## -- 20220124 FALSE
          }
          if (inherits(p4s,"try-error")) {
             fail <- TRUE

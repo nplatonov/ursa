@@ -58,7 +58,6 @@
       if (is.null(g0 <- getOption("ursaSessionGrid"))) ## added 20161226
          session_grid(obj)
       isList <- .is.ursa_stack(obj)
-      print(session_grid())
       if (isList)
       {
         # if ((all(is.na(layout)))&&(is.na(legend))) {
@@ -78,7 +77,7 @@
          if (is.integer(obj)) {
             if (length(obj)==1) {
                if (fixed) {
-                  ol <- .optimal_layout(obj,ratio=ratio,verbose=TRUE)
+                  ol <- .optimal_layout(obj,ratio=ratio,verbose=verbose)
                  # ratio <- unname(ol[2]/ol[1])
                   layout <- ol
                   g0 <- session_grid()
@@ -415,11 +414,13 @@
    r1 <- ratio # max(grid)/min(grid)
   # panels <- sample(2:15,1)
    v2 <- data.frame(s=seq(panels),nrow=NA,r2=NA)
-   print(c(r1=r1))
+   if (verbose)
+      print(c(r1=r1))
    for (i in seq(panels)) {
       j <- ceiling(panels/i)
       d2 <- round(c(r1*grid[2]/i,grid[1]/j))
-      print(d2)
+      if (verbose)
+         print(d2)
       v2$nrow[i] <- j
       v2$r2[i] <- round(max(d2)/min(d2),2)
    }

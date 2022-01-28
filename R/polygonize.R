@@ -171,7 +171,8 @@
    session_grid(g0)
    sa
 }
-'.vectorize' <- function(obj,fname,opt="",engine=c("sf","sp")) {
+'.vectorize' <- function(obj,fname,opt="",engine=c("sf","sp"),verbose=FALSE) {
+   stopifnot('\'gdal_polygonize.py\' not found'=!nchar(Sys.which("gdal_polygonize.py"))==0)
    engine <- match.arg(engine)
    if (engine=="sp") {
       isSF <- FALSE
@@ -200,6 +201,8 @@
    write_envi(obj,paste0(Fout,"."))
    cmd <- paste("python",Sys.which("gdal_polygonize.py")
                ,opt," -f \"ESRI Shapefile\"",Fout,fname)
+   if (verbose)
+      print(cmd)
    system(cmd)
    envi_remove(Fout)
    if (!internal)

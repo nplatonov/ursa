@@ -103,7 +103,12 @@
             grid$crs <- c("4326","+proj=longlat +datum=WGS84 +no_defs")[-1]
          else if (map[1]=="UTM")
             grid$crs <- paste("+proj=utm",paste0("+zone=",map[8])
-                               ,"+datum=NAD27 +units=m +no_defs")
+                             ,paste0("+datum="
+                                    ,switch(map[10]
+                                           ,'North America 1927'="NAD27"
+                                           ,'WGS-84'="WGS84"
+                                           ,"WGS84"))
+                             ,"+units=m +no_defs")
          op <- options(warn=-1)
          map <- na.omit(as.numeric(map))
          options(op)

@@ -74,8 +74,8 @@
    attr(res,"crs") <- ursa_crs(obj)
    res
 }
-'consistent_grid' <- function(obj,ref,expand=1,border=rep(0,4)) {
-   verbose <- !.isPackageInUse()
+'consistent_grid' <- function(obj,ref,expand=1,border=rep(0,4),verbose=FALSE) {
+  # verbose <- !.isPackageInUse()
    if (!missing(obj)) {
       if (is_ursa(obj))
          obj <- ursa_grid(obj)
@@ -138,7 +138,7 @@
   # d.web <- trunc(log(d)/log(2)) ## trunc(use) round(dev)
    d.less <- 2^(d.web-1+1*1)
    d.more <- 2^(d.web+0+1*1)
-   if (T)
+   if (verbose)
       print(c(d=d,d.orig=d.orig,d.more=d.more,d.less=d.less,d.web=2^d.web
              ,d.raw=2^(log(d)/log(2)),expand=expand),digits=3)
    if (d>1) {

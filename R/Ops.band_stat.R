@@ -35,7 +35,8 @@
    }
    if ((TRUE)&&(!sum(nchar(myname)))) {
      # result <- subset(result,select=-c(name))
-      result <- result[,-c("name")]
+     # result <- result[,-c("name")] ## -- 20211209
+      result$name <- rep("____",n) ## ++ 20211209
    }
    for (i in seq(along=myname))
    {

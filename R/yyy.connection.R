@@ -79,7 +79,9 @@
    if (x$con$driver=="ENVI")
       .write.hdr(x)
    else if (x$con$driver=="GDAL") {
+      opW <- options(warn=ifelse(.isPackageInUse(),0,1)) # 
       rgdal::GDALcall(x$con$handle,"SetProject",x$grid$crs)
+      options(opW)
       rgdal::GDALcall(x$con$handle,"SetGeoTransform"
                                   ,with(x$grid,c(minx,resx,0,maxy,0,-resy)))
       nodata <- ursa_nodata(x)

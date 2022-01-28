@@ -303,7 +303,7 @@
       bbox <- c(x0-dx,y0-dy,x0+dx,y0+dy)
      # print(bbox)
    }
-   if ((is.na(res))&&(!is.na(resx))&&(!is.na(resy)))
+   if ((anyNA(res))&&(!is.na(resx))&&(!is.na(resy)))
       res <- c(resx,resy)
    if (is.numeric(mul))
    {

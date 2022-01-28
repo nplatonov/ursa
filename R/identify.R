@@ -19,9 +19,15 @@
    if (n==1)
       ind <- arglist[[1]]
    else {
+      if (is.ursa(obj))
+         nc <- obj$grid$columns
+      else if (is.ursa(obj,"grid"))
+         nc <- obj$columns
+      else
+         nc <- session_grid()$columns
       lc <- .getPrm(arglist,name="^c",default=NA_real_)
       lr <- .getPrm(arglist,name="^r",default=NA_real_)
-      ind <- (lr-1L)*n+lc
+      ind <- (lr-1L)*nc+lc
    }
    .getValue(obj=obj,ind=ind)
 }

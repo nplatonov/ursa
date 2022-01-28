@@ -34,6 +34,7 @@
                   ,default=ifelse(device=="windows","sans","sans"))
    background <- .getPrm(arglist,name="(background|nodata)",default="white")
    dev <- .getPrm(arglist,name="^dev(el)*$",default=FALSE)
+   fixed <- .getPrm(arglist,name="^(fixed)",default=FALSE)
    verbose <- .getPrm(arglist,name="verb(ose)*",kwd="open",default=FALSE)
    options(ursaPngWebCartography=FALSE)
    if (is_spatial(mosaic))
@@ -69,6 +70,8 @@
       mosaic <- compose_design(layout=c(1,1),legend=NULL)
    else if (!inherits(mosaic,"ursaLayout"))
       mosaic <- compose_design(...)
+   if ((isTRUE(fixed))&&(is.na(scale)))
+      scale <- 1
    .compose_open(mosaic=mosaic,fileout=fileout,dpi=dpi,pointsize=pointsize
                 ,scale=scale,width=width,height=height
                 ,indent=indent,frame=frame,box=box,delafter=delafter,wait=wait

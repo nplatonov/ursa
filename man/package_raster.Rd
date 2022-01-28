@@ -62,6 +62,7 @@ Package \pkg{raster} is marked as "Suggested".
 %%~ %% ~~objects to See Also as \code{\link{help}}, ~~~
 %%~ }
 \examples{
+\donttest{ ## test is skipped: raster's loading time is close to CRAN allowable test time
 session_grid(NULL)
 if (requireNamespace("raster")) {
    session_grid(regrid(mul=1/4))
@@ -109,6 +110,7 @@ if (requireNamespace("raster")) {
       print(c(theSameValue=identical(ursa_value(a4),ursa_value(b4))
              ,theSameGrid=identical(ursa_grid(a4),ursa_grid(b4))))
    }
+}
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
