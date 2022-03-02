@@ -32,7 +32,8 @@
   # dst <- with(PROJ::proj_trans_generic(src,source="EPSG:4326",target=crs),cbind(x_,y_))
     loaded <- loadedNamespaces()
     is_proj4 <- (("proj4" %in% loaded)||
-        (TRUE)&&(requireNamespace("proj4",quietly=.isPackageInUse()))) ## currently quicker
+        (!isTRUE(getOption("ursaForceSF")))&&
+        (requireNamespace("proj4",quietly=.isPackageInUse()))) ## `proj4` faster `sf`20220216
     is_rgdal <- "rgdal" %in% loaded
     is_sf <- "sf" %in% loaded
     if ((!is_sf)&&(!is_rgdal)&&(!is_proj4)) {
@@ -91,11 +92,11 @@
       if (verbose)
          message("'sf' is used")
       if (inv) {
-         crs_t <- 4326
+         crs_t <- "EPSG:4326"
          crs_s <- proj
       }
       else {
-         crs_s <- 4326
+         crs_s <- "EPSG:4326"
          crs_t <- proj
       }
       if (is.list(xy))
@@ -104,15 +105,22 @@
          xy <- matrix(xy,ncol=2)
      # ind <- which((is.na(xy[,1]))|(is.na(xy[,2])))
       hasNA <- anyNA(xy[,1])
+      tryMatrix <- TRUE
       if (hasNA) {
          ind <- which(is.na(xy[,1])) ## less conditions
          res <- matrix(NA,ncol=2,nrow=nrow(xy))
-         a <- .try(res[-ind,] <- unclass(sf::st_transform(sf::st_sfc(
-                           sf::st_multipoint(xy[-ind,]),crs=crs_s),crs_t)[[1]]))
+         if (!tryMatrix)
+            a <- .try(res[-ind,] <- unclass(sf::st_transform(sf::st_sfc(
+                              sf::st_multipoint(xy[-ind,]),crs=crs_s),crs_t)[[1]]))
+         else
+            a <- .try(res[-ind,] <- sf::sf_project(from=crs_s,to=crs_t,pts=xy[-ind,]))
       }
       else {
-         a <- .try(res <- unclass(sf::st_transform(sf::st_sfc(
-                                  sf::st_multipoint(xy),crs=crs_s),crs_t)[[1]]))
+         if (!tryMatrix)
+            a <- .try(res <- unclass(sf::st_transform(sf::st_sfc(
+                                     sf::st_multipoint(xy),crs=crs_s),crs_t)[[1]]))
+         else
+            a <- .try(res <- sf::sf_project(from=crs_s,to=crs_t,pts=xy))
       }
    }
    if (!a) {

@@ -1,5 +1,4 @@
 \name{summary}
-\alias{summary.ursaRaster}
 \alias{summary.ursaNumeric}
 \alias{summary.ursaCategory}
 %- Also NEED an '\alias' for EACH other topic documented here.

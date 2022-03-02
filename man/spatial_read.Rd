@@ -7,14 +7,14 @@ Wrapper functions for reading spatial objects.
 Read either simple features (package \pkg{sf}) and abstract of class Spatial (package \pkg{sp}) from disk using appropriate functionality (\emph{\dQuote{engine}}) of respective packages is used. 
 }
 \usage{
-spatial_read(dsn, engine = c("native", "sp", "sf"))
+spatial_read(dsn, engine = c("native", "sp", "sf", "geojsonsf"))
 }
 \arguments{
   \item{dsn}{
 Character. File name of spatial object (vector GIS).
 }
   \item{engine}{
-Character. Functionality of which package is used for reading data. If value is \code{"sf"} then package is \pkg{sf} is used and simple features are returned. If value is \code{"sp"}, then package \pkg{rgdal} is used and Spatial abstracts (package \pkg{sp}) are returned. If value is \code{"native"} then engine selection depends of which namespace has already loaded or has suggested package \pkg{sf} been installed.
+Character. Functionality of which package is used for reading data. If value is \code{"sf"}, then package \pkg{sf} is used and simple features are returned. If value is \code{"geojsonsf"}, GDAL driver is GeoJSON and package \pkg{geojsonsf} can be loaded, then package \pkg{geojsonsf} is used and simple features are returned. If value is \code{"sp"}, then package \pkg{rgdal} is used and Spatial abstracts (package \pkg{sp}) are returned. If value is \code{"native"} then engine selection depends of which namespace has already loaded or has suggested package \pkg{sf} been installed.
 }
 }
 \details{
@@ -25,6 +25,9 @@ Depending of used engine, either simple features (package \pkg{sf}) or Spatial a
 }
 \author{
 Nikita Platonov \email{platonov@sevin.ru}
+}
+\note{
+   For GeoJSON files in the case \code{engine="geojsonsf"} reading is faster and the order of fields can be rearranged.
 }
 
 \seealso{

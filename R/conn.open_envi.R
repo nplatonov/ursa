@@ -11,6 +11,11 @@
       stop("filename is missing")
    wname <- fname
    fname <- envi_list(wname,exact=TRUE)
+   dname <- unique(dirname(fname))
+   if (identical(wname,dname)) ## 20220130
+      fname <- envi_list(file.path(dirname(wname),paste0("^",basename(wname),"$"))
+                        ,exact=TRUE)
+  # str(list(wname=wname,dname=dname,fname=fname))
    if ((length(fname)!=1)&&(dirname(wname)=="."))
       fname <- envi_list(path=getOption("ursaRequisite")
                         ,pattern=basename(wname),exact=TRUE,full.names=TRUE)

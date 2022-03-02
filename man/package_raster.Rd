@@ -1,7 +1,7 @@
 \name{as.Raster}
 %%~ \alias{raster}
 \alias{as.Raster}
-\alias{as.Raster.ursaRaster}
+\alias{as.Raster.ursaBrick}
 \alias{as.Raster.list}
 \alias{as.Raster.ursaStack}
 \alias{as.Raster.NULL}

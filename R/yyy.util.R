@@ -412,11 +412,13 @@
 '.isPackageInUse' <- function(verbose=FALSE) {
    cond1 <- "package:ursa" %in% search()
    cond2 <- "ursa" %in% loadedNamespaces()
-   ret <- (cond1)&&(cond2)
+   cond3 <- !("plEnviron" %in% search())
+  # ret <- (cond1)&&(cond2)
+   ret <- (cond2)&&(cond3)
    if (verbose) {
        print(search())
        print(loadedNamespaces())
-       print(c(cond1=cond1,cond2=cond2,ret=ret))
+       print(c(cond1=cond1,cond2=cond2,cond3=cond3,ret=ret))
    }
    ret
 }

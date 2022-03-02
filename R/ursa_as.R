@@ -13,12 +13,23 @@
       requireNamespace("sp",quietly=.isPackageInUse())
       cs <- methods::slot(sp::getGridTopology(obj),"cellsize")
       bb <- c(sp::bbox(obj))
+      opW6 <- options(warn=ifelse(.isPackageInUse(),0,1))
       pr <- sp::proj4string(obj)
+      options(opW6)
      # g1 <- regrid(bbox=bb,res=cd,proj=p)
       g1 <- regrid(ursa_grid(),bbox=bb,res=cs,proj=pr)
       session_grid(g1)
-      res <- vector("list",ncol(methods::slot(obj,"data")))
-      names(res) <- colnames(methods::slot(obj,"data"))
+      isList <- F
+     # dt <- all(sapply(obj@data,class) %in% c("numeric"))
+      dt <- sapply(obj@data,class)
+      isList <- !(all(dt %in% "integer") | all(dt %in% "numeric"))
+      if (isList) {
+         res <- vector("list",ncol(methods::slot(obj,"data")))
+         names(res) <- names(dt) # colnames(methods::slot(obj,"data"))
+      }
+      else {
+         res <- ursa(bandname=names(dt))
+      }
       for (i in seq_len(ncol(methods::slot(obj,"data")))) {
          value <- methods::slot(obj,"data")[,i]
          if (!is.numeric(value)) {
@@ -31,15 +42,22 @@
                                 ,permute=FALSE)#,bandname=names(res)[i])
             class(res[[i]]$value) <- "ursaCategory"
          }
-         else
-            res[[i]] <- ursa_new(value,flip=FALSE
-                                ,permute=FALSE)#,bandname=names(res)[i])
+         else {
+            if (isList)
+               res[[i]] <- ursa_new(value,flip=FALSE
+                                   ,permute=FALSE)#,bandname=names(res)[i])
+            else {
+               res$value[,i] <- value
+            }
+         }
       }
-      if (length(ind <- which(sapply(res,is.null)))) {
-         res[ind] <- as.list(ursa_new(NA,nband=length(ind)))
+      if (isList) {
+         if (length(ind <- which(sapply(res,is.null)))) {
+            res[ind] <- as.list(ursa_new(NA,nband=length(ind)))
+         }
+         for (i in seq_along(res))
+            names(res[[i]]) <- names(res)[i]
       }
-      for (i in seq_along(res))
-         names(res[[i]]) <- names(res)[i]
       return(res)
    }
    if (inherits(obj,c("SpatialPointsDataFrame","SpatialPixelsDataFrame"))) {
@@ -136,14 +154,15 @@
    if ((is.list(obj))&&(!anyNA(match(c("filename","cols","rows","bands","crs"
                                       ,"geotransform","datatype","meta")
                                     ,names(obj))))) { ## from 'sf::gdal_read'
+     # .elapsedTime("A")
       columns <- obj$cols[2]
       rows <- obj$rows[2]
       bands <- obj$bands[2]
-      patt <- "^Band_(\\d+)=\\t*(.+)$"
-      bname <- grep(patt,obj$meta,value=TRUE)
-      b1 <- .grep(patt,obj$meta,value=TRUE)
-      bname <- .gsub(patt,"\\2",b1)
-      bname[as.integer(.gsub(patt,"\\1",b1))] <- bname
+     # patt <- "^Band_(\\d+)=\\t*(.+)$"
+     # bname <- grep(patt,obj$meta,value=TRUE)
+     # b1 <- .grep(patt,obj$meta,value=TRUE)
+     # bname <- .gsub(patt,"\\2",b1)
+     # bname[as.integer(.gsub(patt,"\\1",b1))] <- bname
       resx <- obj$geotransform[2]
       resy <- -obj$geotransform[6]
       minx <- obj$geotransform[1]
@@ -155,12 +174,29 @@
          maxy <- miny
          miny <- interim
       }
-      prm <- list(minx=minx,maxx=maxx,miny=miny,maxy=maxy,columns=columns,rows=rows
-                  ,crs=obj$crs$proj4string)
+      ##~ prm <- list(minx=minx,maxx=maxx,miny=miny,maxy=maxy,columns=columns,rows=rows
+                  ##~ ,crs=obj$crs$proj4string)
       ##~ g1 <- regrid(minx=minx,maxx=maxx,miny=miny,maxy=maxy,columns=columns,rows=rows
                   ##~ ,crs=obj$crs$proj4string)
-      g1 <- regrid(setbound=c(minx,miny,maxx,maxy),dim=c(rows,columns)
-                  ,crs=obj$crs$proj4string)
+     # .elapsedTime("I")
+      if (F) 
+         g1 <- regrid(setbound=c(minx,miny,maxx,maxy),dim=c(rows,columns)
+                     ,crs=obj$crs$proj4string)
+      else {
+         g1 <- .grid.skeleton()
+         g1$columns <- as.integer(columns)
+         g1$rows <- as.integer(rows)
+         g1$minx <- minx
+         g1$maxx <- maxx
+         g1$miny <- miny
+         g1$maxy <- maxy
+         g1$resx <- with(g1,(maxx-minx)/columns)
+         g1$resy <- with(g1,(maxy-miny)/rows)
+         g1$crs <- obj$crs$proj4string
+      }
+      if (is.na(g1$crs))
+         g1$crs <- ""
+     # .elapsedTime("J")
       session_grid(g1)
      # hasData <- inherits("NULL",class(attr(obj,"data")))
       hasData <- !inherits(attr(obj,"data"),"NULL")
@@ -169,27 +205,82 @@
          if (!requireNamespace("sf",quietly=.isPackageInUse()))
             stop("Package 'sf' is required for this operation")
          res <- as.ursa(attr(sf::gdal_read(obj$filename,read_data=TRUE),"data")
-                       ,flip=TRUE)
+                       ,flip=TRUE) ## RECURSIVE
       }
       else {
          v <-  attr(obj,"data")
          attr(v,"units") <- NULL
          dimv <- dim(v)
-         if (R.Version()$arch %in% c("i386","x86_64","dummy")[1]) {
-            if (length(dimv)==2)
-               res <- ursa_new() ## or RECURSIVE as_ursa()
-            else
-               res <- ursa_new(nband=dimv[3])
-            res$value <- v
-            dima <- dim(res)
-            dim(res$value) <- c(prod(dima[1:2]),dima[3])
-            class(res$value) <- "ursaNumeric"
-            rm(v)
+         if (R.Version()$arch %in% c("i386","x86_64","dummy")[1:2]) {
+           # print("U")
+            if (devel2 <- TRUE) {
+               if (length(dimv)==2)
+                  dimv <- c(dimv,band=1L)
+               dimv <- unname(c(prod(dimv[1:2]),dimv[3]))
+               dim(v) <- dimv
+               isClass <- length(obj$attribute_tables[[1]])>0
+               isColor <- length(obj$color_tables[[1]])>0
+               isCat <- (isClass)||(isColor)
+               if (isCat) {
+                  if (isClass) {
+                     ctName <- obj$attribute_tables[[1]][["category"]]
+                     if (is.null(ctName))
+                        isCat <- FALSE
+                  }
+               }
+               if (isCat) {
+                  if (isColor) {
+                     ctCol <- obj$color_tables[[1]]
+                     ct <- rgb(ctCol[,1],ctCol[,2],ctCol[,3],ctCol[,4],maxColorValue=255)
+                  }
+                  else
+                     ct <- rep(NA,length(ctName))
+                  if (isClass)
+                     names(ct) <- ctName
+                 # else
+                 #    names(ct) <- 
+                  class(ct) <- "ursaColorTable"
+               }
+               if ((isCat)||((T & !.lgrep("float",obj$datatype)))) {
+                 # .elapsedTime("F")
+                 # v <- as.integer(v)
+                 # dim(v) <- dimv
+                 # storage.mode(v) <- "integer"
+                  mode(v) <- "integer"
+                 # .elapsedTime("G")
+               }
+              # .elapsedTime("as.ursa -- before")
+              # res <- as.ursa(v) ## RECURSIVE
+               res <- ursa_new(v)
+              # .elapsedTime("as.ursa -- after")
+               if (isCat) {
+                  ursa_colortable(res) <- ct
+                  class(res$value) <- "ursaCategory"
+               }
+               bname <- obj$description
+               if (any(nchar(bname)>0)) {
+                  names(res) <- gsub("\\t","",bname) ## patch for ENVI 'band name'
+               }
+            }
+            else {
+               if (length(dimv)==2)
+                  res <- ursa_new() ## or RECURSIVE as_ursa()
+               else
+                  res <- ursa_new(nband=dimv[3])
+               res$value <- v
+               dima <- dim(res)
+               dim(res$value) <- c(prod(dima[1:2]),dima[3])
+               class(res$value) <- "ursaNumeric"
+               rm(v)
+            }
          }
          else {## quicker for 'x86_64'
+           # print("V")
             res <- as.ursa(v,flip=TRUE) ## RECURSIVE!!!
          }
+         rm(v)
       }
+     # .elapsedTime("C")
      # .elapsedTime("sf::gdal_read -- finish")
       return(res)
    }
@@ -223,8 +314,21 @@
                   ##~ ,crs=md$x$refsys)
       ##~ g1 <- regrid(minx=minx,maxx=maxx,miny=miny,maxy=maxy,columns=columns,rows=rows
                   ##~ ,crs=md$x$refsys)
-      g1 <- regrid(setbound=c(minx,miny,maxx,maxy),dim=c(rows,columns)
-                  ,crs=md$x$refsys$proj4string)
+      if (F) ## quick development
+         g1 <- regrid(setbound=c(minx,miny,maxx,maxy),dim=c(rows,columns)
+                     ,crs=md$x$refsys$proj4string)
+      else { ## quick implementation
+         g1 <- .grid.skeleton()
+         g1$columns <- as.integer(columns)
+         g1$rows <- as.integer(rows)
+         g1$minx <- minx
+         g1$maxx <- maxx
+         g1$miny <- miny
+         g1$maxy <- maxy
+         g1$resx <- with(g1,(maxx-minx)/columns)
+         g1$resy <- with(g1,(maxy-miny)/rows)
+         g1$crs <- md$x$refsys$proj4string
+      }
       session_grid(g1)
       isHomo <- length(obj)==0 ##
      # print(c(isHomo=isHomo))
@@ -236,16 +340,37 @@
          names(res) <- names(obj)
          for (i in seq_along(res)) {
             if (R.Version()$arch %in% c("i386","x86_64","zzz")[-3]) {
+               o <- obj[[i]]
               # print("A")
-               dima <- dim(obj[[i]])
+               dima <- dim(o)
                if (length(dima)==2)
                   dima <- c(dima,band=1L)
-               a <- ursa(nband=dima[3])
-               a$value <- obj[[i]]
-               dim(a$value) <- c(prod(dima[1:2]),dima[3])
-               class(a$value) <- "ursaNumeric"
-               res[[i]] <- a
-               rm(a)
+               if (devel2 <- TRUE) {
+                  dim(o) <- c(prod(dima[1:2]),dima[3])
+                  if (isCat <- is.factor(o)) {
+                     ct <- attr(o,"colors")
+                     names(ct) <- levels(o)
+                     class(ct) <- "ursaColorTable"
+                     o <- as.integer(o)-1L
+                  }
+                  res[[i]] <- as.ursa(o)
+                  if (isCat) {
+                     class(res[[i]]$value) <- "ursaCategory"
+                     ursa_colortable(res[[i]]) <- ct
+                  }
+                  bname <- attr(obj[i],"dimensions")$band$values
+                  if (!is.null(bname))
+                     names(res[[i]]) <- bname
+                  rm(o)
+               }
+               else {
+                  a <- ursa(nband=dima[3])
+                  a$value <- o
+                  dim(a$value) <- c(prod(dima[1:2]),dima[3])
+                  class(a$value) <- "ursaNumeric"
+                  res[[i]] <- a
+                  rm(a)
+               }
             }
             else { ## faster for 'x86_64' // 20210203 -- slower for any
               # print("B")
@@ -280,13 +405,24 @@
          g1 <- regrid(bbox=c(0,0,rev(dim(g1))),res=1,crs=crs)
      # g0 <- getOption("ursaSessionGrid")
      # session_grid(g1)
-      res <- ursa(obj[])
+      if (approved <- TRUE)
+         res <- ursa(obj[]) ## as.matrix()
+      else {
+         .elapsedTime("rast -- 1")
+         o <- obj[]
+        # o <- as.matrix(obj)
+        # o <- as.array(obj)
+         .elapsedTime("rast -- 2")
+         res <- ursa(o)
+         .elapsedTime("rast -- 3")
+      }
       names(res) <- aname
       return(res)
    }
    if (is.list(obj)) {
-      if ((length(obj$x)==length(obj$z))&&(length(obj$y)==length(obj$z))) 
+      if ((length(obj$x)==length(obj$z))&&(length(obj$y)==length(obj$z))) {
          return(allocate(obj,...))
+      }
       g <- .grid.skeleton()
       g$resx <- mean(diff(obj$x))
       g$resy <- mean(diff(obj$y))

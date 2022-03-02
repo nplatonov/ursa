@@ -3353,7 +3353,7 @@ void internalMargin(double *x,int *dim,int *indr,int *indc)
    double S;
    int l=lines*samples;
    double *res=(double *)malloc(l*sizeof(double));
-  // Rprintf("dim=c(%d,%d,%d)\n",samples,lines,bands);
+   //~ Rprintf("dim=c(%d,%d,%d)\n",samples,lines,bands);
    for (s=0;s<l;s++)
    {
       if (bands==4)
@@ -3364,9 +3364,9 @@ void internalMargin(double *x,int *dim,int *indr,int *indc)
          S=S/(double)bands;
          res[s]=S;
       }
-     // Rprintf(" %.1f",res[s]);
+      //~ Rprintf(" %.1f",res[s]);
    }
-  // Rprintf("\n");
+   //~ Rprintf("\n");
    for (c=0;c<samples;c++)
    {
       for (S=0.0,r=0;r<lines;r++)

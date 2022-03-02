@@ -20,17 +20,27 @@
       setwd(wd)
       return(invisible(integer()))
    }
-   if ((TRUE)&&(.lgrep("\\.tif$",basename(fname)))&&(nchar(Sys.which("gdal_translate")))) {
+   if ((TRUE)&&(.lgrep("\\.(tif|img)$",basename(fname)))&&(nchar(Sys.which("gdal_translate")))) {
+     # print("interim ENVI, then system GDAL")
       ftmp <- .maketmp()
       ret <- write_envi(obj,paste0(ftmp,"."))
+      pr <- ifelse(ret %in% c(1L,2L,11L),2L,3L)
       proj_lib <- Sys.getenv("PROJ_LIB")
       Sys.setenv(PROJ_LIB=file.path(dirname(dirname(Sys.which("gdal_translate")))
                                    ,"share/proj"))
-      system2("gdal_translate",c("-q","-of","GTiff"
-                                ,"-co",.dQuote("COMPRESS=DEFLATE")
-                                ,"-co",.dQuote("PREDICTOR=2")
-                                ,"-co",.dQuote("TILED=NO")
-                                ,.dQuote(ftmp),.dQuote(fname)))
+      if (.lgrep("\\.(tif)$",basename(fname)))
+         system2("gdal_translate",c("-q","-of","GTiff"
+                                   ,"-co",.dQuote(paste0("COMPRESS=",c("DEFLATE","ZSTD")[1]))
+                                   ,"-co",.dQuote(paste0("PREDICTOR=",pr))
+                                   ,"-co",.dQuote("ZSTD_LEVEL=9")
+                                   ,"-co",.dQuote("ZLEVEL=9")
+                                   ,"-co",.dQuote("TILED=NO")
+                                   ,"-co",.dQuote("INTERLEAVE=BAND")
+                                   ,.dQuote(ftmp),.dQuote(fname)))
+      else if (.lgrep("\\.(img)$",basename(fname)))
+         system2("gdal_translate",c("-q","-of","HFA"
+                                   ,"-co",.dQuote("COMPRESSED=YES")
+                                   ,.dQuote(ftmp),.dQuote(fname)))
       Sys.setenv(PROJ_LIB=proj_lib)
       envi_remove(ftmp)
       return(invisible(ret))

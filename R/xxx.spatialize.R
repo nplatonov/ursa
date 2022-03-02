@@ -1,4 +1,4 @@
-'spatialize' <- function(dsn,engine=c("native","sp","sf")
+'spatialize' <- function(dsn,engine=c("native","sp","sf","geojsonsf")
                          ,layer=".*",field=".+",coords=c("x","y"),crs=character()
                          ,geocode="",place="",area=c("bounding","point","shape")
                          ,grid=NULL,size=NA,cell=NA,expand=1,border=NA
@@ -23,13 +23,13 @@
       isSF <- FALSE
       isSP <- TRUE
    }
-   else if (engine=="sf") {
+   else if (engine %in% c("sf","geojsonsf")) {
       isSF <- requireNamespace("sf",quietly=.isPackageInUse())
       isSP <- !isSF
    }
    else {
       loaded <- loadedNamespaces() #.loaded()
-      if ("sf" %in% loaded)
+      if (any(c("sf","geojsonsf") %in% loaded))
          isSF <- TRUE
       else if (("sp" %in% loaded)||("rgdal" %in% loaded))
          isSF <- FALSE
@@ -485,8 +485,9 @@
          }
       }
       else {
-         jsonSF <- (engine %in% c("native"))&&(isSF)&&(.lgrep("\\.geojson",dsn))&&
+         jsonSF <- (engine %in% c("native","geojsonsf"))&&(isSF)&&(.lgrep("\\.geojson",dsn))&&
             (requireNamespace("geojsonsf",quietly=.isPackageInUse()))
+        #    print(data.frame(engine=engine,isSP=isSP,isSF=isSF,jsonSF=jsonSF))
          if (jsonSF)
             NULL
          else if (isZip <- .lgrep("\\.zip$",dsn)>0) {
@@ -608,7 +609,7 @@
                      obj[,i] <- as.POSIXct(as.numeric(d),origin=.origin())
                   }
                   else if (length(grep("^\\d{4}-\\d{2}-\\d{2}$",a))==length(a)) {
-                     obj[,i] <- as.Date(obj[,i,drop=TRUE,tz="UTC"])
+                     obj[,i] <- as.Date(obj[,i,drop=TRUE],tz="UTC")
                   }
                }
             }
@@ -857,6 +858,19 @@
               # Encoding(da) <- "UTF-8"
               # if (is.null(cpg)) ## ++ 20180527
               #    Encoding(da) <- "UTF-8"
+            }
+            if ((is.character(da))&&(anyNA(da))) {
+               ind <- which(!is.na(da))
+              # da[ind] <- paste0("a",da[ind]) ## devel
+               opN <- options(warn=-1)
+               daD <- as.numeric(da[ind])
+               options(opN)
+               if (!anyNA(daD)) {
+                  if (.is.integer(daD))
+                     da <- as.integer(da)
+                  else
+                     da <- as.numeric(da)
+               }
             }
            ## if inherits(da,"POSIXlt") then 'da' is a list with 9 items
             if (isSF)

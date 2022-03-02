@@ -10,7 +10,7 @@
    compiler::enableJIT(0) ## speed up if 'ByteCompile: no' in "DESCRIPTION"
   # print("ursa -- .onLoad")
    p <- proc.time()
-   options(ursaTimeStart=p,ursaTimeDelta=p)
+   options(ursaTimeStart=p,ursaTimeDelta=p) # ,ursaForceSF=TRUE 
    rm(p)
   # session_pngviewer()
    fpath <- getOption("ursaCacheDir") ## e.g., from ~/.Rprofile

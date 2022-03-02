@@ -192,8 +192,10 @@
    else
    {
       if (!isLoaded) {
-         if (!requireNamespace("proj4",quietly=.isPackageInUse()))
-            requireNamespace("rgdal",quietly=.isPackageInUse())
+         if (!("sf" %in% loadedNamespaces())) {
+            if (!requireNamespace("proj4",quietly=.isPackageInUse()))
+               requireNamespace("rgdal",quietly=.isPackageInUse())
+            }
       }
       proj4 <- paste(proj,collapse=" ")
    }
@@ -721,59 +723,59 @@
          fid5 <- pair[[i]]
          a0 <- spatial_transform(subset(a,FID %in% fid5),3571)
          xy0 <- spatial_coordinates(a0)
+         if (devel6 <- F) {
+            if (i==4) {
+               str(xy0)
+               p <- unlist(xy0,recursive=FALSE)
+               str(p)
+               saveRDS(p,"tmp2.rds")
+               q()
+            }
+         }
          xy1 <- head(xy0[[1]][[1]],-1)
          xy2 <- head(xy0[[2]][[1]],-1)
-         d1 <- .dist2(xy1,xy2,verbose=FALSE)
-         d1$x <- xy1[,1]
-         order1 <- order(d1$dist,d1$x)[1:2]
+         d1 <- .dist2(xy1,xy2,verbose=FALSE,summarize=FALSE)
+         order1 <- order(d1$dist,xy1[,1])[1:2]
          ind1 <- d1$ind[order1]
-         d2 <- .dist2(xy2,xy1,verbose=FALSE)
-         d2$x <- xy2[,1]
-         order2 <- order(d2$dist,d2$x)[1:2]
+         d2 <- .dist2(xy2,xy1,verbose=FALSE,summarize=FALSE)
+         order2 <- order(d2$dist,xy2[,1])[1:2]
          ind2 <- d2$ind[order2]
          if (ind2[1]>ind2[2]) { ## 10 9
-            xy7 <- rbind(xy1[ind2[1]:nrow(xy1),]
-                        ,xy1[1L:ind2[2],]
-                        )
+           # print("ind2A")
+            xy1 <- xy1[c(ind2[1]:nrow(xy1),1L:ind2[2]),]
          }
-         else { ## 9 10
-            if (ind2[1]>1) {
-               xy7 <- rbind(xy1[ind2[1]:1L,]
-                           ,xy1[nrow(xy1):ind2[2],]
-                           )
-            }
-            else { ## 1 11
-               xy7 <- rbind(xy1[ind2[1]:ind2[2],])
-            }
+         else if (ind2[1]>1) { ## 9 10
+           # print("ind2B")
+            xy1 <- xy1[c(ind2[1]:1L,nrow(xy1):ind2[2]),]
          }
-         if (ind1[1]>ind1[2]) { ## 6 1
-            if (ind1[2]>1) {
-               xy7 <- rbind(xy7
-                           ,xy2[ind1[2]:1L,]
-                           ,xy2[nrow(xy2):ind1[2],]
-                           )
-            }
-            else { ## 6 1
-               xy7 <- rbind(xy7
-                           ,xy2[ind1[2]:ind1[1],]
-                           )
-            }
+         else if (ind2[2]>2) {
+           # print("ind2C")
          }
-         else { ##
-            if (ind1[1]>1) {
-               if (.isPackageInUse())
-                  print("B15")
-               xy7 <- rbind(xy7
-                           ,xy2[ind1[2]:nrow(xy2),]
-                           ,xy2[1L:ind1[2],]
-                           )
-            }
-            else { ## 1 11
-               xy7 <- rbind(xy7
-                          # ,xy2[ind1[2]:ind1[1],]
-                           )
-            }
+         else {
+            xy1 <- xy1[c(tail(seq(nrow(xy1)),-1),head(seq(nrow(xy1)),1)),]
+           # print("ind2D")
          }
+         if (ind1[1]>ind1[2]) { ## 10 9
+           # print("ind1A")
+            xy2 <- xy2[c(ind1[1]:nrow(xy2),1L:ind1[2]),]
+         }
+         else if (ind1[1]>1) { ## 9 10
+           # print("ind1B")
+            xy2 <- xy2[c(ind1[1]:1L,nrow(xy2):ind1[2]),]
+         }
+         else if (ind1[2]>2) {
+           # print("ind1C")
+         }
+         else {
+            xy2 <- xy2[c(tail(seq(nrow(xy2)),-1),head(seq(nrow(xy2)),1)),]
+            print("ind1D")
+         }
+         ind3 <- .dist2(xy1[range(seq(nrow(xy1))),],xy2[range(seq(nrow(xy2))),]
+                       ,verbose=FALSE,summarize=FALSE)$ind
+         xy7 <- rbind(if (T) xy1 else head(xy1,-1)
+                     ,if (ind3[1]>ind3[2]) xy2
+                      else xy2[order(seq(nrow(xy2)),decreasing=TRUE),]
+                     )
          xy7 <- xy7[c(which(!duplicated(xy7))),]
          xy7 <- xy7[c(seq(nrow(xy7)),1),]
          if (mean(xy1[,1])<0) {
@@ -788,10 +790,25 @@
          spatial_data(a7) <- data.frame(FID=65000L+i)
          a180[[i]] <- sf::st_transform(a7,prj1)
       }
+      if (devel10 <- F) {
+         a2 <- do.call(spatial_bind,a180)
+         g1 <- session_grid(c(360,400))
+         compose_open(length(pair),fix=TRUE)
+         for (i in seq_along(pair)) {
+            a2 <- spatialize(a180[[i]],resetProj=TRUE)
+            g3 <- consistent_grid(spatial_grid(a2),ref=g1)
+            session_grid(g3)
+            panel_new("white")
+            panel_plot(a2,lwd=1)
+         }
+         compose_close()
+         q()
+      }
       .elapsedTime("spliting - done")
       a <- list(subset(a,!(FID %in% unlist(pair))))
       a <- do.call("rbind",c(a,a180))
       .elapsedTime("merging - done")
+     # spatial_write(do.call(spatial_bind,a180),"tmp1.sqlite")
    }
    if (devel2 <- FALSE) {
       sf::sf_use_s2(TRUE)

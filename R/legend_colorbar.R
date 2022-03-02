@@ -102,8 +102,13 @@
         return(0L)
      }
    }
-   if (is.na(useRaster))
-      useRaster <- getOption("ursaPngDevice")!="windows"
+   if (is.na(useRaster)) {
+      cond1 <- getOption("ursaPngDevice")!="windows"
+      cond2 <- !(tolower(gsub(".*\\.(\\S+)$","\\1"
+                                    ,getOption("ursaPngFileout"))) %in% c("svg"))
+      useRaster <- cond1 #&& cond2
+     # print(c(cond1=cond1,cond2=cond2,useRaster=useRaster))
+   }
   # isChar <- length(grep("([A-Za-d]|[f-z]|/|\\*)",names(ct)))>0
    if ((devSkipExtraTiffValues <- TRUE)&&(length(ct) %in% 2^c(8,16,32))) {
      # ct <- tail(ct,-2540) ## dev N_20200407_concentration_v3.0.tif 
@@ -537,7 +542,7 @@
               ,xlab="",ylab="",useRaster=!useRaster,add=TRUE)
       }
       image(x=z0,y=c(0,1),z=matrix(z,ncol=1),axes=FALSE,col=col
-           ,xlab="",ylab="",useRaster=useRaster,add=TRUE)
+           ,xlab="",ylab="",useRaster=useRaster & isTick,add=TRUE)
       if (nchar(shadow)) {
          image(x=z0,y=if (side==3) c(0.7,1) else c(0,0.3)
               ,z=matrix(z,ncol=1),axes=FALSE,col=shadow
@@ -565,7 +570,7 @@
               ,xlab="",ylab="",useRaster=!useRaster,add=TRUE)
       }
       image(y=z0,x=c(0,1),z=matrix(z,nrow=1),axes=FALSE,col=col
-           ,xlab="",ylab="",useRaster=useRaster,add=TRUE)
+           ,xlab="",ylab="",useRaster=useRaster & isTick,add=TRUE)
       if (nchar(shadow)) {
          image(y=z0,x=if (side==4) c(0.7,1) else c(0,0.3)
               ,z=matrix(z,nrow=1),axes=FALSE,col=shadow

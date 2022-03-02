@@ -89,7 +89,7 @@
       isCT <- (nband(x)==1)&&(length(ct)>0)
       hasColor <- (isCT)&&(all(!is.na(ct)))
       hasNames <- (isCT)&&(all(!is.na(names(ct))))
-     # print(c(isCT=isCT,hasColor=hasColor,hasNames=hasNames))
+     # print(c(has_nodata=!is.na(nodata),isCT=isCT,hasColor=hasColor,hasNames=hasNames))
       if (any(!is.na(nodata),isCT,hasColor,hasNames)) {
          for (i in seq(nband(x))) {
             bset <- methods::new("GDALRasterBand",x$con$handle,i)

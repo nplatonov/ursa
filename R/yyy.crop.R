@@ -1,13 +1,34 @@
 '.crop' <- function(fileout,border=5,verbose=FALSE) {
    isJPEG <- .lgrep("(jpg|jpeg)",gsub(".*\\.(.+$)","\\1",fileout))>0
    isWEBP <- .lgrep("(webp)",gsub(".*\\.(.+$)","\\1",fileout))>0
+   isSVG <- .lgrep("(svg)",gsub(".*\\.(.+$)","\\1",fileout))>0
+   isPNG <- .lgrep("(png)",gsub(".*\\.(.+$)","\\1",fileout))>0
    frame <- as.integer(round(border))
-   requireNamespace("png",quietly=.isPackageInUse())
-   if (isJPEG)
-      requireNamespace("jpeg",quietly=.isPackageInUse())
+   if (!isSVG)
+      requireNamespace("png",quietly=.isPackageInUse())
+   if (isPNG)
+      NULL
+   else if (isJPEG)
+      isJPEG <- requireNamespace("jpeg",quietly=.isPackageInUse())
    else if (isWEBP)
-      requireNamespace("webp",quietly=.isPackageInUse())
-   x <- png::readPNG(fileout,native=FALSE,info=TRUE)
+      isWEBP <- requireNamespace("webp",quietly=.isPackageInUse())
+   else if (isSVG) {
+      if (!(isSVG <- requireNamespace("magick",quietly=.isPackageInUse())))
+         return(0L)
+     # tempf <- tempfile()
+     # sink(tempf)
+     # print("A")
+      a <- magick::image_raster(magick::image_read(fileout))
+     # print("B")
+     # sink()
+     # file.remove(tempf)
+      x <- col2rgb(a$col)/255
+      dim(x) <- c(dim(x)[1],max(a$x),max(a$y))
+      x <- aperm(x,c(3,2,1))
+      rm(a)
+   }
+   if (!isSVG)
+      x <- png::readPNG(fileout,native=FALSE,info=TRUE)
    dimx <- dim(x)
    b <- .Cursa("internalMargin",x=as.numeric(x),dim=as.integer(dimx)
           ,indr=integer(dimx[1]),indc=integer(dimx[2]),NAOK=TRUE)
@@ -19,7 +40,8 @@
       s1 <- c(1L,s1)
    if (b$indc[length(b$indc)]==0)
       s2 <- c(s2,length(b$indc))
-   indc <- c(indentc,s1[1]:s2[length(s2)],indentc)
+   seqc <- s1[1]:s2[length(s2)]
+   indc <- c(indentc,seqc,indentc)
    indentr <- rep(which(b$indr==1)[1],frame)
    d <- diff(b$indr)
    s1 <- which(d==-1)+1L
@@ -28,14 +50,43 @@
       s1 <- c(1L,s1)
    if (b$indr[length(b$indr)]==0)
       s2 <- c(s2,length(b$indr))
-   indr <- c(indentr,s1[1]:s2[length(s2)],indentc)
+   seqr <- s1[1]:s2[length(s2)]
+   indr <- c(indentr,seqr,indentc)
    att <- attr(x,"info")
    if (is.null(att$dpi)) { ## e.g. after Cairo::CairoPNG
       dpi <- getOption("ursaPngDpi")
       if (is.numeric(dpi))
          att$dpi <- dpi
    }
-   if (isJPEG)
+   if (isSVG) {
+      sc <- 0.75
+      ##~ print(range(seqc))
+      ##~ print(range(seqr))
+      lenc <- round(length(seqc)*sc,2)
+      lenr <- round(length(seqr)*sc,2)
+      seqc <- round(range(seqc)*sc,2)
+      seqr <- round(range(seqr)*sc,2)
+      ##~ print(seqc)
+      ##~ print(seqr)
+      ##~ print(lenc)
+      ##~ print(lenr)
+      content <- readLines(fileout)
+      patt <- paste0("^(.+)(width=\\S+\\sheight=\\S+\\s)(viewBox=(\\\"|'))"
+                    ,"\\S+\\s\\S+\\s\\S+\\s\\S+((\\\"|').+)$")
+      if (length(ind <- grep(patt,head(content,4)))==1) {
+         ##~ print(content[ind])
+         content[ind] <- gsub(patt,paste0("\\1\\3"
+                                         ,seqc[1]-frame," "
+                                         ,seqr[1]-frame," "
+                                         ,lenc[1]+frame+frame," "
+                                         ,lenr[1]+frame+frame
+                                         ,"\\5"),content[ind])
+         ##~ print(content[ind])
+        # file.copy(fileout,paste0(fileout,"~"))
+         writeLines(content,paste0(fileout,""))
+      }
+   }
+   else if (isJPEG)
       jpeg::writeJPEG(x[indr,indc,],fileout)
    else if (isWEBP)
       webp::write_webp(x[indr,indc,],fileout)
@@ -51,9 +102,9 @@
    isWEBP <- .lgrep("(webp)",gsub(".*\\.(.+$)","\\1",fileout))>0
    requireNamespace("png",quietly=.isPackageInUse())
    if (isJPEG)
-      requireNamespace("jpeg",quietly=.isPackageInUse())
+      isJPEG <- requireNamespace("jpeg",quietly=.isPackageInUse())
    if (isWEBP)
-      requireNamespace("webp",quietly=.isPackageInUse())
+      isWEBP <- requireNamespace("webp",quietly=.isPackageInUse())
    x <- png::readPNG(fileout,native=FALSE,info=TRUE)
    dimx <- dim(x)
    b <- .Cursa("internalMargin",x=as.numeric(x),dim=as.integer(dimx)
@@ -103,8 +154,10 @@
    isJPEG <- .lgrep("(jpg|jpeg)",gsub(".*\\.(.+$)","\\1",fileout))>0
    if (!isJPEG)
       return(NULL)
+   isJPEG <- requireNamespace("jpeg",quietly=.isPackageInUse())
+   if (!isJPEG)
+      return(NULL)
    requireNamespace("png",quietly=.isPackageInUse())
-   requireNamespace("jpeg",quietly=.isPackageInUse())
    jpeg::writeJPEG(png::readPNG(fileout,native=FALSE,info=TRUE),fileout)
    NULL
 }

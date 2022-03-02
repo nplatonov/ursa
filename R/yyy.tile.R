@@ -341,7 +341,7 @@
          a <- try(255*jpeg::readJPEG(fname),silent=!verbose)
          isJPEG <- !inherits(a,"try-error")
          if (inherits(a,"try-error")) {
-            print("HERE")
+            print("Cannot read either 'png' or 'jpg/jpeg' file.")
          }
       }
       else

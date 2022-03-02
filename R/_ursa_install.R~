@@ -134,55 +134,45 @@
    patt <- "^ursa_.*(\\.tar\\.gz|\\.zip)$"
    nul <- file.remove(dir(pattern=patt))
    system("R --vanilla CMD build ursa")
-   pkg <- tail(dir(pattern=patt))
-   if (length(pkg)!=1)
-      return(NULL)
-   opt1 <- "--fake" ## --no-multiarch
-   opt2 <- "--no-html"
-   opt3 <- "--no-html --build"
-   checkArch <- dir(path=file.path(Sys.getenv("R_HOME"),"bin")
-                   ,pattern="Rterm",recursive=TRUE,full.names=TRUE)
-   if (length(checkArch)==1)
-      opt3 <- paste(opt3,"--no-multiarch")
-   if (!TRUE) {
-      src <- file.path(Sys.getenv("HOME"),".R","Makevars")
-      a <- readLines(src)
-      a <- a[nchar(a)>0]
-      ind <- regexpr("#",a)
-      ind[ind<0] <- 32767
-      a <- substr(a,1,ind-1)
-      a <- a[nchar(a)>0]
-      a <- strsplit(a,"\\s*=\\s*")
-      prm <- lapply(a,function(x) x[2])
-      names(prm) <- lapply(a,function(x) x[1])
-      do.call("Sys.setenv",prm)
-      prm <- lapply(prm,function(x) "")
-      install.packages(pkg,INSTALL_opts=opt2,lib=.libPaths()[1],repos=NULL)
-      do.call("Sys.setenv",prm)
+   pkg <- tail(plutil::filelist(patt))
+   if (length(pkg)==1) {
+      opt1 <- "--fake" ## --no-multiarch
+      opt2 <- "--no-html"
+      opt3 <- "--no-html --build"
+      if (!TRUE) {
+         src <- file.path(Sys.getenv("HOME"),".R","Makevars")
+         a <- readLines(src)
+         a <- a[nchar(a)>0]
+         ind <- regexpr("#",a)
+         ind[ind<0] <- 32767
+         a <- substr(a,1,ind-1)
+         a <- a[nchar(a)>0]
+         a <- strsplit(a,"\\s*=\\s*")
+         prm <- lapply(a,function(x) x[2])
+         names(prm) <- lapply(a,function(x) x[1])
+         do.call("Sys.setenv",prm)
+         prm <- lapply(prm,function(x) "")
+         install.packages(pkg,INSTALL_opts=opt2,lib=.libPaths()[1],repos=NULL)
+         do.call("Sys.setenv",prm)
+      }
+      else {
+         system2("R",c("--vanilla","CMD","INSTALL",opt3,pkg)[-1])
+        # system(paste("R","--vanilla","CMD","INSTALL",opt2,pkg))
+      }
+     # file.remove(pkg)
    }
-   else {
-      Sys.setenv(R_LIBS_USER=.libPaths()[1])
-      Sys.setenv(BINPREF=Sys.getenv("R_BINPREF"))
-      system2("R",c("--vanilla","CMD","INSTALL",opt3,pkg)[-1])
-     # system(paste("R","--vanilla","CMD","INSTALL",opt2,pkg))
-   }
-  # file.remove(pkg)
    NULL
 }
 invisible({
-  # .a <- try(ursa:::.argv0())
-   .argv0 <- commandArgs(FALSE)
-   .ind1 <- grep("^-f$",.argv0)
-   .ind2 <- grep("(.+/_|.+\\\\_|^_)ursa_install.R$",.argv0)
-   .ind3 <- grep("--file=.*_ursa_install.R$",.argv0)
-   if ((length(.ind3)==1)||((length(.ind1)==1)&&(length(.ind2)==1)&&(.ind1+1L==.ind2)))
+   .a <- try(ursa:::.argv0())
+  # .a <- basename(strsplit(commandArgs(FALSE)[4],"=")[[1]][2])
+   if ((!is.na(.a))&&(.a=="_ursa_install.R"))
       .buildAndInstall()
    else {
-     # .buildAndInstall()
-      print("mysource")
+     # print("mysource")
      # try(Sys.setenv(R_RMAP_TEMPLATE=
      #     file.path(chartr("\\","/",Sys.getenv("R_USER")),"template.idr")))
    }
-  # rm(.a)
+   rm(.a)
    NULL
 })

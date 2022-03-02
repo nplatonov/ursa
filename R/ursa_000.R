@@ -10,7 +10,7 @@
             return(session_crs())
          if (.lgrep("(cell)",obj))
             return(session_cellsize())
-         if (.lgrep("(dummy)",obj))
+         if (.lgrep("(^dummy$)",obj,ignore.case=FALSE))
             return(ursa_dummy())
       }
       return(as.ursa(obj,...))

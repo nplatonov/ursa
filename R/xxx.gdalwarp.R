@@ -67,8 +67,12 @@
       opt <- c(opt,to="SRC_METHOD=NO_GEOTRANSFORM",to="DST_METHOD=NO_GEOTRANSFORM")
    }
    if (!("co" %in% names(opt))) {
-      if (driver=="GTiff")
-         opt <- c(opt,co="COMPRESS=DEFLATE",co="PREDICTOR=2",co="TILED=NO")
+      if (driver=="GTiff") {
+         pr <- ifelse(((removeSrc)&&(inherits(.src$value,"ursaNumeric"))),3,2)
+         opt <- c(opt,co=paste0("COMPRESS=",c("DEFLATE","ZSTD")[1])
+                     ,co=paste0("PREDICTOR=",pr)
+                     ,co="TILED=NO")
+      }
       else if (driver=="HFA") {
          opt <- c(opt,co="COMPRESSED=YES")
       }

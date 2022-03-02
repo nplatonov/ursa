@@ -62,7 +62,7 @@
      # if (is.na(object$grid$retina))
      #    object$grid$retina <- NULL
    }
-   if (is.na(object$grid$retina))
+   if ((!is.null(object$grid$retina))&&(is.na(object$grid$retina)))
       object$grid$retina <- NULL
    object$object.size <- format(os,units="MB")
    metadata <- attr(object,"metadata")

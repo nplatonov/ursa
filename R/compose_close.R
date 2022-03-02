@@ -168,8 +168,16 @@
          .elapsedTime(paste0("uniqueColor:finish (",n,")"))
       bpp <- ifelse(n<256,8,24)
    }
-   if (bpp==8) {
-      if (nchar(Sys.which("i_view32"))) {
+   if ((bpp==8)&&(!(tolower(gsub(".*\\.(\\S+$)","\\1",fileout)) %in% c("svg","pdf")))) {
+      if (requireNamespace("magick",quietly=.isPackageInUse())) {
+            magick::image_write(
+               magick::image_quantize(
+                  magick::image_read(fileout)
+                  ,max=256,dither=FALSE,colorspace='sRGB')
+               ,fileout)
+            cmd <- ""
+      }
+      else if (nchar(Sys.which("zzzi_view32"))) {
          FoutTmp <- ifelse(dirname(fileout)==".",basename(fileout),normalizePath(fileout))
          cmd <- paste("i_view32",FoutTmp,"/bpp=8",paste0("/convert=",FoutTmp))
       }
@@ -197,7 +205,7 @@
          cmd <- ""
       }
       if (nchar(cmd)) {
-         if (verbose)
+         if (T | verbose)
             message(cmd)
          system(cmd)
       }

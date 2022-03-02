@@ -33,30 +33,49 @@
 'read_gdal' <- function(fname,resetGrid=TRUE,band=NULL
                        ,engine=c("native","rgdal","sf"),verbose=FALSE,...) { ## ,...
    engine <- match.arg(engine)
+   loaded <- loadedNamespaces() #.loaded()
+   forceSF <- isTRUE(getOption("ursaForceSF"))
    if (accepted_changes <- TRUE) {
-      if ((!is.null(band))||(engine %in% c("native","rgdal")[1:2])) {
-         isSF <- FALSE
-      }
-      else if (engine %in% c("native","sf")[2])
-         isSF <- TRUE
-      else {
-         loaded <- loadedNamespaces() #.loaded()
-         if ("sf" %in% loaded)
-            isSF <- TRUE
-         else if (("sp" %in% loaded)||("rgdal" %in% loaded))
+      if ((is.null(band))&&(engine %in% "native")) {
+         if ((!forceSF)&&(("sp" %in% loaded)||("rgdal" %in% loaded)))
             isSF <- FALSE
+         if ((forceSF)||("sf" %in% loaded))
+            isSF <- TRUE
          else
-            isSF <- requireNamespace("sf",quietly=.isPackageInUse())
+            isSF <- FALSE
       }
+      else if (engine %in% c("native","sf")[2]) { 
+         isSF <- TRUE
+      }
+     # else if ((!is.null(band))||(engine %in% c("native","rgdal")[1:2])) {
+     #    isSF <- FALSE
+     # }
+      else
+         isSF <- FALSE
+      ##~ else {
+         ##~ loaded <- loadedNamespaces() #.loaded()
+         ##~ if ("sf" %in% loaded)
+            ##~ isSF <- TRUE
+         ##~ else if (("sp" %in% loaded)||("rgdal" %in% loaded))
+            ##~ isSF <- FALSE
+         ##~ else
+            ##~ isSF <- requireNamespace("sf",quietly=.isPackageInUse())
+      ##~ }
    }
    else
       isSF <- FALSE
+   if ((isSF)&&(!("sf" %in% loaded)))
+      isSF <- requireNamespace("sf",quietly=.isPackageInUse())
    if (verbose)
       print(c(isSF=isSF))
    if (isSF) {
      # str(md <- sf::gdal_metadata(fname,parse=!FALSE))
      # str(ds <- sf::gdal_subdatasets(fname,name=TRUE))
+      opW <- options(warn=ifelse(.isPackageInUse(),-1,1))
       res <- as_ursa(sf::gdal_read(fname))
+      options(opW)
+      if (!is.null(band))
+         res <- res[band]
    }
    else {
       obj <- open_gdal(fname,verbose=verbose)

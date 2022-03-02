@@ -102,7 +102,15 @@
               ,antialias=antialias,font=font,background=background,dev=dev
               ,verbose=verbose))
    }
-   if (!nchar(fileout))
+   patt <- "^\\.(png|svg|png|webp|jpeg|jpg)$"
+   if (grepl(patt,fileout)) {
+      fileext <- tolower(gsub(patt,"\\1",fileout))
+      fileext[fileext=="jpg"] <- "jpeg"
+      fileout <- ""
+   }
+   else
+      fileext <- NULL
+   if (isTemp <- !nchar(fileout))
    {
      # print(c(batch=.isRscript()))
      # print(commandArgs(FALSE))
@@ -124,13 +132,21 @@
    }
    else if (is.na(delafter))
       delafter <- FALSE
-   fileext <- if (.lgrep("\\.(jpeg|jpg)$",fileout)) "jpeg" 
-              else if (.lgrep("\\.(webp)$",fileout)) "webp"
-              else "png"
+   if (is.null(fileext))
+      fileext <- if ((isTemp)&&(!.isKnitr())&&(mosaic$image<5)) c("png","svg")[1]
+                 else if (.lgrep("\\.(jpeg|jpg)$",fileout)) "jpeg" 
+                 else if (.lgrep("\\.(webp)$",fileout)) "webp"
+                 else if (.lgrep("\\.(svg)$",fileout)) "svg"
+                 else "png"
+   else
+      fileout <- paste0(fileout,".",fileext)
    isJPEG <- fileext %in% "jpeg"
    isWEBP <- fileext %in% "webp"
-   if ((!isJPEG)&&(!isWEBP)&&(!.lgrep("\\.png$",fileout)))
+   isSVG <- fileext %in% "svg"
+   if ((!isJPEG)&&(!isWEBP)&&(!isSVG)&&(!.lgrep("\\.png$",fileout)))
       fileout <- paste0(fileout,".png")
+   else if ((isSVG)&&(!.lgrep("\\.svg$",fileout)))
+      fileout <- paste0(fileout,".svg")
    g1 <- session_grid()
   # scale1 <- (18.5*96)/(g1$rows*2.54)
   # scale2 <- (23.7*96)/(g1$columns*2.54)
@@ -247,7 +263,16 @@
              ,scale=scale,autoscale=autoscale,pointsize=pointsize,dpi=dpi))
    if (.isJupyter())
       options(jupyter.plot_mimetypes=ifelse(isJPEG,'image/jpeg','image/png'))
-   if ((device=="agg")&&(requireNamespace("ragg",quietly=.isPackageInUse()))) {
+   if (isSVG) {
+     # print(c(w=png_width/dpi,h=png_height/dpi,dpi=dpi)) ## svglite::svglite
+      a <- try(svg(filename=fileout
+                             ,width=png_width/dpi,height=png_height/dpi#,res=dpi
+                             ,bg=background,pointsize=pointsize
+                            # ,antialias=antialias
+                            # ,family=font
+                             ))
+   }
+   else if ((device=="agg")&&(requireNamespace("ragg",quietly=.isPackageInUse()))) {
       a <- try(ragg::agg_png(filename=fileout
                              ,width=png_width,height=png_height,res=dpi
                              ,bg=background,pointsize=pointsize

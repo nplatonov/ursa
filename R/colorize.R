@@ -424,7 +424,9 @@
                         ,"Pastel1","Pastel2","Set1","Set2","Set3","Blues"   
                         ,"BuGn","BuPu","GnBu","Greens","Greys","Oranges" 
                         ,"OrRd","PuBu","PuBuGn","PuRd","Purples","RdPu"    
-                        ,"Reds","YlGn","YlGnBu","YlOrBr","YlOrRd")))
+                        ,"Reds","YlGn","YlGnBu","YlOrBr","YlOrRd"
+                       # ,"terrain.colors"
+                        )))
             palname <- pal
          else
             palname <- "cubehelix"
@@ -1271,6 +1273,10 @@
                   if (rownames(selected)=="qual")
                      pal <- sample(pal)
                }
+               ##~ else if (pal %in% c("terrain.colors")) {
+                  ##~ str(pal)
+                  ##~ stop("0204")
+               ##~ }
             }
             col <- colorRampPalette(unlist(strsplit(pal,split="\\s+"))
                                    ,alpha=TRUE)(n)

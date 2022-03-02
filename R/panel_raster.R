@@ -90,8 +90,12 @@
    e <- band_nNA(obj)
    isRGB <- nband(obj) %in% c(2,3,4) & all(band_nNA(obj)>=0) # '==0' is NA used for RGB?
    toResample <- floor(1/scale)>1 & !isRGB
-   if (is.na(useRaster))
-      useRaster <- getOption("ursaPngDevice")!="windows"
+   if (is.na(useRaster)) {
+      cond1 <- getOption("ursaPngDevice")!="windows"
+      cond2 <- !(tolower(gsub(".*\\.(\\S+)$","\\1"
+                                    ,getOption("ursaPngFileout"))) %in% c("svg"))
+      useRaster <- cond1 && cond2
+   }
    if (verbose)
       str(list(isRGB=isRGB,isCT=isCT,toResample=toResample,isColorTable=isCT
               ,useRasrer=useRaster))

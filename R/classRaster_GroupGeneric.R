@@ -29,7 +29,9 @@
 {
   # print(.Generic)
    x <- discolor(x)
+  # opW <- options(warn=ifelse(.isPackageInUse(),-1,1))
    x$value[] <- do.call(.Generic,list(x$value,...))
+  # options(opW)
    get("x")
 }
 'Complex.ursaRaster' <- function(z)
