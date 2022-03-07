@@ -31,7 +31,7 @@ Logical. If \code{TRUE} then convertion is attended by progress bar. Default is 
 }
 }
 \details{
-Some GIS software (e.g., QGIS) has broad tools for display vector data. Excepting choroplets, it is assumed that visualization of each cell separately is more attractive than displaying of polygons with different forms, which are produced, for example, by GDAL convertion utillity \href{https://gdal.org/gdal_polygonize.html}{gdal_polygonize.py}.
+Some GIS software (e.g., QGIS) has broad tools for display vector data. Excepting choroplets, it is assumed that visualization of each cell separately is more attractive than displaying of polygons with different forms, which are produced, for example, by GDAL convertion utillity \href{https://gdal.org/programs/gdal_polygonize.html}{gdal_polygonize.py}.
 
 %%~ If tools from package \pkg{sp} then \code{polyigonize} uses \link[sp:SpatialPolygons]{"Spatial Polygons"} functions from \pkg{sp} package. ESRI Shapefile is created by \code{\link[rgdal]{writeOGR}} function from \pkg{rgdal} package.
 

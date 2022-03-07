@@ -37,7 +37,7 @@ Ignored.
 \details{
 \code{ursa_read} is simplified implementation of \code{gdal_read}.
 
-The composite GDAL formats (e.g., \href{https://gdal.org/frmt_netcdf.html}{NetCDF: Network Common Data Format}, \href{https://gdal.org/frmt_hdf5.html}{HDF5: Hierarchical Data Format Release 5}) are likely unsupported.
+The composite GDAL formats (e.g., \href{https://gdal.org/drivers/raster/netcdf.html}{NetCDF: Network Common Data Format}, \href{https://gdal.org/drivers/raster/hdf5.html}{HDF5: Hierarchical Data Format Release 5}) are likely unsupported.
 
 \code{read_gdal} uses functions from \pkg{rgdal}:
 \itemize{

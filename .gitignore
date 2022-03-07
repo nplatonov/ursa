@@ -17,3 +17,5 @@ R/FarMenu.ini
 R/SciTE.properties
 R/_md5
 *.knitted
+src-i386/
+src-x64/

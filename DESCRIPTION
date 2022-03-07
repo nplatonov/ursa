@@ -5,7 +5,7 @@ Version: 3.9.6
 Authors@R: person(given="Nikita",family="Platonov",role=c("aut","cre"),email="platonov@sevin.ru",comment=c(ORCID="0000-0001-7196-7882"))
 Author: Nikita Platonov [aut, cre] (<https://orcid.org/0000-0001-7196-7882>)
 Maintainer: Nikita Platonov <platonov@sevin.ru>
-Description: S3 classes and methods for manipulation with georeferenced raster data: reading/writing, processing, multi-panel visualization.
+Description: S3 classes and methods for manipulation with georeferenced raster data: reading/writing, processing, multi-panel visualization. SWU.
 License: GPL (>= 2)
 URL: https://github.com/nplatonov/ursa
 BugReports: https://github.com/nplatonov/ursa/issues

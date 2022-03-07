@@ -768,7 +768,7 @@
          }
          else {
             xy2 <- xy2[c(tail(seq(nrow(xy2)),-1),head(seq(nrow(xy2)),1)),]
-            print("ind1D")
+           # print("ind1D")
          }
          ind3 <- .dist2(xy1[range(seq(nrow(xy1))),],xy2[range(seq(nrow(xy2))),]
                        ,verbose=FALSE,summarize=FALSE)$ind

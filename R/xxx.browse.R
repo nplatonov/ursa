@@ -10,12 +10,18 @@
       }
       return(browse(obj,...))
    }
-   if (.isRemark())
-      return(browse(obj,...))
+  # if (.isRemark())
+  #    return(browse(obj,...))
    if (inherits(obj,c("datatables")))
       return(browse(obj,...))
+   if (inherits(obj,c("htmlwidget"))) {
+      if (("knitr" %in% loadedNamespaces())&&
+         (isTRUE(knitr::opts_current$get("results")=="asis")))
+         return(browse(obj,...))
+   }
    if (!inherits(obj,c("htmlwidget","knitr_kable")))
       return(browse(obj,...))
+   
    obj
 }
 'browse' <- '.open' <- function(...) {
