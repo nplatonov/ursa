@@ -89,9 +89,13 @@
          if (grepl("\\{variant\\}",sUrl))
             if (!is.null(p1$options$variant))
                sUrl <- gsub("\\{variant\\}",p1$options$variant,sUrl)
-         if (grepl("\\{s\\}",sUrl))
+         if (grepl("\\{s\\}",sUrl)) {
             if (!is.null(p1$options$subdomains))
-               sUrl <- gsub("\\{s\\}",paste0("{",p1$options$subdomains,"}"),sUrl)
+               sdomain <- p1$options$subdomains
+            else
+               sdomain <- "abc"
+            sUrl <- gsub("\\{s\\}",paste0("{",sdomain,"}"),sUrl)
+         }
          if (grepl("^//",sUrl))
             sUrl <- paste0("https:",sUrl)
          if (grepl("\\{attribution\\.OpenStreetMap\\}",sAttr))
@@ -104,8 +108,6 @@
         # art <- style
       }
    }
-   ##~ print(art)
-   ##~ print(style)
    isStatic <- .lgrep("static",style)>0
   # if ((!isStatic)&&("ursa" %in% loadedNamespaces())) {
   #    stop("Operation is prohibited: unable to display attribution.")

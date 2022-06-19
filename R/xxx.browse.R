@@ -8,6 +8,7 @@
       if (is.character(obj)) {
          return(cat(obj,sep="\n"))
       }
+     # cat("not knit","a\n")
       return(browse(obj,...))
    }
   # if (.isRemark())
@@ -15,13 +16,21 @@
    if (inherits(obj,c("datatables")))
       return(browse(obj,...))
    if (inherits(obj,c("htmlwidget"))) {
+     # cat("htmlwidget 1","\n")
+     # cat("knitr:",c(knitr="knitr" %in% loadedNamespaces()),"\n")
+     # cat("asis:",knitr::opts_current$get("results")=="asis","\n")
+     # cat("class:",class(obj),"\n")
       if (("knitr" %in% loadedNamespaces())&&
-         (isTRUE(knitr::opts_current$get("results")=="asis")))
+         (isTRUE(knitr::opts_current$get("results")=="asis"))) {
+        # cat("asis 2","\n")
          return(browse(obj,...))
+      }
    }
-   if (!inherits(obj,c("htmlwidget","knitr_kable")))
+   if (!inherits(obj,c("htmlwidget","knitr_kable"))) {
+     # cat("htmlwidget 3","\n")
       return(browse(obj,...))
-   
+   }
+  # cat("obj 4","\n")
    obj
 }
 'browse' <- '.open' <- function(...) {
@@ -155,7 +164,7 @@
      #    if (requireNamspace("tmap"))
      #    obj <- tmap::tmap_leaflet(obj)
      # }
-      if (inherits(obj,c("tmapZZZZZZZ","htmlwidget"))) {
+      if (inherits(obj,c("tmap","htmlwidget"))) {
          isUrsaCache <- !identical(normalizePath(.ursaCacheDir()),tempdir())
          if (!isUrsaCache & is.null(output))
             return(ret2)

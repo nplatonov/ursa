@@ -196,9 +196,11 @@
             if (!.lgrep("bg",names(arglist2))) {
                arglist2$bg <- arglist2$col
                if ((.lgrep("pch",names(arglist2)))&&
-                   (arglist2$pch %in% c(21,22,23,24,25))) ## ?pch
-                  arglist2$col <- "black"
+                   (arglist2$pch %in% c(21,22,23,24,25))) { ## ?pch
+                  op <- median(col2rgb(arglist2$bg,alpha=T)["alpha",])
+                  arglist2$col <- rgb(0,0,0,op,maxColorValue=255)
                  # arglist2$bg <- "transparent"
+               }
             }
             if (!.lgrep("cex",names(arglist2))) {
                arglist2$cex <- 1.2
@@ -213,7 +215,7 @@
             if (!.lgrep("lwd",names(arglist2))) {
                arglist2$lwd <- 1 ## 20180309 was 'lwd <- 3'
             }
-            if (length(ind <- .grep("^border",names(arglist2)))) {
+            if (F & length(ind <- .grep("^border",names(arglist2)))) { ## -- 20220515
                arglist2$col <- arglist2[[ind]]
             }
          }
@@ -249,6 +251,25 @@
            # q()
          }
         # str(c(obj=list(spatial_geometry(obj)),add=TRUE,arglist2))
+         if (isFALSE(arglist2$border))
+            arglist2$border <- NULL
+         if ((TRUE)&&(is_spatial_lines(obj))&&("border" %in% names(arglist2))) {
+            if (isTRUE(arglist2$border)) {
+               gscale <- median(colSums(col2rgb(arglist2$col)*c(0.30,0.59,0.11)))
+               arglist2$border <- ifelse(gscale>160,"#000000A0","#FFFFFFA0")
+            }
+            arglist3 <- list(lwd=1.25,col=arglist2$border)
+            if ("lwd" %in% names(arglist2)) {
+               if (length(arglist2$lwd)==1)
+                  arglist3$lwd <- max(arglist2$lwd*1.3,arglist2$lwd+1.5)
+               else if (length(arglist2$lwd)==2) {
+                  arglist3$lwd <- max(arglist2$lwd)
+                  arglist2$lwd <- min(arglist2$lwd)
+               }
+            }
+            ret3 <- .tryE(do.call(".panel_plot"
+                         ,c(obj=list(spatial_geometry(obj)),add=TRUE,arglist3)))
+         }
          ret <- .tryE(do.call(".panel_plot"
                      ,c(obj=list(spatial_geometry(obj)),add=TRUE,arglist2)))
          arglist2$type <- spatial_geotype(obj)
@@ -295,6 +316,10 @@
          ret[[i]] <- arglist2[[j]]
       }
       if ((TRUE)&&(.lgrep("line",geoType))) {
+         ##~ str(ret)
+         ##~ str(arglist)
+         ##~ str(arglist2)
+         ##~ q()
          if (!is.list(ret$col)) {
             .col <- ret$col
             ret$col <- ret$border
@@ -316,9 +341,12 @@
          }
          else
             ret$fill <- ret$col
-         ret$col <- NA
-         ret$lwd <- NA
-         ret$lty <- NA
+         if (is.null(arglist2$col))
+            ret$col <- NA
+         if (is.null(arglist2$lwd))
+            ret$lwd <- NA
+         if (is.null(arglist2$lty))
+            ret$lty <- NA
       }
    }
    if ((is_spatial(obj))&&(isLang)&&(length(spatial_colnames(obj))>0)) {
@@ -337,6 +365,7 @@
         # spatial_write(obj,"res1.sqlite")
       }
    }
+  # str(ret)
    if (!is.null(ct)) {
       ct <- ursa_colortable(ct)
       ret$name <- names(ct)

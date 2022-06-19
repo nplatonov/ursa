@@ -2,6 +2,7 @@
 \alias{local_mean}
 \alias{local_sum}
 \alias{local_median}
+\alias{local_quantile}
 \alias{local_min}
 \alias{local_max}
 \alias{local_sd}
@@ -11,6 +12,7 @@
 \alias{local_length}
 \alias{mean.ursaRaster}
 \alias{median.ursaRaster}
+\alias{quantile.ursaRaster}
 \alias{.average}
 \title{
 Create single-band raster using statistics of multi-bands raster.
@@ -26,10 +28,13 @@ local_min(x, cover = 0.5 - 1e-3, verbose = FALSE)
 local_max(x, cover = 0.5 - 1e-3, verbose = FALSE)
 local_sd(x, cover = 0.5 - 1e-3, verbose = FALSE)
 local_var(x, cover = 0.5 - 1e-3, verbose = FALSE)
+local_quantile(x, probs = seq(0, 1, 0.25), type = 7, cover = 0.5 - 1e-3, verbose = FALSE)
 
 \method{mean}{ursaRaster}(x, ...)
 
 \method{median}{ursaRaster}(x, ...)
+
+\method{quantile}{ursaRaster}(x, ...)
 
 # non public
 .average(x, cover = 0.5 - 1e-3, weight = NULL, sum = FALSE, verbose = FALSE)
@@ -48,6 +53,12 @@ Positive numeric of length equal to number of bands. For \code{local_mean} and \
   \item{sum}{
 Logical. For \code{.average} only. If \code{sum=TRUE} then fuction returns sum of values else mean value.
 }
+  \item{probs}{
+Numeric. For \code{local_quantile} only. Argument \code{probs}, which is passed as argument \code{probs} to generic function \code{\link[stats]{quantile}()}.
+}
+  \item{type}{
+Numeric. For \code{local_quantile} only. Argument \code{type}, which is passed as argument \code{probs} to generic function \code{\link[stats]{quantile}()}.
+}
   \item{verbose}{
 Logical. If \code{verbose=TRUE} then some output appears in console. Used for debug and benchark.
 }
@@ -55,9 +66,11 @@ Logical. If \code{verbose=TRUE} then some output appears in console. Used for de
 Character. Band name for created single-band image.
 }
   \item{...}{
-Function \code{mean} - arguments, which are passed to \code{local_mean}.
+Function \code{mean} - arguments, which are passed to \code{local_mean()}.
 \cr
-Function \code{median} - arguments, which are passed to \code{local_median}.
+Function \code{median} - arguments, which are passed to \code{local_median()}.
+\cr
+Function \code{quantile} - arguments, which are passed to \code{local_quantile()}.
 }
 }
 \details{
@@ -68,7 +81,11 @@ If for valid output cell value it is required to have at least \code{m} values n
 Generic functions \code{mean}, \code{median}, \code{sd} for \code{ursaRaster} class are implemented via \code{local_mean}, \code{local_median}, \code{local_sd}, respectively. 
 }
 \value{
-Single-band \code{ursaRaster} object.
+Double-band \code{ursaRaster} object for \code{local_range()}.
+\cr
+Multi-band \code{ursaRaster} object for \code{local_quantile()}.
+\cr
+Otherwise, single-band \code{ursaRaster} object. 
 }
 %%~ \references{
 %%~ %% ~put references to the literature/web site here ~

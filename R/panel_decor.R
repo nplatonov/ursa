@@ -3,7 +3,7 @@
    opR <- options(ursaPngAuto=TRUE)
    isWeb <- getOption("ursaPngWebCartography")
    ann <- getOption("ursaPngCopyright")
-   ann <- ((is.character(ann))&&(nchar(ann)))
+   ann <- ((is.character(ann)[1])&&(nchar(ann[1])))
    ann <- ((ann)&&(!.getPrm(arglist,name="coast",default=FALSE)))
    isWeb <- (is.logical(isWeb)&&(isWeb))
    isBefore <- isWeb & !ann

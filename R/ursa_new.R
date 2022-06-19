@@ -116,7 +116,7 @@
       result$dim <- dim(value) #with(result$grid,c(columns*rows,dim(value)[2]))
       bands <- result$dim[2]
    }
-   else if ((is.logical(value))&&(!is.na(value))&&(!value))
+   else if ((length(value)==1)&&(is.logical(value))&&(!is.na(value))&&(!value))
    {
       result$value <- as.numeric(NA)
       result$dim <- with(result$grid,c(columns*rows,bands))

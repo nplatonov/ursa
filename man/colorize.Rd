@@ -1,5 +1,7 @@
 \name{colorize}
 \alias{colorize}
+\alias{palettize}
+
 \title{
 Create color table
 }
@@ -17,12 +19,12 @@ colorize(obj, value = NULL, breakvalue = NULL, name = NULL, pal = NULL, inv = NA
          lazyload = FALSE, reset = FALSE, origin = "1970-01-01" ,format = "",
          alpha = "", colortable = NULL, verbose = FALSE, ...)
                           
-
+palettize(...) ## wrapper for non-spatial vectors
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
    \item{obj}{
-      \code{ursaRaster} object or one-dimension numeric vector.
+      \code{ursaRaster} object or one-dimension numeric or character vector.
    }
    \item{value}{
       Numeric. Values to be assigned to categories.
@@ -106,10 +108,14 @@ colorize(obj, value = NULL, breakvalue = NULL, name = NULL, pal = NULL, inv = NA
       Logical. Some output in console. Primarily for debug purposes.
    }
    \item{\dots}{
-      If \code{pal} is a function, and argument names are in the format "\code{pal.*}" then prefix "\code{pal.}" is omitted, and the rest part is used for argument names, which are passed to \code{pal} function.
+      For \code{colorize()}: If \code{pal} is a function, and argument names are in the format "\code{pal.*}" then prefix "\code{pal.}" is omitted, and the rest part is used for argument names, which are passed to \code{pal} function.
+      
+      For \code{palettize()}: Arguments, which are passed to \code{colorize()}.
    }
 }
 \details{
+\code{palettize} is a wrapper \code{ursa_colortable(colorize(...))} to return color table for one-dimensional numeric or character vector.
+
 \code{colortable} is designed to prepare pretty thematic maps.
 
 %%~ Currently \code{categorize} is synonym of \code{colorize}. It is a mock-up to make categories without color table.

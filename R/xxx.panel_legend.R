@@ -26,11 +26,17 @@
       return(NULL)
    if (missing(items))
       items <- getOption("ursaPngLegend")
-  # if (length(items))(inherits(items,"ursaLegend"))
+   else if (is.list(items)) {
+      items <- lapply(items,function(item) {
+         if ((length(item)==1)&&(is.list(item)))
+            return(item[[1]]) # return(unlist(item,recursive=FALSE))
+         item
+      })
+   }
    items <- items[!sapply(items,is.null)]
    if (!length(items))
       return(invisible(NULL))
-   arglist <- as.list(args(legend))
+   arglist <- head(as.list(args(legend)),-1)
    items2 <- list(list(...))
    if (verbose) {
       message("-------")
@@ -82,8 +88,22 @@
       lname[ind] <- iname[ind]
    arglist[["legend"]] <- lname
   # arglist[["pch"]] <- unname(sapply(items,function(x) x$pch))
+  # arglist[["title.cex"]] <- arglist[["cex"]]
+   if (length(ind <- sapply(arglist,class) %in% "call")) {
+      attach(arglist)
+      arglist[ind] <- lapply(names(arglist)[ind],function(a) {
+         arglist[[a]] <- eval(as.call(arglist[[a]]))
+      })
+      detach("arglist")
+   }
    if (verbose)
       str(arglist)
    ret <- do.call("legend",arglist)
+   ##~ ret <- legend(x="topright",legend=c("213856","213857"),fill="transparent"
+                ##~ ,col="white",border="transparent",pch=21,density=NA
+                ##~ ,bty="o",bg="#0000007F",box,lwd=0.1,box.lty="solid"
+                ##~ ,box.col="black",pt.bg=c('213856'="#978035FF",'213857'="#677EC9FF")
+                ##~ ,pt.cex=2.5,pt.lwd=2,adj=c(0,0.5),text.col="white",merge=FALSE
+                ##~ ,horiz=TRUE,title.col="white",title.adj=0.5)
    invisible(ret)
 }

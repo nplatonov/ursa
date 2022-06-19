@@ -1,7 +1,7 @@
 useDynLib(ursa)
 
 importFrom("grDevices", "col2rgb", "colorRampPalette", "rgb", "png",
-           "graphics.off", "as.raster")
+           "graphics.off", "as.raster","svg")
 importFrom("graphics", "abline", "axTicks", "axis", "contour",
            "filled.contour", "hist", "image", "mtext", "plot",
            "polygon", "rect", "strheight", "strwidth", "text", 
@@ -9,7 +9,7 @@ importFrom("graphics", "abline", "axTicks", "axis", "contour",
            "par", "points", "segments", "legend", "polypath")
 importFrom("stats", "aggregate", "density", "loess", "median", "pf",
            "predict", "runif", "sd", "var", "na.omit", 
-           "as.dist", "cutree", "dist", "hclust")
+           "as.dist", "cutree", "dist", "hclust", "quantile")
 importFrom("utils", "str", "download.file", "head", "tail", "methods",
            "object.size", "unzip", "URLencode", "localeToCharset",
            "read.table", "write.table", "browseURL")
@@ -102,6 +102,7 @@ export("local_max")
 export("local_mean")
 export("local_median")
 export("local_min")
+export("local_quantile")
 export("local_sd")
 export("local_stat")
 export("local_sum")
@@ -109,6 +110,7 @@ export("local_var")
 export("nband")
 export("open_envi")
 export("open_gdal")
+export("palettize")
 export("panel_abline")
 export("panel_annotation")
 export("panel_box")
@@ -173,6 +175,7 @@ export("spatial_geotype")
 export("spatial_grid")
 export("spatial_intersection")
 export("spatial_length")
+export("spatial_levelsplit")
 export("spatial_ncol")
 export("spatial_nrow")
 export("spatial_pattern")
@@ -292,6 +295,7 @@ S3method("print",ursaConnection)
 S3method("print",ursaGrid)
 S3method("print",ursaNumeric)
 S3method("print",ursaRaster)
+S3method("quantile",ursaRaster)
 S3method("rep",ursaRaster)
 S3method("seek",ursaConnection)
 S3method("seq",ursaGrid)

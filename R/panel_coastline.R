@@ -462,10 +462,12 @@
       inside <- any(na.omit(unique(inside)))
       if (inside) {
          area <- with(g1,max(maxx-minx,maxy-miny))
+        # if (grepl("\\+units=km",g1$crs))
+        #    area <- area*1e3
          if (isLongLat)
             area <- area*111
          else
-            area <- area/1000
+            area <- area/ifelse(grepl("\\+units=km",g1$crs),1,1000)
          if (area<=(-10))
             return(NULL)
          else if (area<=100)

@@ -60,7 +60,8 @@
       }
       return(res)
    }
-   if (inherits(obj,c("SpatialPointsDataFrame","SpatialPixelsDataFrame"))) {
+   if (inherits(obj,c("SpatialPointsDataFrame"#,"SpatialPoints"
+                     ,"SpatialPixelsDataFrame"))) {
       return(allocate(obj,...))
    }
    if (inherits(obj,c("RasterBrick","RasterStack","RasterLayer"))) {
@@ -232,6 +233,9 @@
                   if (isColor) {
                      ctCol <- obj$color_tables[[1]]
                      ct <- rgb(ctCol[,1],ctCol[,2],ctCol[,3],ctCol[,4],maxColorValue=255)
+                     if (isClass)
+                        if (length(ct)>length(ctName))
+                           ct <- ct[seq_len(length(ctName))]
                   }
                   else
                      ct <- rep(NA,length(ctName))

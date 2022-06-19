@@ -35,7 +35,8 @@
                                    ,"-co",.dQuote("ZSTD_LEVEL=9")
                                    ,"-co",.dQuote("ZLEVEL=9")
                                    ,"-co",.dQuote("TILED=NO")
-                                   ,"-co",.dQuote("INTERLEAVE=BAND")
+                                   ,"-co",.dQuote(paste0("INTERLEAVE="
+                                                        ,ifelse(length(obj)>=2,"PIXEL","BAND")))
                                    ,.dQuote(ftmp),.dQuote(fname)))
       else if (.lgrep("\\.(img)$",basename(fname)))
          system2("gdal_translate",c("-q","-of","HFA"

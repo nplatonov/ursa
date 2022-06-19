@@ -162,7 +162,7 @@
    }
    else {
       Sys.setenv(R_LIBS_USER=.libPaths()[1])
-      Sys.setenv(BINPREF=Sys.getenv("R_BINPREF"))
+     # Sys.setenv(BINPREF=Sys.getenv("R_BINPREF"))
       system2("R",c("--vanilla","CMD","INSTALL",opt3,pkg)[-1])
      # system(paste("R","--vanilla","CMD","INSTALL",opt2,pkg))
    }

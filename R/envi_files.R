@@ -219,3 +219,21 @@
   #    return(list2[ind])
    character()
 }
+'ursa_exists' <- function(fname) {
+   list1 <- envi_list(fname)
+   if (length(list1)>1) {
+      print(list1)
+      warning("Multiple datasests")
+      return(FALSE)
+   }
+   if (length(list1)==1)
+      return(TRUE)
+   list1 <- dir(path=dirname(fname),pattern=basename(fname),full.names=TRUE)
+   if (length(list1)) {
+      ind <- grep("\\.(tif|tiff|hfa|bin)$",basename(list1))
+      if (length(ind)==1)
+         return(TRUE)
+      return(FALSE)
+   }
+   return(FALSE)
+}

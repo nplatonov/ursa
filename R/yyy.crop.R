@@ -15,11 +15,15 @@
    else if (isSVG) {
       if (!(isSVG <- requireNamespace("magick",quietly=.isPackageInUse())))
          return(0L)
+     # print("A")
+     # imread <- purrr::safely(magick::image_read)
+     # a <- imread(fileout)
+     # print("B")
+     # str(a)
+     # q()
      # tempf <- tempfile()
      # sink(tempf)
-     # print("A")
       a <- magick::image_raster(magick::image_read(fileout))
-     # print("B")
      # sink()
      # file.remove(tempf)
       x <- col2rgb(a$col)/255

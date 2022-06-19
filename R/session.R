@@ -121,6 +121,7 @@
                                  ,c(minx=minx,miny=miny,maxx=maxx,maxy=maxy))
 'session_pngviewer' <- function(allow=NA) {
    opV <- getOption("ursaAllowPngViewer")
+  # str(list(allow=allow,opV=opV,isRscript=.isRscript()))
    if ((is.na(allow))||(!is.logical(allow))) {
       if (is.logical(opV))
          return(opV)

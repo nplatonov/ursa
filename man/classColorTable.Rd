@@ -51,7 +51,10 @@ For \code{names()}: values are names of categories. If length of names is \code{
 Integer vector. Indices specifying elements to extract part (subset) of color table.
 }
   \item{\dots}{
-passing to generic \code{\link[base]{print}}. Currently not used.
+In \code{print()}, passing to generic \code{\link[base]{print}}. Currently not used.
+\cr
+In \code{ursa_colorable()}, passing to generic \code{\link[base]{print}}. Currently not used.
+
 }
 }
 \details{

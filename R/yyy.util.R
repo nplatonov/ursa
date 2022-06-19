@@ -240,13 +240,16 @@
 {
    if (identical(src,dst))
       positive <- TRUE
-   '.modal2' <- function(x,...)
-   {
+   '.modal2' <- function(x,...) {
+      if (length(x)==1)
+         return(x)
       z <- density(x,...)
       y <- z$x[match(max(z$y),z$y)]
       y
    }
    '.modal3' <- function(x) {
+      if (length(x)==1)
+         return(x)
       res <- NA
      ## 'locfit' is not in 'suggests', 'depends'
       if (requireNamespace("locfit",quietly=.isPackageInUse()))
@@ -265,8 +268,11 @@
       }
    }
    else if (is_ursa(src)) {
-      src <- as.data.frame(src)[,1:2]
+      src <- as.data.frame(src,na.rm=T)[,1:2]
       isUrsa <- TRUE
+   }
+   else if ((is.null(dim(src)))&&(length(src)==2)) {
+      src <- rbind(src)
    }
    if (is_spatial(dst)) {
       ##~ dst <- switch(spatial_geotype(dst)
@@ -280,7 +286,10 @@
       }
    }
    else if (is_ursa(dst)) {
-      dst <- as.data.frame(dst)[,1:2]
+      dst <- as.data.frame(dst,na.rm=T)[,1:2]
+   }
+   else if ((is.null(dim(dst)))&&(length(dst)==2)) {
+      dst <- rbind(dst)
    }
    d1 <- dim(src)
    d2 <- dim(dst)
@@ -303,8 +312,7 @@
                ,verb=as.integer(verbose)
                ,dist=numeric(nrow(src)),ind=integer(nrow(src)))
    b1 <- data.frame(ind=b1$ind+1L,dist=b1$dist)
-   if (summarize)
-   {
+   if (summarize) {
       d <- b1$dist
       if (!.try(m <- .modal3(d)))
          m <- NA
@@ -407,7 +415,7 @@
       return(paste0(as.character(x),"\uB0",suffix[1]))
    y
 }
-'.isRscript' <- function() .lgrep("^(--file=|-f$|-e$|--slave$)",commandArgs(FALSE))>=2
+'.isRscript' <- function() .lgrep("^(--file=|-f$|-e$|--hiddenslave$)",commandArgs(FALSE))>=1
 #'.isPackageInUse.deprecated' <- function() "ursa" %in% loadedNamespaces()
 '.isPackageInUse' <- function(verbose=FALSE) {
    cond1 <- "package:ursa" %in% search()

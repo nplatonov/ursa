@@ -28,7 +28,7 @@
                file.remove(ftmp)
             if (file.exists(ftmp <- paste0(.gsub("\\.envi","",fname),".gz")))
                file.remove(ftmp)
-            system(paste("gzip","-f -Sgz",fname))
+            system(paste("gzip","-f -Sgz",dQuote(fname)))
          }
          else if (con$compress==1L)
          {
@@ -44,7 +44,7 @@
                      break
                   Sys.sleep(7)
                }
-               a <- system(paste("gzip","-f -Sgz",con$fname)) ##keep
+               a <- system(paste("gzip","-f -Sgz",dQuote(con$fname))) ##keep
               # str(a)
             }
            # .elapsedTime("PASSED")

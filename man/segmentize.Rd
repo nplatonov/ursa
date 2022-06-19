@@ -7,11 +7,14 @@ Create segmented line from points' sequence
 Connect sequence of points (locations) by direct lines (tracks)
 }
 \usage{
-segmentize(obj, connect=c("consequent", "united"))
+segmentize(obj, by=NULL, connect=c("consequent", "united"))
 }
 \arguments{
   \item{obj}{
    Simple feature (package \pkg{sf}) or Spatial abstract class (package \pkg{sp}) with POINTS spatial geometry.
+}
+  \item{by}{
+   Either field name or \code{NULL}. If specified, then value \code{"united"} is applied for argument \code{connect}, returned spatial object is splitted regarding values of \code{by} with linked single-column attribute table with specified field. Default is \code{NULL}.
 }
   \item{connect}{
    Structure of output segments; either sequence of single segments (\code{"consequent"}) or single multi-segment (\code{"united"}).

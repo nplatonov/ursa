@@ -117,10 +117,14 @@
      # print(c(isCharacter=is.character(obj),isTime=isTime,isDate=isDate))
       if (inherits(obj,c("Date","POSIXct","POSIXlt"))) {
          obj <- sort(obj)
-         od <- sort(unique(diff(sort(unique(obj)))))
-         if (all(od %% min(od) == 0)) {
-            os <- seq(min(obj),max(obj),by=min(od))
-            daily <- match(obj,os)
+        # od <- sort(unique(diff(sort(unique(obj)))))
+         od <- sort(unique(obj))
+         if (length(od)>1) {
+            od <- sort(unique(diff(od)))
+            if (all(od %% min(od) == 0)) {
+               os <- seq(min(obj),max(obj),by=min(od))
+               daily <- match(obj,os)
+            }
          }
         # daily <- integer()
          obj <- if (nchar(format)) format(obj,format) else as.character(obj)
@@ -1329,4 +1333,15 @@
    class(val) <- "ursaColorTable"
    x$colortable <- val
    x
+}
+'palettize' <- function(...) {
+   arglist <- list(...)[[1]]
+  # cat("---------\n")
+  # str(arglist)
+   if (length(ind <- which(sapply(arglist,.is.colortable)))) {
+      ret <- arglist[[ind]]
+      return(ret)
+   }
+  # cat("---------\n")
+   ursa_colortable(colorize(...))
 }

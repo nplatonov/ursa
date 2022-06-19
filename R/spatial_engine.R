@@ -59,6 +59,9 @@
       sp::proj4string(obj) <- NA_character_
       sp::proj4string(obj) <- value
    }
+   if ((inherits(obj,"stars"))&&("sf" %in% loadedNamespaces())) {
+      sf::st_crs(obj) <- .p4s2epsg(value)
+   }
    obj
 }
 'spatial_geometry' <- function(obj,verbose=FALSE) {
@@ -361,6 +364,8 @@
    return(res[,ind,drop=drop])
 }
 'spatial_data<-' <- function(obj,verbose=FALSE,value) {
+   if (is.null(value))
+      return(spatial_geometry(obj))
    operation <- "unknown"
    isSF <- .isSF(obj)
    isSP <- .isSP(obj)
@@ -945,6 +950,12 @@
          sf::st_agr(y) <- "constant"
      # x_
       res <- try(sf::st_intersection(x,y))
+      if (is.null(spatial_data(res))) {
+         if (!is.null(spatial_data(x)))
+            spatial_data(res) <- spatial_data(x)
+         else if (!is.null(spatial_data(y)))
+            spatial_data(res) <- spatial_data(y)
+      }
       if (inherits(res,"try-error")) {
          if (length(grep("st_crs\\(x\\) == st_crs\\(y\\) is not TRUE"
                         ,as.character(res))))
@@ -1001,6 +1012,8 @@
             ind <- .grep("(line|collection)",geotype)
             if (!length(ind))
                return(res)
+            if (noData <- is.null(spatial_data(res)))
+               spatial_data(res) <- data.frame(dummy=0L)
             res <- res[ind,]
             geotype <- geotype[ind]
             if (length(na.omit(match(unique(geotype)
@@ -1012,6 +1025,8 @@
                }
                res <- sf::st_cast(res[grep("LINESTRING",geotype),],"MULTILINESTRING")
             }
+            if (noData)
+               res <- spatial_geometry(res)
             return(res)
          }
          else if (geometry=="points") {
@@ -1259,7 +1274,7 @@
       print(valid)
       valid <- FALSE
    }
-   if ((inherits(valid,"try-error"))||(!valid)) {
+   if ((any(inherits(valid,"try-error")))||(any(!valid))) {
       if (verbose)
          print("repaired by buffering")
       obj <- spatial_buffer(obj)
@@ -1285,7 +1300,7 @@
                arglist[[i]] <- sf::st_sf(spatial_data(arglist[[i]])
                                         ,geometry=spatial_geometry(arglist[[i]]))
          }
-         else { ## repeeat st_column name for first argument
+         else { ## repeat st_column name for first argument
             for (i in tail(seq_along(arglist),-1)) {
                res <- arglist[[i]]
                ind <- match(attr(res,"sf_column"),colnames(res))
@@ -1301,13 +1316,14 @@
       return(do.call("c",arglist))
    geoType <- spatial_geotype(res)
    coerce <- switch(geoType
-                   ,POLYGON="SpatialPolygonsDataFrame"
-                   ,LINESTRING="SpatialLinesDataFrame"
-                   ,POINT="SpatialPointsDataFrame"
+                   ,POLYGON="SpatialPolygons" ## "SpatialPolygonsDataFrame"
+                   ,LINESTRING="SpatialLines" ## "SpatialLinesDataFrame"
+                   ,POINT="SpatialPoints" ## "SpatialPointsDataFrame"
                    ,stop("geoType"))
    for (i in seq_along(arglist))
       arglist[[i]] <- methods::as(arglist[[i]],coerce)
-   res <- spatial_geometry(do.call("rbind",arglist))
+  # res <- spatial_geometry(do.call("rbind",arglist)) ## in the case of *DataFrame
+   res <- do.call("rbind",arglist)
    res
 }
 'spatial_basename' <- function(fname) {
@@ -1341,6 +1357,7 @@
       return(sf::as_Spatial(obj))
    if (toSF) {
      ## 'methods' have already loaded because Spatial* is S4
+     # try `sf::st_as_sf`
       return(methods::as(obj,"sf"))
    }
    NULL

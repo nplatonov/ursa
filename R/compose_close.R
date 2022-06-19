@@ -170,12 +170,12 @@
    }
    if ((bpp==8)&&(!(tolower(gsub(".*\\.(\\S+$)","\\1",fileout)) %in% c("svg","pdf")))) {
       if (requireNamespace("magick",quietly=.isPackageInUse())) {
-            magick::image_write(
-               magick::image_quantize(
-                  magick::image_read(fileout)
-                  ,max=256,dither=FALSE,colorspace='sRGB')
-               ,fileout)
-            cmd <- ""
+         magick::image_write(
+            magick::image_quantize(
+               magick::image_read(fileout)
+               ,max=256,dither=FALSE,colorspace='sRGB')
+            ,fileout)
+         cmd <- ""
       }
       else if (nchar(Sys.which("zzzi_view32"))) {
          FoutTmp <- ifelse(dirname(fileout)==".",basename(fileout),normalizePath(fileout))
@@ -205,7 +205,7 @@
          cmd <- ""
       }
       if (nchar(cmd)) {
-         if (T | verbose)
+         if (T & verbose)
             message(cmd)
          system(cmd)
       }
@@ -222,9 +222,11 @@
          dpi1 <- getOption("ursaPngDpi")
          dpi2 <- knitr::opts_current$get("dpi")
          dpi3 <- dpi1/96*dpi2/96
+         opK <- options(warn=-1) ## https://github.com/yihui/knitr/pull/2063
          retK <- knitr::include_graphics(fileout
                                         ,auto_pdf=FALSE
                                         ,dpi=getOption("ursaPngDpi"))
+         options(opK)
          if ((delafter)&&(sysRemove))
             on.exit({
                wait <- 5

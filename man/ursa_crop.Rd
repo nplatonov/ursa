@@ -12,7 +12,7 @@ makes such spatial subset of source raster image, where margins of 'no data' val
 \usage{
 %%~ \method{subset}{ursaRaster}(x, ...)
 
-ursa_crop(obj, condition, border = 0, resetGrid = TRUE, verbose = FALSE)
+ursa_crop(obj, condition, border = 0, expand = 1, resetGrid = TRUE, verbose = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -23,7 +23,10 @@ Object of class \code{ursaRaster}
 Object of class \code{ursaRaster} or \code{\link[base]{missing}}. The condition for cutting. If \sQuote{missing} then condition is defined from \code{obj}.
 }
   \item{border}{
-Integer of length 1 or 4. Desired margins for geographical subset. Units are cells (pixels).
+Integer of length 1, 2 or 4. Desired margins for geographical subset. Units are cells (pixels).
+}
+  \item{expand}{
+Numeric of length 1, 2 or 4. Desired boundary expansion for geographical subset. Units is ratio (relative to 1). Default is 1.
 }
   \item{resetGrid}{
 Logical. If \code{resetGrid=TRUE} then sessional grid parameters is established from grid parameters of created raster. If \code{resetGrid=FALSE} then sessional grid parameters keep without change. Defailu is \code{TRUE}.
@@ -42,6 +45,8 @@ Logical. \code{TRUE} provides some additional information on console.
 %%~ \code{subset} for \code{ursaRaster} object is a wrapper to \code{ursa_crop}.
 
 This function calls \code{\link[ursa:regrid]{regrid}} with passing values of arguments \code{resetGrid} and \code{verbose} without changes.
+
+Bordering (argument \code{border}) is applied before expansion (argument \code{expand}).
 
 This function is an instrument for data compression for spatial matrices with wide margins of 'no data' value. It keeps spatial structure (pixel's neighborhood) in the internal data storage. Otherwise, \code{\link[ursa:codec]{compress}} reduces object size using spatial indexing with dropping of spatial structure.
 }

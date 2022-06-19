@@ -1,16 +1,22 @@
 ##~ 'layout.label' <- function(...) .syn('panel_annotation',0,...)
 ## 'panel_annotation'??
-'panel_annotation' <- function(...)
-{
+'panel_annotation' <- function(...) {
    if (.skipPlot(TRUE))
       return(invisible(NULL))
    arglist <- list(...)
    if ((length(arglist))&&(is_spatial(arglist[[1]]))) {
       obj <- spatial_transform(arglist[[1]],session_crs())
       xy <- spatial_coordinates(spatial_centroid(obj))
-      da <- spatial_data(obj)[[1]]
+      da <- spatial_data(obj)
+      noLabel <- !ncol(da)
+     # if (noLabel)
+     #    da <- data.frame(label=rep("*",nrow(xy)))
+      if (!noLabel)
+         da <- da[[1]]
       return(invisible(lapply(seq_len(spatial_count(obj)),function(i) {
-         do.call(panel_annotation,c(x=xy[i,1],y=xy[i,2],label=da[i],arglist[-1]))
+         do.call(panel_annotation,c(x=xy[i,1],y=xy[i,2]
+                                   ,label=if (noLabel) NULL else da[i]
+                                   ,arglist[-1]))
       })))
    }
    kwd <- "(caption|ann(otation)*)"
@@ -99,7 +105,10 @@
    else
       pos <- position
   # scale <- getOption("ursaPngScale")
-   mycex <- cex/par()$cex
+   if (F)
+      print(data.frame(cex=cex,par=par()$cex,retina=getOption("ursaPngRetina")
+                      ,pointsize=getOption("ursaPngPointsize"),default=12))
+   mycex <- cex/par()$cex#*getOption("ursaPngRetina")*getOption("ursaPngPointsize")/12
    if (!isPicture)
       if ((length(label)>1)&&(length(label)>=getOption("ursaPngLayout")$image))
          label <- label[getOption("ursaPngFigure")]
@@ -206,7 +215,8 @@
       return(invisible(NULL))
    }
    if (TRUE) { ## 20180625
-      adjust <- (adjust-0.5)*width/height+0.5 
+      if (adjust>=0.48)
+         adjust <- (adjust-0.5)*width/height+0.5 
    }
   # print(c(scale=scale,cex=mycex))
    x <- 0.5*(coord[1]+coord[3])
@@ -227,7 +237,7 @@
       if (verbose)
          .elapsedTime("label:finish")
    }
-   text(x=x,y=y,adj=c(adjust,vadj),label,cex=mycex,col=fg,srt=srt)
+   text(x=x,y=y,adj=c(adjust,vadj),labels=label,cex=mycex,col=fg,srt=srt)
    par(opt)
    invisible(NULL)
 }

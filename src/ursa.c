@@ -652,6 +652,8 @@ void optimalDatatypeDouble(double *x,int *n,int *res)
             break;
          }
       }
+      else if ((fabs(x[i])>0)&&(fabs(x[i])<1e-11))
+         val[5]=1;
       else if ((!((val[2])||(val[12])||(val[3])))&&(x[i]>=0)&&(x[i]<=255))
          val[1]=1;
       else if ((!val[3])&&(x[i]>=-32768)&&(x[i]<=32767))
@@ -674,18 +676,22 @@ void optimalDatatypeDouble(double *x,int *n,int *res)
          Rprintf(" %d(%d)",val[i],i);
       Rprintf("\n");
    }
-   if (val[4])
+   if (val[5])
+      *res=5;
+   else if (val[4])
       *res=4;
-   else if ((val[12])&&(val[2]))
-      val[3]=3;
-   else if (val[3])
-      *res=3;
-   else if (val[2])
-      *res=2;
-   else if (val[12])
-      *res=12;
-   else if (val[1])
-      *res=1;
+   else {
+      if ((val[12])&&(val[2]))
+         val[3]=3; // ??? wrong code?
+      if (val[3])
+         *res=3;
+      else if (val[2])
+         *res=2;
+      else if (val[12])
+         *res=12;
+      else if (val[1])
+         *res=1;
+   }
    return;
 }
 void conTest(int *adr,int *res)

@@ -56,7 +56,7 @@
       cat(sprintf("x$name=%s\n",x$name))
    if (any(is.na(x$dim)))
       x$dim <- as.integer(with(x$con,c(lines*samples,bands)))
-   if ((x$dim[2]!=x$con$bands)&&((is.na(x$value))||(x$dim[2]!=dim(x$value)[2])))
+   if ((x$dim[2]!=x$con$bands)&&((length(x$value)==1)&&(is.na(x$value))||(x$dim[2]!=dim(x$value)[2])))
       x$dim[2] <- x$con$bands
    if (length(.grep("(band|layer|names)",names(arglist))))
    {
@@ -68,7 +68,7 @@
       if (x$con$bands!=x$dim[2])
          x$con$bands <- x$dim[2]
    }
-   if ((TRUE)&&(!is.na(x$name[1]))&&(!is.na(x$con$posZ))) ## FALSE before 29may2010
+   if ((TRUE)&&(!is.na(x$name[1]))&&(!is.na(x$con$posZ[1]))) ## FALSE before 29may2010
       NULL # x$name <- x$name #[x$con$posZ]
    else if ((is.na(x$name[1]))||(length(x$name)!=x$dim[2])) {
       x$name <- sprintf(sprintf("%s%%0%dd"
@@ -574,6 +574,7 @@
          res <- .Cursa("optimalDatatypeDouble",x=c(as.numeric(x),as.numeric(nodata))
                   ,n=n,res=integer(1),NAOK=TRUE)$res
       }
+     # str(res)
      # print(summary(x));q()
       return(res)
    }

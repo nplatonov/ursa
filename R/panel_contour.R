@@ -17,7 +17,9 @@
      # if ((isFilled)||(isColored))
      #    isLine <- TRUE
    }
-  # print(c(line=isLine,filled=isFilled,colored=isColored,label=isLabel))
+   verbose <- .getPrm(list(...),name="verb(ose)*",default=FALSE)
+   if (T | verbose)
+      print(c(line=isLine,filled=isFilled,colored=isColored,label=isLabel))
    if ((!TRUE)&&(isLabel)&&(!isFilled)&&(!isColored)&&(!isLine))
       res <- .panel_contour(obj,expand=0,...)
    else {
@@ -75,11 +77,15 @@
       labcex <- .getPrm(arglist,name="(lab)*cex",default=0.85)
       method <- .getPrm(arglist,name="method",default="flattest")
       labels <- .getPrm(arglist,name="label(s)",class="character",default=NULL)
-      if ((isFilled)&&(!isLabel))
+      if ((isLine)&&(!isLabel))
+         drawL <- FALSE
+      else if ((isFilled)&&(!isLabel))
          drawL <- FALSE
       else
          drawL <- TRUE
-      contour(res,levels=res$lev,col=col,lwd=lwd,lty=lty,labels=labels
+     # str(list(res="res",levels=res$lev,col=col,lwd=lwd,lty=lty,labels=labels
+     #                  ,labcex=labcex,method=method,drawlabels=drawL,add=TRUE))
+      contour(res,levels=unique(res$lev),col=col,lwd=lwd,lty=lty,labels=labels
                        ,labcex=labcex,method=method,drawlabels=drawL,add=TRUE)
    }
    res$col
@@ -190,7 +196,6 @@
       val <- c(head(val,1)-head(dval,1),head(val,-1)+dval,tail(val,1)+tail(dval,1))
    }
    if (oneBreak) {
-      res$lev <- res$lev[1:2]
       if (val[1]==0)
          val <- c(-1e-6,1e-6)
       else

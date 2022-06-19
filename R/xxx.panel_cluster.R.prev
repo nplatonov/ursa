@@ -297,7 +297,7 @@
    if (length(bg)==1)
       bg <- rep(bg,length(ctInd))
    bg <- col2rgb(bg)/255
-   bg <- rgb(bg[1,],bg[2,],bg[3,],alpha=ifelse(separate,0.6,0.2))
+   bg <- rgb(bg[1,],bg[2,],bg[3,],alpha=0.2)
    s2 <- s/ifelse(label,2,1.5)/overlap
    for (i in seq(nrow(lut))) {
       x <- lut$.x[i] # <- mean(da2$x)
@@ -425,12 +425,8 @@
    }
    if (is.null(col))
       col <- ursa_colortable(colorize(seq(nz)))
-   if (!is.null(border)) {
-      border1 <- rep_len(border,nz)
-      border2 <- rep_len("#FFFFFF",nz)
-      gscale <- colSums(col2rgb(col)*c(0.30,0.59,0.11))
-      border2[gscale>160] <- "#00000080"
-   }
+   if (!is.null(border)) 
+      border <- rep_len(border, nz)
    if (!is.null(lty)) 
       lty <- rep_len(lty, nz)
    if (!is.null(lwd)) 
@@ -475,18 +471,18 @@
    }
    for (i in seq_len(nz)) {
       n <- max(2,floor(edges*dz[i]))
-      if (!ball) { ## external circle
+      if (!ball) {
          P <- t2xy(seq.int(z[i],z[i+1],length.out=n),scale=c(1,0.65))
          ##~ polygon(c(P$x,0+x),c(P$y,0+y),border=border[i],col=col[i]
                 ##~ ,lty=lty[i],lwd=lwd[i]
                 ##~ )
-         polypath(P$x,P$y,border=border2[i],col=col1[i]
+         polypath(P$x,P$y,border=border[i],col=col1[i]
                  ,lty=lty[i],lwd=lwd[i]
                  ,rule=c("winding","evenodd")[2]
                  )
       }
       P <- t2xy(seq.int(z[i],z[i+1],length.out=n),scale=ifelse(ball,0.75,0.65))
-      polypath(P$x,P$y,border=border1[i],col=if (ball) col1[i] else col2[i]
+      polypath(P$x,P$y,border=border[i],col=if (ball) col1[i] else col2[i]
               ,lty=lty[i],lwd=lwd[i]
               ,rule=c("winding","evenodd")[2]
               )

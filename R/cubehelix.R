@@ -3,7 +3,7 @@
 # b <- colorize(n,rich=0,rotate=60,hue=1.5 ~ for bathymetry
 
 'cubehelix' <- function(n,value=numeric(),weak=NA,rich=NA,rotate=NA,hue=NA,gamma=1
-                       ,dark=NA,light=NA,inv=NA,verbose=NA)
+                       ,dark=NA,light=NA,bright=NA,inv=NA,verbose=NA)
 {
   # str(match.call())
   # set.seed(as.integer(as.numeric(Sys.time())/10))
@@ -18,9 +18,14 @@
    default.light <- ifelse(bg>127,.light,255-.dark)
    autobright <- FALSE
    if ((is.na(dark))&&(is.na(light))) {
-      dark <- default.dark/255
-      light <- default.light/255
-      autobright <- TRUE
+      if (is.na(bright)) {
+         dark <- default.dark/255
+         light <- default.light/255
+         autobright <- TRUE
+      }
+      else {
+         dark <- light <- bright
+      }
    }
    else if ((is.na(dark))&&(!is.na(light))) {
       if (light>1)

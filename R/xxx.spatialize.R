@@ -187,9 +187,14 @@
             crsNow <- style
          else
             crsNow <- NA
-         if ((is.na(crsNow))&&
-            (.lgrep("^(lon|lng$)",coords[1])==1)&&(.lgrep("^lat",coords[2])==1))
-            crsNow <- "EPSG:4326"
+         if (is.na(crsNow)) {
+            if ((.lgrep("^(lon|lng$)",coords[1])==1)&&(.lgrep("^lat",coords[2])==1))
+               crsNow <- "EPSG:4326"
+            else if (is.data.frame(dsn)) {
+               if (is.character(attr(dsn,"crs")))
+                  crsNow <- attr(dsn,"crs")
+            }
+         }
          isCRS <- ((!is.na(crsNow))&&(nchar(crsNow)))
          if (isSF) {
             if (isCRS)
@@ -776,6 +781,8 @@
          cl2 <- cl[i]
          if (isSF) {
             da <- obj[,dname[i],drop=TRUE] ## sf>=0.5
+            if (inherits(da,c("track_xy","random_points")))
+               da <- unclass(da)
            # da <- obj[,dname[i],drop=TRUE][,,drop=TRUE] ## sf>=0.4
            # str(da)
          }

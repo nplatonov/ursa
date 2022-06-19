@@ -37,7 +37,12 @@
          obj$value <- array(NA,dim=dima)
          class(obj$value) <- cl
       }
-      if (is.array(value)) {
+      if (is.ursa(value)) {
+         dimb <- dim(value$value)
+         ind <- rep(seq(dimb[2]),length.out=dima[2])
+         obj$value <- value$value
+      }
+      else if (is.array(value)) {
          dimb <- dim(value)
          if (dima[1]==dimb[1]) {
             obj$value[] <- value

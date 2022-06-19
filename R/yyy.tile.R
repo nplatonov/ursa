@@ -194,6 +194,9 @@
    s$'Stamen.Terrain' <- c(paste0("https://stamen-tiles-{abcd}.a.ssl.fastly.net/terrain"
                                   ,"/{z}/{x}/{y}{r}.png")
                           ,StamenCr)
+   s$'Stamen.TonerLite' <- c(paste0("https://stamen-tiles-{abcd}.a.ssl.fastly.net/toner-lite"
+                                  ,"/{z}/{x}/{y}{r}.png")
+                          ,StamenCr)
    s$'rumap' <- c("https://{abcd}tilecart.kosmosnimki.ru/rw/{z}/{x}/{y}.png"
                  ,"\u0420\u435\u043b\u044c\u0435\u0444 \u0420\u0443\u043c\u0430\u043f Scanex")
   # http://a.maps.owm.io/map/precipitation_new/6/37/19?appid=b1b15e88fa797225412429c1c50c122a1   

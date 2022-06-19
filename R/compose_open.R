@@ -120,10 +120,17 @@
       else if (!TRUE)
          fileout <- file.path(tempdir(),basename(.maketmp()))
       else if (.isKnitr()) {
-         bname <- basename(.maketmp())
-         bname <- gsub("_[0-9a-f]+"
-                  ,paste0("_",knitr::opts_current$get()$label),bname,ignore.case=TRUE)
-         fileout <- file.path(knitr::opts_current$get()$fig.path,bname)
+         bname <- paste0(gsub("^_+","",basename(.maketmp())),"")
+         klabel <- knitr::opts_current$get("label")
+         if (!is.null(klabel))
+            bname <- gsub("_[0-9a-f]+"
+                     ,paste0("_",klabel),bname,ignore.case=TRUE)
+         if (is.null(bpath <- knitr::opts_current$get("fig.path")))
+            if (is.null(bpath <- knitr::opts_chunk$get("fig.path")))
+               bpath <- "."
+         if ((FALSE)&&(dirname(bpath)==knitr::opts_current$get("root.dir")))
+            bpath <- basename(bpath)
+         fileout <- file.path(bpath,bname)
       }
       else
          fileout <- .maketmp()
@@ -205,7 +212,7 @@
    if (verbose)
       print(c(v=scale1,h=scale2,autoscale=autoscale,scale=scale,c=g1$columns,r=g1$rows
              ,retina=retina,digits=3))
-   pointsize0 <- ifelse(.isKnitr(),round(12*retina,0),round(12*retina,0))
+   pointsize0 <- ifelse(.isKnitr(),round(12*retina,1),round(12*retina,1))
    if (is.na(pointsize)) {
      # print(c(pointsize0=pointsize0,dpi=dpi,scale=scale,scale0=autoscale))
      # pointsize <- pointsize0*96/dpi*scale/autoscale ## removed 20161217

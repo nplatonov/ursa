@@ -27,13 +27,14 @@
             other <- other[-indS]
          if (length(indSP)) {
            # panel_plot(...)
-            ret <- do.call("panel_plot",c(arglist[indSP],arglist[other]))$col
+            ret <- do.call("panel_plot",c(arglist[indSP],arglist[other]))#$col
          }
          if (length(indSF)) {
             ret <- do.call("panel_plot",c(arglist[indSF],arglist[other]))#$col
-            if (!is_ursa(ret,"colortable"))
+            if ((!is_ursa(ret,"colortable"))||(!inherits(ret,"ursaLegend")))
                ret <- ret$col
          }
+         str(ret)
          if ((!length(indS))&&(length(other))) {
             ret <- do.call("panel_plot",c(arglist[other]))$col
          }

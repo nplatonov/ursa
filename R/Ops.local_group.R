@@ -133,3 +133,29 @@
    }
    stop(paste0(fun,": Non-supported class of data"))
 }
+'quantile.ursaRaster' <- function(x,...) .syn('local_quantile',0,x,...)
+'local_quantile' <- function(x,probs=seq(0,1,0.25),type=7,cover=0.5-1e-3,verbose=FALSE) {
+   if (!is.ursa(x))
+      return(NULL)
+   g0 <- session_grid()
+   nx <- length(x)
+   skip <- rep(NA,length(probs))
+   if (cover>1)
+      cover <- cover/length(x)
+   if (cover==0)
+      cover <- 1e-11
+   session_grid(x)
+  # res <- ursa(bandname=as.character(probs))
+   qv <- apply(ursa_value(x),1,function(v) {
+      if (length(na.omit(v))/nx<cover)
+         return(skip)
+      quantile(v,probs=probs,type=type,name=FALSE,na.rm=TRUE)
+   })
+   res <- as.ursa(t(qv))
+  # ursa_value(res) <- t(qv)
+   print(res)
+  # display(res)
+   q()
+   session_grid(g0)
+   res
+}
