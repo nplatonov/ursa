@@ -68,6 +68,13 @@
             if (file.exists(obj)) {
                a <- open_gdal(obj)
             }
+            else {
+               list1 <- dir(path=dirname(obj)
+                           ,pattern=paste0(basename(obj),"\\.(tif|tiff|hfa)$")
+                           ,full.names=TRUE)
+               if (length(list1)==1)
+                  a <- open_gdal(list1)
+            }
          }
          g1 <- a$grid
          if (is_ursa(a))

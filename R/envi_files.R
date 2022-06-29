@@ -126,6 +126,8 @@
 'envi_list' <- function(pattern=".+",path=".",all.files=FALSE,full.names=recursive
                        ,recursive=FALSE,ignore.case=TRUE,exact=FALSE)
 {
+   if (length(pattern)>1)
+      return(do.call(c,lapply(pattern,envi_list))) ## RECURSIVE
    '.noESRI' <- function(elist) {
       fpath <- ifelse(full.names | length(grep("/",elist)),elist,file.path(path,elist))
       a <- elist[sapply(fpath,function(f) readLines(paste0(f,".hdr"),1)=="ENVI")]

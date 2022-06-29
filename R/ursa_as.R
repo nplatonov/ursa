@@ -593,7 +593,12 @@
    if (is.character(obj)) {
       if ((FALSE)&&(envi_exists(obj))) ## FALSE to keep alternative to read ENVI using GDAL 
          return(read_envi(obj,...))
+      if ((!FALSE)&&(envi_exists(obj))) {
+         return(read_envi(obj,...))
+      }
       if (file.exists(obj))
+         return(read_gdal(obj,...))
+      if (ursa_exists(obj))
          return(read_gdal(obj,...))
       if (isURL <- .lgrep("^(http://|https://|ftp://|file:///)",obj)>0) {
          arglist <- list(...)

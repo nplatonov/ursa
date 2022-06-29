@@ -624,7 +624,8 @@
                y <- ursa(x,"colortable") ## y <- x$colortable
                if ((TRUE)&&(isWeb)&&(after)) {
                   alpha2 <- 0.65
-                  y[] <- paste0(substr(y,1,7),toupper(as.hexmode(round(alpha2*255))))
+                  y[] <- paste0(substr(y,1,7),format(as.hexmode(round(alpha2*255))
+                                             ,width=2,upper.case=TRUE))
                }
                y
             })

@@ -60,7 +60,7 @@
    }
    data.frame(at=finalY,lab=finalLabel)
 }
-'.deintervale' <- function(value,verbose=FALSE) {
+'.deintervale' <- function(value,mix=FALSE,verbose=FALSE) {
    if (is.ursa(value))
       value <- ursa_colortable(value)
    if (.is.colortable(value))
@@ -87,6 +87,7 @@
       patt <- "(^(<=|<|>|>=).+$|^(\\(|\\[).+(\\]|\\))$)"
      # patt <- "^(\\(|\\[).+]$"
    found <- sum(grepl(patt,value,perl=TRUE))
+  # found2 <- grep(patt,value,perl=TRUE)
    if (found>0) {
       if (dev) {
          ivalue <- value
@@ -105,6 +106,11 @@
          ivalue <- paste(ivalue,collapse=" ")
          ivalue <- unlist(strsplit(ivalue,split="\\s+"))
          ivalue <- ivalue[nchar(ivalue)>0]
+      }
+      if (mix) {
+         tvalue <- table(ivalue)
+         tvalue <- tvalue[match(unique(ivalue),names(tvalue))]-1
+         return(tvalue)
       }
       invalid <- ((found<l1)||(length(unique(c(table(ivalue))))>1)) ## 20170609 intro
      # print(c(invalid=invalid))

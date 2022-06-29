@@ -23,7 +23,10 @@
       }
    }
    lname <- .gsub("^(.+)\\.(.+)$","\\1",bname)
-   isList <- is.list(obj)
+   if (inherits(obj,"sf"))
+      isList <- FALSE
+   else
+      isList <- is.list(obj)
    if (isList) {
       cl <- sapply(obj,inherits,c("sf","sfc","SpatialLinesDataFrame"
                           ,"SpatialPointsDataFrame","SpatialPolygonsDataFrame"
@@ -62,7 +65,7 @@
          stop("'ogr2ogr' is requires to merge layers")
      # fname1 <- paste0("res",seq_along(obj),".gpkg")
      # fname1 <- .maketmp(length(obj),ext=interimExt)
-      fname1 <- file.path("c:/tmp",paste0("interim",seq_along(obj),".",interimExt))
+      fname1 <- file.path(tempdir(),paste0("interim",seq_along(obj),".",interimExt))
       if (!allSF)
          pb <- ursaProgressBar(min=0,max=2*length(obj),tail=TRUE)
       p4s <- sapply(obj,function(x){

@@ -4,6 +4,7 @@
 \alias{envi_copy}
 \alias{envi_rename}
 \alias{envi_remove}
+\alias{ursa_exists}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 ENVI File Manipulation 
