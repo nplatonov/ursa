@@ -74,6 +74,7 @@ ref <- colorize(a,breakvalue=refval,pal.rich=45,pal.rotate=0)
 p1 <- colorize(a,breakvalue=val,pal.rich=135,pal.rotate=0)
 p2 <- colorize(a,value=val,pal.rich=-15,pal.rotate=0)
 p3 <- colorize(a,value=refval)
+\donttest{
 if (exam1 <- TRUE) {
    compose_open(legend=list(list(1,"left"),list(1,"right")),scale=2)
    panel_new()
@@ -88,6 +89,7 @@ if (exam1 <- TRUE) {
    if (exists("ct2"))
       compose_legend(ct2,units="contour")
    compose_close(bpp=8)
+}
 }
 if (exam2 <- TRUE) {
    compose_open(layout=c(2,2),byrow=FALSE
@@ -119,6 +121,7 @@ if (exam2 <- TRUE) {
    compose_legend(ct2,units="contour")
    compose_close()
 }
+\donttest{
 if (exam3 <- TRUE) {
    s <- 29
    session_grid(NULL)
@@ -140,6 +143,7 @@ if (exam3 <- TRUE) {
    else if (exists("ct1"))
       legend_colorbar(ct1)
    compose_close()
+}
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

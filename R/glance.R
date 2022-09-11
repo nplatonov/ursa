@@ -159,7 +159,7 @@
                         ,zoom=NA,gdal_rasterize=FALSE
                         ,silent=FALSE,verbose=FALSE,...) {
    arglist <- list(...)
-   a <- as.list(match.call())
+   a <- as.list(match.call()) ## try mget(names(match.call())[-1])
   # feature <- "geometry"
    if (TRUE) {
       geocodeList <- eval(as.list(args(.geocode))$service)

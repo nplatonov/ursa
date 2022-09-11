@@ -5,7 +5,7 @@
 }
 'histogram' <- function(...) .syn('ursa_hist',0,...)
 'ursa_hist' <- function(obj,width=800,height=600,...) {
-   rel <- as.list(match.call())
+   rel <- as.list(match.call()) ## try mget(names(match.call())[-1])
    rel <- .evaluate(rel,c("colorize","ursa_hist")[1])
    isFactor <- inherits(obj,c("character","factor","Date"))
    if (F) {

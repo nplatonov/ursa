@@ -49,6 +49,7 @@
    }
   # try(Sys.setenv(R_RMAP_TEMPLATE=fpath))
    try(options(ursaRequisite=fpath0))
+   options(ursaNoticeMatchCall=FALSE & !.isPackageInUse())
    invisible(0L)
 }
 .onAttach <- function(lib, pkg) { ## FAILED for 'Rscript -e "ursa::display()"'

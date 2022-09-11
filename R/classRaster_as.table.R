@@ -4,6 +4,7 @@
    isCT <- .is.colortable(x)
    res <- table(x$value,...)
    if (!.is.colortable(ct)) {
+     # ## try mget(names(match.call())[2])
      # names(dimnames(res)) <- as.character(match.call())[2]
       names(dimnames(res)) <- NULL
       return(res)

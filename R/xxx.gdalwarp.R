@@ -2,7 +2,7 @@
 # gdalwarp -t_srs WGS84 ~/0_360.tif 180.tif  -wo SOURCE_EXTRA=1000 --config CENTER_LONG 0
 
 '.gdalwarp' <- function(src,dst=NULL,grid=NULL,resample="near",nodata=NA
-                       ,resetGrid=FALSE,opt=NULL,close=FALSE,verbose=0L) {
+                       ,resetGrid=FALSE,opt=NULL,sf=TRUE,close=FALSE,verbose=0L) {
    if (is.null(grid)) {
       if (is.ursa(dst,"grid")) {
          grid <- dst
@@ -17,13 +17,14 @@
    }
    else
       grid <- ursa_grid(grid)
-   if (!nchar(Sys.which("gdalwarp"))) {
+   isSF <- isTRUE(sf) & requireNamespace("sf",quietly=.isPackageInUse())
+   if (!isSF & !nchar(Sys.which("gdalwarp"))) {
       withRaster <- requireNamespace("raster",quietly=.isPackageInUse())
       if (withRaster) {
          r1 <- as.Raster(src)
          session_grid(grid)
          r2 <- as.Raster(ursa_new(0L))
-         r3 <- try(raster::resample(r1,r2,method=c("bilinear","ngb")[1]))
+         r3 <- try(raster::resample(r1,r2,method=switch(resample,near="ngb","bilinear")))
          if (inherits(r3,"try-error")) {
             if (verbose)
                message('reprojection is failed')
@@ -92,28 +93,38 @@
       optF <- paste(optF,"-r",resample)
    }
    if (is.null(grid))
-      cmd <- paste("gdalwarp -overwrite -of",driver
+      cmd <- paste("-overwrite -of",driver
                   ,ifelse(is.na(nodata),"",paste("-srcnodata",nodata,"-dstnodata",nodata))
                   ,ifelse(verbose==0L,"-q","")
-                  ,optF,src,dst)
+                  ,optF)
    else
-      cmd <- with(grid,paste("gdalwarp -overwrite -of",driver
-                        ,ifelse(nchar(proj4),paste("-t_srs",.dQuote(proj4)),"")
-                        ,"-nosrcalpha"
-                        ,"-tr",resx,resy,"-te",minx,miny,maxx,maxy
-                        ,ifelse(is.na(nodata),"",paste("-srcnodata",nodata,"-dstnodata",nodata))
-                        ,ifelse(verbose==0L,"-q","")
-                        ,optF,src,dst))
+      cmd <- with(grid,c(NULL
+                 ,"-overwrite"
+                 ,"-of",driver
+                 ,if (nchar(proj4)) c("-t_srs",.dQuote(proj4))
+                # ,if (nchar(proj4)) c("-t_srs",proj4)
+                 ,"-nosrcalpha"
+                 ,"-tr",resx,resy,"-te",minx,miny,maxx,maxy
+                 ,if (!is.na(nodata)) c("-srcnodata",nodata,"-dstnodata",nodata)
+                 ,if (verbose==0L) "-q"
+                 ,unlist(strsplit(optF,split="\\s+"))
+                 ))
+   cmdcli <- paste("gdalwarp",paste(cmd,collapse=" "),src,dst)
    if (verbose)
-      message(cmd)
+      message(cmdcli)
    if (verbose>1)
       return(NULL)
-   proj_lib <- Sys.getenv("PROJ_LIB")
-   Sys.setenv(PROJ_LIB=file.path(dirname(dirname(Sys.which("gdalwarp"))),"share/proj"))
-  # Sys.setenv(PROJ_LIB="")
-  # print(Sys.getenv("PROJ_LIB"))
-   system(cmd)
-   Sys.setenv(PROJ_LIB=proj_lib)
+   if (!isSF) {
+     # proj_lib <- Sys.getenv("PROJ_LIB")
+     # Sys.setenv(PROJ_LIB=file.path(dirname(dirname(Sys.which("gdalwarp"))),"share/proj"))
+     ### Sys.setenv(PROJ_LIB="")
+     # print(Sys.getenv("PROJ_LIB"))
+      system(cmdcli)
+     # Sys.setenv(PROJ_LIB=proj_lib)
+   }
+   else {
+      sf::gdal_utils("warp",src,dst,options=gsub("\"","",cmd),quiet=verbose==0L)
+   }
    session_grid(NULL)
    if (inMemory) {
       ret <- if (driver=="ENVI") read_envi(dst) else read_gdal(dst)

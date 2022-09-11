@@ -63,7 +63,9 @@ Nikita Platonov \email{platonov@sevin.ru}
 \examples{
 session_grid(NULL)
 a1 <- as.integer(ursa_dummy(nband=1,mul=1/16,elements=1e3))  ## white noise
-display(a1,legend=NULL)
+\donttest{ ## to avoid over-time during example check -- begin
+   display(a1,legend=NULL)
+} ## to avoid over-time during example check -- end
 a2 <- ursa_dummy()
 print(a2)
 display_brick(a2,decor=FALSE)

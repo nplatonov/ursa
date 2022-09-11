@@ -25,7 +25,8 @@
 '.try' <- function(...)
 {
    a <- try(...)
-   if ((is.character(a))&&(class(a)=="try-error"))
+  # if ((is.character(a))&&(class(a)=="try-error"))
+   if (inherits(a,"try-error"))
       return(FALSE)
    return(TRUE)
 }
@@ -644,6 +645,8 @@
          next
       if (inherits(try(match.arg(rname[i],argname),silent=TRUE),"try-error"))
          next
+      if (isTRUE(getOption("ursaNoticeMatchCall")))
+         message('.evaluate: try `mget(names(match.call())[-1])` instead of `as.list(match.call())`')
       res <- try(eval.parent(arglist[[i]],n=depth),silent=TRUE)
       if (inherits(res,"try-error")) {
          next

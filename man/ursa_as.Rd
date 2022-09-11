@@ -133,11 +133,15 @@ print(head(c5))
 session_grid(b)
 b5a <- as.ursa(c5)
 print(b5a)
-display(b5a)
+\donttest{ ## to avoid over-timing during tests -- begin
+   display(b5a)
+} ## to avoid over-timing during tests -- end
 session_grid(NULL)
 b5b <- as.ursa(c5)
 print(b5b)
-display(b5b)
+\donttest{ ## to avoid over-timing during tests -- begin
+   display(b5b)
+} ## to avoid over-timing during tests -- end
 
 b6 <- as.ursa(system.file("pictures/erdas_spnad83.tif",package="rgdal"))
 print(b6)
@@ -150,7 +154,8 @@ if (requireNamespace("raster")) {
    b7 <- as.ursa(r)
    ursa_proj(b7) <- ""
    print(b7)
-   display_rgb(b7)}
+   display_rgb(b7)
+}
 } ## package 'raster' is required -- end
 } 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

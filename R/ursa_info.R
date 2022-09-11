@@ -4,7 +4,7 @@
    toClose <- FALSE
    isList <- .is.ursa_stack(obj)
    if (isList) { ## recursive!!!
-      rel <- as.list(match.call())
+      rel <- as.list(match.call()) ## try mget(names(match.call())[-1])
       fun <- as.character(rel[1])
       res <- vector("list",length(obj))
      # oname <- names(obj)

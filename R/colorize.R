@@ -17,48 +17,54 @@
                           ,colortable=NULL
                           ,verbose=FALSE,...)
 {
-   rel <- as.list(match.call())
-   fun <- "colorize" #"colorize" ## as.character(rel[1])
-   if (!FALSE) { ## ++ 20170629
-     # .elapsedTime("---")
-     # print(c('as.character(rel[[1]])'=as.character(rel[[1]])))
-     # print(c(isPackageInUse=.isPackageInUse()))
-     # print(c('rel[[1]]'=rel[[1]]))
-     # try(print(c(a=head(names(as.list(args(rel[[1]]))))),quote=FALSE))
-     # try(print(c(b=head(names(as.list(args(as.character(rel[[1]])))))),quote=FALSE))
-     # try(print(c(c=head(names(as.list(args(colorize))))),quote=FALSE))
-     # try(print(c(d=head(names(as.list(args(ursa::colorize))))),quote=FALSE))
-      argname <- names(as.list(args(colorize)))
-      rname <- names(rel)
-      j <- NULL
-     # str(rel)
-     # print(argname)
-      for (i in seq_along(rel)[-1]) {
-         if (rname[i]=="obj")
-            next
-         if ((is.language(rel[[i]]))&&(rname[i] %in% argname)) {
-            res <- eval.parent(rel[[i]])
-            if (is.null(res))
-               j <- c(j,i)
-            else if (is.language(res)) {
-               res <- eval.parent(res)
-               if (!is.language(res)) {
-                  assign(rname[i],res)
-                  rel[[i]] <- res
+   fun <- "colorize" #"colorize" ## as.character(as.list(match.call())[1])
+   if (F)
+      rel <- mget(names(match.call())[-1])
+   else {
+      rel <- as.list(match.call()) # try mget(names(match.call())[-1])
+      if (!FALSE) { ## ++ 20170629
+        # .elapsedTime("---")
+        # print(c('as.character(rel[[1]])'=as.character(rel[[1]])))
+        # print(c(isPackageInUse=.isPackageInUse()))
+        # print(c('rel[[1]]'=rel[[1]]))
+        # try(print(c(a=head(names(as.list(args(rel[[1]]))))),quote=FALSE))
+        # try(print(c(b=head(names(as.list(args(as.character(rel[[1]])))))),quote=FALSE))
+        # try(print(c(c=head(names(as.list(args(colorize))))),quote=FALSE))
+        # try(print(c(d=head(names(as.list(args(ursa::colorize))))),quote=FALSE))
+         argname <- names(as.list(args(colorize)))
+         rname <- names(rel)
+         j <- NULL
+        # str(rel)
+        # print(argname)
+         for (i in seq_along(rel)[-1]) {
+            if (rname[i]=="obj")
+               next
+            if ((is.language(rel[[i]]))&&(rname[i] %in% argname)) {
+               if (isTRUE(getOption("ursaNoticeMatchCall")))
+                  message('colorize: try `mget(names(match.call())[-1])` instead of `as.list(match.call())`')
+               res <- eval.parent(rel[[i]])
+               if (is.null(res))
+                  j <- c(j,i)
+               else if (is.language(res)) {
+                  res <- eval.parent(res)
+                  if (!is.language(res)) {
+                     assign(rname[i],res)
+                     rel[[i]] <- res
+                  }
+                  else
+                     stop("unable to evaluate agrument ",.sQuote(rname[i]))
                }
                else
-                  stop("unable to evaluate agrument ",.sQuote(rname[i]))
+                  rel[[i]] <- res 
             }
-            else
-               rel[[i]] <- res 
          }
+         if (length(j))
+            rel <- rel[-j]
+        # .elapsedTime("===")
       }
-      if (length(j))
-         rel <- rel[-j]
-     # .elapsedTime("===")
+      else if (TRUE)
+         rel <- .evaluate(rel,"colorize")
    }
-   else if (TRUE)
-      rel <- .evaluate(rel,"colorize")
    if (is.numeric(alpha)) {
      ## ?adjustcolor 
       if (all(alpha<=1))

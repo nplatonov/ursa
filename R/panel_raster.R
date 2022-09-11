@@ -26,7 +26,7 @@
    if (.is.ursa_stack(obj)) { ## recursive!!! (20160404 has bugs)
       if (verbose)
          print(match.call())
-      rel <- as.list(match.call())
+      rel <- as.list(match.call()) ## try mget(names(match.call())[-1])
       fun <- as.character(rel[1])
       rel <- rel[-1]
       rel <- rel[nchar(names(rel))>0]

@@ -212,6 +212,7 @@
    }
    if (proposed <- TRUE) {
       if (.isShiny()) {  ## in 'imageOutput'/'renderImage'
+        # print("URSA as list with '$src'")
          return(if (execute) list(src=fileout) else fileout)
       }
       if ((execute)&&(.isKnitr())) {

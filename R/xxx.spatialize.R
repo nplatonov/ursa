@@ -67,9 +67,11 @@
             stop("Either filename is not recognized or multiple files")
       }
    }
+   proj4 <- NULL
    if (!((is.character(dsn))&&(length(dsn)==1))) {
       nextCheck <- TRUE
       if ((.isSF(dsn))||(.isSP(dsn))) {
+        ## try mget(names(match.call())[-1])
          if ((resetProj)||(length(as.list(match.call())[-1])==1))
             session_grid(NULL)
       }
@@ -229,7 +231,7 @@
             message("process 'array' by 'sf' -- TODO (dilemma: raster is array)")
          }
          else if (is.numeric(dsn)) {
-            proj4 <- attr(dsn,"crs")
+            proj4 <- attr(dsn,"crs") ## from 'ursa_bbox()'
             limLonLat <- all(dsn>=-360 & dsn<=+360)
             if (length(dsn)==2) { ## point
               # obj <- sf::st_sfc(sf::st_point(dsn))
@@ -253,7 +255,8 @@
               # colnames(obj) <- c("lon","lat")
                ##~ obj <- sf::st_sf(sf::st_sfc(sf::st_polygon(list(obj)))
                                ##~ ,coords=c("lon","lat"),crs=4326)
-               obj <- sf::st_sfc(sf::st_multilinestring(list(obj)))#,crs=4326)
+              # obj <- sf::st_sfc(sf::st_multilinestring(list(obj)))#,crs=4326)
+               obj <- sf::st_sfc(sf::st_polygon(list(obj)))#,crs=4326)
               # obj <- sf::st_sf(obj)
             }
             else
@@ -264,7 +267,8 @@
                else if (!is.null(proj4)) {
                   sf::st_crs(obj) <- proj4
                   style <- proj4
-                  session_grid(NULL)
+                 # grid <- session_grid() ## ++ 20220702
+                 # session_grid(NULL) ## -- 20220702 ??
                }
                else
                   sf::st_crs(obj) <- session_crs()
@@ -448,7 +452,7 @@
                   if (length(da)==4)
                      da <- da[c("minx","miny","maxx","maxy")]
                   else if (length(da)==2) {
-                     arglist <- as.list(match.call())
+                     arglist <- as.list(match.call()) ## try mget(names(match.call())[-1])
                      arglist$dsn <- da
                      arglist[[1]] <- tail(as.character(arglist[[1]]),1)
                      if ((TRUE)&&("auto" %in% style)) {
@@ -642,11 +646,13 @@
                   return(NULL)
                }
                else {
-                  rel <- as.list(match.call())
+                  rel <- as.list(match.call()) ## try mget(names(match.call())[-1])
                   rname <- names(rel)
                   j <- NULL
                   for (i in seq_along(rel)[-1]) {
                      if (is.language(rel[[i]])) {
+                        if (isTRUE(getOption("ursaNoticeMatchCall")))
+                           message('spatialize: try `mget(names(match.call())[-1])` instead of `as.list(match.call())`')
                         res <- eval.parent(rel[[i]])
                         if (is.null(res))
                            j <- c(j,i)
@@ -978,8 +984,10 @@
       else
          border <- 27L
    }
-   if (!.lgrep("(none|auto|keep)",style))
-      resetProj <- TRUE
+   if (!.lgrep("(none|auto|keep)",style)) {
+      if ((!is.null(proj4))&&(proj4!=style))
+         resetProj <- TRUE
+   }
    if (isEPSG)
       resetProj <- FALSE
   # q()
@@ -1222,7 +1230,7 @@
                           ,paste0("+lat_0=",lat_0)
                           ,paste0("+lat_ts=",lat_ts)
                           ,paste0("+lon_0=",lon_0)
-                          ,"+k=1","+x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs")
+                          ,"+k=1","+x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs")
          }
          else if (proj=="laea") {
             if (.lgrep("(polarmap|ArcticConnect|ArcticSDI|^web$)",style)) {
@@ -1240,7 +1248,7 @@
             t_srs <- paste("","+proj=laea"
                           ,paste0("+lat_0=",lat_0)
                           ,paste0("+lon_0=",lon_0)
-                          ,"+k=1","+x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs")
+                          ,"+k=1","+x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs")
          }
          else if (proj=="merc")
             t_srs <- paste("+proj=merc +a=6378137 +b=6378137"

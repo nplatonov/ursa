@@ -79,25 +79,32 @@ Nikita Platonov \email{platonov@sevin.ru}
 \examples{
 a1 <- ursa(volcano)
 print(a1)
-display(a1)
+\donttest{ ## to avoid over-timing during tests -- begin
+   display(a1)
+} ## to avoid over-timing during tests -- end
 
 a2 <- ursa(volcano,flip=TRUE)
 print(a2)
-display(a2)
+\donttest{ ## to avoid over-timing during tests -- begin
+   display(a2)
+} ## to avoid over-timing during tests -- end 
 
 a3 <- ursa(volcano,permute=TRUE)
 print(a3)
-display(a3)
+\donttest{ ## to avoid over-timing during tests -- begin
+   display(a3)
+} ## to avoid over-timing during tests -- end
 
 a4 <- ursa(volcano,flip=TRUE,permute=TRUE)
 print(a4)
-display(a4)
+\donttest{ ## to avoid over-timing during tests -- begin
+   display(a4)
+} ## to avoid over-timing during tests -- end
 
 dima <- c(200,300,4)
 b1 <- ursa(array(runif(prod(dima)),dim=dima))
 print(b1)
 display_brick(b1,scale=1,pal.rotate=0,pal.hue=0,decor=FALSE)
-
 session_grid(NULL)
 
 c1 <- ursa(seq(3))

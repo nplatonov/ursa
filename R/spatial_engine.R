@@ -1289,8 +1289,10 @@
    isSF <- .isSF(res)
    isSP <- .isSP(res)
    if (!is.null(spatial_data(res))) {
-      if (isSP)
+      if (isSP) {
+        # res <- lapply(seq_along(arglist),function(i) sp::spChFIDs(arglist[[i]],as.character(i)))
          return(do.call("rbind",arglist))
+      }
       if (isSF) {
          geom <- unique(sapply(arglist,function(x) attr(x,"sf_column")))
          if (length(unique(geom))==1)
@@ -1323,7 +1325,8 @@
    for (i in seq_along(arglist))
       arglist[[i]] <- methods::as(arglist[[i]],coerce)
   # res <- spatial_geometry(do.call("rbind",arglist)) ## in the case of *DataFrame
-   res <- do.call("rbind",arglist)
+   res <- lapply(seq_along(arglist),function(i) sp::spChFIDs(arglist[[i]],as.character(i)))
+   res <- do.call("rbind",res)
    res
 }
 'spatial_basename' <- function(fname) {

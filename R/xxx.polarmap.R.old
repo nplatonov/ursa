@@ -12,7 +12,7 @@
       obj <- spatialize(obj,resetGrid=TRUE,style="longlat",engine="sf")
    }
    else {
-      layer <- as.character(as.list(match.call())[["obj"]])
+      layer <- as.character(as.list(match.call())[["obj"]]) ## try mget(names(match.call())[-1])
       obj <- spatialize(obj,style="longlat")
    }
   # glance(obj);q()

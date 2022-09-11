@@ -87,6 +87,7 @@
       if (is.null(lname))
          lname <- rep("",length(obj))
       if (any(ind <- !nchar(lname))) {
+        ## try mget(names(match.call())[-1])
          lname[ind] <- as.character(as.list(match.call())$obj)[-1][ind]
         # lname[ind] <- aname[ind]
       }

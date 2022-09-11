@@ -21,7 +21,8 @@
 }
 'panel_legend' <- function(items,...)
 {
-   verbose <- !.isPackageInUse()
+  # verbose <- !.isPackageInUse()
+   verbose <- .getPrm(list(...),name="verb(ose)*",default=!.isPackageInUse())
    if (.skipPlot(TRUE))
       return(NULL)
    if (missing(items))
@@ -71,6 +72,8 @@
             next
          if (verbose)
             message(a)
+         if (isTRUE(getOption("ursaNoticeMatchCall")))
+            message('panel_legend: try `mget(names(match.call())[-1])` instead of `as.list(match.call())`')
          res <- try(eval.parent(arglist[[a]]))
          if (inherits(res,"try-error")) {
             next
@@ -89,12 +92,10 @@
    arglist[["legend"]] <- lname
   # arglist[["pch"]] <- unname(sapply(items,function(x) x$pch))
   # arglist[["title.cex"]] <- arglist[["cex"]]
-   if (length(ind <- sapply(arglist,class) %in% "call")) {
-      attach(arglist)
+   if (length(ind <- which(sapply(arglist,class) %in% "call"))) {
       arglist[ind] <- lapply(names(arglist)[ind],function(a) {
-         arglist[[a]] <- eval(as.call(arglist[[a]]))
+         arglist[[a]] <- with(arglist,eval(as.call(arglist[[a]])))
       })
-      detach("arglist")
    }
    if (verbose)
       str(arglist)

@@ -27,8 +27,6 @@ Nikita Platonov \email{platonov@sevin.ru}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{
-}
 \examples{
 palette("Set3")
 radius <- seq(1,length.out=5,by=1)*200

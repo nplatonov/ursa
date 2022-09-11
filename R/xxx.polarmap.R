@@ -12,7 +12,7 @@
       obj <- spatialize(obj,resetGrid=TRUE,style="longlat",engine="sf")
    }
    else {
-      layer <- as.character(as.list(match.call())[["obj"]])
+      layer <- as.character(as.list(match.call())[["obj"]]) ## try mget(names(match.call())[-1])
       obj <- spatialize(obj,style="longlat")
    }
   # glance(obj);q()
@@ -60,7 +60,7 @@
       obj <- spatialize(obj,resetGrid=TRUE,style=style,engine="sf")
    }
    else {
-      layer <- as.character(as.list(match.call())[["obj"]])
+      layer <- as.character(as.list(match.call())[["obj"]]) ## try mget(names(match.call())[-1])
       if (!length(grep("\\+proj=laea",spatial_crs(obj))))
          obj <- spatialize(obj,resetProj=TRUE,resetGrid=TRUE,style=style)
    }
@@ -114,7 +114,7 @@
       extentASDI <- 4889334.802955
       scale0 <- 136421171.96428573131561279297
       resolutions <- 0.28*1e-3*scale0/(2^seq(0,18))
-      minZoom <- 2
+      minZoom <- 1
       maxZoom <- 10
       crsASDI <- leaflet::leafletCRS(crsClass="L.Proj.CRS"
                                     ,code=paste0("EPSG:",epsg)

@@ -51,7 +51,7 @@
    else if ((.lgrep("\\+proj=merc",session_crs()))&&
            (!is.na(.is.near(session_cellsize(),2*6378137*pi/(2^(1:21+8)))))) {
      # print("WEB #2")
-      arglist <- as.list(match.call())
+      arglist <- as.list(match.call()) ## try mget(names(match.call())[-1])
       if (!("scale" %in% names(arglist))) {
         # options(ursaPngWebCartography=TRUE) ## -- 20201125
          scale <- 1

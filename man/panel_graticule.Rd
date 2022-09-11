@@ -99,7 +99,7 @@ session_grid(regrid(lim=3.2*1e6*c(-1,-1,1,1)))
 compose_open(cl)
 for (i in 1:4) {
    panel_new()
-   panel_coastline()
+   \donttest{panel_coastline()}
    panel_graticule(decor=TRUE,trim=i \%in\% c(2:4))
    panel_annotation(text=as.character(i))
    panel_scalebar(scalebar=i==3)
@@ -111,7 +111,7 @@ session_grid(regrid(lim=1e6*c(-0.5,0.5,1.5,2.5)))
 compose_open(layout=c(2,2),legend=NULL,skip=4)
 for (i in seq(getOption("ursaPngLayout")$image)) {
    panel_new()
-   panel_coastline()
+   \donttest{panel_coastline()}
    if (i==1)
       panel_graticule()
    else if (i==2)

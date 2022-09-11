@@ -75,7 +75,7 @@
       return(NULL)
    nr <- x$grid$rows
    res <- if (missing(fname)) create_envi(x,...) else create_envi(x,fname,...)
-   rel <- as.list(match.call())[-1]
+   rel <- as.list(match.call())[-1] ## try mget(names(match.call())[-1])
    rel$fname <- NULL
    size <- rel[[.grep("size",names(rel))]]
    s1 <- ceiling(size)

@@ -60,15 +60,21 @@ Nikita Platonov \email{platonov@sevin.ru}
 session_grid(NULL)
 a1 <- ursa_new(volcano)
 print(a1)
-display(a1)
+\donttest{ ## to avoid over-timing during tests -- begin
+   display(a1)
+} ## to avoid over-timing during tests -- end
 
 a2 <- ursa_new(volcano,flip=TRUE)
 print(a2)
-display(a2)
+\donttest{ ## to avoid over-timing during tests -- begin
+   display(a2)
+} ## to avoid over-timing during tests -- end
 
 a3 <- ursa_new(volcano,permute=TRUE)
 print(a3)
-display(a3)
+\donttest{ ## to avoid over-timing during tests -- begin
+   display(a3)
+} ## to avoid over-timing during tests -- end
 
 dima <- c(200,300,4)
 b1 <- as.ursa(array(runif(prod(dima)),dim=dima))

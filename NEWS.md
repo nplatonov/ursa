@@ -6,12 +6,10 @@
 
 ### version 3.9.7
 
--   Ongoing…
-
 -   New function `palettize()` as a wrapper
     `ursa_colortable(colorize(...))`.
 
--   New argunent `expand` in function `ursa_crop()` for spatial
+-   New argument `expand` in function `ursa_crop()` for spatial
     expansion using relative value.
 
 -   New argument `by` in function `segmentize()` to split segments by
@@ -47,7 +45,7 @@
     `all.equal()`.
 
 -   Corrected index in `value_cr`, when number of columns and number in
-    argunents.
+    arguments.
 
 -   New argument `zoom` in function `regrid()` simultaneously replaces
     `expand=zoom` and `mul=1/zoom`.
@@ -260,8 +258,8 @@
 ### version 3.8.12
 
 -   Default style for web basemaps is OSM Mapnik tiles insead of OSM
-    static map due to
-    [limitations](http://staticmap.openstreetmap.de/staticmap.php).
+    static map due to [limitations](https://staticmap.openstreetmap.de).
+   <!-- [limitations](https://staticmap.openstreetmap.de/staticmap.php)-->
 
 -   Parsing of metadata from object of package **stars** (&gt;=0.2).
 

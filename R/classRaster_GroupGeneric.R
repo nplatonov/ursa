@@ -101,7 +101,9 @@
       if (.lgrep(e2,names(e1)))
          e2 <- e1[e2]
       else {
-         ind <- .grep(e2,cl1)
+         ind <- match(e2,cl1)
+         if (is.na(ind))
+            ind <- .grep(e2,cl1)
          if (length(ind) == 1)
             e2 <- ind-1L
          else {

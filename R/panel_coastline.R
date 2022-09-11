@@ -491,7 +491,7 @@
                   return(do.call("compose_coastline",arglist))
                }
                else {
-                  arglist <- as.list(match.call())
+                  arglist <- as.list(match.call()) ## try mget(names(match.call())[-1])
                   arglist$detail <- detail
                   return(do.call(as.character(arglist[[1]]),arglist[-1]))
                }

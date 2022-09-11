@@ -671,16 +671,19 @@
                           ,extend=FALSE
                           ,cache=TRUE
                           ,verbose=FALSE,...) {
-   arglist <- as.list(match.call())
+   arglist <- as.list(match.call()) ## try mget(names(match.call())[-1])
    if (TRUE) {
       argname <- names(as.list(args(.compose_wms)))
       argname <- argname[nchar(argname)]
       rname <- names(arglist)
       for (i in seq_along(arglist)[-1]) {
-         if ((inherits(arglist[[i]],c("name","call")))&&(rname[i] %in% argname))
+         if ((inherits(arglist[[i]],c("name","call")))&&(rname[i] %in% argname)) {
         # if (((is.language(arglist[[i]]))||(is.name(arglist[[i]])))&&
         #         (rname[i] %in% argname))
+            if (isTRUE(getOption("ursaNoticeMatchCall")))
+               message('try `mget(names(match.call())[-1])` instead of `as.list(match.call())`')
             arglist[[i]] <- eval.parent(arglist[[i]])
+         }
       }
       arglist$extend <- FALSE
    }
@@ -1075,7 +1078,7 @@
    if (.skipPlot(TRUE))
       return(NULL)
    g0 <- session_grid()
-   arglist <- as.list(match.call())
+   arglist <- as.list(match.call()) ## try mget(names(match.call())[-1])
    arglist[[2]] <- eval.parent(arglist[[2]])
    res <- do.call(".get_wms",arglist[-1])
    n <- length(res)

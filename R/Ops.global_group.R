@@ -83,6 +83,7 @@
 
 
 ## code below is proposal to reduce COPY/PASTE, but doesn't work correctly for 'range'
+## try mget(names(match.call())[-1]) instead of as.list(match.call())[-1]
 '.global_fun1' <- '.global_fun2'<- 
      function(x,ursa=FALSE,...) do.call(".global_common",as.list(match.call()))
 '.global_common' <- function(...) {

@@ -80,6 +80,7 @@
    if ((is.null(e))||(!nrow(e)))
       return(e)
    if (isTRUE(caption)) {
+     ## try mget(names(match.call())[-1])
       caption <- as.character(as.expression(as.list(match.call())[["x"]]))
    }
    else if (!(is.character(caption))||(!nchar(caption)))

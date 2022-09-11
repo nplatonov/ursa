@@ -132,7 +132,7 @@
          }
          return(obj)
       }
-      args <- as.list(match.call())
+      args <- as.list(match.call()) ## try mget(names(match.call())[-1])
       args$obj <- quote(obj)
       args$src <- seq_along(ct)-1
       if (length(val)==length(ct)) { ## categoral

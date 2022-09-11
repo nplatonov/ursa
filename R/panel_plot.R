@@ -5,7 +5,7 @@
    geoType <- ""
    isSP <- FALSE
    isSF <- FALSE
-   arglist <- as.list(match.call())
+   arglist <- as.list(match.call()) ## try mget(names(match.call())[-1])
    isLang <- is.language(arglist[["obj"]])
    if (isLang)
       oname <- as.character(arglist["obj"])
@@ -278,6 +278,12 @@
       isSF <- .isSF(obj)
       isSP <- .isSP(obj)
    }
+   else if (F & is.list(obj)) {
+      retname <- names(obj)[1]
+      ret <- try(.panel_plot(obj[[1]],add=TRUE,...))
+      str(ret)
+      q()
+   }
    else {
       ret <- try(.panel_plot(obj,add=TRUE,...))
       if (inherits(ret,"try-error")) {
@@ -357,7 +363,11 @@
       ##~ str(eval(arglist[["obj"]]))
       ##~ sink()
      # ret$name <- spatial_data(eval(arglist[["obj"]]))[[1]]
+      if (isTRUE(getOption("ursaNoticeMatchCall")))
+         message('panel_plot: try `mget(names(match.call())[-1])` instead of `as.list(match.call())`')
       ret$name <- spatial_data(eval.parent(arglist[["obj"]]))[[1]]
+     # if (length(unique(ret$name))==length(ret$pt.bg))
+     #    ret$name <- unique(ret$name)
    }
    if (FALSE) {
       if (length(geoType)>1) {
