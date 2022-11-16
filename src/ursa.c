@@ -3711,8 +3711,7 @@ void scatterplot(int *x,int *y,int *n,int *nbreakX,int *nbreakY
    }
    return;
 }
-int main()
-{
+int main(void) {
    Rprintf("Compile and build as DLL\n");
    return (1);
 }

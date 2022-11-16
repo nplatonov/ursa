@@ -948,18 +948,17 @@
          sf::st_agr(x) <- "constant"
       if (inherits(y,"sf"))
          sf::st_agr(y) <- "constant"
-     # x_
       res <- try(sf::st_intersection(x,y))
+      if (inherits(res,"try-error")) {
+         if (length(grep("st_crs\\(x\\) == st_crs\\(y\\) is not TRUE"
+                        ,as.character(res))))
+         res <- sf::st_intersection(x,spatial_transform(y,x))
+      }
       if (is.null(spatial_data(res))) {
          if (!is.null(spatial_data(x)))
             spatial_data(res) <- spatial_data(x)
          else if (!is.null(spatial_data(y)))
             spatial_data(res) <- spatial_data(y)
-      }
-      if (inherits(res,"try-error")) {
-         if (length(grep("st_crs\\(x\\) == st_crs\\(y\\) is not TRUE"
-                        ,as.character(res))))
-         res <- sf::st_intersection(x,spatial_transform(y,x))
       }
       if (FALSE) {
         # spatial_geometry(res) <- sf:::st_cast_sfc_default(spatial_geometry(res))

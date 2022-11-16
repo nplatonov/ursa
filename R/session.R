@@ -55,31 +55,34 @@
    if (is.character(obj)) {
      # print(obj)
      # print(spatial_dir(pattern=obj,recursive=FALSE))
-      if (T & length(spatial_dir(path=dirname(obj),pattern=basename(obj),recursive=FALSE))==1) {
-         a <- spatial_read(obj)
-         g1 <- spatial_grid(a)
-         rm(a)
-      }
-      else {
-         opW <- options(warn=2)
-         a <- try(open_envi(obj,resetGrid=TRUE,decompress=FALSE))
-         options(opW)
-         if (inherits(a,"try-error")) {
-            if (file.exists(obj)) {
-               a <- open_gdal(obj)
-            }
-            else {
-               list1 <- dir(path=dirname(obj)
-                           ,pattern=paste0(basename(obj),"\\.(tif|tiff|hfa)$")
-                           ,full.names=TRUE)
-               if (length(list1)==1)
-                  a <- open_gdal(list1)
-            }
+      opW <- options(warn=2)
+      a <- try(open_envi(obj,resetGrid=TRUE,decompress=FALSE))
+      options(opW)
+      if (inherits(a,"try-error")) {
+         if (file.exists(obj)) {
+            a <- open_gdal(obj)
          }
+         else {
+            list1 <- dir(path=dirname(obj)
+                        ,pattern=paste0(basename(obj),"\\.(tif|tiff|hfa)$")
+                        ,full.names=TRUE)
+            if (length(list1)==1)
+               a <- open_gdal(list1)
+         }
+      }
+      if (!inherits(a,"try-error")) {
          g1 <- a$grid
          if (is_ursa(a))
             close(a)
       }
+      else if (T & length(spatial_dir(path=dirname(obj),pattern=basename(obj)
+                                     ,recursive=FALSE))==1) {
+         a <- spatial_read(obj)
+         g1 <- spatial_grid(a)
+         rm(a)
+      }
+      else
+         return(NULL)
       if (!.is.grid(g1))
          return(NULL)
       options(ursaSessionGrid=g1)

@@ -86,7 +86,8 @@
 
 '.gc' <- function(verbose=FALSE)
 {
-   a1 <- gc()
+   if (verbose)
+      a1 <- gc()
    a2 <- gc(reset=TRUE)
    if (verbose)
    {

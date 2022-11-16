@@ -1,23 +1,36 @@
-2022-05-17
+2022-11-16
 
 <!--
 + Depends on R (>= 4.1.0) instead of R (>= 3.0.0) due to using native pipes `|>` in code.
++ Ongoing...
 -->
+
+### version 3.9.8
+
+-   Minor changes in `ursa.c` file for removing warnings during
+    `r-devel-linux` compilation (`-Wstrict-prototypes`).
+
+-   New function `sort()` for `ursaRaster` objects for ordering based on
+    band names.
+
+-   ‘session\_grid()’ prioritizes raster rather vector files, with the
+    same names of files.
+
+-   Coastline is updated to version 2022-11-16T04:45.
 
 ### version 3.9.7
 
 -   New function `palettize()` as a wrapper
     `ursa_colortable(colorize(...))`.
 
--   New argument `expand` in function `ursa_crop()` for spatial
+-   New argunent `expand` in function `ursa_crop()` for spatial
     expansion using relative value.
 
 -   New argument `by` in function `segmentize()` to split segments by
     specified field name.
 
--   New function `spatial_levelsplit()` (syn. `spatial_splitlevels()`)
-    trasforms nested polygons (e.g., polygonized isolines) to intervaled
-    non-overlapped polygons.
+-   New function `spatial_levelsplit()` trasforms nested polygons (e.g.,
+    polygonized isolines) to intervaled non-overlapped polygons.
 
 ### version 3.9.6
 
@@ -45,7 +58,7 @@
     `all.equal()`.
 
 -   Corrected index in `value_cr`, when number of columns and number in
-    arguments.
+    argunents.
 
 -   New argument `zoom` in function `regrid()` simultaneously replaces
     `expand=zoom` and `mul=1/zoom`.
@@ -258,8 +271,8 @@
 ### version 3.8.12
 
 -   Default style for web basemaps is OSM Mapnik tiles insead of OSM
-    static map due to [limitations](https://staticmap.openstreetmap.de).
-   <!-- [limitations](https://staticmap.openstreetmap.de/staticmap.php)-->
+    static map.
+    <!-- due to [limitations](http://staticmap.openstreetmap.de/staticmap.php). -->
 
 -   Parsing of metadata from object of package **stars** (&gt;=0.2).
 

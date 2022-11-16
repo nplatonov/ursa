@@ -74,7 +74,7 @@
             message(a)
          if (isTRUE(getOption("ursaNoticeMatchCall")))
             message('panel_legend: try `mget(names(match.call())[-1])` instead of `as.list(match.call())`')
-         res <- try(eval.parent(arglist[[a]]))
+         res <- try(eval.parent(arglist[[a]]),silent=TRUE)
          if (inherits(res,"try-error")) {
             next
          }
@@ -93,9 +93,12 @@
   # arglist[["pch"]] <- unname(sapply(items,function(x) x$pch))
   # arglist[["title.cex"]] <- arglist[["cex"]]
    if (length(ind <- which(sapply(arglist,class) %in% "call"))) {
+     # attach(arglist)
       arglist[ind] <- lapply(names(arglist)[ind],function(a) {
          arglist[[a]] <- with(arglist,eval(as.call(arglist[[a]])))
+        # arglist[[a]] <- eval(as.call(arglist[[a]]))
       })
+     # detach("arglist")
    }
    if (verbose)
       str(arglist)

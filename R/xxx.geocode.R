@@ -204,7 +204,7 @@
                ind2 <- unlist(gregexpr("(\\)|\\})\\'",b))
                ind3 <- which(ind1>0)
                ind4 <- which(ind2>0)
-               if ((ind3==ind4)&&(length(ind3)>0)) {
+               if ((identical(ind3,ind4))&&(length(ind3)>0)) { ## ind3[1]==ind4[1]
                   ind1 <- ind1[ind3]
                   ind2 <- ind2[ind4]
                   shape <- lapply(seq_along(ind3),function(i) {

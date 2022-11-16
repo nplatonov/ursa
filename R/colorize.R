@@ -456,6 +456,7 @@
       }
       if (is.na(inv))
          inv <- TRUE
+      palname <- "Blues"
    }
    else if (stretch=="sd")
    {

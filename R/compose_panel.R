@@ -22,7 +22,8 @@
          indSP <- which(sapply(arglist,.isSP))
          indSF <- which(sapply(arglist,.isSF))
          other <- seq_along(arglist)
-         indS <- c(indSP,indSF)
+         indS <- c(sp=indSP,sf=indSF)
+        # print(indS)
          if (length(indS))
             other <- other[-indS]
          if (length(indSP)) {
@@ -30,11 +31,14 @@
             ret <- do.call("panel_plot",c(arglist[indSP],arglist[other]))#$col
          }
          if (length(indSF)) {
-            ret <- do.call("panel_plot",c(arglist[indSF],arglist[other]))#$col
-            if ((!is_ursa(ret,"colortable"))||(!inherits(ret,"ursaLegend")))
-               ret <- ret$col
+            ret <- do.call("panel_plot",c(arglist[indSF],arglist[other]))#[[1]]#$col
+           # if (inherits(ret,"ursaLegend"))
+           #    NULL # ret <- ret[[1]]$col
+           # if ((!is_ursa(ret,"colortable"))||(!inherits(ret,"ursaLegend")))
+           #    ret <- ret$col
+           # str(ret)
+           # q()
          }
-         str(ret)
          if ((!length(indS))&&(length(other))) {
             ret <- do.call("panel_plot",c(arglist[other]))$col
          }

@@ -24,7 +24,7 @@
      # print("interim ENVI, then system GDAL")
       ftmp <- .maketmp()
       ret <- write_envi(obj,paste0(ftmp,"."))
-      pr <- ifelse(ret %in% c(1L,2L,11L),2L,3L)
+      pr <- ifelse(ret %in% c(1L,2L,3L,11L,12L,13L),2L,3L)
       proj_lib <- Sys.getenv("PROJ_LIB")
       Sys.setenv(PROJ_LIB=file.path(dirname(dirname(Sys.which("gdal_translate")))
                                    ,"share/proj"))

@@ -105,6 +105,7 @@ session_grid(NULL)
    compose_close(bpp=8)
 
 # example no.4 -- length distortion in the Transverse Mercator projection
+\donttest{
    a1 <- regrid(setbound=c(10,65,71,83),dim=c(100,100),crs=4326)
    a2 <- polygonize(ursa_bbox(a1))
    a3 <- spatial_transform(a2,3857)
@@ -116,6 +117,7 @@ session_grid(NULL)
    for (p in c("bottom","center","top"))
       panel_scalebar(pos=p,w=200)
    compose_close()
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

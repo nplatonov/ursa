@@ -2,7 +2,7 @@
                            ,method=c("complete","centroid","single")
                            ,fun=c("count","sum","mean","label"),label=fun %in% "count"
                            ,ngroup=NA,separate=FALSE,repel=20L,legend="bottomright"
-                           ,title=NULL,verbose=FALSE) {
+                           ,title=NULL,verbose=FALSE,...) {
    ##~ method <- c('1'="ward.D",'2'="ward.D2",'3'="single",'4'="complete"
               ##~ ,'5'="average",'6'="mcquitty",'7'="median"
               ##~ ,'8'="centroid")[4] ## 3 4! 8 
@@ -331,7 +331,8 @@
         # str(lab)
          panel_annotation(x=x,y=y,label=as.character(lab),cex=cex,adj=c(0.5,0.53)
                         # ,fg="#FFFFFFA0",bg="#000000AF"
-                        # ,buffer=2/scale
+                         ,buffer=2/scale ## commment it
+                        # ,buffer=2
                          )
       }
       if (F) {
@@ -347,6 +348,7 @@
             ,box.lwd=0.1,bg="#FFFFFFAF"
            # ,pt.bg=ursa_colortable(colorize(seq_along(ctInd),pal=ctInd,alpha="30"))
             ,pt.bg=if (label) bg else ctInd
+            ,...
             )
      # return(invisible(ct)) ## colortable of obj[[indCat]]
       return(invisible(ursa_colortable(ct)))

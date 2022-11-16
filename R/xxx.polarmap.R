@@ -57,7 +57,7 @@
          layer <- spatial_basename(obj)
       else
          layer <- obj
-      obj <- spatialize(obj,resetGrid=TRUE,style=style,engine="sf")
+      obj <- spatialize(obj,resetProj=TRUE,resetGrid=TRUE,style=style,engine="sf")
    }
    else {
       layer <- as.character(as.list(match.call())[["obj"]]) ## try mget(names(match.call())[-1])
