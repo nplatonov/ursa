@@ -1,18 +1,17 @@
 useDynLib(ursa)
 
 importFrom("grDevices", "col2rgb", "colorRampPalette", "rgb", "png",
-           "graphics.off", "as.raster","svg")
+           "graphics.off", "as.raster")
 importFrom("graphics", "abline", "axTicks", "axis", "contour",
            "filled.contour", "hist", "image", "mtext", "plot",
            "polygon", "rect", "strheight", "strwidth", "text", 
            "box", "layout", "layout.show", "lcm", "lines",
-           "par", "points", "segments", "legend", "polypath")
+           "par", "points", "segments", "legend")
 importFrom("stats", "aggregate", "density", "loess", "median", "pf",
-           "predict", "runif", "sd", "var", "na.omit", 
-           "as.dist", "cutree", "dist", "hclust", "quantile")
+           "predict", "runif", "sd", "var", "na.omit")
 importFrom("utils", "str", "download.file", "head", "tail", "methods",
            "object.size", "unzip", "URLencode", "localeToCharset",
-           "read.table", "write.table", "browseURL")
+           "read.table", "write.table")
 export(".onAttach")
 export(".onDetach")
 export(".onLoad")
@@ -245,6 +244,18 @@ export("value_xy")
 export("write_envi")
 export("write_gdal")
 export("zonal_stat")
+export("browse")
+export("panel_cluster")
+export("panel_legend")
+export("panel_wind")
+export("polarmap")
+export("spatial_clip")
+export("spatial_dim<-")
+export("spatial_fileext")
+export("spatial_revise")
+export("spatial_simplify")
+export("spatialize")
+export("widgetize")
 
 S3method("[",ursaColorTable)
 S3method("[",ursaRaster)

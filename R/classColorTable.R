@@ -1,5 +1,5 @@
-'ursa_colortable' <- function(x)
-{
+'ursa_colortable' <- function(x) {
+   verbose <- !.isPackageInUse()
    if ((TRUE)&&(inherits(x,"ursaColorTable"))) ## was FALSE 20160127
       ct <- x
    else if (is.character(x)) {
@@ -13,14 +13,16 @@
    }
    else if (inherits(x,"ursaLegend")) {
       if (length(x$name)==length(x$pt.bg)) {
-         print("POINT")
+         if (verbose) 
+            print("POINT")
          ret <- x$pt.bg
          names(ret) <- x$name
          class(ret) <- "ursaColorTable"
          return(ret)
       }
       if ((all("transparent" %in% x$fill))&&(length(x$name)==length(unique(x$border)))) {
-         print("LINESTRING")
+         if (verbose)
+            print("LINESTRING")
          ind <- match(x$name,names(x$border))
          if (inherits(x$border,"ursaColorTable"))
             return(x$border[ind])
@@ -30,13 +32,15 @@
          return(ret)
       }
       if (length(x$name)==length(x$fill)) {
-         print("POLYGON")
+         if (verbose)
+            print("POLYGON")
          ret <- x$fill
          names(ret) <- x$name
          class(ret) <- "ursaColorTable"
          return(ret)
       }
-      print("unreachable")
+      if (verbose)
+         print("unreachable")
       return(NULL)
    }
    else if (any(sapply(x,inherits,"ursaLegend"))) {

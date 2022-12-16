@@ -162,10 +162,10 @@ See description of argument \code{recirsive} in function \code{\link[base:list.f
 See description of argument \code{ignore.case} in function \code{\link[base:list.files]{dir}}.
 }
   \item{quadsegs}{
-Integer. Number of segments per quadrant (fourth of a circle), for all or per-feature. See description for \code{quadsegs} argument of \code{\link[rgeos:misc-gBuffer]{gBuffer}} and for \code{nQuadSegs} argument of \code{\link[sf:geos_unary]{st_buffer}}.
+Integer. Number of segments per quadrant (fourth of a circle), for all or per-feature. See description for \code{quadsegs} argument of \code{\link[rgeos:rgeos-deprecated]{gBuffer}} (NOTE: deprecated after \pkg{rgeos} v.0.6-1) and for \code{nQuadSegs} argument of \code{\link[sf:geos_unary]{st_buffer}}.
 }
   \item{dist}{
-Numeric. Buffer distance for all, or for each of the elements. See description for \code{width} argument of \code{\link[rgeos:misc-gBuffer]{gBuffer}} and for \code{dist} argument of \code{\link[sf:geos_unary]{st_buffer}}.
+Numeric. Buffer distance for all, or for each of the elements. See description for \code{width} argument of \code{\link[rgeos:rgeos-deprecated]{gBuffer}} (NOTE: deprecated after \pkg{rgeos} v.0.6-1) and for \code{dist} argument of \code{\link[sf:geos_unary]{st_buffer}}.
 }
   \item{byid}{
 Logical. For \code{spatial_union} function, \code{TRUE} does unite of each feature; \code{FALSE} returns a single feature that is the geometric union of the set of features; default \code{NA} is coerced to \code{FALSE} for unary operation (missing \code{y}) and to \code{TRUE} for binary operation.

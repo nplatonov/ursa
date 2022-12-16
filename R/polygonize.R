@@ -64,7 +64,14 @@
          b <- b[-ind,]
    }
    else if (is.ursa(obj)) {
-      b <- as.data.frame(obj)
+      if (length(ind <- attr(obj$value,"sparse"))) {
+         val <- data.frame(unclass(ursa_value(obj)),check.names=FALSE)
+         colnames(val) <- names(obj)
+         b <- cbind(data.frame(t(coord_cr(obj,ind))),val)
+         attr(b,"crs") <- ursa_crs(obj)
+      }
+      else
+         b <- as.data.frame(obj)
    }
    else
       b <- obj

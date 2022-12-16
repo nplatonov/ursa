@@ -1,9 +1,17 @@
-2022-11-16
+2022-12-16
 
 <!--
 + Depends on R (>= 4.1.0) instead of R (>= 3.0.0) due to using native pipes `|>` in code.
 + Ongoing...
 -->
+
+### version 3.9.9
+
+-   ongoing…
+
+-   Speeding up elapsed time for `panel_raster()` example.
+
+-   Package **`terra`** is added as suggested for development purpose.
 
 ### version 3.9.8
 

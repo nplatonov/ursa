@@ -500,7 +500,14 @@
          if (jsonSF)
             NULL
          else if (isZip <- .lgrep("\\.zip$",dsn)>0) {
-            ziplist <- unzip(dsn,exdir=tempdir());on.exit(file.remove(ziplist))
+            opW <- options(warn=1)
+            ziplist <- unzip(dsn,exdir=tempdir())
+            options(opW)
+            if ((FALSE)&&(!length(ziplist))&&(nchar(Sys.which("7z")))) {
+               ziplist <- system(paste("7z","l","-scsUTF-8",dsn),intern=TRUE)
+               print(ziplist)
+            }
+            on.exit(file.remove(ziplist))
             dsn <- .grep("\\.(shp|sqlite|gpkg|geojson)$",ziplist,value=TRUE)
          }
          else if ((nchar(Sys.which("gzip")))&&(isZip <- .lgrep("\\.gz$",dsn)>0)) {

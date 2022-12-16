@@ -44,7 +44,10 @@
       .src <- src
       nodata <- ignorevalue(src)
       src <- .maketmp(ext=".")
-      write_envi(.src,src)
+      if (resample=="near")
+         write_envi(.src,src)
+      else
+         write_envi(.src,src,datatype=NA)
    }
    else {
       removeSrc <- FALSE

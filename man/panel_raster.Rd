@@ -76,7 +76,7 @@ dima <- with(session_grid(),c(columns,rows,3))
 a <- ursa_new(value=array(runif(prod(dima),min=127,max=255),dim=dima))
 p <- colorize(a,pal=c("black","white"),ramp=TRUE,value=0:256)
 compose_open(layout=c(2,3),skip=4,legend=list(list("top","full"),list("bottom",2:3)))
-for (i in seq(6)) {
+for (i in seq(6)) {q()
    panel_new()
    if (i<4)
       panel_raster(p[i])
@@ -91,13 +91,14 @@ legend_mtext("color composite")
 compose_close()
 
 # example no.2 -- indirect use
-display(pixelsize(NULL),raster.verb=TRUE)
+ps <- pixelsize(NULL)
+display(ps,raster.verb=TRUE)
 
 # example no.3 -- color table for legend
 session_grid(NULL)
 compose_open()
 panel_new()
-ct <- panel_raster(pixelsize(),palname="Greens")
+ct <- panel_raster(ps,pal=terrain.colors)
 panel_decor()
 compose_legend(ct)
 compose_close()

@@ -102,6 +102,20 @@
    }
    expired
 }
+'.ursaCacheDirZero' <- function() {
+   list1 <- list.dirs(.ursaCacheDir())
+   for (i in seq(9)) {
+      list2 <- sapply(list1,function(x) {
+         list3 <- dir(path=x,recursive=FALSE)
+         length(list3)==0
+      })
+      list2 <- names(list2)[list2]
+      if (!length(list2))
+         break
+      sapply(list2,unlink,force=TRUE,recursive=TRUE)
+   }
+   0L
+}
 '.ursaCacheDownload' <- function(src,dst,method,quiet=FALSE,cache=TRUE
                                 ,mode="w",headers=NULL) {
    enc <- "UTF-8"

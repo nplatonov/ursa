@@ -567,14 +567,26 @@
             cat(" ok!\n")
       }
       options(opW)
-      ret <- utils::zip(z,f,flags="-qm9j") ## verbose output ## 'myzip(z,f,keys="-m -9 -j")'
+      if (hasDir <- dirname(z)!=".")
+         wd <- setwd(dirname(z))
+      ret <- utils::zip(basename(z),basename(f),flags="-qmj") ## -9?
+          ## verbose output ## 'myzip(z,f,keys="-m -9 -j")'
+      if (hasDir)
+         setwd(wd)
       if (ret) {
-         opW <- options(warn=1)
-         warning("Unable to compress files (zip)")
          if (isSevenZip <- nchar(Sys.which("7z"))>0) {
+            if (!.isPackageInUse()) {
+               opW <- options(warn=1)
+               warning("'zip' is failed. Trying '7z'")
+               options(opW)
+            }
             ret <- system2("7z",c("a -mx9 -sdel -sccWIN",dQuote(z),dQuote(f)),stdout="nul")
          }
-        # options(opW)
+         else {
+            opW <- options(warn=1)
+            warning("Unable to compress files (zip)")
+            options(opW)
+         }
       }
    }
    if (verbose)

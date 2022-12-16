@@ -1,4 +1,5 @@
 '.project' <- function(xy,proj,inv=FALSE,verbose=FALSE) {
+  # verbose <- TRUE; print("ENTERED IN"); on.exit(print("ENTERED OUT"))
    ## because of quicker load of 'proj4' package
   # show.error.messages=verbose
    if (isSF <- .isSF(xy)) {
@@ -30,17 +31,19 @@
    }
   ## CHECK LATER (currently not quick):
   # dst <- with(PROJ::proj_trans_generic(src,source="EPSG:4326",target=crs),cbind(x_,y_))
-    loaded <- loadedNamespaces()
-    is_proj4 <- (("proj4" %in% loaded)||
-        (!isTRUE(getOption("ursaForceSF")))&&
-        (requireNamespace("proj4",quietly=.isPackageInUse()))) ## `proj4` faster `sf`20220216
-    is_rgdal <- "rgdal" %in% loaded
-    is_sf <- "sf" %in% loaded
-    if ((!is_sf)&&(!is_rgdal)&&(!is_proj4)) {
-       requireNamespace("proj4",quietly=.isPackageInUse())
-       loaded <- loadedNamespaces()
-       is_proj4 <- "proj4" %in% loaded
-    }
+   loaded <- loadedNamespaces()
+   is_proj4 <- (("proj4" %in% loaded)||
+       (!isTRUE(getOption("ursaForceSF")))&&
+       (requireNamespace("proj4",quietly=.isPackageInUse()))) ## `proj4` faster `sf`20220216
+   is_rgdal <- "rgdal" %in% loaded
+   is_sf <- "sf" %in% loaded
+   if ((!is_sf)&&(!is_rgdal)&&(!is_proj4)) {
+      requireNamespace("proj4",quietly=.isPackageInUse())
+      loaded <- loadedNamespaces()
+      is_proj4 <- "proj4" %in% loaded
+   }
+   if (verbose)
+      print(c(proj4=is_proj4,rgdal=is_rgdal,sf=is_sf))
   # if ((!FALSE)&&(!("package:rgdal" %in% search()))&&
    if ((!a)&&(("proj4" %in% loaded)||
        ((FALSE)&&(requireNamespace("proj4",quietly=.isPackageInUse()))))) {
@@ -70,7 +73,13 @@
         # str(xy)
         # str(list(xy[,1],xy[,2]))
         ## suppressMessages(require(proj4)) ## uncomment?
-         if (utils::packageVersion("proj4")>="1.0.10") {
+         proj4version <- utils::packageVersion("proj4")
+         if ((proj4version>="1.0.12")&&(!nchar(Sys.getenv("PROJ_LIB")))) {
+            Sys.setenv(PROJ_LIB=system.file("proj",package="sf"))
+            if (!nchar(Sys.getenv("PROJ_LIB")))
+               Sys.setenv(PROJ_LIB=system.file("proj",package="rgdal"))
+         }
+         if (proj4version>="1.0.10") {
             res <- proj4::project(xy=xy,proj=proj,inverse=inv)
          }
          else

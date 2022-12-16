@@ -84,6 +84,10 @@
       row <- .getPrm(arglist,name="^r",default=NA_integer_)
       ind <- (row-1L)*nc+col
    }
+   if (!is.na(obj$con$posR[1]))
+      row <- obj$con$posR[row]
+   if (!is.na(obj$con$posC[1]))
+      col <- obj$con$posC[col]
    res <- matrix(NA,nrow=2,ncol=length(ind)
                 ,dimnames=list(c("x","y"),ind))
    res["x",] <- with(ursa_grid(obj),minx+(col-0.5)*resx)

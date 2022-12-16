@@ -342,9 +342,17 @@
       }
    }
    if (!is.null(legend)) {
+      sc <- 96*getOption("ursaPngRetina")/getOption("ursaPngDpi")
+      if (F)
+         str(list('par(cex)'=par("cex"),cex=cex,scale=getOption("ursaPngScale")
+                 ,retina=getOption("ursaPngRetina"),ps=getOption("ursaPngPointsize")
+                 ,dpi=getOption("ursaPngDpi"),sc=sc))
       legend(legend,legend=bname,title=title
-            ,col=ctInd,cex=c(1,cex)[1]/par("cex")
-            ,pch=21,pt.lwd=ifelse(label,1,0)*2.4/par("cex"),pt.cex=1.8/par("cex")
+            ,col=ctInd
+            ,cex=c(1,cex)[1]/par("cex")
+            ,pch=21
+            ,pt.lwd=ifelse(label,1,0)*2.4/par("cex")#*sc
+            ,pt.cex=1.8/par("cex")
             ,box.lwd=0.1,bg="#FFFFFFAF"
            # ,pt.bg=ursa_colortable(colorize(seq_along(ctInd),pal=ctInd,alpha="30"))
             ,pt.bg=if (label) bg else ctInd
@@ -431,7 +439,8 @@
       border1 <- rep_len(border,nz)
       border2 <- rep_len("#FFFFFF",nz)
       gscale <- colSums(col2rgb(col)*c(0.30,0.59,0.11))
-      border2[gscale>160] <- "#00000080"
+      if (all(gscale>160))
+         border2[] <- "#00000080"
    }
    if (!is.null(lty)) 
       lty <- rep_len(lty, nz)

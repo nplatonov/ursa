@@ -587,26 +587,36 @@ void optimalDatatypeInt(int *x,int *n,int *res)
      // printf("x[%d]=%d\n",i,x[i]);
       if (x[i]==-0x80000000)
          continue;
-      if (((!val[2])||(!val[12]))&&(x[i]>=0)&&(x[i]<=255))
+      if ((!val[1])&&((!val[2])||(!val[12])||(!val[3])||(!val[13]))&&(x[i]>=0)&&(x[i]<=255))
+     // if ((x[i]>=0)&&(x[i]<=255))
       {
          if (!val[1])
             val[1]=1;
       }
-      else if ((x[i]>=-32768)&&(x[i]<=32767)) //&&(!val[2])
+      else if ((!val[2])&&(x[i]>=-32768)&&(x[i]<=32767)) //&&(!val[2])
       {
          if (!val[2])
             val[2]=2;
       }
-      else if ((x[i]>=0)&&(x[i]<=65535)) //&&(!val[12])
+      else if ((!val[12])&&(x[i]>=0)&&(x[i]<=65535)) //&&(!val[12])
       {
          if (!val[12])
             val[12]=12;
       }
-      else if ((!val[3])&&(!((val[1])||(val[2])||(val[12]))))
+      //~ else if ((!val[3])&&(!((val[1])||(val[2])||(val[12]))))
+     // else if ((x[i]<-32768)||(x[i]>32767))
+      else if ((!val[3])&&(x[i]<-32768))
       {
         // printf("x[%d]=%d\n",i,x[i]);
          val[3]=3;
-         break;
+        // break;
+      }
+      //~ else if ((!val[3])&&(!((val[1])||(val[2])||(val[12]))))
+      else if ((!val[13])&&(x[i]>65535))
+      {
+        // printf("x[%d]=%d\n",i,x[i]);
+         val[13]=13;
+        // break;
       }
    }
    if (0)
@@ -619,7 +629,7 @@ void optimalDatatypeInt(int *x,int *n,int *res)
       val[3]=3;
    if (val[4])
       *res=4;
-   if (val[3])
+   if ((val[3])||(val[13]))
       *res=3;
    else if (val[2])
       *res=2;
