@@ -35,3 +35,52 @@
       names(res) <- bname
    res
 }
+'as_stars' <- function(obj) {
+   if (!inherits(obj,"ursaRaster"))
+      return(NULL)
+   g <- ursa_grid(obj)
+   crs <- ursa_crs(obj)
+   if ((FALSE)&&(requireNamespace("sf",quietly=.isPackageInUse())))
+      crs <- sf::st_crs(crs)
+   md <- list(x=NULL
+             ,y=NULL
+             ,band=NULL
+             )
+   md$x <- list(from=1L
+               ,to=g$columns
+               ,offset=g$minx
+               ,delta=g$resx
+               ,refsys=crs
+               ,point=NA
+               ,values=NULL
+               )
+   md$y <- list(from=1L
+               ,to=g$rows
+               ,offset=g$maxy
+               ,delta=-g$resy
+               ,refsys=crs
+               ,point=NA
+               ,values=NULL
+               )
+   md$band <- list(from=1L
+                  ,to=unname(length(obj))
+                  ,offset=NA_real_
+                  ,delta=NA_real_
+                  ,refsys=NA_character_
+                  ,point=NA,values=names(obj)
+                  )
+   class(md$x) <- class(md$y) <- class(md$band) <- "dimension"
+   band <- list(affine=c(0,0)
+               ,dimensions=c("x","y")
+               ,curvilinear=FALSE
+               ,blocksizes=NULL
+               )
+   class(band) <- "stars_raster"
+   attr(md,"raster") <- band
+   class(md) <- "dimensions"
+   ret <- list(imported=as.array(obj,flip=TRUE,permute=FALSE))
+   attr(ret,"dimensions") <- md
+   class(ret) <- "stars"
+   ret
+}
+'as.stars' <- function(obj) as_stars(obj=obj)

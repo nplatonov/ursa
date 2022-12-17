@@ -331,7 +331,7 @@
          g1$maxy <- maxy
          g1$resx <- with(g1,(maxx-minx)/columns)
          g1$resy <- with(g1,(maxy-miny)/rows)
-         g1$crs <- md$x$refsys$proj4string
+         g1$crs <- if (is.character(md$x$refsys)) md$x$refsys else md$x$refsys$proj4string
       }
       session_grid(g1)
       isHomo <- length(obj)==0 ##

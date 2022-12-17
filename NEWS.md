@@ -11,7 +11,7 @@
 
 -   Speeding up elapsed time for `panel_raster()` example.
 
--   Package **`terra`** is added as suggested for development purpose.
+-   Packages **`stars`** and **`terra`** are added as suggested for development purpose.
 
 ### version 3.9.8
 
