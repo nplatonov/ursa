@@ -207,10 +207,14 @@
             if (requireNamespace("widgetframe",quietly=.isPackageInUse())) {
                obj <- widgetframe::frameableWidget(obj)
             }
+            if (!.isPackageInUse())
+               opW <- options(warn=1)
             htmlwidgets::saveWidget(obj,file=fname,libdir=libdir
                                    ,selfcontained=FALSE
                                    ,knitrOptions=list(hello="World")
                                    )
+            if (!.isPackageInUse())
+               options(opW)
          }
          if (!.isKnitr()) {
             a <- readLines(fname,encoding="UTF-8")
@@ -238,7 +242,7 @@
          }
          else
             cap <- ""
-         if (!is.null(oname))
+         if ((!is.null(oname))&&(nchar(oname[k])>0))
             cap <- paste(oname[k],cap)
          iframe <- paste0("knitr::include_url(",dQuote(fname))
          if (!is.null(height)) {
@@ -286,8 +290,9 @@
             }
            # writeLines(cmd,"c:/tmp/cap.Rmd")
            # knitr::asis_output(cmd)
-            if (!.isRemark())
+            if (!.isRemark()) {
                cmd <- knitr::knit_child(text=cmd,quiet=TRUE)
+            }
             else {
                cmd <- paste0("<div class=\"figure\">\n"
                             ,"<div class=\"framed\"",suffix,">\n"

@@ -83,4 +83,4 @@
    class(ret) <- "stars"
    ret
 }
-'as.stars' <- function(obj) as_stars(obj=obj)
+# 'as.stars' <- function(obj) as_stars(obj=obj) ## if 'stars' is class, then 'as' is function

@@ -343,7 +343,7 @@
    }
    if (!is.null(legend)) {
       sc <- 96*getOption("ursaPngRetina")/getOption("ursaPngDpi")
-      if (F)
+      if (T)
          str(list('par(cex)'=par("cex"),cex=cex,scale=getOption("ursaPngScale")
                  ,retina=getOption("ursaPngRetina"),ps=getOption("ursaPngPointsize")
                  ,dpi=getOption("ursaPngDpi"),sc=sc))
@@ -351,7 +351,7 @@
             ,col=ctInd
             ,cex=c(1,cex)[1]/par("cex")
             ,pch=21
-            ,pt.lwd=ifelse(label,1,0)*2.4/par("cex")#*sc
+            ,pt.lwd=ifelse(label,1,0)*2.4/par("cex")*sc
             ,pt.cex=1.8/par("cex")
             ,box.lwd=0.1,bg="#FFFFFFAF"
            # ,pt.bg=ursa_colortable(colorize(seq_along(ctInd),pal=ctInd,alpha="30"))

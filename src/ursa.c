@@ -587,49 +587,63 @@ void optimalDatatypeInt(int *x,int *n,int *res)
      // printf("x[%d]=%d\n",i,x[i]);
       if (x[i]==-0x80000000)
          continue;
-      if ((!val[1])&&((!val[2])||(!val[12])||(!val[3])||(!val[13]))&&(x[i]>=0)&&(x[i]<=255))
-     // if ((x[i]>=0)&&(x[i]<=255))
-      {
-         if (!val[1])
+      if (1) { // ++ 20230227
+         if ((!((val[2])||(val[12])||(val[3])))&&(x[i]>=0)&&(x[i]<=255))
             val[1]=1;
-      }
-      else if ((!val[2])&&(x[i]>=-32768)&&(x[i]<=32767)) //&&(!val[2])
-      {
-         if (!val[2])
+         else if ((!val[3])&&(x[i]>=-32768)&&(x[i]<=32767))
             val[2]=2;
-      }
-      else if ((!val[12])&&(x[i]>=0)&&(x[i]<=65535)) //&&(!val[12])
-      {
-         if (!val[12])
+         else if ((!(val[3]))&&(x[i]>=0)&&(x[i]<=65535))
             val[12]=12;
+         else if ((!val[3])&&(x[i]<-32768))
+            val[3]=3;
+         else if ((!val[13])&&(x[i]>65535))
+            val[13]=13;
       }
-      //~ else if ((!val[3])&&(!((val[1])||(val[2])||(val[12]))))
-     // else if ((x[i]<-32768)||(x[i]>32767))
-      else if ((!val[3])&&(x[i]<-32768))
-      {
-        // printf("x[%d]=%d\n",i,x[i]);
-         val[3]=3;
-        // break;
-      }
-      //~ else if ((!val[3])&&(!((val[1])||(val[2])||(val[12]))))
-      else if ((!val[13])&&(x[i]>65535))
-      {
-        // printf("x[%d]=%d\n",i,x[i]);
-         val[13]=13;
-        // break;
+      else { // -- 20230227
+         if ((!val[1])&&((!val[2])||(!val[12])||(!val[3])||(!val[13]))&&(x[i]>=0)&&(x[i]<=255))
+        // if ((x[i]>=0)&&(x[i]<=255))
+         {
+            if (!val[1])
+               val[1]=1;
+         }
+         else if ((!val[2])&&(x[i]>=-32768)&&(x[i]<=32767)) //&&(!val[2])
+         {
+            if (!val[2])
+               val[2]=2;
+         }
+         else if ((!val[12])&&(x[i]>=0)&&(x[i]<=65535)) //&&(!val[12])
+         {
+            if (!val[12])
+               val[12]=12;
+         }
+         //~ else if ((!val[3])&&(!((val[1])||(val[2])||(val[12]))))
+        // else if ((x[i]<-32768)||(x[i]>32767))
+         else if ((!val[3])&&(x[i]<-32768))
+         {
+           // printf("x[%d]=%d\n",i,x[i]);
+            val[3]=3;
+           // break;
+         }
+         //~ else if ((!val[3])&&(!((val[1])||(val[2])||(val[12]))))
+         else if ((!val[13])&&(x[i]>65535))
+         {
+           // printf("x[%d]=%d\n",i,x[i]);
+            val[13]=13;
+           // break;
+         }
       }
    }
+   if ((val[12])&&(val[2]))
+      val[3]=3;
    if (0)
    {
       for (i=0;i<32;i++)
          Rprintf(" %d(%d)",val[i],i);
       Rprintf("\n");
    }
-   if ((val[12])&&(val[2]))
-      val[3]=3;
    if (val[4])
       *res=4;
-   if ((val[3])||(val[13]))
+   else if ((val[3])||(val[13]))
       *res=3;
    else if (val[2])
       *res=2;
@@ -2707,6 +2721,7 @@ void focalLoG(double *x,int *dim,double *bg,double *sz,double *S,double *A
    double eps=1e-38;
    double *H=(double *)malloc(size*size*sizeof(double));
    double localH;
+   H[shift*size+shift]=0.0; // to prevent warning 'may be used uninitialized [-Wmaybe-uninitialized] '
    for (j=0;j<size;j++)
    {
       j2=j-shift;

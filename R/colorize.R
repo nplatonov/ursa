@@ -1073,7 +1073,7 @@
             val[ind] <- nodata
             ivalue[ivalue==-Inf] <- -1e38
             ivalue[ivalue==Inf] <- +1e38
-            val <- .Cursa("reclassify",src=as.numeric(val),n=as.integer(length(val))
+            val <- .Cursa(C_reclassify,src=as.numeric(val),n=as.integer(length(val))
                      ,nodata=as.numeric(nodata)
                      ,class=as.numeric(ivalue),nclass=length(ivalue)
                      ,dst=integer(length(val)),NAOK=TRUE)$dst
@@ -1088,7 +1088,7 @@
             nodata <- ceiling(max(val,na.rm=TRUE))+1
             ivalue[ivalue==-Inf] <- -1e38
             ivalue[ivalue==Inf] <- +1e38
-            val[ind] <- .Cursa("reclassify",src=as.numeric(val[ind])
+            val[ind] <- .Cursa(C_reclassify,src=as.numeric(val[ind])
                      ,n=as.integer(length(ind))
                      ,nodata=as.numeric(nodata)
                      ,class=as.numeric(ivalue),nclass=length(ivalue)

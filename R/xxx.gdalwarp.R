@@ -85,10 +85,29 @@
       optF <- ""
    }
    else if (!is.null(names(opt))) {
-      optS <- unlist(opt)
-      optF <- paste(paste0("-",names(optS)," ",.dQuote(unname(optS))),collapse=" ")
-      optF <- gsub("\\s*\"TRUE\"","",optF)
-      optF <- .gsub("\\s\\\"\\\"","",optF)
+      str(opt)
+      if (T) ## 20230228++
+         optF <- paste(lapply(names(opt),\(x) {
+            val <- opt[[x]]
+            res <- paste0("-",x)
+            if (is.character(val)) {
+               if (!nchar(val))
+                  return(res)
+               if (grepl("-config",x))
+                  res <- paste0(res," ",val)
+               else
+               res <- paste0(res," ",.dQuote(val))
+            }
+            else
+               res <- paste0(res," ",val)
+            res
+         }),collapse=" ")
+      else { ## --
+         optS <- unlist(opt)
+         optF <- paste(paste0("-",names(optS)," ",.dQuote(unname(optS))),collapse=" ")
+         optF <- gsub("\\s*\"TRUE\"","",optF)
+         optF <- .gsub("\\s\\\"\\\"","",optF)
+      }
    }
    else
       optF <- ""

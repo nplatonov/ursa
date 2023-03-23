@@ -7,6 +7,8 @@
    bpp <- .getPrm(arglist,name="bpp",valid=c(8L,24L)
               ,default=switch(getOption("ursaPngDevice"),windows=8L,cairo=24L,24L))
    execute <- .getPrm(arglist,name="(execute|view|open|render)",default=!.isShiny())
+  # if (isTRUE(Sys.getenv("_R_CHECK_PACKAGE_NAME_")=="ursa"))
+  #    execute <- FALSE
    verbose <- .getPrm(arglist,name="verb(ose)*",kwd="close",default=FALSE)
   # wait <- .getPrm(arglist,name="wait",default=NA_real_)
    .compose_close(kind=kind,border=border,bpp=bpp,execute=execute#,wait=wait
@@ -18,7 +20,8 @@
    sysRemove <- TRUE
    if (verbose)
       str(list(kind=kind,border=border,bpp=bpp,execute=execute,verbose=verbose))
-   toOpen <- session_pngviewer()
+   isPackageTest <- isTRUE(Sys.getenv("_R_CHECK_PACKAGE_NAME_")=="ursa")
+   toOpen <- !isPackageTest & session_pngviewer()
    if (FALSE) {
       message(paste(commandArgs(FALSE),collapse=" "))
       print(Sys.getenv()[grep("^(_)*R_",names(Sys.getenv()))])
@@ -112,7 +115,9 @@
                par(op)
             }
             else {
-               if (TRUE)
+               if (isPackageTest)
+                  NULL
+               else if (TRUE)
                   browseURL(normalizePath(fileout))
                else if (.Platform$OS.type=="unix")
                   system2("xdg-open",c(.dQuote(fileout)),wait=!.isRscript())
@@ -265,7 +270,9 @@
          par(op)
       }
       else {
-         if (TRUE)
+         if (isPackageTest)
+            NULL
+         else if (TRUE)
             browseURL(normalizePath(fileout))
          else if (.Platform$OS.type=="unix")
             system2("xdg-open",c(.dQuote(fileout)),wait=!.isRscript())
@@ -276,7 +283,7 @@
         # stop("How to implement file association in Unix-like systems?")
       }
       if (normalizePath(tempdir())==normalizePath(dirname(fileout)))
-         sysRemove=FALSE
+         sysRemove <- FALSE
      # print(wait)
       if ((!sysRemove)&&(delafter))
          Sys.sleep(wait)

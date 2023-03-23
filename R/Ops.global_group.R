@@ -78,6 +78,12 @@
       return(ursa_new(res,bandname="n"))
    res
 }
+'global_quantile' <- function(x,ursa=FALSE,...) {
+   v <- quantile(na.omit(c(ursa_value(x))),...)
+   if (!ursa)
+      return(v)
+   ursa(v,bands=length(v))
+}
 'global_range' <- function(x,ursa=FALSE,...)
    c(global_min(x,ursa=ursa,...),global_max(x,ursa=ursa,...))
 

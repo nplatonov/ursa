@@ -55,8 +55,14 @@
          sc <- 1
       g2 <- regrid(mul=sc/8,resetGrid=TRUE,tolerance=0.999) ## let rough grid
       dima <- dim(g2)
-      minc <- 247/255
-      maxc <- 1.000
+      if (isTRUE(getOption("ursaPngBackground") %in% c("black","#000000"))) {
+         minc <- 21/255
+         maxc <- 0.000
+      }
+      else {
+         minc <- 247/255
+         maxc <- 1.000
+      }
       s1 <- rep(c(minc,maxc),length=dima["samples"])
       s2 <- rep(c(maxc,minc),length=dima["samples"])
       a <- matrix(NA,nrow=dima["lines"],ncol=dima["samples"],byrow=TRUE)

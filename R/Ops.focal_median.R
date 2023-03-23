@@ -27,7 +27,7 @@
       print(summary(x$value))
    if (verbose)
       .elapsedTime(paste0("start:",fun))
-   x$value <- .Cursa("focalMedian",x=x$value,nodata=as.numeric(nodata)
+   x$value <- .Cursa(C_focalMedian,x=x$value,nodata=as.numeric(nodata)
                 ,dim=as.integer(dimy),size=as.integer(size)
                 ,fillNA=as.integer(fillNA),saveMargin=as.integer(saveMargin)
                 ,cover=as.numeric(cover),verbose=as.integer(verbose)

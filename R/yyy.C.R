@@ -1,5 +1,7 @@
 '.Cursa' <- function(...) {
-   return(.C(...))
+   if (T) ## if .isPackageInUse()
+      return(.C(...))
+   print("without package")
   ## without package registration:
    arglist <- list(...)
   # message(paste(".C:",arglist[[1]]))

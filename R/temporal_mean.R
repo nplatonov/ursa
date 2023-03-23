@@ -20,7 +20,7 @@
    if (isArray)
    {
       dimx <- dim(obj)
-      a <- .Cursa("timefilt4"
+      a <- .Cursa(C_timefilt4
              ,x=as.numeric(obj),dim=as.integer(dimx),win=as.integer(win)
              ,cover=as.numeric(cover)
              ,res=numeric(prod(dimx)),NAOK=TRUE)$res
@@ -31,7 +31,7 @@
    dimx <- dim(obj$value)
    if (verbose)
       .elapsedTime(paste(fun,"start",sep=":"))
-   obj$value[] <- .Cursa("timefilt4"
+   obj$value[] <- .Cursa(C_timefilt4
                     ,x=as.numeric(obj$value),dim=as.integer(dimx)
                     ,win=as.integer(win),cover=as.numeric(cover)
                     ,res=numeric(prod(dimx)),NAOK=TRUE)$res

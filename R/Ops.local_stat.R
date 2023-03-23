@@ -19,7 +19,7 @@
       cover <- cover/length(myname)-1e-11
    if (verbose)
       .elapsedTime(paste(fun,"start",sep=":"))
-   ret <- .Cursa("variability4"
+   ret <- .Cursa(C_variability4
             ,y=as.numeric(obj$value),x=as.numeric(time),dim=as.integer(dimy)
             ,cover=as.numeric(cover)
             ,res=numeric(np*10L),NAOK=TRUE)$res

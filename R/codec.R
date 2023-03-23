@@ -3,7 +3,7 @@
       if (length(attr(obj,"sparse")))
          return(obj)
       dimx <- dim(obj)
-      ind <- .Cursa("makeField",as.numeric(obj),dim=dimx
+      ind <- .Cursa(C_makeField,as.numeric(obj),dim=dimx
                    ,res=integer(dimx[1]),NAOK=TRUE)$res
       ind <- ind[ind!=0L]
       if (!length(ind)) {
@@ -30,7 +30,7 @@
    if (length(attr(obj$value,"sparse")))
       return(obj)
    if (TRUE) {
-      ind <- .Cursa("makeField",as.numeric(obj$value),dim=dimx
+      ind <- .Cursa(C_makeField,as.numeric(obj$value),dim=dimx
                             ,res=integer(dimx[1]),NAOK=TRUE)$res
    }
    else

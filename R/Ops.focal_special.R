@@ -44,7 +44,7 @@
          fmask=1
          size=1L
       }
-      x$value <- .Cursa("focalCommon"
+      x$value <- .Cursa(C_focalCommon
                    ,x=as.numeric(x$value)
                    ,dim=as.integer(dimy)
                    ,nodata=as.numeric(nodata)

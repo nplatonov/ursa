@@ -45,7 +45,7 @@
       print(summary(x$value))
    if (verbose)
       .elapsedTime(paste0("start:",fun))
-   x$value <- .Cursa("focalExtrem",x=x$value
+   x$value <- .Cursa(C_focalExtrem,x=x$value
                 ,kind=switch(kind,min=-1L,max=1L)
                 ,nodata=as.numeric(nodata)
                 ,dim=as.integer(dimy)

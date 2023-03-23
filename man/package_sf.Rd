@@ -1,6 +1,5 @@
 \name{as_stars}
 \alias{as_stars}
-\alias{as.stars}
 \title{
 Raster coercion to \code{`stars`}
 }
@@ -9,7 +8,6 @@ Coercion from raster \code{ursaRaster} object to raster \code{stars} object defi
 }
 \usage{
 as_stars(obj)
-as.stars(obj)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -19,8 +17,8 @@ Object of class \code{ursaRaster}.
 }
 \details{
 Simple coercion to \code{stars} object of package \pkg{stars}. Currently, color tables and attribution tables are not supported.
-
-\code{as_stars} and \code{as.stars} are synonyms.
+%%~ 
+%%~ \code{as_stars} and \code{as.stars} are synonyms.
 }
 \value{
 Object of class \code{stars} for argument of class \code{ursaRaster}. Otherwise, \code{NULL}.

@@ -2,6 +2,8 @@
 'glance' <- function(...) {
    arglist <- list(...)
    execute <- .getPrm(arglist,name="(execute|view|open|render)",default=!.isShiny())
+  # if (isTRUE(Sys.getenv("_R_CHECK_PACKAGE_NAME_")=="ursa"))
+  #    execute <- FALSE
    plotKnitr <- .isKnitr() & execute
    if (!length(arglist)) {
       viewer <- session_pngviewer(TRUE)

@@ -35,7 +35,7 @@
    if (verbose)
       .elapsedTime(paste0("start:",fun))
    if (noNA) {# C-code is more quick 
-      x$value <- .Cursa("focalMean",x=x$value,nodata=as.numeric(nodata)
+      x$value <- .Cursa(C_focalMean,x=x$value,nodata=as.numeric(nodata)
                    ,dim=as.integer(dimy),size=as.numeric(size)
                    ,cover=as.numeric(cover),fillNA=as.integer(fillNA)
                    ,saveMargin=as.integer(saveMargin)
@@ -43,7 +43,7 @@
                    ,res=numeric(prod(dimy)),NAOK=FALSE)$res
    }
    else {
-      x$value <- .Cursa("focalMeanWithNA",x=x$value
+      x$value <- .Cursa(C_focalMeanWithNA,x=x$value
                    ,dim=as.integer(dimy),size=as.numeric(size)
                    ,cover=as.numeric(cover),fillNA=as.integer(fillNA)
                    ,verbose=as.integer(verbose)

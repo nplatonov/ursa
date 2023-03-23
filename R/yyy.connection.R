@@ -562,16 +562,15 @@
 {
    if (is.ursa(x))
       x <- x$value
-   if (TRUE)
-   {
+   if (TRUE) {
       isInt <- is.integer(x)
       n <- as.integer(prod(dim(x)))+as.integer(!is.null(nodata))
-      if (isInt)
-         res <- .Cursa("optimalDatatypeInt",x=c(as.integer(x),as.integer(nodata))
+      if (isInt) {
+         res <- .Cursa(C_optimalDatatypeInt,x=c(as.integer(x),as.integer(nodata))
                   ,n=n,res=integer(1),NAOK=TRUE)$res
-      else
-      {
-         res <- .Cursa("optimalDatatypeDouble",x=c(as.numeric(x),as.numeric(nodata))
+      }
+      else {
+         res <- .Cursa(C_optimalDatatypeDouble,x=c(as.numeric(x),as.numeric(nodata))
                   ,n=n,res=integer(1),NAOK=TRUE)$res
       }
      # str(res)

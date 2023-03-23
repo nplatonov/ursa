@@ -33,3 +33,9 @@
    names(res) <- bandname(obj)
    res
 }
+'band_quantile' <- function(obj,...) {
+   res <- apply(ursa_value(obj),2,simplify=FALSE,function(x) quantile(na.omit(x),...))
+   res <- do.call(rbind,res)
+   rownames(res) <- names(obj)
+   res
+}

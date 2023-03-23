@@ -106,7 +106,7 @@
    y <- as.ursa(NA,bandname=bandname(x),nodata=nodata) ## ursa_new
    ##~ if (isCT)
       ##~ y$colortable <- x$colortable
-   y$value <- .Cursa("resampl4",x=x$value,nodata=as.numeric(nodata)
+   y$value <- .Cursa(C_resampl4,x=x$value,nodata=as.numeric(nodata)
                 ,dim1=as.integer(dimx),dim2=as.integer(dimy)
                 ,lim1=as.numeric(with(g1,c(minx,miny,maxx,maxy)))
                 ,lim2=as.numeric(with(g2,c(minx,miny,maxx,maxy)))

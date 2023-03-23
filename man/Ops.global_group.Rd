@@ -8,12 +8,13 @@
 \alias{global_n}
 \alias{global_nNA}
 \alias{global_range}
+\alias{global_quantile}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Extract certains statistics for whole image
 }
 \description{
-Function from this \verb{global.\emph{FUN}} list returns required statistics \emph{FUN} for the whole image.
+Function from this \verb{global.}\emph{\verb{FUN}} list returns required statistics \emph{FUN} for the whole image.
 }
 \usage{
 global_mean(x, ursa = FALSE, ...)
@@ -25,6 +26,7 @@ global_max(x, ursa = FALSE, ...)
 global_n(x, ursa = FALSE, ...)
 global_nNA(x, ursa = FALSE, ...)
 global_range(x, ursa = FALSE, ...)
+global_quantile(x, ursa = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -35,13 +37,13 @@ Object of class \code{ursaRaster}.
 Logical. The class of returned value. If \code{FALSE} then numeric vector of length one is returned (for \code{global_range} vector has length two). If \code{TRUE} then returned value is single-band raster image (two-bands image for \code{global_range}) with constant value for all cells (blank image). Default is \code{FALSE}.
 }
   \item{\dots}{
-Arguments in function \verb{global.\emph{FUN}} which are passed to function \verb{\emph{FUN}}. 
+Arguments in function \verb{global.}\emph{\verb{FUN}} which are passed to function \emph{\verb{FUN}}. 
 }
 }
 \details{
-For any function \verb{global.\emph{FUN}}, if argument \code{na.rm} is not in \code{\dots}, then \verb{\emph{FUN}} is called with forced \code{na.rm=TRUE}.
+For any function \verb{global}.\emph{\verb{FUN}}, if argument \code{na.rm} is not in \code{\dots}, then \emph{\verb{FUN}} is called with forced \code{na.rm=TRUE}.
 
-\verb{global_range\emph{list of arguments}} is implemented as \verb{c(global_min(\emph{list of arguments}), global_max(\emph{list of arguments}))} with the same list of arguments.
+\verb{global_range\emph{list of arguments}} is implemented as \verb{c(global_min(}\emph{\verb{list of arguments}}\verb{), global_max(}\emph{\verb{list of arguments}}\verb{))} with the same list of arguments.
 
 Alternative method to get global statistics is function applying directly to the raster value. For example, \code{sd(ursa_value(x,na.rm=TRUE))}. This way is also appropriate for missing global functions: for example, \code{var(ursa_value(x,na.rm=TRUE))}.
 }
@@ -83,6 +85,7 @@ r.max <- global_max(a,ursa=TRUE)
 print(r.max)
 b <- c(a,'appended scalar value'=a.max)
 print(b)
+print(global_quantile(a))
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

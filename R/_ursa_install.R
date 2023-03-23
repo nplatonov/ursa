@@ -11,9 +11,15 @@
    list2 <- grep("\\.(ursa(Raster|Grid|ColorTable|Connection|Numeric|Category|Stack|ProgressBar))"
                 ,list2,value=TRUE,invert=TRUE)
    list2 <- grep("^(as\\.Raster|djqwotrhfndh)\\.",list2,value=TRUE,invert=TRUE)
+   if (length(list3 <- grep("^C_.+",list2,value=TRUE,invert=FALSE))) {
+      list3 <- paste0(list3," <- \"",gsub("^C_","",list3),"\"")
+      writeLines(list3,"ursa/R/_ursa_C_registration.R")
+   }
+   list2 <- grep("^C_.+",list2,value=TRUE,invert=TRUE)
    list2 <- list2[which(is.na(match(list2,list1)))]
    list2
 }
+# setwd("../..");.undoc_functions();q()
 '.generate_namespace' <- function(verbose=FALSE) {
    U <- file.path("./ursa")
    Fns <- file.path(U,"NAMESPACE.")

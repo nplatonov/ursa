@@ -420,11 +420,11 @@
                   if (!is.na(con$nodata))
                      val[is.na(val)] <- con$nodata
                   if (con$mode=="integer")
-                     val <- .Cursa("writeBilBandInteger",con$fname,val=val,dim=xdim
+                     val <- .Cursa(C_writeBilBandInteger,con$fname,val=val,dim=xdim
                               ,index=posZ,n=length(posZ),datatype=con$datatype
                               ,swap=con$swap)
                   else
-                     val <- .Cursa("writeBilBandDouble",con$fname,dim=xdim,index=i
+                     val <- .Cursa(C_writeBilBandDouble,con$fname,dim=xdim,index=i
                               ,n=bands,datatype=con$datatype,swap=con$swap
                               ,res=double(with(con,bands*samples*lines)))$res
                }

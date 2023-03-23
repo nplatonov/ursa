@@ -8,7 +8,7 @@
   # str(match.call())
   # set.seed(as.integer(as.numeric(Sys.time())/10))
   # value <- NULL
-   verbose <- FALSE
+  # verbose <- FALSE
    bg <- getOption("ursaPngBackground")
    bg <- ifelse(is.null(bg),255,sum(c(col2rgb(bg))*c(0.30,0.59,0.11)))
    .dark <- 91 # '63' for monitors, '91' for printers

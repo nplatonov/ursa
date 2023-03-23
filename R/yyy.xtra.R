@@ -22,7 +22,7 @@
    else if (length(dist)!=2)
       stop("unrecognized argument 'dist'")
    dimx <- with(x$grid,c(columns,rows,nb))
-   x$value <- (.Cursa("areaIncrement",x=as.numeric(x$value),dim=as.integer(dimx)
+   x$value <- (.Cursa(C_areaIncrement,x=as.numeric(x$value),dim=as.integer(dimx)
                  ,res=as.numeric(dist),out=numeric(prod(dimx))
                  ,NAOK=TRUE)$out-1)*mul
    dim(x$value) <- with(x$grid,c(columns*rows,nb))

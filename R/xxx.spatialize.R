@@ -199,7 +199,13 @@
          }
          isCRS <- ((!is.na(crsNow))&&(nchar(crsNow)))
          if (isSF) {
-            if (isCRS)
+            xy <- dsn[,coords]
+            ind <- unique(c(which(is.na(xy[,1])),which(is.na(xy[,2]))))
+            if (length(ind))
+               dsn <- dsn[-ind,]
+            if (inherits(try(sf::st_crs(crsNow)),"try-error"))
+               obj <- sf::st_as_sf(dsn,coords=coords,crs=4326)
+            else if (isCRS)
                obj <- sf::st_as_sf(dsn,coords=coords,crs=crsNow)
             else
                obj <- sf::st_as_sf(dsn,coords=coords)
@@ -207,8 +213,10 @@
          else if (isSP) {
             obj <- dsn
             sp::coordinates(obj) <- coords
-            if (isCRS)
-               sp::proj4string(obj) <- crsNow
+            if (isCRS) {
+               if (!.try(sp::proj4string(obj) <- crsNow))
+                  sp::proj4string(obj) <- "EPSG:4326"
+            }
          }
          rm(dsn)
          nextCheck <- FALSE
@@ -1056,6 +1064,8 @@
    if ((is.null(g0))||(is.numeric(lon0))||(is.numeric(lat0))) {
   # if ((resetProj)||(is.ursa(g0,"grid"))||(is.numeric(lon0))||(is.numeric(lat0))) {
       proj4 <- spatial_crs(obj)
+      if (verbose)
+         str(list(proj4=proj4,proj=proj,style=style))
       if ((is.na(proj4))&&(nchar(style))&&(.lgrep("\\+proj=.+",style))) { ## ++ 20180530
          proj4 <- style
         # isPROJ4 <- FALSE
@@ -1066,6 +1076,10 @@
       }
       isLonLat <- .lgrep("(\\+proj=longlat|epsg:4326)",proj4)>0
       if ((proj %in% c("auto"))&&(isLonLat)&&(!isEPSG)&&(style!="keep")) { ## added 2016-08-09
+         resetProj <- TRUE
+         proj4 <- "auto"
+      }
+      if ((isLonLat)&&(proj==style)&&(proj %in% c("laea","stere"))) {
          resetProj <- TRUE
          proj4 <- "auto"
       }
@@ -1210,7 +1224,10 @@
         # lon_0 <- if (is.numeric(lon0)) lon0 else mean(range(lon2))
          lon_0 <- if (is.numeric(lon0)) lon0 else round(theta2,4)
          lat_ts <- if (is.numeric(lat0)) lat0 else round(mean(lat2),4)
-         lat_0 <- if (lat_ts>=0) 90 else -90
+         if (proj=="laea")
+            lat_0 <- lat_ts
+         else
+            lat_0 <- if (lat_ts>=0) 90 else -90
          if (((proj=="merc")&&(.lgrep("(polarmap|ArcticConnect|ArcticSDI|tile357[123456])",style)>0))||
                ((proj=="auto")&&("web" %in% style)&&(isTRUE(crs %in% 3571:3576)))) {
             proj <- "laea"

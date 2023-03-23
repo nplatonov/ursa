@@ -212,7 +212,7 @@
    dimy <- with(res$grid,c(columns,rows,nb))
    if (verbose)
       .elapsedTime(paste0(fun,":start"))
-   res$value <- .Cursa("rasterize",dat=numeric(prod(dimy)),dim=as.integer(dimy)
+   res$value <- .Cursa(C_rasterize,dat=numeric(prod(dimy)),dim=as.integer(dimy)
                   ,bbox=as.numeric(with(g1,c(minx,miny,maxx,maxy)))
                   ,x=as.numeric(vec$x),y=as.numeric(vec$y),value=as.numeric(z)
                   ,nodata=as.numeric(nodata)

@@ -86,7 +86,7 @@
          weight <- weight/sum(weight)
       if (verbose)
          .elapsedTime(paste(fun,"start",sep=":"))
-      a <- .Cursa("makemap4"
+      a <- .Cursa(C_makemap4
              ,x=as.numeric(x$value),bg=as.numeric(nodata)
              ,dim=as.integer(dimx),cover=as.numeric(cover)
              ,weight=weight,sum=as.integer(sum)
@@ -122,7 +122,7 @@
       if (is.null(weight))
          weight <- rep(1,dimx[2])
       weight <- weight/sum(weight)
-      a <- .Cursa("makemap4"
+      a <- .Cursa(C_makemap4
              ,x=as.numeric(x),bg=-1e34
              ,dim=as.integer(dimx),cover=as.numeric(cover)
              ,weight=weight,sum=as.integer(sum)
@@ -153,9 +153,7 @@
    })
    res <- as.ursa(t(qv))
   # ursa_value(res) <- t(qv)
-   print(res)
   # display(res)
-   q()
    session_grid(g0)
    res
 }

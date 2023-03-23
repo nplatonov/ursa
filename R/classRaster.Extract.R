@@ -178,25 +178,25 @@
             seek(con,where=0L,origin="start",rw="r")
             if (con$interleave=="bsq") {
                if (con$mode=="integer")
-                  res$value <- with(con,.Cursa("readBsqBandInteger"
+                  res$value <- with(con,.Cursa(C_readBsqBandInteger
                                    ,fname=fname,dim=xdim,index=seq(bands),n=bands
                                    ,datatype=datatype,swap=swap
                                    ,res=integer(bands*samples*lines)))$res
                else
-                  res$value <- with(con,.Cursa("readBsqBandDouble"
+                  res$value <- with(con,.Cursa(C_readBsqBandDouble
                                    ,fname=fname,dim=xdim,index=seq(bands),n=bands
                                    ,datatype=datatype,swap=swap
                                    ,res=double(bands*samples*lines)))$res
             }
             else if (con$interleave=="bil") {
                if (con$mode=="integer") {
-                  res$value <- with(con,.Cursa("readBilLineInteger2"
+                  res$value <- with(con,.Cursa(C_readBilLineInteger2
                                    ,fname=fname,dim=xdim,index=seq(lines),n=lines
                                    ,datatype=datatype,swap=swap
                                    ,res=integer(bands*samples*lines)))$res
                }
                else {
-                  res$value <- with(con,.Cursa("readBilLineDouble2",fname,dim=xdim
+                  res$value <- with(con,.Cursa(C_readBilLineDouble2,fname,dim=xdim
                            ,lines=seq(lines)
                            ,nline=lines,datatype=datatype,swap=swap
                            ,res=double(with(con,lines*samples*bands))))$res
@@ -340,11 +340,11 @@
                   seek(con,where=0L,origin="start",rw="r")
                xdim <- with(con,c(lines,samples,bands))
                if (con$mode=="integer")
-                  val <- .Cursa("readBilBandInteger",con$fname,dim=xdim,index=i
+                  val <- .Cursa(C_readBilBandInteger,con$fname,dim=xdim,index=i
                            ,n=nb,datatype=con$datatype,swap=con$swap
                            ,res=integer(with(con,nb*samples*lines)))$res
                else {
-                  val <- .Cursa("readBilBandDouble",con$fname,dim=xdim,index=i
+                  val <- .Cursa(C_readBilBandDouble,con$fname,dim=xdim,index=i
                            ,n=nb,datatype=con$datatype,swap=con$swap
                            ,res=double(with(con,nb*samples*lines)))$res
                }
@@ -414,13 +414,13 @@
               # str(list(i=i,dim=xdim,nb=nb,fname=con$fname))
                if (con$mode=="integer")
                {
-                  val <- .Cursa("readBsqBandInteger",fname=con$fname,dim=xdim,index=i
+                  val <- .Cursa(C_readBsqBandInteger,fname=con$fname,dim=xdim,index=i
                            ,n=nb,datatype=con$datatype,swap=con$swap
                            ,res=integer(with(con,nb*samples*lines)))$res
                }
                else
                {
-                  val <- .Cursa("readBsqBandDouble",fname=con$fname,dim=xdim,index=i
+                  val <- .Cursa(C_readBsqBandDouble,fname=con$fname,dim=xdim,index=i
                            ,n=nb,datatype=con$datatype,swap=con$swap
                            ,res=double(with(con,nb*samples*lines)))$res
                }
@@ -596,12 +596,12 @@
             {
                xdim <- with(con,c(lines,samples,bands))
                if (con$mode=="integer")
-                  val <- .Cursa("readBilLineInteger",con$fname,dim=xdim
+                  val <- .Cursa(C_readBilLineInteger,con$fname,dim=xdim
                            ,lines=j+as.integer(min(con$indexR-1L))
                            ,nline=nline,datatype=con$datatype,swap=con$swap
                            ,res=integer(with(con,nline*samples*bands)))$res
                else
-                  val <- .Cursa("readBilLineDouble",con$fname,dim=xdim
+                  val <- .Cursa(C_readBilLineDouble,con$fname,dim=xdim
                            ,lines=j+as.integer(min(con$indexR-1L))
                            ,nline=nline,datatype=con$datatype,swap=con$swap
                            ,res=double(with(con,nline*samples*bands)))$res
@@ -634,11 +634,11 @@
             {
                xdim <- with(con,c(lines,samples,bands))
                if (con$mode=="integer")
-                  val <- .Cursa("readBsqLineInteger",con$fname,dim=xdim,lines=j
+                  val <- .Cursa(C_readBsqLineInteger,con$fname,dim=xdim,lines=j
                            ,nline=nline,datatype=con$datatype,swap=con$swap
                            ,res=integer(with(con,nline*samples*bands)))$res
                else
-                  val <- .Cursa("readBsqLineDouble",con$fname,dim=xdim,lines=j
+                  val <- .Cursa(C_readBsqLineDouble,con$fname,dim=xdim,lines=j
                            ,nline=nline,datatype=con$datatype,swap=con$swap
                            ,res=double(with(con,nline*samples*bands)))$res
             }

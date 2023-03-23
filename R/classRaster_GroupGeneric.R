@@ -236,7 +236,7 @@
       cover <- 1e-6
    if (verbose)
       .elapsedTime(paste(fun,"start",sep=":"))
-   a <- .Cursa("groupSummary"
+   a <- .Cursa(C_groupSummary
           ,x=as.numeric(obj$value),dim=as.integer(dimx),cover=as.numeric(cover)
           ,weight=weight,generic=as.integer(code),res=numeric(dimx[1]*1L)
           ,NAOK=TRUE)$res

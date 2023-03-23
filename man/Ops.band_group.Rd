@@ -9,6 +9,7 @@
 \alias{band_max}
 \alias{band_n}
 \alias{band_nNA}
+\alias{band_quantile}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Extract certain statistics of each band.
@@ -24,11 +25,15 @@ band_min(obj)
 band_max(obj)
 band_n(obj)
 band_nNA(obj)
+band_quantile(obj, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{obj}{
 Object of class \code{ursaRaster}.
+}
+  \item{\dots}{
+Arguments, which are passed to generic \code{\link[stats:quantile]{quantile}} function, e.g. \code{probs}, \code{type}.
 }
 }
 \details{
@@ -40,6 +45,7 @@ Object of class \code{ursaRaster}.
    \item \code{band_max} returns maximal value.
    \item \code{band_n} returns number of non-\code{NA} pixels.
    \item \code{band_nNA} returns number of \code{NA} pixels.
+   \item \code{band_quantile} returns matrix of quantiles.
 }
 }
 \value{
@@ -77,6 +83,7 @@ b2.mean <- band_mean(a)
 print(b1$mean)
 print(b2.mean)
 print(b1$mean-b2.mean)
+print(band_quantile(a))
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

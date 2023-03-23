@@ -54,8 +54,9 @@
       return(NULL)
    }
    if (!is.ursa(obj)) {
+      options(warn=1)
       if (.lgrep("^table",attr)) {
-         if ((is.list(obj))&&(names(obj) %in% c("index","colorable"))) {
+         if ((is.list(obj))&&(all(names(obj) %in% c("index","colortable")))) {
             na <- names(obj$colortable)
             ta <- table(with(obj,names(colortable[index])))
             res <- rep(0L,length(na))

@@ -308,7 +308,7 @@
    if ((anyNA(dst[,"x"]))||(anyNA(dst[,"y"]))||
        (anyNA(src[,"x"]))||(anyNA(src[,"y"])))
       stop("NA values are not applicable")
-   b1 <- .Cursa("dist2dist",x1=as.numeric(dst[,"x"]),y1=as.numeric(dst[,"y"])
+   b1 <- .Cursa(C_dist2dist,x1=as.numeric(dst[,"x"]),y1=as.numeric(dst[,"y"])
                            ,x2=as.numeric(src[,"x"]),y2=as.numeric(src[,"y"])
                ,nxy=nrow(dst),ndf=nrow(src),positive=as.integer(positive)
                ,verb=as.integer(verbose)
@@ -354,7 +354,7 @@
    }
    n1 <- length(x1)
    n2 <- length(x2)
-   b1 <- .Cursa("isNear",x1=as.numeric(x1),x2=as.numeric(x2),n1=n1,n2=n2
+   b1 <- .Cursa(C_isNear,x1=as.numeric(x1),x2=as.numeric(x2),n1=n1,n2=n2
            ,res=integer(n1),NAOK=FALSE)$res
    b1[b1==0] <- NA
    if (verbose)
@@ -487,26 +487,30 @@
 '.isRemark' <- function() {
    if (!all(c("knitr","rmarkdown") %in% loadedNamespaces()))
       return(FALSE)
-   length(grep("moon.*reader"
-              ,rmarkdown::all_output_formats(knitr::current_input())[1]))>0
+   grepl("moon.*reader",names(rmarkdown::metadata$output))
+  # length(grep("moon.*reader"
+  #            ,rmarkdown::all_output_formats(knitr::current_input())[1]))>0
 }
 '.isDashboard' <- function() {
    if (!all(c("knitr","rmarkdown") %in% loadedNamespaces()))
       return(FALSE)
-   length(grep("flex.*dashboard"
-              ,rmarkdown::all_output_formats(knitr::current_input())[1]))>0
+   grepl("flex.*dashboard",names(rmarkdown::metadata$output))
+  # length(grep("flex.*dashboard"
+  #            ,rmarkdown::all_output_formats(knitr::current_input())[1]))>0
 }
 '.isPaged' <- function() {
    if (!all(c("knitr","rmarkdown") %in% loadedNamespaces()))
       return(FALSE)
-   length(grep("(thesis|html).*paged"
-              ,rmarkdown::all_output_formats(knitr::current_input())[1]))>0
+   grepl("(thesis|html).*paged",names(rmarkdown::metadata$output))
+  # length(grep("(thesis|html).*paged"
+  #            ,rmarkdown::all_output_formats(knitr::current_input())[1]))>0
 }
 '.isVignette' <- function() {
    if (!all(c("knitr","rmarkdown") %in% loadedNamespaces()))
       return(FALSE)
-   length(grep("(vignette|html_document)"
-              ,rmarkdown::all_output_formats(knitr::current_input())[1]))>0
+   grepl("(vignette|html_document)",names(rmarkdown::metadata$output))
+  # length(grep("(vignette|html_document)"
+  #            ,rmarkdown::all_output_formats(knitr::current_input())[1]))>0
 }
 '.isShiny' <- function() {
    (("shiny" %in% loadedNamespaces())&&(length(shiny::shinyOptions())>0))

@@ -76,7 +76,7 @@ dima <- with(session_grid(),c(columns,rows,3))
 a <- ursa_new(value=array(runif(prod(dima),min=127,max=255),dim=dima))
 p <- colorize(a,pal=c("black","white"),ramp=TRUE,value=0:256)
 compose_open(layout=c(2,3),skip=4,legend=list(list("top","full"),list("bottom",2:3)))
-for (i in seq(6)) {q()
+for (i in seq(6)) {
    panel_new()
    if (i<4)
       panel_raster(p[i])

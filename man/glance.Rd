@@ -178,13 +178,13 @@ proj4string(a) <- "EPSG:4326"
 glance(a,style="google color maptype=terrain")
 }
 \donttest{ ## internet connection is required
-glance(a,style="Positron")
+glance(a,style="Positron",border=0)
 }
 \donttest{ ## internet connection is required
-glance(a,style="mapnik color tile")
+glance(a,style="mapnik color tile",border=0)
 }
 \donttest{ ## internet connection is required
-glance("Svalbard")
+glance("Svalbard",resetGrid=TRUE)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
