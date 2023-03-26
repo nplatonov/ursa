@@ -92,6 +92,7 @@
       }
    }
 }
+.noGenerics <- TRUE
 .onUnload <- function(libpath) {
   # message("ursa -- unload")
    library.dynam.unload("ursa",libpath)

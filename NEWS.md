@@ -1,10 +1,14 @@
-2023-03-23
+2023-03-24
 
 <!--
 + Depends on R (>= 4.1.0) instead of R (>= 3.0.0) due to using native pipes `|>` in code
 + Depends on R (>= 4.1.0) instead of R (>= 3.0.0) due to changed behaviour in `*apply()` functions with argument `simplify`
 + Ongoing...
 -->
+
+### version 3.9.11
+
+-   ongoing…
 
 ### version 3.9.10
 

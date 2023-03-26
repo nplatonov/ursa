@@ -37,10 +37,8 @@
       if (length(size)!=1)
          stop("Only squared filter mask is allowed")
    }
-   if (type %in% c("custom"))
-   {
-      if (is.null(fmask))
-      {
+   if (type %in% c("custom")) {
+      if (is.null(fmask)) {
          fmask=1
          size=1L
       }
@@ -57,7 +55,17 @@
                    ,res=numeric(prod(dimy)),NAOK=FALSE)$res
    }
    else {
-      x$value <- .Cursa(gsub("^(\\w)(\\w+)","focal\\U\\1\\E\\2",type,perl=TRUE) #paste0(type,"4")
+     # fun <- gsub("^(\\w)(\\w+)","focal\\U\\1\\E\\2",type,perl=TRUE) #paste0(type,"4")
+      fun <- switch(type,gaussian=C_focalGaussian
+                        ,laplacian=C_focalLaplacian
+                        ,osisaf=C_focalOsisaf
+                        ,hires=C_focalHires
+                        ,correl=C_focalCorrel
+                        ,LoG=C_focalLoG
+                        ,sobel=C_focalSobel
+                        ,sobelG=C_focalSobelG
+                        )
+      x$value <- .Cursa(fun
                    ,x=as.numeric(x$value)
                    ,dim=as.integer(dimy)
                    ,nodata=as.numeric(nodata)

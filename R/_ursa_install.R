@@ -40,7 +40,7 @@
       message(clP)
    a1 <- grep("^[A-Za-z].+",a,value=TRUE)
    a1 <- grep(clP,a1,invert=TRUE,value=TRUE)
-   a1 <- c(grep("^\\.on.+",a,value=TRUE),a1)
+  # a1 <- c(grep("^\\.on.+",a,value=TRUE),a1)
    if (FALSE) {
       b <- tools::undoc(dir=U)
       if (length(b[[1]])) {
