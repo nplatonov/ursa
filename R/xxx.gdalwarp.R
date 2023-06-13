@@ -39,7 +39,9 @@
   # a <- open_envi(src)
   # ct <- ursa_colortable(a)
   # close(a)
+   ct <- NULL
    if (is.ursa(src)) {
+      ct <- ursa_colortable(src)
       removeSrc <- TRUE
       .src <- src
       nodata <- ignorevalue(src)
@@ -48,6 +50,7 @@
          write_envi(.src,src)
       else
          write_envi(.src,src,datatype=NA)
+      rm(.src)
    }
    else {
       removeSrc <- FALSE
@@ -65,7 +68,7 @@
                       ,"ENVI")
    }
    if (verbose)
-      print(c(inMemory=inMemory,removeSrc=removeSrc,isNullGrid=is.null(grid)))
+      print(c(inMemory=inMemory,removeSrc=removeSrc,isNullGrid=is.null(grid),isSF=isSF))
    proj4 <- ursa_crs(grid)
    if (!nchar(proj4)) {
       opt <- c(opt,to="SRC_METHOD=NO_GEOTRANSFORM",to="DST_METHOD=NO_GEOTRANSFORM")
@@ -150,6 +153,8 @@
    session_grid(NULL)
    if (inMemory) {
       ret <- if (driver=="ENVI") read_envi(dst) else read_gdal(dst)
+      if (!is.null(ct))
+         ursa_colortable(ret) <- ct
    }
    else if (!close)
       ret <- if (driver=="ENVI") open_envi(dst) else open_gdal(dst)

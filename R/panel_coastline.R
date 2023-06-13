@@ -627,8 +627,14 @@
 }
 
 'update_coastline' <- function(merge=TRUE) {
-   if (!requireNamespace("sf",quietly=TRUE))
+   missedSF <- !requireNamespace("sf",quietly=TRUE) 
+   missedLW <- !requireNamespace("lwgeom",quietly=TRUE)
+   if ((missedSF)&&(missedLW))
+      stop("Suggested packages 'sf' and 'lwgeom' are required for this operation")
+   else if (missedSF)
       stop("Suggested package 'sf' is required for this operation")
+   else if (missedLW)
+      stop("Suggested package 'lwgeom' is required for this operation")
    dpath <- getOption("ursaRequisite")
    ftemp <- tempfile(tmpdir=dpath)
    opW <- options(warn=-1)

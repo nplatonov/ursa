@@ -194,6 +194,8 @@
       x <- x[!is.na(x)]
    if (is.ursa(x))
       x <- c(x$value)
+   else if (inherits(x,"units"))
+      x <- unclass(x)
    else if ((is.character(x))||(is.factor(x))) {
       ch <- grep("^\\s*(\\-)*\\d+(\\.\\d+)*((\\+|\\-)[eE]\\d+)*\\s*$",x,invert=TRUE)
       if (length(ch))
@@ -238,7 +240,8 @@
       return(FALSE)
    getOption("ursaPngSkip")
 }
-'.dist2' <- function(src,dst,summarize=!FALSE,positive=FALSE,verbose=!.isPackageInUse())
+'.dist2' <- function(src,dst,summarize=!FALSE,positive=FALSE,spherical=NA
+                    ,verbose=!.isPackageInUse())
 {
    if (identical(src,dst))
       positive <- TRUE
@@ -258,9 +261,12 @@
          try(res <- x[which.max(predict(locfit::locfit(~x),newdata=x))])
       res
    }
+   isLonLat <- .lgrep("(\\+proj=longlat|epsg:4326)",spatial_crs(src))>0
    isUrsa <- FALSE
-   if ((is_spatial(src))&&((is_spatial(dst))))
-      stopifnot(identical(spatial_crs(src),spatial_crs(dst)))
+   if ((is_spatial(src))&&((is_spatial(dst)))) {
+      if (!identical(spatial_crs(src),spatial_crs(dst)))
+         dst <- spatial_transform(dst,src)
+   }
    if (is_spatial(src)) {
       src <- spatial_coordinates(src)
       if (is.list(src)) {
@@ -270,6 +276,7 @@
       }
    }
    else if (is_ursa(src)) {
+      crsS <- ursa_crs(src)
       src <- as.data.frame(src,na.rm=T)[,1:2]
       isUrsa <- TRUE
    }
@@ -277,6 +284,11 @@
       src <- rbind(src)
    }
    if (is_spatial(dst)) {
+      if (isUrsa) {
+         crsD <- spatial_crs(dst)
+         if (!identical(crsS,crsD))
+            dst <- spatial_transform(dst,crsS)
+      }
       ##~ dst <- switch(spatial_geotype(dst)
                    ##~ ,POINT=spatial_coordinates(dst)
                    ##~ ,stop("'dst': unimplemented for ",spatial_geotype(dst)))
@@ -308,9 +320,15 @@
    if ((anyNA(dst[,"x"]))||(anyNA(dst[,"y"]))||
        (anyNA(src[,"x"]))||(anyNA(src[,"y"])))
       stop("NA values are not applicable")
+   if (is.na(spherical))
+      spherical <- isLonLat
+   ##~ print(summary(src))
+   ##~ print(summary(dst))
+   ##~ print(spherical)
    b1 <- .Cursa(C_dist2dist,x1=as.numeric(dst[,"x"]),y1=as.numeric(dst[,"y"])
                            ,x2=as.numeric(src[,"x"]),y2=as.numeric(src[,"y"])
                ,nxy=nrow(dst),ndf=nrow(src),positive=as.integer(positive)
+               ,spherical=as.integer(spherical)
                ,verb=as.integer(verbose)
                ,dist=numeric(nrow(src)),ind=integer(nrow(src)))
    b1 <- data.frame(ind=b1$ind+1L,dist=b1$dist)
@@ -384,7 +402,7 @@
    }
    B
 }
-'.degminsec' <- function(x,suffix=c("A","B")) {
+'.degminsec' <- function(x,suffix=c("A","B"),unique=FALSE) {
    s <- sign(x)
    x <- abs(x)
    y <- rep("",length(x))
@@ -407,8 +425,16 @@
       y <- sprintf("%.0f\uB0",x1a)
    else if (all(x3==0))
       y <- sprintf("%.0f\uB0%02.0f'",x1a,x2)
-   else
+   else if ((!unique)||(length(unique(x3))==length(x3)))
       y <- sprintf("%.0f\uB0%02.0f'%02.0f\"",x1a,x2,x3)
+   else {
+      for (digit in seq(1,6)) {
+         x3b <- .round(x3a,digit)
+         if (length(unique(x3b))==length(x3a))
+            break
+      }
+      y <- sprintf(paste0("%.0f\uB0%02.0f'%0",3+digit,".",digit,"f\""),x1a,x2,x3a)
+   }
    if (length(ind2 <- s>=0))
       y[ind2] <- paste0(y[ind2],suffix[1])
    if (length(ind2 <- s<0))
@@ -487,28 +513,40 @@
 '.isRemark' <- function() {
    if (!all(c("knitr","rmarkdown") %in% loadedNamespaces()))
       return(FALSE)
-   grepl("moon.*reader",names(rmarkdown::metadata$output))
+   oname <- names(rmarkdown::metadata$output)
+   if (is.null(oname))
+      return(FALSE)
+   grepl("moon.*reader",oname[1])
   # length(grep("moon.*reader"
   #            ,rmarkdown::all_output_formats(knitr::current_input())[1]))>0
 }
 '.isDashboard' <- function() {
    if (!all(c("knitr","rmarkdown") %in% loadedNamespaces()))
       return(FALSE)
-   grepl("flex.*dashboard",names(rmarkdown::metadata$output))
+   oname <- names(rmarkdown::metadata$output)
+   if (is.null(oname))
+      return(FALSE)
+   grepl("flex.*dashboard",oname[1])
   # length(grep("flex.*dashboard"
   #            ,rmarkdown::all_output_formats(knitr::current_input())[1]))>0
 }
 '.isPaged' <- function() {
    if (!all(c("knitr","rmarkdown") %in% loadedNamespaces()))
       return(FALSE)
-   grepl("(thesis|html).*paged",names(rmarkdown::metadata$output))
+   oname <- names(rmarkdown::metadata$output)
+   if (is.null(oname))
+      return(FALSE)
+   grepl("(thesis|html).*paged",oname[1])
   # length(grep("(thesis|html).*paged"
   #            ,rmarkdown::all_output_formats(knitr::current_input())[1]))>0
 }
 '.isVignette' <- function() {
    if (!all(c("knitr","rmarkdown") %in% loadedNamespaces()))
       return(FALSE)
-   grepl("(vignette|html_document)",names(rmarkdown::metadata$output))
+   oname <- names(rmarkdown::metadata$output)
+   if (is.null(oname))
+      return(FALSE)
+   grepl("(vignette|html_document)",oname[1])
   # length(grep("(vignette|html_document)"
   #            ,rmarkdown::all_output_formats(knitr::current_input())[1]))>0
 }

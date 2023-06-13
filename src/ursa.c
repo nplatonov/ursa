@@ -3650,22 +3650,61 @@ void groupSummary(double *x,int *dim,double *_cover,double *weight,int *_fun
    return;
 }
 void dist2dist(double *x1,double *y1,double *x2,double *y2
-              ,int *lenxy,int *lendf,int *pos,int *verb
+              ,int *lenxy,int *lendf,int *pos,int *sphere,int *verb
               ,double *dist,int *ind)
 {
    int i,j,i2;
    int n1=*lenxy;
    int n2=*lendf;
+   int s1,s2;
    int verbose=*verb;
+   int spherical=*sphere;
    int positive=*pos;
    double d,minD;
+   int k=0;
+   if (spherical) {
+      s1=n1;
+      s2=n2;
+   }
+   else {
+      s1=1;
+      s2=1;
+   }
+   double *lon1=(double *)malloc(s1*sizeof(double));
+   double *clat1=(double *)malloc(s1*sizeof(double));
+   double *slat1=(double *)malloc(s1*sizeof(double));
+   double *lon2=(double *)malloc(s2*sizeof(double));
+   double *clat2=(double *)malloc(s2*sizeof(double));
+   double *slat2=(double *)malloc(s2*sizeof(double));
+   if (spherical) {
+      k=k+1;
+      for (j=0;j<n2;j++) {
+         lon2[j]=x2[j]*PI/180.0;
+         slat2[j]=sin(y2[j]*PI/180.0);
+         clat2[j]=cos(y2[j]*PI/180.0);
+        // Rprintf("x2=%.2f cos=%.2f sin=%.2f\n",x2[j],clat2[j],slat2[j]);
+      }
+      for (i=0;i<n1;i++) {
+         lon1[i]=x1[i]*PI/180.0;
+         slat1[i]=sin(y1[i]*PI/180.0);
+         clat1[i]=cos(y1[i]*PI/180.0);
+        // Rprintf("x1=%.2f cos=%.2f sin=%.2f\n",x1[j],clat1[j],slat1[j]);
+      }
+   }
    for (j=0;j<n2;j++)
    {
       minD=1e37;
       i2=0;
       for (i=0;i<n1;i++)
       {
-         d=(x1[i]-x2[j])*(x1[i]-x2[j])+(y1[i]-y2[j])*(y1[i]-y2[j]);
+         if (spherical) {
+           // d=0;
+           // Rprintf("k=%d lon1=%.2f\n",k,lon1[i]);
+            d=6371000.0*acos(slat1[i]*slat2[j]+clat1[i]*clat2[j]*cos(fabs(lon1[i]-lon2[j])));
+           // d=acos(cos(lat1[i]));
+         }
+         else
+            d=(x1[i]-x2[j])*(x1[i]-x2[j])+(y1[i]-y2[j])*(y1[i]-y2[j]);
          if ((d==0.0)&&(positive))
             continue;
          if (i==0)
@@ -3684,6 +3723,11 @@ void dist2dist(double *x1,double *y1,double *x2,double *y2
       if (verbose)
          progressBar(j,n2,"");
    }
+   free(clat1);
+   free(clat2);
+   free(slat1);
+   free(lon1);
+   free(lon2);
    return;
 }
 void isNear(double *x1,double *x2,int *len1,int *len2,int *res)

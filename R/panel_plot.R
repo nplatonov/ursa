@@ -98,7 +98,7 @@
                   col <- ct$colortable[ct$index]
                }
                else if (length(spatial_fields(obj))==-1) {
-                 # stop("B")
+                  stop("B")
                   if (.is.colortable(arglist2$col)) {
                     # stop("B1")
                      val <- spatial_data(obj,drop=TRUE)
@@ -134,7 +134,6 @@
                        (length(spatial_fields(obj))==1)) {
                  # stop("D")
                   ct <- arglist2$col
-                 # str(ct)
                   val <- spatial_data(obj)[,1,drop=TRUE]
                   if (length(ct)==length(val)) {
                     # stop("D1")
@@ -143,15 +142,21 @@
                   else {
                     # stop("D2")
                     # str(val)
+                    # str(ct)
                     # print(table(val))
-                     col <- colorize(val,colortable=ct)
-                     col <- unname(col$colortable[col$index])
+                     if (!FALSE) { ## -- 20230529
+                        col <- colorize(val,colortable=ct)
+                        col <- unname(col$colortable[col$index])
+                     }
+                     else { ## ++ 20230529
+                        col <- palettize(val,colortable=ct)
+                     }
                   }
                  # str(col)
                  # print(table(col))
                }
                else {
-                 # stop("E")
+                  ##~ stop("E")
                   col <- NULL
                }
             }
@@ -174,13 +179,40 @@
             }
             if (!is.null(col))
                arglist2$col <- unclass(col)
+           # str(arglist2)
          }
          else if (length(spatial_fields(obj))==1) {
            # stop("II")
-           # ct <- colorize(spatial_data(obj)[[1]])
-            ct <- do.call("colorize",c(list(spatial_data(obj)[[1]]),arglist2))
-           # arglist2$col <- ct$colortable ## ++ 20210520
-            arglist2$col <- ct$colortable[ct$index] ## -- 20210520
+            if ((!is.null(arglist2$pal))&&(inherits(arglist2$pal,"ursaColorTable"))) {
+              # stop("II1")
+               if (isTRUE(is.numeric(arglist2$alpha))) {
+                  pname <- names(arglist2$pal)
+                  alpha <- sprintf("%02X",.round(as.hexmode(gsub(".*(\\w{2}$)","\\1"
+                            ,arglist2$pal))*arglist2$alpha))
+                  arglist2$pal <- paste0(gsub("(\\w{2}$)","",arglist2$pal),alpha)
+                  names(arglist2$pal) <- pname
+               }
+               ind <- match(obj[[1]],names(arglist2$pal))
+               if (!anyNA(ind))
+                  arglist2$col <- arglist2$pal[ind]
+               else {
+                  ct <- do.call("colorize",c(list(obj[[1]],arglist2)))
+                  arglist2$col <- ct$colortable[ct$index]
+               }
+            }
+            else if (is_ursa(attr(obj[[1]],"colortable"),"colortable")) {
+              # stop("II2")
+               arglist2$pal <- attr(obj[[1]],"colortable")
+               ind <- match(obj[[1]],names(arglist2$pal))
+               arglist2$col <- unclass(unname(arglist2$pal))[ind]
+            }
+            else {
+              # stop("II3")
+              # ct <- colorize(obj[[1]])
+               ct <- do.call("colorize",c(list(obj[[1]]),arglist2))
+               arglist2$pal <- ct$colortable ## ++ 20210520
+               arglist2$col <- unclass(unname(ct$colortable))[ct$index] ## -- 20210520
+            }
          }
          else {
             arglist2$col <- ifelse(is_spatial_lines(obj),"black"
@@ -248,7 +280,6 @@
             }
            # str(arglist2)
            # str(ct)
-           # q()
          }
         # str(c(obj=list(spatial_geometry(obj)),add=TRUE,arglist2))
          if (isFALSE(arglist2$border))
@@ -272,6 +303,8 @@
          }
          ret <- .tryE(do.call(".panel_plot"
                      ,c(obj=list(spatial_geometry(obj)),add=TRUE,arglist2)))
+        # str(arglist2)
+        # str(ret)
          arglist2$type <- spatial_geotype(obj)
         # options(opE)
       }
@@ -473,9 +506,10 @@
          plot <- sp::plot ## unerror "cannot coerce type 'S4' to vector of type 'double'"
          opW <- options(warn=-1) ## release 'warn=-1': no warnings
    }
-  # message("-----------------")
-  # str(arglist)
-  # message("-----------------")
+   ##~ message("-----------------")
+   ##~ str(obj)
+   ##~ str(arglist)
+   ##~ message("-----------------")
    ret <- do.call("plot",c(list(obj),arglist))
    if (!is.null(opW))
       options(opW)

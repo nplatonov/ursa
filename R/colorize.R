@@ -122,9 +122,12 @@
       isDate <- inherits(obj,c("Date","POSIXct","POSIXlt")[1])
      # print(c(isCharacter=is.character(obj),isTime=isTime,isDate=isDate))
       if (inherits(obj,c("Date","POSIXct","POSIXlt"))) {
-         obj <- sort(obj)
+        # obj <- sort(obj) ## -- 20230611
         # od <- sort(unique(diff(sort(unique(obj)))))
-         od <- sort(unique(obj))
+         if (is.data.frame(obj))
+            ob <- sort(unique(c(obj)))
+         else
+            od <- sort(unique(obj))
          if (length(od)>1) {
             od <- sort(unique(diff(od)))
             if (all(od %% min(od) == 0)) {

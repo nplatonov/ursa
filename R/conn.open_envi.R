@@ -439,7 +439,7 @@
    }
    else if ((file.exists(fname.envigz))&&(!file.info(fname.envigz)$isdir))
    {
-      verbose <- Sys.Date()<=as.Date("2020-11-15") & !.isPackageInUse()
+      verbose <- Sys.Date()<=as.Date("2023-05-29") & !.isPackageInUse()
       solved <- FALSE
       if (nchar(Sys.which("gzip"))) {
          if (cache) {
@@ -769,18 +769,36 @@
    if (identical(ln1,ln2))
       return(obj)
    close(obj) ## rebuild bands; e.g. after update to monthly sst
-   m12 <- match(ln1,ln2)
-   if (any(is.na(m12))) {
-      close(obj)
+   if (length(unique(ln1))!=length(ln1)) {
+      stop("Band names are not unique")
+   }
+   m12 <- c(na.omit(match(ln1,ln2)))
+   m21 <- c(na.omit(match(ln2,ln1)))
+   if (length(m12)!=length(m21)) { #  (any(is.na(m12))) {
+     # close(obj)
       stop("Inconsistence of band names")
    }
-  # m21 <- match(ln2,ln1)
    ftemp <- .maketmp()
    envi_rename(fname,ftemp)
-   src <- open_envi(ftemp) ## RECURSUVE
+   src <- open_envi(ftemp,cache=TRUE) ## RECURSUVE
    dst <- create_envi(wname,...)
+   srcname <- names(src)
+   dstname <- names(dst)
+   cb <- chunk_band(src)
+   from <- head(m21,1)
+   to <- tail(m21,1)
    for (i in chunk_band(src)) {
-      dst[i] <- src[i]
+      j <- i[i>=from & i<=to]
+      if (!length(j))
+         next
+      k <- match(j,m21)
+      if (anyNA(k)) {
+         j <- j[which(!is.na(k))]
+         k <- c(na.omit(k))
+      }
+      if (!length(j))
+         next
+      dst[k] <- src[j]
    }
    close(src)
    envi_remove(ftemp)

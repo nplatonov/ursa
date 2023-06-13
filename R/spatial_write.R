@@ -430,9 +430,9 @@
                  # Encoding(obj[[i]]) <- "UTF-8"
                }
             }
-            if (length(ind <- which(sapply(obj,inherits,"POSIXct")))) {
+            if (length(ind <- which(sapply(obj,inherits,c("POSIXlt","POSIXct"))))) {
                for (i in ind) {
-                  obj[,i] <- format(obj[,i,drop=TRUE],tz="UTC","%Y-%m-%dT%H:%M:%SZ")
+                  obj[,i] <- format(c(obj[,i,drop=TRUE]),tz="UTC","%Y-%m-%dT%H:%M:%SZ")
                }
             }
             a <- geojsonsf::sf_geojson(obj,atomise=F,simplify=F,digits=6)

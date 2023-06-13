@@ -139,7 +139,7 @@
                   cmd <- paste0("Sys.sleep(",wait,");"
                                ,"if (file.exists(",sQuote(fileout),"))"
                                ," file.remove(",sQuote(fileout),")")
-                  system2(file.path(R.home("bin"),"Rscript")
+                  ret <- system2(file.path(R.home("bin"),"Rscript")
                          ,c("-e",dQuote(cmd)),wait=FALSE,stdout=NULL)
                }
             }
@@ -310,8 +310,19 @@
             wait <- 5
          cmd <- paste0("Sys.sleep(",wait,");"
                       ,"if (file.exists(",sQuote(fileout),")) file.remove(",sQuote(fileout),")")
-         system2(file.path(R.home("bin"),"Rscript")
-                ,c("-e",dQuote(cmd)),wait=FALSE,stdout=NULL)
+         if (FALSE) {
+           # requireNamespace("sys"))
+           # message(cmd)
+           # ret <- sys::r_background(c('--vanilla','-e',dQuote(cmd)))
+           # print(ret)
+         }
+         else {
+           # message('Package `sys` is suggested for cleaning spead-up')
+            ret <- system2(file.path(R.home("bin"),"Rscript")
+                          ,c("-e",dQuote(cmd)),wait=FALSE,stdout=NULL)
+         }
+        # print(cmd)
+        # print(ret)
       }
    }
    if (file.exists(fileout)) {

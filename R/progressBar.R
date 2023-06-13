@@ -64,6 +64,8 @@
    pb
 }
 'setUrsaProgressBar' <- function(pb,value,title=NULL,label=NULL) {
+   if (is.null(pb))
+      return(pb)
    if ((length(class(pb))==1)&&(inherits(pb,"ursaProgressBar")))
       return(pb)
   # if (.isKnitr())
@@ -179,3 +181,4 @@
    NextMethod("close",con,...)
 }
 # 'close.ursaProgressBar' <- function(con,...) close(con,...)
+# 'close.NULL' <- function(obj,...) invisible(NULL)

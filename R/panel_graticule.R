@@ -494,7 +494,7 @@
       }
       else {
          latSet <- na.omit(latSet)
-         if (projclass %in% c("stere","laea"))
+         if (projclass %in% c("stere","laea")[1])
             lat <- seq(min(latSet),max(latSet),len=2)
          else if (projclass %in% c("merc"))
             lat <- c(-1,1)*(90-1e-6)

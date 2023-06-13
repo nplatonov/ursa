@@ -17,7 +17,6 @@ setUrsaProgressBar(pb, value, title = NULL, label = NULL)
 
 \method{close}{ursaProgressBar}(con, ...)
 
-
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -79,6 +78,8 @@ Wrapper to one of
 Visualization of progress bar is updates each 0.5 seconds, it is effective for multiple short-term iterations.
 
 Progress bars should be closed by calling of appropriate method of generic function \code{\link[base:connections]{close}} depending of class of reference progress bar.
+
+%%~ \code{close(NULL)} returns invisible \code{NULL}.
 }
 \value{
 %%  ~Describe the value returned

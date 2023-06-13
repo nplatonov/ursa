@@ -7,7 +7,7 @@ Create segmented line from points' sequence
 Connect sequence of points (locations) by direct lines (tracks)
 }
 \usage{
-segmentize(obj, by=NULL, connect=c("consequent", "united"))
+segmentize(obj, by=NULL, connect=c("united", "consequent"))
 }
 \arguments{
   \item{obj}{

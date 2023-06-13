@@ -31,6 +31,7 @@
             ret <- do.call("panel_plot",c(arglist[indSP],arglist[other]))#$col
          }
          if (length(indSF)) {
+           # str(arglist[other])
             ret <- do.call("panel_plot",c(arglist[indSF],arglist[other]))#[[1]]#$col
            # if (inherits(ret,"ursaLegend"))
            #    NULL # ret <- ret[[1]]$col

@@ -1,7 +1,30 @@
-'segmentize' <- function(obj,by=NULL,connect=c("consequent","united")) {
-   if (!is.null(by))
-      connect <- "united"
+'segmentize' <- function(obj,by=NULL,connect=c("united","consequent")) {
    connect <- match.arg(connect)
+  # if (!is.null(by))
+  #    connect <- "united"
+   if ((!is.null(by))&&(connect=="consequent")) {
+      ret <- do.call(spatial_bind,by(obj,by,segmentize,connect=connect)) ## RECURSIVE
+      ##~ for (a in spatial_fields(obj)) {
+         ##~ byvalue <- obj[[a]]
+         ##~ str(a)
+         ##~ str(byvalue)
+         ##~ if (is.integer(byvalue))
+            ##~ ret[[a]] <- as.integer(ret[[a]])
+         ##~ else if (is.numeric(byvalue))
+            ##~ ret[[a]] <- as.numeric(ret[[a]])
+         ##~ else if (inherits(byvalue,"Date"))
+            ##~ ret[[a]] <- as.Date(ret[[a]])
+      ##~ }
+      return(ret)
+   }
+   if ((TRUE)&&(T & is.null(by))&&(spatial_geotype(obj) %in% c("MULTIPOINT"))&&
+       (spatial_count(obj)>1)) {
+      ret <- lapply(seq_len(spatial_count(obj)),\(j) {
+         res <- segmentize(obj[j,],by=spatial_data(obj[j,]),connect=connect) ## RECURSIVE
+      })
+      ret <- do.call(spatial_bind,ret)
+      return(ret)
+   }
    if (is_spatial_lines(obj)) {
       crd <- sapply(seq(1,2),function (x) basename(tempfile(pattern="")))
       if (is.null(by)) {
@@ -40,6 +63,14 @@
    if (!is_spatial_points(obj))
       return(NULL)
    xy <- unname(spatial_coordinates(obj))
+   if (is.list(xy)) {
+      if (length(xy)==1)
+         xy <- xy[[1]]
+      else {
+         str(xy)
+         stop("It seems that MULTI<geometry>, which is unsupported")
+      }
+   }
    if (connect=="united") {
       if (!is.null(by)) {
          ##~ if ((length(by)==1)&&(by %in% spatial_fields(obj))) {
@@ -56,29 +87,52 @@
               # sp::coordinates(x) <- c("coords.x1","coords.x2")
                sp::coordinates(x) <- crd
             }
-            segmentize(x,connect=connect) ## RECURSIVE
+            ret <- segmentize(x,connect=connect) ## RECURSIVE
+            ret
          })
          ind <- which(!sapply(res,is.null))
-         if (smartRenaming <- FALSE) {
-            da <- by(spatial_data(obj),by,function(x) x)
-            str(da)
-            list1 <- as.list(match.call())
-            str(list1)
-            dname <- gsub(paste0(as.character(list1["obj"]),"\\$"),""
-                         ,as.character(list1["by"]))
-            str(dname)
-            q()
-         }
          da <- attr(res,"dimnames")
-         if (!is.data.frame(da))
-            da <- do.call(expand.grid,da)
+         if (!is.data.frame(da)) {
+            da <- do.call(expand.grid,list(da,stringsAsFactors=FALSE))[ind,,drop=FALSE]
+            attr(da,"out.attrs") <- NULL
+         }
+         if (ncol(da)==1) {
+            byname <- as.list(match.call())[["by"]]
+            byvalue <- eval(byname,envir=parent.frame())
+            if (is.list(byvalue)) {
+               dname <- names(byvalue)
+               byvalue <- byvalue[[1]]
+            }
+            else {
+               list1 <- as.list(match.call())
+               dname <- gsub(paste0(as.character(list1["obj"]),"\\$"),""
+                            ,as.character(list1["by"]))
+               by <- data.frame(array(by,dim=c(length(by),1),dimnames=list(NULL,dname))
+                               ,check.names=FALSE)
+            }
+            colnames(da) <- dname
+           # if (is.null(names(by)))
+           #    names(by) <- byname
+         }
+         for (a in names(by)) {
+            byvalue <- by[[a]]
+            if (is.integer(byvalue))
+               da[[a]] <- as.integer(da[[a]])
+            else if (is.numeric(byvalue))
+               da[[a]] <- as.numeric(da[[a]])
+            else if (inherits(byvalue,"Date"))
+               da[[a]] <- as.Date(da[[a]])
+         }
          res <- do.call(spatial_bind,res[ind])
          spatial_data(res) <- da
          if (.isSP(obj))
             sp::proj4string(res) <-  sp::CRS(spatial_crs(obj),doCheckCRSArgs=FALSE)
       }
       else if (.isSF(obj)) {
-         res <- sf::st_sfc(sf::st_linestring(xy),crs=spatial_crs(obj))
+         if (nrow(xy)==1)
+            res <- sf::st_sfc(sf::st_linestring(xy[integer(),]),crs=spatial_crs(obj))
+         else
+            res <- sf::st_sfc(sf::st_linestring(xy),crs=spatial_crs(obj))
       }
       else if (.isSP(obj)) {
          res <- sp::Lines(sp::Line(xy),1L)
@@ -97,7 +151,6 @@
          res[[i]] <- sf::st_linestring(xy[ind[i]+c(-1,0),])
       }
       res <- sf::st_sfc(res,crs=spatial_crs(obj))
-     # str(res)
    }
    else if (.isSP(obj)) {
       for (i in seq_along(ind)) {
@@ -112,14 +165,18 @@
       spatial_data(res) <- tail(spatial_data(obj),-1)
    else {
       da <- spatial_data(obj)
-      da1 <- head(da,-1)
-      da2 <- tail(da,-1)
-      ind <- rep(NA,ncol(da)) 
-      for (i in seq_len(ncol(da1))) {
-         ind[i] <- identical(da1[,i],da2[,i])
+      if (nrow(da)==1)
+         spatial_data(res) <- da
+      else {
+         da1 <- head(da,-1)
+         da2 <- tail(da,-1)
+         ind <- rep(NA,ncol(da)) 
+         for (i in seq_len(ncol(da1))) {
+            ind[i] <- identical(da1[,i],da2[,i])
+         }
+         da1[,which(ind)] <- NULL
+         spatial_data(res) <- data.frame(cbind(da2,da1))
       }
-      da1[,which(ind)] <- NULL
-      spatial_data(res) <- data.frame(cbind(da2,da1))
    }
    res
 }

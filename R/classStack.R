@@ -1,6 +1,8 @@
 'as.list.ursaRaster' <- function(x,...) ursa_stack(x,...)
 'unlist.ursaStack' <- function(x,recursive,use.names) ursa_brick(x)
 'ursa_apply' <- function(obj,FUN,...) {
+  # if (!.is.ursa_stack(res))
+  #    res <- lapply(seq(obj),function(i),FUN=FUN,obj...)
    res <- lapply(X=obj,FUN=FUN,...)
    if (.is.ursa_stack(res))
       class(res) <- "ursaStack"

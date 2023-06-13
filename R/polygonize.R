@@ -70,8 +70,9 @@
          b <- cbind(data.frame(t(coord_cr(obj,ind))),val)
          attr(b,"crs") <- ursa_crs(obj)
       }
-      else
+      else {
          b <- as.data.frame(obj)
+      }
    }
    else
       b <- obj

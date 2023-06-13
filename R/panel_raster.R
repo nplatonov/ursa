@@ -89,6 +89,9 @@
    scale <- getOption("ursaPngScale")
    e <- band_nNA(obj)
    isRGB <- nband(obj) %in% c(2,3,4) & all(band_nNA(obj)>=0) # '==0' is NA used for RGB?
+   g1 <- getOption("ursaPngPanelGrid")
+   if (ursa_crs(g1)!=ursa_crs(obj))
+      obj <- .gdalwarp(obj,grid=g1)
    toResample <- floor(1/scale)>1 & !isRGB
    if (is.na(useRaster)) {
       cond1 <- getOption("ursaPngDevice")!="windows"

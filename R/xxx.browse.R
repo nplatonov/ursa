@@ -20,10 +20,13 @@
      # cat("knitr:",c(knitr="knitr" %in% loadedNamespaces()),"\n")
      # cat("asis:",knitr::opts_current$get("results")=="asis","\n")
      # cat("class:",class(obj),"\n")
-      if (("knitr" %in% loadedNamespaces())&&
-         (isTRUE(knitr::opts_current$get("results")=="asis"))) {
-        # cat("asis 2","\n")
-         return(browse(obj,...))
+      if ("knitr" %in% loadedNamespaces()) {
+         if (!isTRUE(knitr::opts_chunk$get("customized_rendering")))
+            return(obj)
+         if (isTRUE(knitr::opts_current$get("results")=="asis")) {
+           # cat("asis 2","\n")
+            return(browse(obj,...))
+         }
       }
    }
    if (!inherits(obj,c("htmlwidget","knitr_kable"))) {
@@ -216,7 +219,7 @@
             if (!.isPackageInUse())
                options(opW)
          }
-         if (!.isKnitr()) {
+         if (T | !.isKnitr()) {
             a <- readLines(fname,encoding="UTF-8")
             a <- grep("application/json.+data-for=\\\"htmlwidget",a,value=TRUE)
             id <- gsub("^.+visdat\\W+([0-9a-f]+)\\W+.+$","\\1",a)
@@ -227,7 +230,13 @@
                md5 <- unname(tools::md5sum(ftemp))
                file.remove(ftemp)
                ename <- fname
-               fname <- file.path(dirname(fname),paste0("htmlwidget-",md5,".html"))
+               if (!.isKnitr())
+                  fname <- file.path(dirname(fname),paste0("htmlwidget-",md5,".html"))
+               else
+                  fname <- file.path(dirname(fname),paste0("widget_"
+                                                  ,knitr::opts_current$get("label")
+                                                  ,"_",unname(md5)
+                                                  ,".html"))
                file.rename(ename,fname)
             }
          }

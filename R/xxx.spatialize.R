@@ -27,7 +27,7 @@
       isSF <- requireNamespace("sf",quietly=.isPackageInUse())
       isSP <- !isSF
    }
-   else {
+   else if (F) { ## deprecated 'rgdal'
       loaded <- loadedNamespaces() #.loaded()
       if (any(c("sf","geojsonsf") %in% loaded))
          isSF <- TRUE
@@ -35,6 +35,10 @@
          isSF <- FALSE
       else
          isSF <- requireNamespace("sf",quietly=.isPackageInUse())
+      isSP <- !isSF
+   }
+   else {
+      isSF <- requireNamespace("sf",quietly=.isPackageInUse())
       isSP <- !isSF
    }
    jsonSF <- FALSE
@@ -68,6 +72,9 @@
       }
    }
    proj4 <- NULL
+   if ((!(style %in% c("auto","keep")))&&(isFALSE(resetProj))) { ## ++20230612
+      resetProj <- TRUE
+   }
    if (!((is.character(dsn))&&(length(dsn)==1))) {
       nextCheck <- TRUE
       if ((.isSF(dsn))||(.isSP(dsn))) {
