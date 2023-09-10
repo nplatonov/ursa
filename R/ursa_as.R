@@ -400,7 +400,7 @@
          ##~ str(a1[[1]]$finalize())
          ##~ q()
       }
-      bbox <- terra::as.vector(obj)[c(1,3,2,4)]
+      bbox <- as.vector(obj)[c(1,3,2,4)]
       res <- terra::res(obj)
       crs <- terra::crs(obj, proj=TRUE)
       aname <- terra::names(obj)
