@@ -247,7 +247,19 @@
       s2 <- strsplit(style,split="\\s+")
       s <- expand.grid(s1,s2)
    }
-   isUrl <- .lgrep("http(s)*://",style)
+   canUrl <- length(unlist(regmatches(style,gregexpr("\\{[xyz]\\}",style))))==3
+   if (!canUrl) {
+      sascache <- gsub("\\s(color|grey|gray)$","",style)
+      if (!length(ind <- which(dir.exists(sascache))))
+         sascache <- file.path(getOption("SAS_Planet_cache"),sascache)
+      if (length(ind <- which(dir.exists(sascache)))>0) {
+         list1 <- dir(path=sascache[ind],pattern="\\.sqlitedb$",recursive=TRUE)
+         canUrl <- length(list1)>0
+         if (canUrl)
+            style <- basename(sascache)
+      }
+   }
+   isUrl <- .lgrep("http(s)*://",style) | canUrl
    if (isUrl) {
       ind <- .grep("http(s)*://",style)
       style[ind] <- unlist(strsplit(style[ind],split="\\s+"))[1]
@@ -282,7 +294,7 @@
          nextStyle <- .grep(ostyle[1],staticMap
                            ,invert=TRUE,value=TRUE)
       else
-         nextStyle <- .grep(ostyle[1],c("mapnik","mapsurfer","cartoDB","opentopomap")
+         nextStyle <- .grep(ostyle[1],c("mapnik","cartoDB","opentopomap")
                            ,invert=TRUE,value=TRUE)[seq(3)]
       nsize <- length(nextStyle)+1
       cache <- .getPrm(arglist,"cache",class=c("logical","character"),default=TRUE)
@@ -510,6 +522,8 @@
             panel_new(...) #fill=ifelse(isWeb,"transparent","chessboard"))
          if (before) {
             panel_plot(basemap,alpha=basemap.alpha)
+            if (toCoast)
+               panel_coastline(cline)
          }
         # if ((!length(ct))||(all(is.na(ct[[i]]$index)))) {
          if ((!length(ct))||(!hasField)) {
@@ -583,9 +597,9 @@
          }
          if (after) {
             panel_plot(basemap,alpha=basemap.alpha)
+            if (toCoast)
+               panel_coastline(cline)
          }
-         if (toCoast)
-            panel_coastline(cline)
          if ((geocodeStatus)||(!length(ct)))
             panel_graticule(gline,margin=c(T,T,F,F))
          else

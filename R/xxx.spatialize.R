@@ -1257,7 +1257,7 @@
          if (verbose)
             print(data.frame(lon0=lon_0,lat0=lat_0,lat_ts=lat_ts,row.names=proj))
          if (proj=="stere") {
-            t_srs <- paste("","+proj=stere"
+            t_srs <- paste("+proj=stere"
                           ,paste0("+lat_0=",lat_0)
                           ,paste0("+lat_ts=",lat_ts)
                           ,paste0("+lon_0=",lon_0)
@@ -1276,7 +1276,7 @@
                lon_0[lon_0>=(-25) && lon_0<(+50)] <- 10
                lon_0[lon_0>=(50) && lon_0<(+135)] <- 90
             }
-            t_srs <- paste("","+proj=laea"
+            t_srs <- paste("+proj=laea"
                           ,paste0("+lat_0=",lat_0)
                           ,paste0("+lon_0=",lon_0)
                           ,"+k=1","+x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs")

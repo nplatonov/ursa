@@ -322,9 +322,6 @@
       stop("NA values are not applicable")
    if (is.na(spherical))
       spherical <- isLonLat
-   ##~ print(summary(src))
-   ##~ print(summary(dst))
-   ##~ print(spherical)
    b1 <- .Cursa(C_dist2dist,x1=as.numeric(dst[,"x"]),y1=as.numeric(dst[,"y"])
                            ,x2=as.numeric(src[,"x"]),y2=as.numeric(src[,"y"])
                ,nxy=nrow(dst),ndf=nrow(src),positive=as.integer(positive)

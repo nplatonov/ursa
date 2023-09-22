@@ -148,7 +148,7 @@
          arglist2 <- c(quote(obj[[i]]),arglist) ## 20180308 change 'arglist[-1]'?
         # arglist[[1]] <- quote(obj[[i]])
          if (.is.colortable(obj[[i]])) {
-            arglist2[["units"]] <- units[i]
+            arglist2[["unit"]] <- units[i]
            # str(arglist2)
             do.call("legend_colorbar",arglist2)
            # arglist[["units"]] <- NULL

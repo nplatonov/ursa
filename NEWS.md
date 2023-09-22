@@ -1,4 +1,4 @@
-2023-03-24
+2023-08-24
 
 <!--
 + Depends on R (>= 4.1.0) instead of R (>= 3.0.0) due to using native pipes `|>` in code
@@ -8,11 +8,19 @@
 
 ### version 3.9.11
 
--   ongoing…
+-   Repaired parsing of Nominatim responses.
+
+-   Package **`RSQLite`** is added as suggested for using map tiles from
+    specified directory of SAS Planet cache
+
+-   In `segmentize()` 1) improved response of `by` argument, 2) order of
+    `type` argument is reversed to `c("united","conseqwent")`
+
+-   Coastline is updated to version 2023-08-24T03:31.
 
 ### version 3.9.10
 
--   Foreign functions are symbolic insead of character after [R-devel
+-   Foreign functions are symbolic instead of character after [R-devel
     BUG FIXES
     2023-03-20](https://developer.r-project.org/blosxom.cgi/R-devel/NEWS/2023/03/20#n2023-03-20).
 

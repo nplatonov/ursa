@@ -81,7 +81,6 @@
      # str(ds <- sf::gdal_subdatasets(fname,name=TRUE))
       opW <- options(warn=ifelse(.isPackageInUse(),-1,1))
       res <- as_ursa(sf::gdal_read(fname))
-      options(opW)
       if (!is.null(band))
          res <- res[band]
    }
@@ -92,7 +91,8 @@
       res <- if (!is.null(band)) obj[band] else obj[]
       close(obj)
    }
-   if (T & length(grep("^\\d{8}\\.s1ab\\.1km\\.n\\.mos[13]d\\.jpg$",basename(fname)))) {
+   if (T & length(grep("^(\\d{8}\\.s1ab\\.1km\\.n\\.mos[13]d|.+sentinel1-n-[13]daymos)\\.jpg$"
+                      ,basename(fname)))) {
      ## patch to seaice.dk Sentinel-1 mosaic
       g0 <- ursa_grid(res)
       if ((g0$columns==4500L)&&(g0$rows==5500L)) {

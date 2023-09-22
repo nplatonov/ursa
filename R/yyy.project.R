@@ -121,18 +121,32 @@
          if (!tryMatrix)
             a <- .try(res[-ind,] <- unclass(sf::st_transform(sf::st_sfc(
                               sf::st_multipoint(xy[-ind,]),crs=crs_s),crs_t)[[1]]))
-         else
+         else {
             a <- .try(res[-ind,] <- sf::sf_project(from=crs_s,to=crs_t,pts=xy[-ind,]))
+         }
       }
       else {
          if (!tryMatrix)
             a <- .try(res <- unclass(sf::st_transform(sf::st_sfc(
                                      sf::st_multipoint(xy),crs=crs_s),crs_t)[[1]]))
-         else
+         else {
+            if (T & !sf::sf_proj_network())
+               sf::sf_proj_network(url="",TRUE)
+            if (F & verbose) {
+               print(xy)
+               print(crs_s)
+               print(crs_t)
+               print(sf::st_crs(crs_t)$proj4string)
+            }
             a <- .try(res <- sf::sf_project(from=crs_s,to=crs_t,pts=xy))
+         }
       }
    }
    if (!a) {
+      if (verbose) {
+         print("WWW")
+         q()
+      }
       if (verbose)
          message("'rgdal' is used")
       if (!("rgdal" %in% loadedNamespaces()))
@@ -155,7 +169,7 @@
       if (!a) {
          if (verbose)
             message("patch with backing to 'proj4' via interim projection")
-         .epsg3411 <- paste("","+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1"
+         .epsg3411 <- paste("+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1"
                            ,"+x_0=0 +y_0=0 +a=6378273 +b=6356889.449 +units=m +no_defs")
          if (requireNamespace("proj4",quietly=.isPackageInUse())) {
             a <- .try(res <- proj4::project(xy=xy,proj=.epsg3411))
@@ -203,6 +217,8 @@
   # a <- try(as.integer(code),silent=TRUE)
    if ((is.character(code))&&(!nchar(code)))
       return(code)
+   if (is.matrix(code))
+      return(NULL)
    if (!.lgrep("\\D",code))
       p4epsg <- paste0(c("+init=epsg:","EPSG:")[2],code)
    else if (.lgrep("^epsg:\\d+",code))

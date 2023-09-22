@@ -36,7 +36,7 @@
    }
    units <- .getPrm(arglist,name="unit(s)*",kwd=kwd
                    ,class=list("character","expression"),default="",verbose=FALSE)
-   if (!nchar(units)) {
+   if (all(!nchar(units))) {
       aname <- names(arglist[1])
       if (!is.null(aname))
          units <- names(arglist[1])
@@ -799,7 +799,7 @@
       panel_box()
    }
   # options(ursaWidth=width,ursaHeight=height)
-   if (((is.character(units))&&(is.na(units)))||(!nchar(units)))
+   if (((is.character(units))&&(is.na(units[1])))||(!nchar(units[1])))
       return(invisible(10L))
   # b <- 2*width+0.5+height
   # print(b)

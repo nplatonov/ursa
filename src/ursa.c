@@ -3688,7 +3688,7 @@ void dist2dist(double *x1,double *y1,double *x2,double *y2
          lon1[i]=x1[i]*PI/180.0;
          slat1[i]=sin(y1[i]*PI/180.0);
          clat1[i]=cos(y1[i]*PI/180.0);
-        // Rprintf("x1=%.2f cos=%.2f sin=%.2f\n",x1[j],clat1[j],slat1[j]);
+        // Rprintf("x1=%.2f cos=%.2f sin=%.2f\n",x1[i],clat1[i],slat1[i]);
       }
    }
    for (j=0;j<n2;j++)
@@ -3699,7 +3699,7 @@ void dist2dist(double *x1,double *y1,double *x2,double *y2
       {
          if (spherical) {
            // d=0;
-           // Rprintf("k=%d lon1=%.2f\n",k,lon1[i]);
+           // Rprintf("k=%d lon1=%.2f (%.2f)\n",k,lon1[i],lon1[i]*180.0/PI);
             d=6371000.0*acos(slat1[i]*slat2[j]+clat1[i]*clat2[j]*cos(fabs(lon1[i]-lon2[j])));
            // d=acos(cos(lat1[i]));
          }
@@ -3718,10 +3718,16 @@ void dist2dist(double *x1,double *y1,double *x2,double *y2
             i2=i;
          }
       }
-      dist[j]=sqrt(minD);
+      if (spherical)
+         dist[j]=minD;
+      else
+         dist[j]=sqrt(minD);
       ind[j]=i2;
       if (verbose)
          progressBar(j,n2,"");
+      if ((0)&&(spherical)) {
+         Rprintf("ind=%d dist=%.3f\n",j,minD);
+      }
    }
    free(clat1);
    free(clat2);

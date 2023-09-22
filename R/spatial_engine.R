@@ -814,10 +814,13 @@
                                                ,recursive=FALSE,ignore.case=TRUE) {
    patt0 <- "\\.(gpkg|tab|kml|json|geojson|mif|sqlite|shp|osm)(\\.(zip|gz|bz2))*$"
    if (devel <- TRUE & all(!dir.exists(path))) {
-      dpath <- list.dirs(dirname(path),full.names=FALSE)
-      ind <- grep(basename(path),dpath,ignore.case=ignore.case)
-      if (length(ind)==1)
-         path <- file.path(dirname(path),dpath[ind])
+      dname <- dirname(path)
+      if (dname!=".") {
+         dpath <- list.dirs(dirname(path),full.names=FALSE)
+         ind <- grep(basename(path),dpath,ignore.case=ignore.case)
+         if (length(ind)==1)
+            path <- file.path(dirname(path),dpath[ind])
+      }
    }
    res <- dir(path=path,pattern=patt0,full.names=full.names
              ,recursive=recursive,ignore.case=ignore.case)
@@ -1299,12 +1302,14 @@
 }
 'spatial_bind' <- function(...) {
    arglist <- list(...)
+   if (length(ind <- which(sapply(arglist,is.null))))
+      arglist <- arglist[-ind]
+   if (!length(arglist))
+      return(NULL)
    if ((length(arglist)==1)&&
        (any(sapply(arglist[[1]],is_spatial)))&&
        (!is_spatial(arglist[[1]])))
       arglist <- arglist[[1]]
-   if (length(ind <- which(sapply(arglist,is.null))))
-      arglist <- arglist[-ind]
    res <- arglist[[1]]
    isSF <- .isSF(res)
    isSP <- .isSP(res)

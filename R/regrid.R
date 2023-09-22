@@ -11,7 +11,7 @@
          session_grid(result)
       return(result)
    }
-   fun <- "resize" #as.character(match.call())[1]
+   fun <- "regrid" #as.character(match.call())[1]
    if (.is.ursa_stack(x)) {
       return(lapply(x,regrid,...))
    }

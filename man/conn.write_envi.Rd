@@ -28,7 +28,7 @@ close(a)
 }
 }
 \value{
-Integer code of ENVI data type. See values of the \dQuote{data type} field in description of the \href{https://www.l3harrisgeospatial.com/docs/ENVIHeaderFiles.html}{ENVI Header Format}.
+Integer code of ENVI data type. See values of the \dQuote{data type} field in description of the \href{https://www.nv5geospatialsoftware.com/docs/ENVIHeaderFiles.html}{ENVI Header Format}.
 }
 %%~ \references{
 %%~ %% ~put references to the literature/web site here ~

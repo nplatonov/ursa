@@ -271,7 +271,7 @@ Nikita Platonov \email{platonov@sevin.ru}
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \section{Acknowledgements }{
-   The great improvement for development of functions for manipulation with spatial objects has been reached during work in series of projects (2015-2018) for design of marine protected areas in the Arctic, which were supported by WWF Russia.
+   The great improvement for development of functions for manipulation with spatial objects has been reached during work in series of projects (2015-2018) for design of marine protected areas in the Arctic.
 }
 
 \examples{

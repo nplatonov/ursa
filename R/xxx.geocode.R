@@ -52,6 +52,7 @@
                   # ,"&polygon_text=1"
                    ,"&format=xml","&bounded=0","&accept-language=en-US,ru")
      # dst <- tempfile() # "nominatim.xml" # tempfile()
+     # print(src)
       dst <- .ursaCacheDownload(src,quiet=!verbose)
       xmlstring <- scan(dst,character(),quiet=!verbose)
      # Encoding(xmlstring) <- "UTF-8"
@@ -64,11 +65,11 @@
          print(geotext)
       }
       ptype <- .grep("^type=",xmlstring,value=TRUE)
-      ptype <- .gsub(".*\'(.+)\'.*","\\1",ptype)
+      ptype <- .gsub(".*(\'|\")(.+)(\'|\").*","\\2",ptype)
       pclass <- .grep("^class=",xmlstring,value=TRUE)
-      pclass <- .gsub(".*\'(.+)\'.*","\\1",pclass)
+      pclass <- .gsub(".*(\'|\")(.+)(\'|\").*","\\2",pclass)
       prank <- .grep("^place_rank=",xmlstring,value=TRUE)
-      prank <- .gsub(".*\'(.+)\'.*","\\1",prank)
+      prank <- .gsub(".*(\'|\")(.+)(\'|\").*","\\2",prank)
       if (FALSE) {
          prank[prank=="8"] <- "state"
          prank[prank=="10"] <- "region"
@@ -77,12 +78,12 @@
         # prank[prank=="17"] <- "town|island"
         # prank[prank=="18"] <- "village|"
         # prank[prank=="19"] <- ""
-     }
+      }
       ptype <- paste(pclass,ptype,prank,sep=":")
       lon <- .grep("lon=",xmlstring,value=TRUE)
-      lon <- as.numeric(.gsub(".*\'(.+)\'.*","\\1",lon))
+      lon <- as.numeric(.gsub(".*(\'|\")(.+)(\'|\").*","\\2",lon))
       lat <- .grep("lat=",xmlstring,value=TRUE)
-      lat <- as.numeric(.gsub(".*\'(.+)\'.*","\\1",lat))
+      lat <- as.numeric(.gsub(".*(\'|\")(.+)(\'|\").*","\\2",lat))
       pt <- cbind(lon=lon,lat=lat)
       if (!nrow(pt))
          return(NULL)
@@ -99,7 +100,7 @@
       ann <- .grep("display_name=",xmlstring,value=TRUE)
       ann <- .gsub(".*\"(.+)\".*","\\1",ann)
       importance <- .grep("importance",xmlstring,value=TRUE)
-      importance <- as.numeric(.gsub(".*\'(.+)\'.*","\\1",importance))
+      importance <- as.numeric(.gsub(".*(\'|\")(.+)(\'|\").*","\\2",importance))
      # type <- NULL ## debug
       typeInd <- integer()
       if ((is.character(place))&&(nchar(place))) {
@@ -140,8 +141,8 @@
               # print(file.size(dst))
                b <- unlist(strsplit(b,split="'"))
                b <- .grep("(MULTI)*(POLYGON|LINESTRING)",b,value=TRUE,ignore.case=FALSE)
-               b <- .gsub("((MULTI)*(POLYGON|LINESTRING)|\\(|\\))"," ",b)
-               b <- .gsub("(^\\s+|\\s+$)","",b)
+               b <- .gsub("(^.+(MULTI)*(POLYGON|LINESTRING)|\\(|\\))"," ",b)
+               b <- .gsub("(^\\s+|\\s+(\".+)*$)","",b)
                b <- lapply(b,function(b2) {
                   b3 <- unlist(strsplit(b2,split=","))
                   b3 <- unlist(strsplit(b3,split="\\s+"))

@@ -31,8 +31,14 @@
                       ,style=c("Arctic Connect","Arctic SDI")) {
    isSDI <- isTRUE(.lgrep("sdi",style[1])>0)
    isConnect <- !isSDI
-   if (missing(obj))
-      obj <- spatialize(c(0,50,360,50))
+   if (onlyBasemap <- missing(obj)) {
+      if (is.null(getOption("ursaSessionGrid")))
+         obj <- spatialize(c(0,50,360,50))
+      else {
+         obj <- spatial_transform(polygonize(session_bbox()),4326)
+      }
+      addFeature <- FALSE
+   }
    for (pkg in c("leaflet","leafem","leafpop")) 
       if (!requireNamespace(pkg,quietly=.isPackageInUse()))
          stop(paste("Package",sQuote(pkg),"is required for this operation"))

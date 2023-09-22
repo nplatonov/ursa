@@ -75,7 +75,7 @@
       str(list(label=label,position=position,cex=cex,adjust=adjust,fg=fg,bg=bg
               ,fill=fill,buffer=buffer,vertical=vertical,verbose=verbose))
    opt <- par(family=font)
-   g1 <- session_grid()
+   g1 <- getOption("ursaPngPanelGrid") # session_grid()
    minx <- g1$minx
    miny <- g1$miny
    maxx <- g1$maxx
@@ -98,8 +98,8 @@
       pos <- c((xy[1,1]-minx)/(maxx-minx),(xy[1,2]-miny)/(maxy-miny))
    }
    else if ((!is.na(x))&&(!is.na(y))) {
-      if ((x<minx)||(x>maxx)||(y<miny)||(y>maxy))
-         return(NULL)
+     # if ((x<minx)||(x>maxx)||(y<miny)||(y>maxy))
+     #    return(NULL)
       pos <- c((x-minx)/(maxx-minx),(y-miny)/(maxy-miny))
    }
    else
@@ -117,7 +117,7 @@
       if (!isE)
          label <- paste(label,collapse="\n")
       if (!nchar(label))
-         return (10L)
+         return(invisible(NULL)) ## 10L
    }
    if (is.factor(pos))
       pos <- as.character(pos)
@@ -237,6 +237,8 @@
       if (verbose)
          .elapsedTime("label:finish")
    }
+   if (verbose)
+      str(list(x=x,y=y,adj=c(adjust,vadj),labels=label,cex=mycex,col=fg,srt=srt))
    text(x=x,y=y,adj=c(adjust,vadj),labels=label,cex=mycex,col=fg,srt=srt)
    par(opt)
    invisible(NULL)

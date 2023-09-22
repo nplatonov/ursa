@@ -127,8 +127,11 @@
 'session_proj' <- 'session_proj4' <- 'session_crs' <- function() session_grid()$crs
 'session_cellsize' <- function() with(session_grid(),sqrt(as.numeric(resx)*as.numeric(resy)))
 'session_dim' <- function() with(session_grid(),c(lines=rows,samples=columns))
-'session_bbox' <- function() with(session_grid()
-                                 ,c(minx=minx,miny=miny,maxx=maxx,maxy=maxy))
+'session_bbox' <- function() {
+   ret <- with(session_grid(),c(minx=minx,miny=miny,maxx=maxx,maxy=maxy))
+   attr(ret,"crs") <- session_crs()
+   ret
+}
 'session_pngviewer' <- function(allow=NA) {
    opV <- getOption("ursaAllowPngViewer")
   # str(list(allow=allow,opV=opV,isRscript=.isRscript()))

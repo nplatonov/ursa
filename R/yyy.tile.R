@@ -137,8 +137,6 @@
                      ,paste0(osmCr,", \uA9 OpenTopoMap"))
    s$wiki <- c("https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png"
               ,paste0("Wikimedia | ",osmCr))
-   s$polarmap <- c("https://{abc}.tiles.arcticconnect.ca/osm_{l}/{z}/{x}/{y}.png"
-                  ,paste0("Map \uA9 ArcticConnect. Data ",osmCr))
    s$ArcticConnect <- c("https://{abc}.tiles.arcticconnect.ca/osm_{l}/{z}/{x}/{y}.png"
                   ,paste0("Map \uA9 ArcticConnect. Data ",osmCr))
    s$ArcticSDI <- c(paste0("http://basemap.arctic-sdi.org/mapcache?"
@@ -155,6 +153,9 @@
                    )
                   ,paste0("ArcticSDI")
                   ,"jpg")
+  # s$polarmap <- c("https://{abc}.tiles.arcticconnect.ca/osm_{l}/{z}/{x}/{y}.png"
+  #                ,paste0("Map \uA9 ArcticConnect. Data ",osmCr))
+   s$polarmap <- if (T) s$ArcticSDI else s$ArcticConnect
    s$google.h <- c(paste0("https://mt{0123}.google.com/vt/lyrs=h" ## roads only
                                ,"&x={x}&y={y}&z={z}&hl=",language),googleCr)
    s$google <- c(paste0("https://mt{0123}.google.com/vt/lyrs=m" ## standard roadmap
@@ -250,6 +251,21 @@
    if (server[1] %in% names(s))
       tile$name <- server
    indUrl <- .grep("^http(s)*://",style)
+   if (!length(indUrl)) {
+      patt <- dirname(style)
+      indUrl <- which(patt!=".")
+      if (!length(indUrl)) {
+         patt <- file.path(getOption("SAS_Planet_cache"),style)
+         indUrl <- which(dir.exists(patt))
+         if (length(indUrl)==1)
+            style[indUrl] <- patt[indUrl]
+      }
+      else
+         if (!dir.exists(patt[indUrl]))
+            indUrl <- integer()
+      if (length(style)==1)
+         style <- c(style,"from SAS Planet cache")
+   }
    if (!length(indUrl))
       return(names(s))
    indUrl <- indUrl[1]
@@ -329,7 +345,37 @@
    if (!.isPackageInUse())
       print(tile)
   # q()
-   fname <- .ursaCacheDownload(tile,mode="wb",cache=cache,quiet=!verbose)
+   if ((dir.exists(tile))&&(requireNamespace("RSQLite",quietly=!.isPackageInUse()))) {
+     ## try SAS Planet
+      list1 <- dir(path=file.path(tile,paste0("z",z+1L)),pattern="\\.sqlitedb$"
+                  ,recursive=TRUE,full.names=TRUE)
+      if (!length(list1))
+         return("missed in cache")
+      for (i in seq_along(list1)) {
+         mydb <- RSQLite::dbConnect(RSQLite::SQLite(),list1[i])
+         a <- RSQLite::dbGetQuery(mydb
+                ,paste0("SELECT * FROM t where t.x=",x," and ","t.y=",y))
+         RSQLite::dbDisconnect(mydb)
+         if (nrow(a))
+            break
+      }
+      if (!nrow(a))
+         return("missed in cache")
+      fname <- a$b[[1]]
+      d <- rawToChar(fname[1:8],multiple=TRUE) |> paste(collapse="")# |> as.character()
+      Encoding(d) <- "latin1" # |> print()
+      if (grepl("PNG",d))
+         fileext <- "png"
+      else if (grepl("JFIF",d))
+         fileext <- "jpg"
+      else
+         fileext <- "jpg"
+   }
+   else if (file.exists(tile)) {
+      fname <- tile
+   }
+   else
+      fname <- .ursaCacheDownload(tile,mode="wb",cache=cache,quiet=!verbose)
    if (inherits(fname,"try-error")) {
       return(fname)
      # message(a)

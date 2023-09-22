@@ -8,9 +8,9 @@
   #    .elapsedTime("rgdal has been loaded")
    opW <- options(warn=0-!verbose,show.error.messages=TRUE) ## to prevent 'GeoTransform values not available'
    on.exit(options(opW))
-   if (devel <- T) {
-      a <- vapour:::gdalinfo_internal(fname,json=TRUE,stats=FALSE)
-      a <- jsonlite::fromJSON(a)
+   if (devel <- F) {
+     # a <- vapour:::gdalinfo_internal(fname,json=TRUE,stats=FALSE)
+     # a <- jsonlite::fromJSON(a)
    }
    a <- try(rgdal::GDALinfo(fname,returnStats=FALSE,returnRAT=FALSE
                 ,returnColorTable=TRUE,returnCategoryNames=TRUE),silent=TRUE)

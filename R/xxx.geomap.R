@@ -33,6 +33,19 @@
      # print(art);q()
      # proj <- "merc"
    }
+   canUrl <- length(unlist(regmatches(style,gregexpr("\\{[xyz]\\}",style))))==3
+   isSAScache <- FALSE
+   if (!canUrl) {
+      sascache <- style
+      if (!length(ind <- which(dir.exists(sascache))))
+         sascache <- file.path(getOption("SAS_Planet_cache"),style)
+      if (length(ind <- which(dir.exists(sascache)))>0) {
+         list1 <- dir(path=sascache[ind],pattern="\\.sqlitedb$",recursive=TRUE)
+         canUrl <- length(list1)>0
+         isSAScache <- TRUE
+         art <- "sascache"
+      }
+   }
    if ((art=="none")&&(length(style)==1)&&
          (requireNamespace("leaflet",quietly=.isPackageInUse()))&&
          (requireNamespace("leaflet.providers",quietly=.isPackageInUse()))) {
@@ -127,9 +140,21 @@
    if (isStatic) {
       len[len>mlen] <- mlen
    }
-   isUrl <- .lgrep("^http(s)*://",style)>0
+   if (trytodeprecate20230723 <- TRUE) {
+      canUrl <- length(unlist(regmatches(style,gregexpr("\\{[xyz]\\}",style))))==3
+      if (!canUrl) {
+         sascache <- style
+         if (!length(ind <- which(dir.exists(sascache))))
+            sascache <- file.path(getOption("SAS_Planet_cache"),style)
+         if (length(ind <- which(dir.exists(sascache)))>0) {
+            list1 <- dir(path=sascache[ind],pattern="\\.sqlitedb$",recursive=TRUE)
+            canUrl <- length(list1)>0
+         }
+      }
+   }
+   isUrl <- .lgrep("^http(s)*://",style)>0 | canUrl
   # canTile <- .lgrep(art,eval(as.list(args(".tileService()"))$server))>0
-   canTile <- isUrl | .lgrep(art,.tileService())>0
+   canTile <- isUrl | .lgrep(art,.tileService())>0 | canUrl
    isTile <- .lgrep("tile",style)>0 & canTile
    if ((!isStatic)&&(!isTile)) {
       if (art %in% staticMap)
@@ -153,7 +178,8 @@
    isWeb <- .lgrep(tilePatt,art)>0 | isUrl
    if (verbose)
       print(data.frame(art=art,color=isColor,grey=isGrey,static=isStatic
-                      ,canTile=canTile,tile=isTile,web=isWeb,row.names="geomap:"))
+                      ,canTile=canTile,canUrl=canUrl,tile=isTile,web=isWeb
+                      ,row.names="geomap:"))
    geocodeStatus <- FALSE
    if (.isSP(loc)) {
       proj4 <- sp::proj4string(loc)
@@ -174,7 +200,6 @@
          loc <- c(.project(matrix(loc,ncol=2,byrow=TRUE),proj4
                           ,inv=TRUE))[c(1,3,2,4)]
    }
-   
    isWMS <- isUrl & .is.wms(style)
    notYetGrid <- TRUE
    g3 <- NULL
@@ -242,7 +267,7 @@
          lon_0[lon_0>=(-70) && lon_0<(-25)] <- -40
          lon_0[lon_0>=(-25) && lon_0<(+50)] <- 10
          lon_0[lon_0>=(50) && lon_0<(+135)] <- 90
-         proj4 <- paste("","+proj=laea +lat_0=90",paste0("+lon_0=",lon_0)
+         proj4 <- paste("+proj=laea +lat_0=90",paste0("+lon_0=",lon_0)
                        ,"+x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs")
          if (bbox[3]<bbox[1])
             bbox[3] <- bbox[3]+360
@@ -455,9 +480,12 @@
          tgr$maxy <- xy["y",]+res/2
          h <- sort(unique(tgr[,"x"]))
          v <- sort(unique(tgr[,"y"]))
-         cat("-=---------------------------------------------\n")
+         if (F & !.isPackageInUse())
+            cat("-=---------------------------------------------\n")
          g1 <- with(g0,regrid(g1,bbox=c(minx,miny,maxx,maxy),crs=proj4
-                             ,zero="keep",verbose=!FALSE))
+                             ,zero="keep",verbose=F & !.isPackageInUse()))
+         if (F & !.isPackageInUse())
+            cat("-=---------------------------------------------\n")
          if (TRUE) {
             x <- seq(g1$minx,g1$maxx,by=g1$resx)
             y <- seq(g1$miny,g1$maxy,by=g1$resy)
@@ -639,12 +667,13 @@
          tgr$lat2 <- y2
       }
       img1 <- vector("list",nrow(tgr))
-      for (i in sample(seq(nrow(tgr))))
+      for (i in sample(seq(nrow(tgr)))) {
          img1[[i]] <- .tileGet(z=zoom,x=tgr[i,"x"],y=tgr[i,"y"]
                               ,minx=tgr[i,"minx"],miny=tgr[i,"miny"]
                               ,maxx=tgr[i,"maxx"],maxy=tgr[i,"maxy"]
                               ,retina=retina,url=tile$url
                               ,fileext=tile$fileext,cache=cache,verbose=verbose)
+      }
       nb <- sapply(img1,function(x) {
          if (!is.array(x))
             return(0)
@@ -673,17 +702,20 @@
             x
          })
       }
+      ind <- sapply(img1,function(x) length(dim(x))==3)
      # str(lapply(img1,dim))
-      dimb <- apply(list2DF(lapply(img1,dim)),1,max)
+      dimb <- apply(list2DF(lapply(img1[ind],dim)),1,max)
       img <- array(0L,dim=c(dimb[1]*length(v),dimb[2]*length(h),nbmax))
       for (i in sample(seq(nrow(tgr)))) {
         # img[igr[i,"y"]*256L+seq(256),igr[i,"x"]*256+seq(256),] <- img2[,,1:3]
         # img[igr[i,"y"]*256L+seq(256),igr[i,"x"]*256+seq(256),] <- img2[,,seq(nb)]
         # img[igr[i,"y"]*256L+seq(256),igr[i,"x"]*256+seq(256),seq(nb)] <- img2[,,seq(nb)]
          img2 <- img1[[i]]
+         dima <- dim(img2)
+         if (!length(dima))
+            next
          if (inherits(img2,"try-error"))
             next
-         dima <- dim(img2)
          if (!((dima[1]==dimb[1])&&(dima[2]==dimb[1]))) {
            # .elapsedTime("everytime 0205a")
             img2 <- as.array(regrid(as.ursa(img2),res=c(dima[1]/dimb[1],dima[2]/dimb[1])))
