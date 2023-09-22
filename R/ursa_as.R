@@ -400,6 +400,7 @@
          ##~ str(a1[[1]]$finalize())
          ##~ q()
       }
+<<<<<<< HEAD
      # bbox <- obj@ptr$extent$vector[c(1,3,2,4)]
      # res <- obj@ptr$res
      # crs <- obj@ptr$get_crs("proj4")
@@ -407,6 +408,11 @@
       bbox <- as.vector(obj)[c(1,3,2,4)]
       res <- terra::res(obj)
       crs <- terra::crs(obj,proj=TRUE)
+=======
+      bbox <- as.vector(obj)[c(1,3,2,4)]
+      res <- terra::res(obj)
+      crs <- terra::crs(obj, proj=TRUE)
+>>>>>>> 8aab93c1119e1e625f7a131296d97e4f9d215a69
       aname <- terra::names(obj)
       g1 <- regrid(bbox=bbox,res=res,crs=crs)
       if (identical(bbox,c(0,0,1,1)))
