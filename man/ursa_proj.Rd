@@ -62,7 +62,7 @@ fname <- tempfile()
 write_envi(a,fname)
 a2 <- read_envi(fname,resetGrid=TRUE)
 print(ursa_crs(a2))
-try(print(rgdal::CRSargs(sp::CRS(p4s))))
+# try(print(rgdal::CRSargs(sp::CRS(p4s)))) ## 'rgdal' is retired
 envi_remove(fname)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

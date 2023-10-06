@@ -691,11 +691,11 @@
    }
    if (isSP) {
       if (!("LINESTRING" %in% spatial_geotype(obj))) {
-         if (!requireNamespace("rgeos",quietly=.isPackageInUse()))
+         if (.rgeos_requireNamespace())
             stop("suggested package is required for this operation")
-         res <- try(rgeos::gLength(obj,byid=TRUE))
+         res <- try(.rgeos_gLength(obj,byid=TRUE))
          if (inherits(res,"try-error"))
-            res <- try(rgeos::gLength(spatial_buffer(obj),byid=TRUE))
+            res <- try(.rgeos_gLength(spatial_buffer(obj),byid=TRUE))
          return(unname(res))
       }
       if (FALSE) { ## thesame
@@ -1092,8 +1092,8 @@
    }
    else if (implement_by_rgeos <- FALSE) {
      # stop("unimplemented for 'sp' objects")
-      requireNamespace("rgeos",quietly=.isPackageInUse())
-      res <- rgeos::gIntersection(x,y,byid=TRUE,drop_lower_td=TRUE
+      .rgeos_requireNamespace()
+      res <- .rgeos_gIntersection(x,y,byid=TRUE,drop_lower_td=TRUE
                                  ,unaryUnion_if_byid_false=FALSE)
       res2 <- names(sp::over(spatial_geometry(x),spatial_geometry(y),returnList=TRUE))
       res2 <- grep("NA",res2,invert=TRUE,value=TRUE)
@@ -1125,13 +1125,13 @@
       return(res)
    }
    else if (isSP) {
-      if (!requireNamespace("rgeos",quietly=.isPackageInUse()))
+      if (!.rgeos_requireNamespace())
          stop("suggested package is required for this operation")
      # opW <- options(warn=-1)
-      res <- try(rgeos::gDifference(x,y,byid=TRUE))
+      res <- try(.rgeos_gDifference(x,y,byid=TRUE))
      # options(opW)
       if (inherits(res,"try-error"))
-         res <- try(rgeos::gDifference(spatial_buffer(x),spatial_buffer(y),byid=TRUE))
+         res <- try(.rgeos_gDifference(spatial_buffer(x),spatial_buffer(y),byid=TRUE))
       return(res)
    }
    else if (dev <- FALSE) {
@@ -1157,13 +1157,13 @@
       return(res)
    }
    else if (isSP) {
-      if (!requireNamespace("rgeos",quietly=.isPackageInUse()))
+      if (!.rgeos_requireNamespace())
          stop("suggested package is required for this operation")
      # opW <- options(warn=-1)
-      res <- try(rgeos::gSymdifference(x,y,byid=TRUE))
+      res <- try(.rgeos_gSymdifference(x,y,byid=TRUE))
      # options(opW)
       if (inherits(res,"try-error"))
-         res <- try(rgeos::gSymdifference(spatial_buffer(x),spatial_buffer(y),byid=TRUE))
+         res <- try(.rgeos_gSymdifference(spatial_buffer(x),spatial_buffer(y),byid=TRUE))
       return(res)
    }
    else if (dev <- FALSE) {
@@ -1202,10 +1202,10 @@
       return(res)
    }
    else if (isSP) {
-      if (!requireNamespace("rgeos",quietly=.isPackageInUse()))
+      if (!.rgeos_requireNamespace())
          stop("suggested package is required for this operation")
      # opW <- options(warn=-1)
-      res <- rgeos::gBuffer(obj,byid=TRUE,width=dist,quadsegs=quadsegs)
+      res <- .rgeos_gBuffer(obj,byid=TRUE,width=dist,quadsegs=quadsegs)
      # options(opW)
       return(res)
    }
@@ -1236,16 +1236,16 @@
       return(res)
    }
    else if (isSP) {
-      if (!requireNamespace("rgeos",quietly=.isPackageInUse()))
+      if (!.rgeos_requireNamespace())
          stop("suggested package is required for this operation")
       if (missing(y)) {
-         res <- try(rgeos::gUnaryUnion(x,id=NULL))
+         res <- try(.rgeos_gUnaryUnion(x,id=NULL))
          if (inherits(res,"try-error")) {
-            res <- rgeos::gUnaryUnion(.spatial_repair(x),id=NULL)
+            res <- .rgeos_gUnaryUnion(.spatial_repair(x),id=NULL)
          }
          return(res)
       }
-      res <- rgeos::gUnion(x,y,byid=byid)
+      res <- .rgeos_gUnion(x,y,byid=byid)
       return(res)
    }
    else if (dev <- FALSE) {
@@ -1262,10 +1262,10 @@
       return(res)
    }
    else if (isSP) {
-      if (!requireNamespace("rgeos",quietly=.isPackageInUse()))
+      if (!.rgeos_requireNamespace())
          stop("suggested package is required for this operation")
      # opW <- options(warn=-1)
-      res <- rgeos::gSimplify(obj,tol=tol,topologyPreserve=topologyPreserve)
+      res <- .rgeos_gSimplify(obj,tol=tol,topologyPreserve=topologyPreserve)
      # options(opW)
       return(res)
    }
@@ -1283,9 +1283,9 @@
       valid <- try(sf::st_is_valid(obj,NA_on_exception=TRUE,reason=verbose))
    }
    else if (isSP) {
-      if (!requireNamespace("rgeos",quietly=.isPackageInUse()))
+      if (!.rgeos_requireNamespace())
          stop("suggested package is required for this operation")
-      valid <- try(rgeos::gIsValid(obj,reason=verbose))
+      valid <- try(.rgeos_gIsValid(obj,reason=verbose))
    }
    else
       return(NULL)
@@ -1316,7 +1316,15 @@
    if (!is.null(spatial_data(res))) {
       if (isSP) {
         # res <- lapply(seq_along(arglist),function(i) sp::spChFIDs(arglist[[i]],as.character(i)))
-         return(do.call("rbind",arglist))
+         da <- do.call(rbind,lapply(arglist,spatial_data))
+         geom <- lapply(arglist,spatial_geometry)
+         geom$makeUniqueIDs <- TRUE
+         geom <- do.call(rbind,geom)
+        # da <- data.frame(foo=seq(spatial_count(geom)))
+         if (!ncol(da))
+            return(geom)
+         spatial_data(geom) <- da
+         return(geom)
       }
       if (isSF) {
          geom <- unique(sapply(arglist,function(x) attr(x,"sf_column")))
@@ -1398,9 +1406,9 @@
    if (verbose)
       print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
    if (isSP) {
-      if (!requireNamespace("rgeos",quietly=.isPackageInUse()))
+      if (!.rgeos_requireNamespace())
          stop("suggested package is required for this operation")
-      res <- rgeos::gIsValid(obj,byid=TRUE,reason=TRUE)
+      res <- .rgeos_gIsValid(obj,byid=TRUE,reason=TRUE)
       if (reason)
          return(unname(res))
       if (each)

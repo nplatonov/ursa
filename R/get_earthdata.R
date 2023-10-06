@@ -198,7 +198,11 @@
    epsg <- match.arg(epsg)
    matrixSet <- switch(epsg,'3413'="250m",'3857'="GoogleMapsCompatible_Level9")
    isPNG <- length(grep("png",ext))>0
-   isJPG <- length(grep("jpg",ext))>0
+   isJPEG <- length(grep("jpg",ext))>0
+   if (isJPEG) {
+      if (!requireNamespace("jpeg",quietly=.isPackageInUse()))
+         stop("Suggested package 'jpeg' is missed, but is required here.")
+   }
    src <- file.path("https://gibs.earthdata.nasa.gov/wmts",paste0("epsg",epsg)
                    ,"best",product,"default",time,matrixSet,paste0(z,"/",y,"/",x,ext))
   # dst <- paste0("tmp-",z,"-",y,"-",x,ext)
@@ -232,7 +236,7 @@
       if (isPNG) {
          a[[i]] <- aperm(png::readPNG(dst),c(2,1,3))
       }
-      else if (isJPG)
+      else if (isJPEG)
          a[[i]] <- aperm(jpeg::readJPEG(dst),c(2,1,3))
    }
   # file.remove(dst)

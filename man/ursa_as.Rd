@@ -143,9 +143,10 @@ print(b5b)
    display(b5b)
 } ## to avoid over-timing during tests -- end
 
-b6 <- as.ursa(system.file("pictures/erdas_spnad83.tif",package="rgdal"))
+# b6 <- as.ursa(system.file("pictures/erdas_spnad83.tif",package="rgdal"))
+b6 <- as.ursa(system.file("tif/geomatrix.tif",package="sf"))
 print(b6)
-display(b6,coast=FALSE,col="orange")
+display(b6,pal=c("black","white"),coast=FALSE,col="orange")
 
 \donttest{ ## package 'raster' is required -- begin
 if (requireNamespace("raster")) {

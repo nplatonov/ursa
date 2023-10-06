@@ -389,8 +389,11 @@
    isGIF <- FALSE
    if (isPNG <- fileext %in% c("png"))
       a <- try(255*png::readPNG(fname),silent=!verbose)
-   else if (isJPEG <- fileext %in% c("jpg","jpeg"))
+   else if (isJPEG <- fileext %in% c("jpg","jpeg")) {
+      if (!requireNamespace("jpeg",quietly=.isPackageInUse()))
+         stop("Suggested package 'jpeg' missed, but is required here.")
       a <- try(255*jpeg::readJPEG(fname),silent=!verbose)
+   }
    else {
       a <- try(255*png::readPNG(fname),silent=!verbose)
       if (inherits(a,"try-error")) {

@@ -38,7 +38,7 @@
    lwd <- .getPrm(arglist,name="lwd",kwd=kwd,default=0.5)
    lty <- .getPrm(arglist,name="lty",kwd=kwd,default=1L)
    fail180 <- .getPrm(arglist,name="fail180",kwd=kwd,default=NA)
-   obj <- .getPrm(arglist,name=paste0("(^$|",kwd,")") ## name="^$"
+   obj <- .getPrm(arglist,name=paste0("(^$|",kwd,"$)") ## name="^$"
                  ,class=list("character","matrix","SpatialPolygonsDataFrame","sf")#[-3]
                  ,default=NULL)
    verbose <- .getPrm(arglist,name="verbose",kwd=kwd,default=FALSE)
@@ -181,12 +181,14 @@
       if (!nchar(proj4))
       {
          if (!isLoaded)
-            requireNamespace("rgdal",quietly=.isPackageInUse())
-         proj4 <- rgdal::CRSargs(sp::CRS(sprintf("+init=epsg:%s",proj[ind])))
+            requireNamespace(ifelse(.isPackageInUse(),"sf","rgdal")
+                            ,quietly=.isPackageInUse())
+         proj4 <- .rgdal_CRSargs(sp::CRS(sprintf("+init=epsg:%s",proj[ind])))
       }
       else if (!isLoaded) {
          if (!requireNamespace("proj4",quietly=.isPackageInUse()))
-            requireNamespace("rgdal",quietly=.isPackageInUse())
+            requireNamespace(ifelse(.isPackageInUse(),"sf","rgdal")
+                            ,quietly=.isPackageInUse())
       }
    }
    else
@@ -194,7 +196,8 @@
       if (!isLoaded) {
          if (!("sf" %in% loadedNamespaces())) {
             if (!requireNamespace("proj4",quietly=.isPackageInUse()))
-               requireNamespace("rgdal",quietly=.isPackageInUse())
+               requireNamespace(ifelse(.isPackageInUse(),"sf","rgdal")
+                               ,quietly=.isPackageInUse())
             }
       }
       proj4 <- paste(proj,collapse=" ")

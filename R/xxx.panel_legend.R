@@ -100,6 +100,13 @@
       })
      # detach("arglist")
    }
+   if ((all(arglist$col=="transparent"))&&(all(arglist$fill=="transparent"))) {
+      arglist$col <- arglist$border
+      arglist$angle <- NULL
+      arglist$density <- NULL
+      arglist$fill <- NULL
+      arglist$pch <- NA
+   }
    if (verbose)
       str(arglist)
    ret <- do.call("legend",arglist)

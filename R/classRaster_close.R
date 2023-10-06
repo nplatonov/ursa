@@ -13,9 +13,14 @@
             str(args[[i]])
             str(con)
          }
-         if (con$fname %in% showConnections()[,"description"])
+         if (any(con$fname %in% showConnections()[,"description"]))
             close(con$handle)
          con$handle <- NA
+         if ((con$driver=="EGDAL")&&(length(con$fname)==2)) {
+            with(con,.envi2gdal(src=fname[2],dst=fname[1],datatype=datatype,bands=bands))
+            envi_remove(con$fname[2])
+            con$compress <- 0L
+         }
          if (con$compress==-1L)
             file.remove(con$fname)
          else if (con$compress==-2L)
@@ -78,63 +83,12 @@
          }
       }
       else if (inherits(con$handle,"GDALTransientDataset")) {
-         dr <- rgdal::getDriverName(rgdal::getDriver(con$handle))
-         op <- NULL
-         if (dr=="GTiff")
-            op=c(paste0("COMPRESS=",c("DEFLATE","ZSTD","LZW")[1])
-                ,paste0("PREDICTOR=",ifelse(con$mode=="numeric",3,2))
-                ,"TILED=NO"
-                ,"ZLEVEL=9"
-                ,"ZSTD_LEVEL=9"
-                ,paste0("INTERLEAVE=",switch(con$interleave,bil="PIXEL","BAND")))
-         else if (dr=="HFA") {
-            op=c("COMPRESSED=YES")
-         }
-         else if (dr=="ENVI") {
-           # print(con$interleave)
-            op <- paste0("INTERLEAVE=",toupper(con$interleave))
-         }
-         rgdal::saveDataset(con$handle,con$fname,options=op)
-        # rgdal::closeDataset(con$handle)
-         rgdal::GDAL.close(con$handle)
-         con$handle <- NA
          bname <- args[[i]]$name
-        # if (FALSE) {
-         standardname <- paste("Band",seq_along(bname))
-         if ((TRUE)&&(!is.na(bname[1]))&&(!identical(standardname,bname))) {
-            metafile <- paste0(con$fname,".aux.xml")
-            if (!is.na(con$posZ[1]))
-               bname <- bname[con$posZ]
-            added3 <- rep("",length(bname))
-               for (i in seq_along(bname))
-                  added3[i] <- paste0("    <MDI key=",.dQuote(paste0("Band_",i))
-                                    ,">",bname[i],"</MDI>")
-            added2 <- c("  <Metadata>",added3,"  </Metadata>")
-            added1 <- c("<PAMDataset>",added2,"</PAMDataset>")
-            if (!file.exists(metafile)) {
-               Fmeta <- file(metafile,"wt")
-               writeLines(added1,Fmeta)
-               close(Fmeta)
-            }
-            else {
-               meta <- readLines(metafile)
-              # i1 <- .grep("<Metadata>",meta)
-               ##~ i2 <- .grep("</Metadata>",meta)
-               ##~ i2 <- i2[i2>i1][1]
-               i3 <- .grep("</PAMDataset>",meta)
-               metaBefore <- meta[1:(i3-1)]
-               metaAfter <- meta[i3:length(meta)]
-               writeLines(c(metaBefore,added2,metaAfter),metafile)
-              # op <- options(warn=0)
-              # warning("Band names was not written. TODO insert lines to *.aux.xml")
-              # options(op)
-            }
-         }
+         .rgdal_close_Transient(con,bname)
       }
       else if (inherits(con$handle,"GDALReadOnlyDataset")) {
         # print(class(con$handle))
-         rgdal::GDAL.close(con$handle)
-        # rgdal::closeDataset(con$handle)
+         .rgdal_close_ReadOnly(con)
          con$handle <- NA
       }
    }

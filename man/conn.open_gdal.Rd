@@ -8,7 +8,7 @@ Open GDAL file
 \code{open_gdal} creates object of \code{ursaRaster} class, and prepares \code{\link[base]{connections}} for data reading.
 }
 \usage{
-open_gdal(fname, verbose = FALSE)
+open_gdal(fname, engine=c("native", "sf", "gdalraster", "vapour"), verbose = FALSE)
 
 ursa_open(fname, verbose = FALSE)
 
@@ -17,6 +17,10 @@ ursa_open(fname, verbose = FALSE)
 \arguments{
   \item{fname}{
 Character. Filename; full-name or short-name.
+}
+  \item{engine}{
+Character. Functionality of which package is used for reading data. This is experimental list, which future depends on evolution of reviewed packages and their availability for partial reading of multiband rasters.
+
 }
   \item{verbose}{
 Logical. \code{verbose=TRUE} provides some additional information on console. Default is \code{FALSE}.
@@ -56,13 +60,18 @@ Nikita Platonov \email{platonov@sevin.ru}
 
 \examples{
 session_grid(NULL)
-fname1 <- system.file("pictures/cea.tif",package="rgdal")
+# fname1 <- system.file("pictures/cea.tif",package="rgdal")
+fname1 <- system.file("tif/geomatrix.tif",package="sf")
 message(fname1)
 a1 <- open_gdal(fname1)
 print(a1)
 print(a1[])
 close(a1)
-fname2 <- system.file("pictures/test_envi_class.envi",package="rgdal")
+# fname2 <- system.file("pictures/test_envi_class.envi",package="rgdal")
+fname2 <- tempfile(fileext=".")
+a <- ursa_dummy(1,resetGrid=TRUE)
+b <- colorize(a[a>91],stretch="equal",name=format(Sys.Date()+seq(0,6),"\%A \%d"))
+write_envi(b,fname2)
 message(fname2)
 b1 <- open_gdal(fname2)
 b2 <- open_envi(fname2)
@@ -71,6 +80,7 @@ print(b2)
 print(c('The same grid?'=identical(ursa_grid(b1),ursa_grid(b2))
        ,'The same data?'=identical(ursa_value(b1[]),ursa_value(b2[]))))
 close(b1,b2)
+envi_remove(fname2)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

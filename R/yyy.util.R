@@ -443,7 +443,8 @@
 '.isRscript' <- function() .lgrep("^(--file=|-f$|-e$|--hiddenslave$)",commandArgs(FALSE))>=1
 #'.isPackageInUse.deprecated' <- function() "ursa" %in% loadedNamespaces()
 '.isPackageInUse' <- function(verbose=FALSE) {
-   cond1 <- "package:ursa" %in% search()
+   if (is.logical(piu <- getOption("ursaPackageInUse")))
+      return(piu)
    cond2 <- "ursa" %in% loadedNamespaces()
    cond3 <- !("plEnviron" %in% search())
   # ret <- (cond1)&&(cond2)
@@ -451,6 +452,7 @@
    if (verbose) {
        print(search())
        print(loadedNamespaces())
+       cond1 <- "package:ursa" %in% search()
        print(c(cond1=cond1,cond2=cond2,cond3=cond3,ret=ret))
    }
    ret

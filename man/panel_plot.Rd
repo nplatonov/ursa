@@ -80,7 +80,7 @@ Package \pkg{graphics} (\code{help(package="graphics")}) and functions \code{\li
 }
 \examples{
 session_grid(NULL)
-require(rgdal)
+# require(rgdal) ## 'rgdal is retired'
 a <- pixelsize()
 g1 <- session_grid()
 n <- 12L

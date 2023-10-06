@@ -23,11 +23,17 @@
       if ((all("transparent" %in% x$fill))&&(length(x$name)==length(unique(x$border)))) {
          if (verbose)
             print("LINESTRING")
-         ind <- match(x$name,names(x$border))
-         if (inherits(x$border,"ursaColorTable"))
-            return(x$border[ind])
-         ret <- x$border[ind]
-         names(ret) <- x$name
+         if (is.null(names(x$border))) {
+            names(x$border) <- x$name
+            ret <- x$border
+         }
+         else {
+            ind <- match(x$name,names(x$border))
+            if (inherits(x$border,"ursaColorTable"))
+               return(x$border[ind])
+            ret <- x$border[ind]
+            names(ret) <- x$name
+         }
          class(ret) <- "ursaColorTable"
          return(ret)
       }

@@ -3,6 +3,8 @@
                              ,title=.argv0(),label=""
                              ,min=0,max=1,initial=min,width=NA,style=1
                              ,tail=FALSE,silent=FALSE) {
+   if (isPackageTest <- isTRUE(Sys.getenv("_R_CHECK_PACKAGE_NAME_")=="ursa"))
+      silent <- TRUE
    if (silent) {
       pb <- logical()
       class(pb) <- "ursaProgressBar"

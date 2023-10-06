@@ -130,6 +130,7 @@
    res$con$compress <- 0L
    grid <- res$grid
    con <- res$con
+   indF <- length(con$fname)
    opW <- options(warn=-1)
    intOverflow <- is.na(with(con,samples*lines*bands*sizeof))
    options(opW)
@@ -170,36 +171,38 @@
    }
    if ((missingJ)&&(missingI)) ## read full
    {
-      if (con$driver=="ENVI") {
+      if (con$driver %in% c("ENVI","EGDAL")) {
          n <- prod(with(con,samples*lines*bands))
          xdim <- with(con,c(lines,samples,bands))
          if ((con$seek)&&(con$interleave %in% c("bsq","bil"))&&
              (externalReading)&&(TRUE)) {
             seek(con,where=0L,origin="start",rw="r")
             if (con$interleave=="bsq") {
-               if (con$mode=="integer")
+               if (con$mode=="integer") {
                   res$value <- with(con,.Cursa(C_readBsqBandInteger
-                                   ,fname=fname,dim=xdim,index=seq(bands),n=bands
+                                   ,fname=con$fname[indF],dim=xdim,index=seq(bands),n=bands
                                    ,datatype=datatype,swap=swap
                                    ,res=integer(bands*samples*lines)))$res
+               }
                else
                   res$value <- with(con,.Cursa(C_readBsqBandDouble
-                                   ,fname=fname,dim=xdim,index=seq(bands),n=bands
+                                   ,fname=con$fname[indF],dim=xdim,index=seq(bands),n=bands
                                    ,datatype=datatype,swap=swap
                                    ,res=double(bands*samples*lines)))$res
             }
             else if (con$interleave=="bil") {
                if (con$mode=="integer") {
                   res$value <- with(con,.Cursa(C_readBilLineInteger2
-                                   ,fname=fname,dim=xdim,index=seq(lines),n=lines
+                                   ,fname=con$fname[indF],dim=xdim,index=seq(lines),n=lines
                                    ,datatype=datatype,swap=swap
                                    ,res=integer(bands*samples*lines)))$res
                }
                else {
-                  res$value <- with(con,.Cursa(C_readBilLineDouble2,fname,dim=xdim
-                           ,lines=seq(lines)
-                           ,nline=lines,datatype=datatype,swap=swap
-                           ,res=double(with(con,lines*samples*bands))))$res
+                  res$value <- with(con,.Cursa(C_readBilLineDouble2
+                                   ,con$fname[indF],dim=xdim
+                                   ,lines=seq(lines)
+                                   ,nline=lines,datatype=datatype,swap=swap
+                                   ,res=double(with(con,lines*samples*bands))))$res
                }
             }
             dim(res$value) <- with(con,c(samples,lines,bands))
@@ -226,13 +229,44 @@
                    ," incorrect interleave type")
          }
       }
-      else if (con$driver=="GDAL") { ## read full
-         res$value <- rgdal::getRasterData(con$handle)
+      else if (con$driver=="RGDAL") { ## read full
+         res$value <- .rgdal_getRasterData(con$handle)
+         dim(res$value) <- with(con,c(samples,lines,bands))
+      }
+      else if (con$driver=="GDALRASTER") { ## read full
+         if (con$datatype %in% c(4,5))
+            res$value <- array(NA_real_,dim=res$dim)
+         else
+            res$value <- array(NA_integer_,dim=res$dim)
+         if (verbose)
+            cat("read")
+         for (b2 in seq_len(con$bands)) {
+            if (verbose)
+               cat(".")
+            res$value[,b2] <- con$handle$read(band=b2
+                                            ,xoff=0,yoff=0
+                                            ,xsize=con$samples,ysize=con$lines
+                                            ,out_xsize=con$samples,out_ysize=con$lines
+                                            )
+         }
+         if (verbose)
+            cat(" done!\n")
+         dim(res$value) <- with(con,c(samples,lines,bands))
+      }
+      else if (con$driver=="SF") { ## read full
+         if (con$datatype %in% c(4,5)) {
+            res$value <- attr(sf::gdal_read(con$handle$filename,read_data=TRUE),"data")
+            attr(res$value,"units") <- NULL
+         }
+         else {
+            res$value <- as.integer(attr(sf::gdal_read(con$handle$filename
+                                                      ,read_data=TRUE),"data"))
+         }
          dim(res$value) <- with(con,c(samples,lines,bands))
       }
       else if (con$driver=="NCDF") { ## read full
         # stop("NCDF -- read full")
-         nc <- ncdf4::nc_open(con$fname)
+         nc <- ncdf4::nc_open(con$fname[indF])
          varName <- con$handle
          flip <- attr(varName,"flip")
          permute <- attr(varName,"permute")
@@ -331,7 +365,7 @@
       minI <- min(i)
       toWarp <- with(con,(!is.na(indexR)[1])&&(length(indexR)!=lines)||
                          (!is.na(indexC)[1])&&(length(indexC)!=samples))
-      if (con$driver=="ENVI") {
+      if (con$driver %in% c("ENVI","EGDAL")) {
          if (con$interleave=="bil")
          {
             if (externalReading)
@@ -340,11 +374,11 @@
                   seek(con,where=0L,origin="start",rw="r")
                xdim <- with(con,c(lines,samples,bands))
                if (con$mode=="integer")
-                  val <- .Cursa(C_readBilBandInteger,con$fname,dim=xdim,index=i
+                  val <- .Cursa(C_readBilBandInteger,con$fname[indF],dim=xdim,index=i
                            ,n=nb,datatype=con$datatype,swap=con$swap
                            ,res=integer(with(con,nb*samples*lines)))$res
                else {
-                  val <- .Cursa(C_readBilBandDouble,con$fname,dim=xdim,index=i
+                  val <- .Cursa(C_readBilBandDouble,con$fname[indF],dim=xdim,index=i
                            ,n=nb,datatype=con$datatype,swap=con$swap
                            ,res=double(with(con,nb*samples*lines)))$res
                }
@@ -407,20 +441,19 @@
            # val <- array(NA,dim=c(con$samples*nline,nb))
             if ((externalReading)&&(TRUE))
             {
-              # cat("isDll\n")
                if (con$seek)
                   seek(con,where=0L,origin="start",rw="r")
                xdim <- with(con,c(lines,samples,bands))
               # str(list(i=i,dim=xdim,nb=nb,fname=con$fname))
                if (con$mode=="integer")
                {
-                  val <- .Cursa(C_readBsqBandInteger,fname=con$fname,dim=xdim,index=i
+                  val <- .Cursa(C_readBsqBandInteger,fname=con$fname[indF],dim=xdim,index=i
                            ,n=nb,datatype=con$datatype,swap=con$swap
                            ,res=integer(with(con,nb*samples*lines)))$res
                }
                else
                {
-                  val <- .Cursa(C_readBsqBandDouble,fname=con$fname,dim=xdim,index=i
+                  val <- .Cursa(C_readBsqBandDouble,fname=con$fname[indF],dim=xdim,index=i
                            ,n=nb,datatype=con$datatype,swap=con$swap
                            ,res=double(with(con,nb*samples*lines)))$res
                }
@@ -460,8 +493,41 @@
             stop("Error in input header file ",con$interleave
                 ," incorrect interleave type")
       }
-      else if (con$driver=="GDAL") { ## read band
-         val <- rgdal::getRasterData(con$handle,band=i)
+      else if (con$driver=="RGDAL") { ## read band
+         val <- .rgdal_getRasterData(con$handle,band=i)
+         dim(val) <- with(con,c(samples,nline,nb))
+      }
+      else if (con$driver=="GDALRASTER") { ## read band
+         if (con$datatype %in% c(4,5))
+            val <- array(NA_real_,dim=c(res$dim[1],length(i)))
+         else
+            val <- array(NA_integer_,dim=c(res$dim[1],length(i)))
+         if (verbose)
+            cat("read chunk band")
+         for (b2 in seq_along(i)) {
+            if (verbose)
+               cat(".")
+            val[,b2] <- con$handle$read(band=i[b2]
+                                       ,xoff=0,yoff=0
+                                       ,xsize=con$samples,ysize=con$lines
+                                       ,out_xsize=con$samples,out_ysize=con$lines
+                                       )
+         }
+         if (verbose)
+            cat(" done!\n")
+         dim(val) <- with(con,c(samples,nline,nb))
+      }
+      else if (con$driver=="SF") { ## read band
+         rasterio <- list(bands=i)
+         if (con$datatype %in% c(4,5)) {
+            val <- attr(sf::gdal_read(con$handle$filename,read_data=TRUE
+                                           ,RasterIO_parameters=rasterio),"data")
+            attr(val,"units") <- NULL
+         }
+         else {
+            val <- as.integer(attr(sf::gdal_read(con$handle$filename,read_data=TRUE
+                                           ,RasterIO_parameters=rasterio),"data"))
+         }
          dim(val) <- with(con,c(samples,nline,nb))
       }
       else if (con$driver=="NCDF") { ## read band
@@ -589,19 +655,19 @@
       j <- as.integer(seq(min(j),max(j)))
       nline <- length(j)
       minJ <- (min(j)-1L)+min(con$indexR-1L)
-      if (con$driver %in% "ENVI") {
+      if (con$driver %in% c("ENVI","EGDAL")) {
          if (con$interleave=="bil") ##bil[col,band,row] -> R[col,row,band]
          {
             if ((externalReading)&&(TRUE))
             {
                xdim <- with(con,c(lines,samples,bands))
                if (con$mode=="integer")
-                  val <- .Cursa(C_readBilLineInteger,con$fname,dim=xdim
+                  val <- .Cursa(C_readBilLineInteger,con$fname[indF],dim=xdim
                            ,lines=j+as.integer(min(con$indexR-1L))
                            ,nline=nline,datatype=con$datatype,swap=con$swap
                            ,res=integer(with(con,nline*samples*bands)))$res
                else
-                  val <- .Cursa(C_readBilLineDouble,con$fname,dim=xdim
+                  val <- .Cursa(C_readBilLineDouble,con$fname[indF],dim=xdim
                            ,lines=j+as.integer(min(con$indexR-1L))
                            ,nline=nline,datatype=con$datatype,swap=con$swap
                            ,res=double(with(con,nline*samples*bands)))$res
@@ -634,11 +700,11 @@
             {
                xdim <- with(con,c(lines,samples,bands))
                if (con$mode=="integer")
-                  val <- .Cursa(C_readBsqLineInteger,con$fname,dim=xdim,lines=j
+                  val <- .Cursa(C_readBsqLineInteger,con$fname[indF],dim=xdim,lines=j
                            ,nline=nline,datatype=con$datatype,swap=con$swap
                            ,res=integer(with(con,nline*samples*bands)))$res
                else
-                  val <- .Cursa(C_readBsqLineDouble,con$fname,dim=xdim,lines=j
+                  val <- .Cursa(C_readBsqLineDouble,con$fname[indF],dim=xdim,lines=j
                            ,nline=nline,datatype=con$datatype,swap=con$swap
                            ,res=double(with(con,nline*samples*bands)))$res
             }
@@ -658,15 +724,54 @@
            # val <- aperm(val,c(1,2,3))
          }
       }
-      else if (con$driver=="GDAL") { ## read line
+      else if (con$driver=="RGDAL") { ## read line
          nline <- length(j)
          minJ <- (min(j)-1L)+min(con$indexR-1L)
-         val <- rgdal::getRasterData(con$handle,offset=c(minJ,0)
+         val <- .rgdal_getRasterData(con$handle,offset=c(minJ,0)
                                ,region.dim=c(nline,con$samples))
          dim(val) <- with(con,c(samples,nline,bands))
       }
+      else if (con$driver=="GDALRASTER") { ## read line
+         nline <- length(j)
+         minJ <- (min(j)-1L)+min(con$indexR-1L)
+         if (con$datatype %in% c(4,5))
+            val <- array(NA_real_,dim=c(con$samples*nline,res$dim[2]))
+         else
+            val <- array(NA_integer_,dim=c(con$samples*nline,res$dim[2]))
+         if (verbose)
+            cat("read chunk line")
+         for (b2 in seq_len(con$bands)) {
+            if (verbose)
+               cat(".")
+            val[,b2] <- con$handle$read(band=b2
+                                       ,xoff=0,yoff=minJ
+                                       ,xsize=con$samples,ysize=nline
+                                       ,out_xsize=con$samples,out_ysize=nline
+                                       )
+         }
+         if (verbose)
+            cat(" done!\n")
+         dim(val) <- with(con,c(samples,nline,bands))
+      }
+      else if (con$driver=="SF") { ## read line
+         nline <- length(j)
+         minJ <- (min(j)-1L)+min(con$indexR-1L)
+         rasterio <- list(nXOff=1,nYOff=minJ+1L,nXSize=con$samples,nYSize=nline
+                        # ,nBufXSize=2,nBufYSize=2
+                         )
+         if (con$datatype %in% c(4,5)) {
+            val <- attr(sf::gdal_read(con$handle$filename,read_data=TRUE
+                                           ,RasterIO_parameters=rasterio),"data")
+            attr(val,"units") <- NULL
+         }
+         else {
+            val <- as.integer(attr(sf::gdal_read(con$handle$filename,read_data=TRUE
+                                           ,RasterIO_parameters=rasterio),"data"))
+         }
+         dim(val) <- with(con,c(samples,nline,bands))
+      }
       else if (con$driver=="NCDF") { ## read line
-         nc <- ncdf4::nc_open(con$fname)
+         nc <- ncdf4::nc_open(con$fname[indF])
          varName <- con$handle
         # str(con$offset)
          flip <- attr(varName,"flip")

@@ -1,4 +1,4 @@
-'spatialize' <- function(dsn,engine=c("native","sp","sf","geojsonsf")
+'spatialize' <- function(dsn,engine=c("native","sf","geojsonsf")
                          ,layer=".*",field=".+",coords=c("x","y"),crs=character()
                          ,geocode="",place="",area=c("bounding","point","shape")
                          ,grid=NULL,size=NA,cell=NA,expand=1,border=NA
@@ -6,7 +6,13 @@
                          ,style="auto" ## auto none internal keep
                         # ,zoom=NA
                          ,subset="",verbose=FALSE,...) {
-   engine <- match.arg(engine)
+   engList <- as.character(as.list(match.fun("spatialize"))[["engine"]])[-1]
+   if (length(engine)<length(engList)) {
+      if (!.isPackageInUse()) {
+         engList <- c(engList,"sp")
+      }
+   }
+   engine <- match.arg(engine,engList)
    if (resetGrid)
       session_grid(NULL)
    toResetGrid <- 0L
@@ -651,7 +657,7 @@
                lname <- try(sf::st_layers(dsn)$name)
             }
             else {
-               lname <- try(rgdal::ogrListLayers(dsn))
+               lname <- try(.rgdal_ogrListLayers(dsn))
             }
             if (inherits(lname,"try-error")) {
                cat("Cannot get layers\n")
@@ -723,14 +729,14 @@
                else {
                   cpg <- "UTF-8"
                }
-               ##~ obj <- rgdal::readOGR(dsn,layer,pointDropZ=TRUE,encoding=enc
+               ##~ obj <- readOGR(dsn,layer,pointDropZ=TRUE,encoding=enc
                                     ##~ ,use_iconv=!is.null(enc),verbose=FALSE)
-               obj <- rgdal::readOGR(dsn,layer,pointDropZ=TRUE,encoding=cpg
+               obj <- .rgdal_readOGR(dsn,layer,pointDropZ=TRUE,encoding=cpg
                                     ,use_iconv=cpg %in% "UTF-8"
                                     ,verbose=FALSE)
                                     ## --20191112 use_iconv=!isSHP
                if ((length(names(obj))==1)&&(names(obj)=="FID")) {
-                  info <- rgdal::ogrInfo(dsn,layer)
+                  info <- .rgdal_ogrInfo(dsn,layer)
                   if (info$nitems==0)
                      methods::slot(obj,"data")$FID <- NULL
                }

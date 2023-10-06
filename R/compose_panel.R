@@ -12,6 +12,7 @@
       if ((is.ursa(img))||(!length(arglist))) {
          panel_new(...)
          panel_decor(...)
+         panel_annotation(...)
       }
       else {
          aname <- names(arglist)
@@ -50,7 +51,7 @@
       }
       return(invisible(ret))
    }
-  # annotation <- .getPrm(arglist,name="annotation",default=NA)#_character_)
+   annotation <- .getPrm(arglist,name="annotation",default=NA_character_)
   # decor <- .getPrm(arglist,name="decor",default=TRUE)
   # scalebar <- .getPrm(arglist,name="scalebar",default=FALSE)
    verbose <- .getPrm(arglist,name="verb",kwd="plot",default=NA) ## FALSE?
@@ -87,13 +88,15 @@
       nl <- nb/np ## ??? not used after
   # print(img)
   # print(c(nb=nb,np=np,ng=ng,isRGB=as.integer(isRGB)))
-   annotation <- nb>1 & !isRGB #& !isList
+   if ((length(annotation)==1)&&(is.na(annotation))) {
+      annotation <- nb>1 & !isRGB #& !isList
+   }
    if (is.na(verbose))
       verbose <- nb>2
    txt <- NULL
    if (is.character(annotation))
       txt <- if (length(annotation)==nb) annotation else rep(annotation,nb)
-   else if ((is.logical(annotation))&&(annotation))
+   else if ((is.logical(annotation))&&(isTRUE(annotation)))
       txt <- ln
    else
       txt <- ""

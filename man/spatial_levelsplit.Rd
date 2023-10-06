@@ -31,9 +31,7 @@ Nikita Platonov \email{platonov@sevin.ru}
 palette("Set3")
 radius <- seq(1,length.out=5,by=1)*200
 ct <- ursa_colortable(colorize(radius,alpha=0.5,pal=sample(palette(),length(radius))))
-origin <- data.frame(lon=139.2,lat=36.6)
-sp::coordinates(origin) <- ~lon+lat
-sp::proj4string(origin) <- "EPSG:4326"
+origin <- sf::st_sfc(sf::st_point(c(lon=139.2,lat=36.6)),crs=4326)
 origin <- spatial_transform(origin,"EPSG:6671")
 isopoly <- do.call(spatial_bind,lapply(radius*1e3,function(r) spatial_buffer(origin,r)))
 spatial_data(isopoly) <- data.frame(radius=radius)

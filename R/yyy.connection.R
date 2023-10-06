@@ -76,35 +76,10 @@
                                ,nchar(length(1:x$con$bands))),1:x$con$bands)
      # x$name <- character()
    }
-   if (x$con$driver=="ENVI")
+   if (x$con$driver %in% c("ENVI","EGDAL"))
       .write.hdr(x)
-   else if (x$con$driver=="GDAL") {
-      opW <- options(warn=ifelse(.isPackageInUse(),0,1)) # 
-      rgdal::GDALcall(x$con$handle,"SetProject",x$grid$crs)
-      options(opW)
-      rgdal::GDALcall(x$con$handle,"SetGeoTransform"
-                                  ,with(x$grid,c(minx,resx,0,maxy,0,-resy)))
-      nodata <- ursa_nodata(x)
-      ct <- ursa_colortable(x)
-      isCT <- (nband(x)==1)&&(length(ct)>0)
-      hasColor <- (isCT)&&(all(!is.na(ct)))
-      hasNames <- (isCT)&&(all(!is.na(names(ct))))
-     # print(c(has_nodata=!is.na(nodata),isCT=isCT,hasColor=hasColor,hasNames=hasNames))
-      if (any(!is.na(nodata),isCT,hasColor,hasNames)) {
-         for (i in seq(nband(x))) {
-            bset <- methods::new("GDALRasterBand",x$con$handle,i)
-            if (!is.na(nodata))
-               rgdal::GDALcall(bset,"SetNoDataValue",nodata)
-            if (hasColor)
-               rgdal::GDALcall(bset,"SetRasterColorTable",as.character(ct))
-            if (hasNames)
-               rgdal::GDALcall(bset,"SetCategoryNames",names(ct))
-           # if (isCT)
-           #    rgdal::putRasterData(dset,as.array(colorize(obj[i]),flip=TRUE,drop=TRUE),band=i)
-           # else
-           #    rgdal::putRasterData(dset,as.array(obj[i],flip=TRUE,drop=TRUE),band=i)
-         }
-      }
+   else if (x$con$driver=="RGDAL") {
+      .rgdal_prepare_con(x)
    }
    x$value <- NA
   # class(x$value) <- ifelse(isCT,"ursaCategory","ursaNumeric")
@@ -193,7 +168,7 @@
    connection <- NULL
    interleaveName <- c("bsq","bil","bip")
    interleave <- NULL
-   implementName <- c("ENVI","GDAL")
+   implementName <- c("ENVI",ifelse(.isPackageInUse(),"EGDAL","RGDAL"))
    implement <- NULL
    driver <- NULL
    proj <- NULL
@@ -375,7 +350,7 @@
       byteorder <- 0L
    if (is.na(con$byteorder))
       con$byteorder <- byteorder
-   if ((con$driver=="ENVI")&&(TRUE)) ## forced to compress
+   if ((con$driver %in% c("ENVI","EGDAL"))&&(TRUE)) ## forced to compress
    {
       if (!(is.null(compressed))) {
          if (!is.na(compressed))
@@ -438,7 +413,7 @@
       con$connection <- "bzfile"
    else if (length(.grep("\\.xz$",con$fname)))
       con$connection <- "xzfile"
-   else if (length(.grep("\\.(envi|bin|img|dat)$",con$fname)))
+   else if (length(.grep("\\.(envi|bin|img|dat|tif|tiff|hfa)$",con$fname)))
    {
       con$connection <- "file"
       con$compress <- 0L
@@ -487,8 +462,14 @@
       con$bands <- obj$dim[2]
    con$interleave <- with(con,switch(interleave,spatial="bsq",temporal="bil"
                            ,interleave))
-   if (con$driver=="ENVI") {
-      con$handle <- do.call(con$connection,list(con$fname,"w+b"))
+   if (con$driver %in% c("ENVI","EGDAL")) {
+      if (con$driver=="ENVI")
+         con$handle <- do.call(con$connection,list(con$fname,"w+b"))
+      else {
+         ftemp <- .maketmp(1)
+         con$fname <- c(con$fname,ftemp)
+         con$handle <- do.call(con$connection,list(ftemp,"w+b"))
+      }
       cl <- class(con$handle)
       if (("bzfile" %in% cl)||("xzfile" %in% cl)||("gzfile" %in% cl)) ## gz?
          con$seek <- FALSE
@@ -496,7 +477,7 @@
          con$seek <- TRUE
       rm(cl)
    }
-   else if (con$driver=="GDAL") {
+   else if (con$driver %in% c("EGDAL","RGDAL")) {
       if (.lgrep("\\.tif(f)*$",fname))
          driver <- "GTiff"
       else if (.lgrep("\\.img$",fname))
@@ -516,25 +497,33 @@
                       ,'11'="Int8",'12'="UInt16",'13'="UInt32",'3'="Int32"
                       ,'5'="Float64",stop("cannot recognize datatype"))
       nb <- if (is.na(con$posZ[1])) con$bands else length(con$posZ)
-      try(con$handle <- methods::new("GDALTransientDataset"
-                                ,methods::new("GDALDriver",driver)
-                                ,con$lines,con$samples,nb,dtName))
-      if (!inherits(con$handle,"GDALTransientDataset"))
-         return(NA)
-      con$seek <- FALSE
+      if (con$driver %in% "RGDAL") {
+         try(con$handle <- methods::new("GDALTransientDataset"
+                                   ,methods::new("GDALDriver",driver)
+                                   ,con$lines,con$samples,nb,dtName))
+         if (!inherits(con$handle,"GDALTransientDataset"))
+            return(NA)
+         con$seek <- FALSE
+      }
+      else { ## via ENVI -> GDAL after closing
+         ftemp <- .maketmp(1)
+         con$fname <- c(con$fname,ftemp)
+         con$handle <- do.call(con$connection,list(ftemp,"w+b"))
+         con$seek <- TRUE
+      }
    }
    if ("file" %in% class(con$handle))
    {
-      if (file.exists(oldpack <- paste0(con$fname,".gz")))
+      if (file.exists(oldpack <- paste0(con$fname[1],".gz")))
          file.remove(oldpack)
-      if (file.exists(oldpack <- paste0(con$fname,".bz2")))
+      if (file.exists(oldpack <- paste0(con$fname[1],".bz2")))
          file.remove(oldpack)
-      if (file.exists(oldpack <- paste0(con$fname,".xz")))
+      if (file.exists(oldpack <- paste0(con$fname[1],".xz")))
          file.remove(oldpack)
    }
-   if (file.exists(aux <- paste0(con$fname,".aux.xml")))
+   if (file.exists(aux <- paste0(con$fname[1],".aux.xml")))
       file.remove(aux)
-   if (con$driver=="ENVI") {
+   if (con$driver %in% c("ENVI","EGDAL")) {
       if (((con$interleave %in% c("bil","bsq"))&&(con$seek))||
          (con$connection %in% c("gzfile"))) #&&(!is.matrix(obj$value)))
       {
@@ -639,7 +628,9 @@
       con$byteorder <- 0L
    if (is.na(con$datatype))
       con$datatype <- 1L
-   fname <- .gsub("\\.(bin|bingz|envi|envigz|img|dat|gz|bz2|xz|unpacked(.*)~)$","",con$fname)
+   indF <- ifelse(length(con$fname)>1,2L,1L)
+   fname <- .gsub("\\.(bin|bingz|envi|envigz|img|dat|gz|bz2|xz|unpacked(.*)~)$",""
+                 ,con$fname[indF])
    if (is.na(fname))
    {
       fname <- x$name[1]
@@ -651,13 +642,13 @@
       list1 <- .dir(path=dirname(fname)
          ,pattern=sprintf("^%s($|\\.(envi|envigz|bin|bingz|dat|img|gz|bz2|xz|.*aux\\.xml)$)"
                                        ,basename(fname)),full.names=TRUE)
-      if (length(ind <- .grep(sprintf("^%s$",basename(con$fname)),basename(list1))))
+      if (length(ind <- .grep(sprintf("^%s$",basename(con$fname[indF])),basename(list1))))
          list1 <- list1[-ind]
       file.remove(list1[which(!file.info(list1)$isdir)])
    }
    Fout <- file(myname,"wt")
    writeLines(sprintf("%s","ENVI"),Fout)
-   writeLines(sprintf("description = {%s}",con$fname),Fout)
+   writeLines(sprintf("description = {%s}",con$fname[indF]),Fout)
    writeLines(sprintf("samples = %d",con$samples),Fout)
    writeLines(sprintf("lines   = %d",con$lines),Fout)
    if (is.na(con$posZ[1]))
@@ -892,28 +883,37 @@
             file.remove(wktout)
          }
       }
-      else if (!("sf" %in% loadedNamespaces())) {
-         if (lverbose)
-            message("'rgdal' engine")
-         if (!.try(wkt <- rgdal::showWKT(proj4,morphToESRI=TRUE)))
-            wkt <- NULL
-      }
-      else { ## 'sf' in namespace; 'OGC_WKT' ONLY. 
-         if (lverbose)
-            message("'sf' engine")
-         if (!.try(wkt <- {
-            if (utils::packageVersion("sf")<"0.9")
-               ret <- sf::st_as_text(sf::st_crs(proj4),EWKT=TRUE)
-            else
-               ret <- sf::st_crs(proj4)$Wkt
-            ret
-         }))
-        # if (!.try(wkt <- sf::st_as_text(sf::st_crs(proj4),EWKT=TRUE)))
-        #    wkt <- NULL
-        # print(proj4)
-        # message(wkt)
-         if (!TRUE) { ## 20191216 patch for EXTENSION["PROJ4","+proj=......."]
-            wkt <- gsub(",EXTENSION\\[\"PROJ4\".+\\]","]",wkt)
+      else {
+         if (!("sf" %in% loadedNamespaces())) {
+            if (.isPackageInUse()) {
+               if (lverbose)
+                  message("forced 'sf' loading")
+               requireNamespace("sf") ## rgdal retired
+            }
+         }
+         if (!("sf" %in% loadedNamespaces())) {
+            if (lverbose)
+               message("'rgdal' engine")
+            if (!.try(wkt <- .rgdal_showWKT(proj4,morphToESRI=TRUE)))
+               wkt <- NULL
+         }
+         else { ## 'sf' in namespace; 'OGC_WKT' ONLY. 
+            if (lverbose)
+               message("'sf' engine")
+            if (!.try(wkt <- {
+               if (utils::packageVersion("sf")<"0.9")
+                  ret <- sf::st_as_text(sf::st_crs(proj4),EWKT=TRUE)
+               else
+                  ret <- sf::st_crs(proj4)$Wkt
+               ret
+            }))
+           # if (!.try(wkt <- sf::st_as_text(sf::st_crs(proj4),EWKT=TRUE)))
+           #    wkt <- NULL
+           # print(proj4)
+           # message(wkt)
+            if (!TRUE) { ## 20191216 patch for EXTENSION["PROJ4","+proj=......."]
+               wkt <- gsub(",EXTENSION\\[\"PROJ4\".+\\]","]",wkt)
+            }
          }
       }
       if (lverbose)
@@ -927,7 +927,7 @@
    if ((is.character(x$name))&&(sum(nchar(x$name))>0))
    {
       if (.lgrep(",",x$name)) {
-         metaname <- paste0(.gsub("\\.(gz|bz2|xz)$","",x$con$fname),".aux.xml")
+         metaname <- paste0(.gsub("\\.(gz|bz2|xz)$","",x$con$fname[indF]),".aux.xml")
          Fmeta <- file(metaname,"wt")
          writeLines("<PAMDataset>",Fmeta)
          writeLines("  <Metadata>",Fmeta)

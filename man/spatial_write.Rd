@@ -4,7 +4,8 @@
 Wrapper functions for writing spatial objects.
 }
 \description{
-Write spatial object to disk. If spatial object is Simple Features, then appropriate functions from package \pkg{sf} are used. If spatial objest are abstract of class Spatial then appropriate functions from packages \pkg{sp} and \pkg{rgdal} are used.
+Write spatial object to disk. If spatial object is Simple Features, then appropriate functions from package \pkg{sf} are used.
+%%~ If spatial objest are abstract of class Spatial then appropriate functions from packages \pkg{sp} and \pkg{rgdal} are used.
 
 }
 \usage{
@@ -14,7 +15,11 @@ spatial_write(obj, fname, layer, driver = NA, compress = "",
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{obj}{
-Spatial object: either Simple Features (\pkg{sf}) or Spatial Abstract (\pkg{sp}). \link[base:list]{List} of spatial objects can be used.
+Spatial object:
+%%~ either
+Simple Features (\pkg{sf}).
+%%~ or Spatial Abstract (\pkg{sp}).
+\link[base:list]{List} of spatial objects can be used.
 }
   \item{fname}{
 Character. File name with or without extension. If extension is missed, then argument \code{driver} must be specified.
@@ -36,7 +41,9 @@ Logical. Value \code{TRUE} provides information on console. Default is \code{FAL
 }
 }
 \details{
-Based on \code{\link[sf:st_write]{sf::st_write}} and \code{\link[rgdal:writeOGR]{rgdal::writeOGR}} functions with additonal options: compressing of output file(s), coordinates trasforming (to longitudes and latitudes for \code{driver="GeoJSON"}), creating multi-layer destination (for \code{driver="SQLite"}).
+Based on \code{\link[sf:st_write]{sf::st_write}}
+%~ and \code{\link[rgdal:writeOGR]{rgdal::writeOGR}}
+function with additonal options: compressing of output file(s), coordinates trasforming (to longitudes and latitudes for \code{driver="GeoJSON"}), creating multi-layer destination (for \code{driver="SQLite"}).
 }
 \value{
 invisible \code{NULL}.
@@ -46,9 +53,10 @@ Nikita Platonov \email{platonov@sevin.ru}
 }
 
 \seealso{
-\code{\link[sf:st_write]{write_sf}} (valid if package \pkg{sf} is installed)
+\code{\link[sf:st_write]{write_sf}}
+%%~ (valid if package \pkg{sf} is installed)
 
-\code{\link[rgdal:writeOGR]{writeOGR}} (package \pkg{rgdal})
+%%~ \code{\link[rgdal:writeOGR]{writeOGR}} (package \pkg{rgdal})
 
 \code{\link[ursa:spatial_read]{spatial_read}}
 }
@@ -67,18 +75,6 @@ if (requireNamespace("sf",quietly=TRUE)) {
    spatial_write(obj1,fname1)
    res1 <- spatial_read(fname1,engine="sf")
    print(series(res1))
-}
-if (requireNamespace("sp")) {
-   obj2 <- da
-   sp::coordinates(obj2) <- c("x","y")
-   sp::proj4string(obj2) <- sp::CRS("+init=epsg:4326")
-   print(series(obj2))
-   print(spatial_crs(obj2))
-   fname2 <- file.path(tempdir(),"res2.shp")
-   print(fname2)
-   spatial_write(obj2,fname2)
-   res2 <- spatial_read(fname2,engine="sp")
-   print(series(obj2))
 }
 print(spatial_dir(tempdir()))
 }

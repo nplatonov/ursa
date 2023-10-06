@@ -8,8 +8,11 @@
       requireNamespace("png",quietly=.isPackageInUse())
    if (isPNG)
       NULL
-   else if (isJPEG)
+   else if (isJPEG) {
+     # if (!requireNamespace("jpeg",quietly=.isPackageInUse()))
+     #    stop("Suggested package 'jpeg' missed, but is required here.")
       isJPEG <- requireNamespace("jpeg",quietly=.isPackageInUse())
+   }
    else if (isWEBP)
       isWEBP <- requireNamespace("webp",quietly=.isPackageInUse())
    else if (isSVG) {

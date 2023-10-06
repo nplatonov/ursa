@@ -16,7 +16,7 @@
    opW <- options(warn=-11,show.error.messages=verbose);on.exit(options(opW))
   # if (("package:rgdal" %in% search())||
   #     (!requireNamespace("proj4",quietly=.isPackageInUse())))
-  #    res <- rgdal::project(xy=xy,proj=proj,inv=inv)
+  #    res <- project(xy=xy,proj=proj,inv=inv) ## project() from 'rgdal'
   # else
   #    res <- proj4::project(xy=t(xy),proj=proj,inverse=inv)
    a <- FALSE
@@ -35,17 +35,17 @@
    is_proj4 <- (("proj4" %in% loaded)||
        (!isTRUE(getOption("ursaForceSF")))&&
        (requireNamespace("proj4",quietly=.isPackageInUse()))) ## `proj4` faster `sf`20220216
-   is_rgdal <- "rgdal" %in% loaded
+   is_rgdal <- !.isPackageInUse() & "rgdal" %in% loaded
    is_sf <- "sf" %in% loaded
    if ((!is_sf)&&(!is_rgdal)&&(!is_proj4)) {
-      requireNamespace("proj4",quietly=.isPackageInUse())
-      loaded <- loadedNamespaces()
-      is_proj4 <- "proj4" %in% loaded
+      is_pro4 <- requireNamespace("proj4",quietly=.isPackageInUse())
+      if ((!is_proj4)&&(T | .isPackageInUse()))
+         is_sf <- requireNamespace("sf",quietly=.isPackageInUse())
    }
    if (verbose)
       print(c(proj4=is_proj4,rgdal=is_rgdal,sf=is_sf))
   # if ((!FALSE)&&(!("package:rgdal" %in% search()))&&
-   if ((!a)&&(("proj4" %in% loaded)||
+   if ((!a)&&((is_proj4)||
        ((FALSE)&&(requireNamespace("proj4",quietly=.isPackageInUse()))))) {
       if (verbose)
          message("'proj4' is used")
@@ -76,7 +76,7 @@
          proj4version <- utils::packageVersion("proj4")
          if ((proj4version>="1.0.12")&&(!nchar(Sys.getenv("PROJ_LIB")))) {
             Sys.setenv(PROJ_LIB=system.file("proj",package="sf"))
-            if (!nchar(Sys.getenv("PROJ_LIB")))
+            if ((!.isPackageInUse())&&(!nchar(Sys.getenv("PROJ_LIB"))))
                Sys.setenv(PROJ_LIB=system.file("proj",package="rgdal"))
          }
          if (proj4version>="1.0.10") {
@@ -97,7 +97,7 @@
          },silent=TRUE)
       }
    }
-   if ((!a)&&(T & "sf" %in% loaded)) {
+   if ((!a)&&(is_sf)) {
       if (verbose)
          message("'sf' is used")
       if (inv) {
@@ -115,6 +115,19 @@
      # ind <- which((is.na(xy[,1]))|(is.na(xy[,2])))
       hasNA <- anyNA(xy[,1])
       tryMatrix <- TRUE
+      if (omitOutside <- FALSE) {
+        # if (length(ind180 <- which(xy[,1]>180)))
+        #    xy[ind180,1] <- xy[ind180,1]-180
+         lim <- c(-18000,10,180000,80)
+         if (length(ind180 <- which(xy[,1]<=lim[1])))
+            xy[ind180,1] <- lim[1]
+         if (length(ind180 <- which(xy[,1]>=lim[3])))
+            xy[ind180,1] <- lim[3]
+         if (length(ind180 <- which(xy[,2]<=lim[2])))
+            xy[ind180,2] <- lim[2]
+         if (length(ind180 <- which(xy[,2]>=lim[4])))
+            xy[ind180,4] <- lim[4]
+      }
       if (hasNA) {
          ind <- which(is.na(xy[,1])) ## less conditions
          res <- matrix(NA,ncol=2,nrow=nrow(xy))
@@ -122,7 +135,8 @@
             a <- .try(res[-ind,] <- unclass(sf::st_transform(sf::st_sfc(
                               sf::st_multipoint(xy[-ind,]),crs=crs_s),crs_t)[[1]]))
          else {
-            a <- .try(res[-ind,] <- sf::sf_project(from=crs_s,to=crs_t,pts=xy[-ind,]))
+            a <- .try(res[-ind,] <- sf::sf_project(from=crs_s,to=crs_t,pts=xy[-ind,]
+                                                  ,keep=TRUE))
          }
       }
       else {
@@ -138,19 +152,22 @@
                print(crs_t)
                print(sf::st_crs(crs_t)$proj4string)
             }
-            a <- .try(res <- sf::sf_project(from=crs_s,to=crs_t,pts=xy))
+            a <- .try(res <- sf::sf_project(from=crs_s,to=crs_t,pts=xy
+                                           ,keep=TRUE))
          }
       }
    }
    if (!a) {
-      if (verbose) {
-         print("WWW")
-         q()
-      }
       if (verbose)
          message("'rgdal' is used")
-      if (!("rgdal" %in% loadedNamespaces()))
-         requireNamespace("rgdal",quietly=.isPackageInUse())
+      if (.isPackageInUse()) {
+         opWG <- options(warn=1)
+         warning("Unable to reproject without `rgdal` package")
+         options(opWG)
+      }
+      if (!("rgdal" %in% loadedNamespaces())) {
+         .rgdal_requireNamespace()
+      }
       if (!is.character(proj))
          proj <- .epsg2proj4(proj)
       if (is.list(xy))
@@ -161,10 +178,10 @@
       ind <- which(is.na(xy[,1])) ## less conditions
       if (length(ind)) {
          res <- matrix(NA,ncol=2,nrow=nrow(xy))
-         a <- .try(res[-ind,] <- rgdal::project(xy=xy[-ind,],proj=proj,inv=inv))
+         a <- .try(res[-ind,] <- .rgdal_project(xy=xy[-ind,],proj=proj,inv=inv))
       }
       else {
-         a <- .try(res <- rgdal::project(xy=xy,proj=proj,inv=inv))
+         a <- .try(res <- .rgdal_project(xy=xy,proj=proj,inv=inv))
       }
       if (!a) {
          if (verbose)

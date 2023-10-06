@@ -838,6 +838,9 @@
       src <- srclist[[k]]
       isPNG <- .lgrep("\\&format=image.+png",src)>0
       isJPEG <- .lgrep("\\&format=image.+(jpg|jpeg)",src)>0
+      if (isJPEG)
+         if (!requireNamespace("jpeg",quietly=.isPackageInUse()))
+            stop("Suggested package 'jpeg' is missed, but is required here.")
       if (verbose)
          print(c(png=isPNG,jpg=isJPEG,GDAL=(!isPNG & !isJPEG)))
       i0 <- 0

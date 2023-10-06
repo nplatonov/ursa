@@ -245,7 +245,7 @@
             myname[ind] <- paste0("band",ind)
          x$name <- myname
          dimx <- x$dim
-         if (x$con$driver=="ENVI") {
+         if (x$con$driver %in% c("ENVI","EGDAL")) {
             .write.hdr(x)
             if (TRUE) { ## added 20161226
                nb <- ifelse(is.na(x$con$posZ[1]),x$con$bands,length(con$posZ))
@@ -300,7 +300,7 @@
          }
          dim(value$value) <- with(con,c(samples,nl,bands))
          dimz <- dim(value$value)
-         if (con$driver=="ENVI") {
+         if (con$driver %in% c("ENVI","EGDAL")) {
             if (con$interleave=="bil")
             {
                if ((0)&&(TRUE))
@@ -369,18 +369,18 @@
               # print(c(onexit=with(con,seek(handle,w=0,pos="current"))))
             }
          }
-         else if (con$driver=="GDAL") { # write lines
+         else if (con$driver=="RGDAL") { # write lines
             minJ <- min(j)-1
             if (toRound) {
                for (b in seq(dimz[3])) {
-                  rgdal::putRasterData(con$handle
+                  .rgdal_putRasterData(con$handle
                                       ,.round(value$value[,,b,drop=TRUE])
                                       ,offset=c(minJ,0),band=b)
                }
             }
             else {
                for (b in seq(dimz[3])) {
-                  rgdal::putRasterData(con$handle,value$value[,,b,drop=TRUE]
+                  .rgdal_putRasterData(con$handle,value$value[,,b,drop=TRUE]
                                       ,offset=c(minJ,0),band=b)
                }
             }
@@ -405,7 +405,7 @@
          else 
             dim(value$value) <- with(con,c(samples,lines,dimy[2]))
          dimz <- dim(value$value)
-         if (con$driver=="ENVI") {
+         if (con$driver %in% c("ENVI","EGDAL")) {
             if (con$interleave=="bil")
             {
                posZ <- as.integer(value$con$posZ)
@@ -523,17 +523,17 @@
             else
                stop("unknown interleave")
          }
-         else if (con$driver=="GDAL") { ## write bands
+         else if (con$driver=="RGDAL") { ## write bands
             if (toRound) {
                for (r in seq_along(i)) {
-                  rgdal::putRasterData(con$handle
+                  .rgdal_putRasterData(con$handle
                                       ,.round(value$value[,,r,drop=TRUE])
                                       ,band=i[r])
                }
             }
             else {
                for (r in seq_along(i)) {
-                  rgdal::putRasterData(con$handle,value$value[,,r,drop=TRUE]
+                  .rgdal_putRasterData(con$handle,value$value[,,r,drop=TRUE]
                                       ,band=i[r])
                }
             }
@@ -560,7 +560,7 @@
          }
          value <- decompress(value)
          dim(value$value) <- with(con,c(samples,lines,bands))
-         if (con$driver=="ENVI") {
+         if (con$driver %in% c("ENVI","EGDAL")) {
             Fout <- con$handle
             if (con$seek)
                seek(con,origin="start",where=con$offset,rw="w")
@@ -607,17 +607,17 @@
                }
             }
          }
-         else if (con$driver=="GDAL") { # write full
+         else if (con$driver=="RGDAL") { # write full
             dimz <- dim(value$value)
             if (toRound) {
                for (b in seq(dimz[3]))
-                  rgdal::putRasterData(con$handle
+                  .rgdal_putRasterData(con$handle
                                       ,.round(value$value[,,b,drop=TRUE])
                                       ,band=b)
             }
             else {
                for (b in seq(dimz[3])) {
-                  rgdal::putRasterData(con$handle,value$value[,,b,drop=TRUE]
+                  .rgdal_putRasterData(con$handle,value$value[,,b,drop=TRUE]
                                       ,band=b)
                }
             }

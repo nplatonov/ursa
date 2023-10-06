@@ -1,3 +1,126 @@
+'.open_sfgdal' <- function(fname,engine="sf",verbose=FALSE) {
+   if (!requireNamespace("sf",quietly=.isPackageInUse()))
+      stop("Package 'sf' is required for this operation")
+   obj <- sf::gdal_read(fname,read_data=FALSE)
+   columns <- obj$cols[2]
+   rows <- obj$rows[2]
+   bands <- length(obj$bands)
+  # patt <- "^Band_(\\d+)=(.+)$"
+   patt <- "^Band_(\\d+)=\\t*(.+)$"
+   bname <- grep(patt,obj$meta,value=TRUE)
+   b1 <- .grep(patt,obj$meta,value=TRUE)
+   bname <- .gsub(patt,"\\2",b1)
+   bname[as.integer(.gsub(patt,"\\1",b1))] <- bname
+   if (all(is.na(obj$geotransform))) {
+      resx <- 1
+      resy <- 1
+      minx <- 0
+      miny <- 0
+      maxx <- columns
+      maxy <- rows
+   }
+   else {
+      resx <- obj$geotransform[2]
+      resy <- -obj$geotransform[6]
+      minx <- obj$geotransform[1]
+      maxy <- obj$geotransform[4]
+      maxx <- minx+columns*resx
+      miny <- maxy-rows*resy
+   }
+   g1 <- regrid(minx=minx,maxx=maxx,miny=miny,maxy=maxy,columns=columns,rows=rows
+               ,crs=sf::st_crs(obj$crs)$proj4string
+               )
+   res <- .raster.skeleton()
+   res$grid <- g1
+   con <- .con.skeleton()
+   con$samples <- columns
+   con$lines <- rows
+   con$bands <- bands
+   con$driver <- "SF"
+   con$indexC <- seq(columns)
+   con$indexR <- seq(rows)
+   con$indexZ <- seq_along(bands)
+   con$seek <- FALSE
+   con$fname <- fname
+   con$datatype <- switch(obj$datatype,byte=1L,integer=2L,real=4L,float=4L
+                         ,Byte=1L,UInt8=1L,Int8=11
+                         ,Int16=2L,UInt16=12,UInt32=13,Int32=3
+                         ,Float32=4L,Float64=5L
+                     ,NULL)
+   con$handle <- obj
+   res$con <- con
+   isClass <- length(obj$attribute_tables[[1]])>0
+   isColor <- length(obj$color_tables[[1]])>0
+   isCat <- (isClass)||(isColor)
+   if (isCat) {
+      if (isClass) {
+         ctName <- obj$attribute_tables[[1]][["category"]]
+         if (is.null(ctName))
+            isCat <- FALSE
+      }
+   }
+   if (isCat) {
+      if (isColor) {
+         ctCol <- obj$color_tables[[1]]
+         ct <- rgb(ctCol[,1],ctCol[,2],ctCol[,3],ctCol[,4],maxColorValue=255)
+         if (all(substr(ct,8,9)=="FF"))
+            ct <- substr(ct,1,7)
+         if (isClass)
+            if (length(ct)>length(ctName))
+               ct <- ct[seq_len(length(ctName))]
+      }
+      else
+         ct <- rep(NA,length(ctName))
+      if (isClass)
+         names(ct) <- ctName
+      class(ct) <- "ursaColorTable"
+   }
+   if ((isCat)||((T & !.lgrep("float",obj$datatype)))) {
+     # .elapsedTime("F")
+     # v <- as.integer(v)
+     # dim(v) <- dimv
+     # storage.mode(v) <- "integer"
+      mode(res$value) <- "integer"
+     # .elapsedTime("G")
+   }
+  # .elapsedTime("as.ursa -- before")
+  # res <- as.ursa(v) ## RECURSIVE
+  # res <- ursa_new(v)
+  # .elapsedTime("as.ursa -- after")
+   if (isCat) {
+      ursa_colortable(res) <- ct
+      class(res$value) <- "ursaCategory"
+   }
+   bname <- obj$description
+   if (any(nchar(bname)>0)) {
+      names(res) <- gsub("\\t","",bname) ## patch for ENVI 'band name'
+   }
+   else {
+      patt <- "^Band_(\\d+)=(.+)$"
+      j <- grep(patt,obj$meta)
+      ind <- as.integer(gsub(patt,"\\1",obj$meta[j]))
+      bname <- gsub(patt,"\\2",obj$meta[j])
+      names(res)[ind] <- bname
+   }
+   res$dim <- as.integer(c(columns*rows,bands))
+   gi <- sf::gdal_utils("info",fname,quiet=!FALSE)
+   gi <- strsplit(gi,split="\\n")[[1]]
+   if (tryToUseOnlyInfoForGridAndMetadata <- FALSE) {
+      cat("---------------\n")
+      print(gi)
+      cat("---------------\n")
+      q()
+   }
+   gi <- grep("NoData Value",gi,value=TRUE)
+   if (length(gi)>0) {
+      nodata <- gsub("^.*=(\\s*(\\S+))$","\\1",gi)
+      if (typeof(ursa_value(res))=="integer")
+         ignorevalue(res) <- as.integer(unique(nodata))
+      else
+         ignorevalue(res) <- as.numeric(unique(nodata))
+   }
+   res
+}
 '.read_stars' <- function(fname) {
    if (!requireNamespace("sf",quietly=.isPackageInUse()))
       stop("Package 'sf' is required for this operation")
@@ -5,7 +128,7 @@
    columns <- a$cols[2]
    rows <- a$rows[2]
    bands <- a$bands[2]
-   patt <- "^Band_(\\d+)=(.+)$"
+  # patt <- "^Band_(\\d+)=(.+)$"
    patt <- "^Band_(\\d+)=\\t*(.+)$"
    bname <- grep(patt,a$meta,value=TRUE)
    b1 <- .grep(patt,a$meta,value=TRUE)
@@ -79,7 +202,16 @@
    attr(md,"raster") <- band
    class(md) <- "dimensions"
    ret <- list(imported=as.array(obj,flip=TRUE,permute=FALSE))
+   if (T & length(ct <- ursa_colortable(obj))>0) {
+      dima <- dim(ret[[1]])[-3]
+      ret[[1]] <- factor(ret[[1]],levels=seq_along(ct)-0L,labels=names(ct))
+      dim(ret[[1]]) <- dima
+      attr(ret[[1]],"colors") <- unclass(unname(ct))
+      attr(ret[[1]],"exclude") <- rep(FALSE,length(ct))
+      md$band <- NULL
+   }
    attr(ret,"dimensions") <- md
+  # attr(ret,"geotransform") <- c(g$minx,g$resx,0,g$maxy,-g$resy,0)
    class(ret) <- "stars"
    ret
 }

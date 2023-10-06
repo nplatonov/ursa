@@ -158,8 +158,8 @@ Package \pkg{sf} is 'Suggested' for package \pkg{ursa}.
 %%~ }
 \examples{
 session_grid(NULL)
-f <- system.file("vectors","scot_BNG.shp",package="rgdal")
-glance(f,style="merc",field="(NAME|COUNT)")
+f <- system.file("shape/nc.shp",package="sf")
+glance(f,style="merc",field="(NAME|AREA|COUNT)")
 cmd <- paste("Rscript --vanilla -e ursa::glance()",paste0("\"",f,"\"")
             ,"style=\"merc\"","field=\"(lon|lat)\"")
 cat(" --------- Try in command line: -----------\n")

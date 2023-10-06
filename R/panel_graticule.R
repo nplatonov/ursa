@@ -163,7 +163,7 @@
                           ##~ ,KEEP.OUT.ATTRS=FALSE,stringsAsFactors=FALSE)
          ##~ g2 <- cbind(g2$x,g2$y)[c(1,4),]
          ##~ g2a <- proj4::project(g2,g1$crs,inv=TRUE)
-         ##~ g2b <- rgdal::project(g2,g1$crs,inv=TRUE)
+         ##~ g2b <- project(g2,g1$crs,inv=TRUE) ## project() from 'rgdal'
          ##~ print(g2)
          ##~ print(g2a)
          ##~ print(g2b)

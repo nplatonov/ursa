@@ -52,7 +52,8 @@
                   # ,"&polygon_text=1"
                    ,"&format=xml","&bounded=0","&accept-language=en-US,ru")
      # dst <- tempfile() # "nominatim.xml" # tempfile()
-     # print(src)
+      if (F & verbose)
+         message(src)
       dst <- .ursaCacheDownload(src,quiet=!verbose)
       xmlstring <- scan(dst,character(),quiet=!verbose)
      # Encoding(xmlstring) <- "UTF-8"
@@ -134,6 +135,8 @@
                             ,"&polygon_text=1"
                             ,"&format=xml"
                             ,"&bounded=0","&accept-language=en-US,ru")
+               if (verbose)
+                  message(src)
                dst <- .ursaCacheDownload(src,cache=cache,quiet=!verbose)
                if (verbose)
                   .elapsedTime("shape|180 -- parsing")
@@ -180,8 +183,10 @@
                isSF <- "sf" %in% loaded ||
                   requireNamespace("sf",quietly=.isPackageInUse())
                if (!isSF) {
-                  isSP <- "rgeos" %in% loaded || 
-                     requireNamespace("rgeos",quietly=.isPackageInUse())
+                  if (.isPackageInUse())
+                     isSP <- FALSE
+                  else 
+                     isSP <- "rgeos" %in% loaded || .rgeos_requireNamespace()
                }
                else
                   isSP <- FALSE
@@ -192,24 +197,25 @@
                             ,"&polygon_",ifelse(isWKT,"text=1","geojson=1")
                             ,"&format=xml"
                             ,"&bounded=0","&accept-language=en-US,ru")
+               if (verbose)
+                  message(src)
                dst <- .ursaCacheDownload(src,cache=cache,quiet=!verbose)
                if (verbose)
                   .elapsedTime("shape|180 -- parsing")
-              # str(dst)
-               b <- readLines(dst,encoding="UTF-8",warn=FALSE)[3]
+               b <- readLines(dst,encoding="UTF-8",warn=FALSE)[2]
               # ind1 <- unlist(gregexpr("geojson)=\\'\\{",b))
               # ind2 <- unlist(gregexpr("\\}\\'",b))
                ##~ ind1 <- gregexpr("geo(text|json)=\\'",b)
                ##~ ind2 <- gregexpr("(\\)|\\})\\'",b)
-               ind1 <- unlist(gregexpr("geo(text|json)=\\'",b))
-               ind2 <- unlist(gregexpr("(\\)|\\})\\'",b))
+               ind1 <- unlist(gregexpr("geo(text|json)=(\\'|\")",b))
+               ind2 <- unlist(gregexpr("(\\)|\\})(\\'|\")",b))
                ind3 <- which(ind1>0)
                ind4 <- which(ind2>0)
                if ((identical(ind3,ind4))&&(length(ind3)>0)) { ## ind3[1]==ind4[1]
                   ind1 <- ind1[ind3]
                   ind2 <- ind2[ind4]
                   shape <- lapply(seq_along(ind3),function(i) {
-                     n1 <- nchar(.gsub2("(geo(text|json)=\\')","\\1",b))
+                     n1 <- nchar(.gsub2("(geo(text|json)=(\\'|\"))","\\1",b))
                      b2 <- substr(b,ind1[i]+n1,ind2[i])
                      if (F)
                         return(b2)
@@ -228,7 +234,7 @@
                         d2 <- spatial_geometry(sf::st_as_sf(d2,wkt="geom"))
                      }
                      else if (isSP) {
-                        d2 <- rgeos::readWKT(b2)
+                        d2 <- .rgeos_readWKT(b2)
                      }
                      spatial_crs(d2) <- 4326
                      if (("top" %in% select)&&(is_spatial_points(d2)))

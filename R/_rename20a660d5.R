@@ -33,6 +33,10 @@
          src <- "crs=="
          dst <- "ZZZ=="
       }
+      else if (stage6 <- T) {
+         src <- ".DeadRoad"
+         dst <- ".DeadEnd"
+      }
       else {
          stop("please select stage")
       }

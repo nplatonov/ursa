@@ -343,7 +343,7 @@
       if (!inherits(obj,c("SpatialPointsDataFrame","SpatialLinesDataFrame"
                          ,"SpatialPolygonsDataFrame")))
          spatial_data(obj) <- data.frame(dummy=seq_len(spatial_count(obj)))
-      rgdal::writeOGR(obj
+      .rgdal_writeOGR(obj
                      ,dsn=fname # iconv(fname,to="UTF-8")
                      ,layer=lname,driver=driver
                      ,dataset_options=dopt,layer_options=lopt
@@ -352,8 +352,8 @@
                      ,verbose=verbose)
       if ((FALSE)&&(driver=="ESRI Shapefile")) { ## replace "OGC ESRI" by "OGC WKT" 
          prj <- sp::proj4string(obj)
-         prj1 <- rgdal::showWKT(prj,morphToESRI=TRUE)
-         prj2 <- rgdal::showWKT(prj,morphToESRI=FALSE)
+         prj1 <- .rgdal_showWKT(prj,morphToESRI=TRUE)
+         prj2 <- .rgdal_showWKT(prj,morphToESRI=FALSE)
          if (!identical(prj1,prj2)) {
             writeLines(prj2,gsub("\\.shp$",".prj",fname))
          }
@@ -370,7 +370,7 @@
       if (driver %in% c("GeoJSON","KML","GPX")) {
          if (!identical(spatial_crs(obj),spatial_crs(4326))) {
             if ((devel <- FALSE)&&(!.isPackageInUse())) {
-              ## ?rgdal::make_EPSG
+              ## see ?make_EPSG for 'rgdal'
                print(spatial_crs(obj))
               # epsg <- sf::st_crs(spatial_crs(obj))$epsg
               # print(c(epsg=epsg))

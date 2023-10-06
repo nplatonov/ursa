@@ -8,7 +8,8 @@ Create ENVI or GDAL files on disk
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 \code{create_envi} creates ENVI binary and header files on disk. ENVI binary file is filled by blank (zero) values.
 \cr
-\code{create_gdal} is a wrapper for creating new object of class \code{\link[rgdal:GDALTransientDataset-class]{GDALTransientDataset}}.
+%%~ \code{create_gdal} is a wrapper for creating new object of class \code{\link[rgdal:GDALTransientDataset-class]{GDALTransientDataset}}.
+\code{create_gdal} is just an entry for GDAL wrapper; currently via internal ENVI implementation.
 }
 \usage{
 create_gdal(x, ...)
@@ -27,6 +28,9 @@ Use \code{name = value} sequence. Properties of new ENVI file are extracted from
 }
 }
 \details{
+
+Prior \pkg{ursa} version < 3.10, \code{create_gdal()} used classes and methods from package \pkg{rgdal}. Currenty, alternatives are not found for complete replacement of \pkg{rgdal}. At the present, ENVI binary and header are created, firstly, and \code{\link[ursa:classRaster_close]{close()}} transforms to desired GDAL format, finally.
+
    \code{create_envi} and \code{create_gdal} use parameters of grid (boundary box, cell size, projection) from reference object of class \code{ursaRaster} in argument \code{x} or calls \code{\link[ursa:session]{session_grid}}. You may specify values of GDAL or ENVI binary file later using \code{\link[ursa:classRaster.Replace]{[<-}}. If \code{x} is object of class \code{ursaRaster} then metadata parameters (interleave, data type, ignore value, etc) are inherited. 
 
 Keywords:

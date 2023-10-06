@@ -22,7 +22,7 @@
       if (.lgrep("\\.(shp(\\.zip)*|(geojson|sqlite|gpkg)(\\.(gz|bz2))*)$",obj)) {
          if (FALSE) { ## 20171216 deprecated
             op <- options(warn=0)
-            requireNamespace("rgdal",quietly=.isPackageInUse())
+           # requireNamespace("rgdal",quietly=.isPackageInUse())
             a <- .shp.read(obj)
            # a <- spTransform(a,session_grid()$crs)
            # ret <- .panel_plot(a,add=TRUE,...)

@@ -233,6 +233,8 @@
                   if (isColor) {
                      ctCol <- obj$color_tables[[1]]
                      ct <- rgb(ctCol[,1],ctCol[,2],ctCol[,3],ctCol[,4],maxColorValue=255)
+                     if (all(substr(ct,8,9)=="FF"))
+                        ct <- substr(ct,1,7)
                      if (isClass)
                         if (length(ct)>length(ctName))
                            ct <- ct[seq_len(length(ctName))]
@@ -264,6 +266,13 @@
                bname <- obj$description
                if (any(nchar(bname)>0)) {
                   names(res) <- gsub("\\t","",bname) ## patch for ENVI 'band name'
+               }
+               else {
+                  patt <- "^Band_(\\d+)=(.+)$"
+                  j <- grep(patt,obj$meta)
+                  ind <- as.integer(gsub(patt,"\\1",obj$meta[j]))
+                  bname <- gsub(patt,"\\2",obj$meta[j])
+                  names(res)[ind] <- bname
                }
             }
             else {
