@@ -5,12 +5,14 @@
    columns <- obj$cols[2]
    rows <- obj$rows[2]
    bands <- length(obj$bands)
-  # patt <- "^Band_(\\d+)=(.+)$"
-   patt <- "^Band_(\\d+)=\\t*(.+)$"
-   bname <- grep(patt,obj$meta,value=TRUE)
-   b1 <- .grep(patt,obj$meta,value=TRUE)
-   bname <- .gsub(patt,"\\2",b1)
-   bname[as.integer(.gsub(patt,"\\1",b1))] <- bname
+   if (length(ind <- grep("(^crs$|^wkt|wkt$)",names(obj))))
+      crs <- obj[[ind]]
+   if (is.character(crs))
+      crs <- sf::st_crs(crs)$proj4string
+   if (inherits(crs,"crs"))
+      crs <- crs$proj4string
+   if (is.na(crs))
+      crs <- ""
    if (all(is.na(obj$geotransform))) {
       resx <- 1
       resy <- 1
@@ -28,7 +30,7 @@
       miny <- maxy-rows*resy
    }
    g1 <- regrid(minx=minx,maxx=maxx,miny=miny,maxy=maxy,columns=columns,rows=rows
-               ,crs=sf::st_crs(obj$crs)$proj4string
+               ,crs=crs # sf::st_crs(obj$crs)$proj4string
                )
    res <- .raster.skeleton()
    res$grid <- g1
@@ -100,7 +102,10 @@
       j <- grep(patt,obj$meta)
       ind <- as.integer(gsub(patt,"\\1",obj$meta[j]))
       bname <- gsub(patt,"\\2",obj$meta[j])
-      names(res)[ind] <- bname
+      bname[ind] <- bname
+      if (!length(bname))
+         bname <- paste("Band",seq(bands))
+      names(res) <- bname
    }
    res$dim <- as.integer(c(columns*rows,bands))
    gi <- sf::gdal_utils("info",fname,quiet=!FALSE)

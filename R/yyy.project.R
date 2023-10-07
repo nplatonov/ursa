@@ -101,11 +101,11 @@
       if (verbose)
          message("'sf' is used")
       if (inv) {
-         crs_t <- "EPSG:4326"
+         crs_t <- "+proj=longlat +datum=WGS84 +no_defs"
          crs_s <- proj
       }
       else {
-         crs_s <- "EPSG:4326"
+         crs_s <- "+proj=longlat +datum=WGS84 +no_defs"
          crs_t <- proj
       }
       if (is.list(xy))
@@ -145,7 +145,7 @@
                                      sf::st_multipoint(xy),crs=crs_s),crs_t)[[1]]))
          else {
             if (T & !sf::sf_proj_network())
-               sf::sf_proj_network(url="",TRUE)
+               try(sf::sf_proj_network(url="",TRUE))
             if (F & verbose) {
                print(xy)
                print(crs_s)

@@ -152,13 +152,23 @@
       }
       return(res)
    }
-   if ((is.list(obj))&&(!anyNA(match(c("filename","cols","rows","bands","crs"
+   if ((is.list(obj))&&(!anyNA(match(c("filename","cols","rows","bands","driver"
                                       ,"geotransform","datatype","meta")
                                     ,names(obj))))) { ## from 'sf::gdal_read'
      # .elapsedTime("A")
       columns <- obj$cols[2]
       rows <- obj$rows[2]
       bands <- obj$bands[2]
+      if (length(ind <- grep("(^crs$|^wkt|wkt$)",names(obj))))
+         crs <- obj[[ind]]
+     # if (!is.na(crs))
+     #    crs <- crs$proj4string
+      if (is.character(crs))
+         crs <- sf::st_crs(crs)$proj4string
+      else if (inherits(crs,"crs"))
+         crs <- crs$proj4string
+      if (is.na(crs))
+         crs <- ""
      # patt <- "^Band_(\\d+)=\\t*(.+)$"
      # bname <- grep(patt,obj$meta,value=TRUE)
      # b1 <- .grep(patt,obj$meta,value=TRUE)
@@ -182,7 +192,7 @@
      # .elapsedTime("I")
       if (F) 
          g1 <- regrid(setbound=c(minx,miny,maxx,maxy),dim=c(rows,columns)
-                     ,crs=obj$crs$proj4string)
+                     ,crs=crs)
       else {
          g1 <- .grid.skeleton()
          g1$columns <- as.integer(columns)
@@ -193,7 +203,7 @@
          g1$maxy <- maxy
          g1$resx <- with(g1,(maxx-minx)/columns)
          g1$resy <- with(g1,(maxy-miny)/rows)
-         g1$crs <- obj$crs$proj4string
+         g1$crs <- crs
       }
       if (is.na(g1$crs))
          g1$crs <- ""

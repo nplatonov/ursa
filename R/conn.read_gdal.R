@@ -35,12 +35,6 @@
                        ,verbose=FALSE,...) { ## ,...
   # if (resetGrid)
   #    session_grid(NULL)
-   if (!file.exists(fname)) {
-      list1 <- dir(path=dirname(fname),pattern=paste0("^",basename(fname)),full.names=TRUE)
-      list1 <- list1[.grep("\\.(tif|tiff|img|hfa)$",basename(list1))]
-      if (length(list1)==1)
-         fname <- list1
-   }
    engList <- as.character(as.list(match.fun("read_gdal"))[["engine"]])[-1]
    if (length(engine)<length(engList)) {
       if (!.isPackageInUse()) {
@@ -48,6 +42,13 @@
       }
    }
    engine <- match.arg(engine,engList)
+   fname <- gsub("\\.$","",fname)
+   if (!file.exists(fname)) {
+      list1 <- dir(path=dirname(fname),pattern=paste0("^",basename(fname)),full.names=TRUE)
+      list1 <- list1[.grep("\\.(tif|tiff|img|hfa)$",basename(list1))]
+      if (length(list1)==1)
+         fname <- list1
+   }
    if ((engine=="vapour")&&(requireNamespace("vapour",quite=!.isPackageInUse()))) {
       return(.read_vapour(fname,resetGrid=resetGrid,band=band
                          ,engine=engine,verbose=verbose))

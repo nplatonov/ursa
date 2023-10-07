@@ -204,7 +204,7 @@
             crsNow <- NA
          if (is.na(crsNow)) {
             if ((.lgrep("^(lon|lng$)",coords[1])==1)&&(.lgrep("^lat",coords[2])==1))
-               crsNow <- "EPSG:4326"
+               crsNow <- "+proj=longlat +datum=WGS84 +no_defs"
             else if (is.data.frame(dsn)) {
                if (is.character(attr(dsn,"crs")))
                   crsNow <- attr(dsn,"crs")

@@ -129,7 +129,7 @@
    proj4 <- .gsub("(^\\s|\\s$)","",proj4)
    proj4 <- proj4[nchar(proj4)>0]
    if (noProj <- !length(proj4))
-      proj4 <- "+init=epsg:4326"
+      proj4 <- "+proj=longlat +datum=WGS84 +no_defs"
    ftemp <- .maketmp() # .maketmp() #tempfile(pattern="") # ".\\tmp1"
    cmd <- paste("ogrinfo","-q",.dQuote(dsn))
    if (verbose)
