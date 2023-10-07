@@ -9,6 +9,7 @@
    grid <- .grid.skeleton()
    if (missing(fname))
       stop("filename is missing")
+   fname <- gsub("\\.$","",fname)
    wname <- fname
    fname <- envi_list(wname,exact=TRUE)
    dname <- unique(dirname(fname))

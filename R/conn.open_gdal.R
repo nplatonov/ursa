@@ -10,6 +10,7 @@
    engine <- match.arg(engine,engList)
   # if (engine=="native")
   #    engine <- "sf" ## replace to 'sf'
+   fname <- gsub("\\.$","",fname)
    if ((engine=="vapour")&&(requireNamespace("vapour",quite=!.isPackageInUse()))) {
       return(.open_vapour(fname,engine=engine,verbose=verbose))
    }
