@@ -114,7 +114,7 @@
    }
    if (isZip <- .lgrep("\\.zip$",dsn)>0) {
       ziplist <- unzip(dsn,exdir=tempdir());on.exit(file.remove(ziplist))
-      dsn <- .grep("\\.(shp|sqlite|gpkg|geojson)$",ziplist,value=TRUE)
+      dsn <- .grep("\\.(shp|sqlite|fgb|gpkg|geojson)$",ziplist,value=TRUE)
    }
    else if ((nchar(Sys.which("gzip")))&&(isZip <- .lgrep("\\.gz$",dsn)>0)) {
       dsn0 <- dsn

@@ -6,13 +6,16 @@
                          ,style="auto" ## auto none internal keep
                         # ,zoom=NA
                          ,subset="",verbose=FALSE,...) {
-   engList <- as.character(as.list(match.fun("spatialize"))[["engine"]])[-1]
-   if (length(engine)<length(engList)) {
-      if (!.isPackageInUse()) {
+   if (.isPackageInUse()) {
+      engine <- match.arg(engine)
+   }
+   else {
+      engList <- as.character(as.list(match.fun("spatialize"))[["engine"]])[-1]
+      if (length(engine)<length(engList)) {
          engList <- c(engList,"sp")
       }
+      engine <- match.arg(engine,engList)
    }
-   engine <- match.arg(engine,engList)
    if (resetGrid)
       session_grid(NULL)
    toResetGrid <- 0L
@@ -71,15 +74,17 @@
    isNative <- engine=="native"
    if (is.character(dsn)) {
       if (length(dsn)>1) {
-         pattern <- "\\.(gpkg|tab|kml|json|geojson|mif|sqlite|shp|osm|csv)(\\.(zip|rar|gz|bz2))*$"
+         pattern <- "\\.(gpkg|tab|kml|json|geojson|mif|fgb|sqlite|shp|osm|csv)(\\.(zip|rar|gz|bz2))*$"
          dsn <- dsn[.grep(pattern,basename(dsn))]
          if (length(dsn)!=1)
             stop("Either filename is not recognized or multiple files")
       }
    }
    proj4 <- NULL
-   if ((!(style %in% c("auto","keep")))&&(isFALSE(resetProj))) { ## ++20230612
-      resetProj <- TRUE
+   if ((!(style %in% c("auto","keep")))&&
+         (isFALSE(resetProj))) { ## ++20230612
+      if (!((is.character(dsn))&&(style %in% .tileService())))
+         resetProj <- TRUE
    }
    if (!((is.character(dsn))&&(length(dsn)==1))) {
       nextCheck <- TRUE
@@ -164,7 +169,9 @@
       }
       if ((nextCheck)&&(is.data.frame(dsn))&&
           (is.character(coords))&&(length(coords)==2)) {
-         if (!all(coords %in% colnames(dsn))) {
+         if (inherits(dsn,"track_xy"))
+            coords <- c("x_","y_")
+         else if (!all(coords %in% colnames(dsn))) {
             mname <- colnames(dsn)
             indX <- .grep("^coords.x1$",mname)
             if (!length(indX))
@@ -174,7 +181,7 @@
             if (!length(indX))
                indX <- .grep("^east",mname)
             if (!length(indX))
-               indX <- .grep("^x1",mname)
+               indX <- .grep("^x1$",mname)
             indY <- .grep("^coords.x2$",mname)
             if (!length(indY))
                indY <- .grep("^y$",mname)
@@ -183,23 +190,30 @@
             if (!length(indY))
                indY <- .grep("^north",mname)
             if (!length(indY))
-               indY <- .grep("^x2",mname)
+               indY <- .grep("^x2$",mname)
             if ((!length(indX))&&(!length(indY))) {
                indX <- .grep("^000x1$",mname)
                indY <- .grep("^000x2$",mname)
+            }
+            if ((!length(indX))&&(!length(indY))) {
+               indX <- .grep("^x_$",mname)
+               indY <- .grep("^y_$",mname)
             }
             if ((!length(indX))&&(!length(indY))) {
                indX <- .grep(paste0("^",coords[1],"$"),mname)
                indY <- .grep(paste0("^",coords[2],"$"),mname)
             }
             ind <- c(indX[1],indY[1])
-            if ((any(is.na(ind)))||(length(ind)!=2))
+            if ((any(is.na(ind)))||(length(ind)!=2)) {
                stop("unable to detect 'x' and 'y' coordinates")
+            }
             coords <- mname[ind]
          }
          #isCRS <- ((!is.na(crsNow))&&(nchar(crsNow)))
          if (style!="auto")
             crsNow <- style
+         else if (inherits(dsn,"track_xy"))
+            crsNow <- sf::st_crs(attr(dsn,"crs_",exact=TRUE))$proj4string
          else
             crsNow <- NA
          if (is.na(crsNow)) {
@@ -429,7 +443,7 @@
             mode <- ifelse(.lgrep("(txt|json)$",dsn),"wt","wb")
             dsn <- .ursaCacheDownload(dsn,mode=mode)
          }
-         else if (.lgrep("\\.(gpkg|tab|kml|json|geojson|mif|sqlite|shp|osm)(\\.(zip|gz|bz2))*$"
+         else if (.lgrep("\\.(gpkg|tab|kml|json|geojson|mif|fgb|sqlite|shp|osm)(\\.(zip|gz|bz2))*$"
                  ,basename(dsn))) {
             message(paste("#40. It seems that specified non-existent file name"
                          ,sQuote(dsn),"rather than geocode request."))
@@ -478,10 +492,10 @@
                      arglist[[1]] <- tail(as.character(arglist[[1]]),1)
                      if ((TRUE)&&("auto" %in% style)) {
                         arglist$style <- switch(geocode
-                                       ,nominatim="mapnik"
+                                       ,nominatim="CartoDB"
                                        ,pickpoint="mapnik"
                                        ,google="google terrain color"
-                                       ,"mapnik")
+                                       ,"CartoDB")
                      }
                      return(do.call(arglist[[1]],arglist[-1])) ## RECURSIVE!!!
                   }
@@ -529,7 +543,7 @@
                print(ziplist)
             }
             on.exit(file.remove(ziplist))
-            dsn <- .grep("\\.(shp|sqlite|gpkg|geojson)$",ziplist,value=TRUE)
+            dsn <- .grep("\\.(shp|fgb|sqlite|gpkg|geojson)$",ziplist,value=TRUE)
          }
          else if ((nchar(Sys.which("gzip")))&&(isZip <- .lgrep("\\.gz$",dsn)>0)) {
             dsn0 <- dsn
@@ -714,8 +728,13 @@
               # options(opW2)
                if (!spatial_count(obj))
                   return(obj)
-               if (TRUE)
-                  obj <- sf::st_zm(obj,drop=TRUE)
+               if (TRUE) {
+                  .o <- obj
+                  obj <- try(sf::st_zm(.o,drop=TRUE))
+                  if (inherits(obj,"try-error"))
+                     obj <- .o
+                  rm(.o)
+               }
             }
             else {
                if (isSHP <- .lgrep("\\.shp$",dsn)>0) {
@@ -762,7 +781,7 @@
       obj <- do.call("subset",list(obj,parse(text=subset)))
    }
    if ((geocodeStatus)&&("auto" %in% style)) {
-      style <- switch(geocode,nominatim=c("mapnik","openstreetmap color")[1]
+      style <- switch(geocode,nominatim=c("CartoDB","mapnik","openstreetmap color")[1]
                              ,pickpoint="mapnik"
                              ,google="google terrain color")
    }
@@ -929,7 +948,9 @@
             }
          }
          else if (TRUE) {
-            isInt <- !is.factor(da) && .is.integer(na.omit(da))
+            cond1 <- isTRUE(!is.factor(da))
+            cond2 <- isTRUE(try(.is.integer(na.omit(da))))
+            isInt <- cond1 && cond2
            # isInt <- .is.integer(da)
             if (isInt) { # &&(!is.integer(da))
                da <- as.integer(round(da))
@@ -1078,7 +1099,7 @@
   # if ((resetProj)||(is.ursa(g0,"grid"))||(is.numeric(lon0))||(is.numeric(lat0))) {
       proj4 <- spatial_crs(obj)
       if (verbose)
-         str(list(proj4=proj4,proj=proj,style=style))
+         str(list(proj4=proj4,proj=proj,style=style,resetProj=resetProj))
       if ((is.na(proj4))&&(nchar(style))&&(.lgrep("\\+proj=.+",style))) { ## ++ 20180530
          proj4 <- style
         # isPROJ4 <- FALSE

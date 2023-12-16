@@ -40,7 +40,7 @@ Positive numeric in interval between 0 and 255. The intensity of the darkest col
 Positive numeric in interval between 0 and 255. The intensity of the lightest color in the palette. For light backgrounds default is 241, for dark backgrounds default is 192 (inverse order with \code{dark}).
 }
   \item{bright}{
-Positive numeric in interval between 0 and 255. Value for equal intensity for code{dark}and \code{light} in the palette. Applied only for both \code{dark=NA} and \code{light=NA}.
+Positive numeric in interval between 0 and 255. Value for equal intensity for \code{dark} and \code{light} in the palette. Applied only for both \code{dark=NA} and \code{light=NA}.
 }
   \item{inv}{
 Logical. Inversion of color intensity. If \code{TRUE} then color vector is \link[base:rev]{reversed} before return. Default is \code{FALSE}.

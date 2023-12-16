@@ -13,7 +13,7 @@
       if (TRUE) {
          res <- vector("list",length(aname))
          names(res) <- aname
-         res <- lapply(list1[ind],.read_gdal,verbose=verbose)
+         res <- lapply(list1[ind],read_gdal,verbose=verbose) ## '.read_gdal'
          names(res) <- aname
          g <- lapply(res,ursa_grid)
          if (all(sapply(head(g,-1),function(g2) all.equal(g[[1]],g2))))

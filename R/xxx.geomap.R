@@ -9,7 +9,7 @@
    geocode <- match.arg(geocode,geocodeList)
    if (!sum(nchar(style)))
       style <- paste(switch(geocode,nominatim="openstreetmap",pickpoint="openstreetmap"
-                           ,google="google","mapnik"),"color")
+                           ,google="google","CartoDB"),"color")
    if (is.na(zoom))
       zoom <- "0"
    isWGS84 <- .lgrep("(maps\\.yandex|^(Yandex|\u042f\u043d\u0434\u0435\u043a\u0441)$)"
@@ -303,7 +303,7 @@
                           ,"+x_0=0.0 +y_0=0 +k=1.0"
                           ,"+units=m +nadgrids=@null +wktext +no_defs")
          bbox <- matrix(bbox,ncol=2,byrow=TRUE)
-         bbox <- .project(bbox,proj4)
+         bbox <- .project(bbox,proj4,verbose=verbose)
          bbox <- c(xmin=bbox[1,1],ymin=bbox[1,2],xmax=bbox[2,1],ymax=bbox[2,2])
          if (bbox[1]>bbox[3]) { ## ++ 20180718
             bbox <- bbox[c(3,2,1,4)]

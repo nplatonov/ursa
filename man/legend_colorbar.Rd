@@ -60,7 +60,7 @@ legend_colorbar(...)
   \item{adj}{
   Argument of class \code{numeric} with matching name \code{"adj"} in \code{legend_colorbar}. Adjustment for labels. For labels parallel to the axes, \code{adj=0} means left or bottom alignment, and \code{adj=1} means right or top alignment. Default is \code{NA}: for labels parallel to the axes \code{adj=0.5}, for labels perpendicular to the axis \code{adj=1} for numeric and \code{adj=0} for character.}
   \item{las}{
-  Argument of values {0, 1, 2, 3} with matching name \code{"adj"} in \code{legend_colorbar}. The correspondence between directions of axis and labels. The same definition as for \code{\link[graphics:par]{par(las=)}}. Default is \code{1L}.}
+  Argument of values \code{0, 1, 2, 3} with matching name \code{"adj"} in \code{legend_colorbar}. The correspondence between directions of axis and labels. The same definition as for \code{\link[graphics:par]{par(las=)}}. Default is \code{1L}.}
   \item{forceLabel}{
   Argument of class \code{logical} with matching name \code{"forceLabel"} in \code{legend_colorbar}. If \code{TRUE} then all labels are plotted regardless their possible overlapping.}
   \item{lomar}{
@@ -72,7 +72,7 @@ legend_colorbar(...)
   \item{useRaster}{
   Argument of class \code{logical} with matching name \code{"useRaster"} in \code{legend_colorbar}. Passed as argument \code{useRaster} to function \code{\link[graphics:image]{image}}. Default is \code{NA}, which is interpreted as \code{TRUE} for "cairo" graphical device and as \code{FALSE} for "windows" graphical device (see description of argument \code{type} in \code{\link[grDevices:png]{png}}).}
   \item{trim}{
-Argument of values {0L, 1L, 2L} with matching name \code{"trim"} in \code{legend_colorbar}. Determines behaviour for plotting marginal labels. If \code{0L}, then marginal labels are displayed as is. If \code{1L}, then marginal labels are shifted inside of color bar to prevent their outcrop to the panel(s) limits. If \code{2L} then outctopped labels are not displayed.}
+Argument of values \code{0L, 1L, 2L} with matching name \code{"trim"} in \code{legend_colorbar}. Determines behaviour for plotting marginal labels. If \code{0L}, then marginal labels are displayed as is. If \code{1L}, then marginal labels are shifted inside of color bar to prevent their outcrop to the panel(s) limits. If \code{2L} then outctopped labels are not displayed.}
   \item{abbrev}{
   Argument of class \code{integer} or \code{logical} with matching name \code{"abbrev"} in \code{legend_colorbar}. \code{TRUE} is interpreted as default value. \code{FALSE} is interpreted as \code{0L}. If positive, then labels are abbreviated, and this argument is passed as argument \code{minlength} to function \code{\link[base:abbreviate]{abbreviate}}: \code{abbreviate(label, minlength=abbrev, strict=TRUE)}. If abbreviation is failed (e.g., non-ASCII symbols), the \code{\link[base:subset]{subset}} is applied. 
   }

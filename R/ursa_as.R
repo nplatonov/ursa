@@ -434,8 +434,11 @@
          g1 <- regrid(bbox=c(0,0,rev(dim(g1))),res=1,crs=crs)
      # g0 <- getOption("ursaSessionGrid")
      # session_grid(g1)
-      if (approved <- TRUE)
+      if (approved <- TRUE) {
+         opW <- options(warn=-1)
          res <- ursa(obj[]) ## as.matrix()
+         options(opW)
+      }
       else {
          .elapsedTime("rast -- 1")
          o <- obj[]

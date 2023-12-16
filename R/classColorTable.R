@@ -167,3 +167,7 @@
       return(ct$index)
    NULL
 }
+'ursa_color' <- function(ct,...) {
+   x <- colorize(ct,...)
+   as.character(x$colortable[x$index])
+}

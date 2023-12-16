@@ -659,7 +659,10 @@
   # return(do.call("system",arg1))
    NULL
 }
-'.origin' <- function () as.Date(as.POSIXlt(Sys.time()-as.numeric(Sys.time()),tz="UTC")) ## "1970-01-01"
+'.origin' <- function () {
+   t3 <- Sys.time()
+   as.Date(as.POSIXlt(t3-as.numeric(t3),tz="UTC")) ## "1970-01-01"
+}
 '.evaluate' <- function(arglist,ref,verbose=F & .isPackageInUse()) {
    if (F & !.isPackageInUse())
       return(arglist)

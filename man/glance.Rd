@@ -37,7 +37,7 @@ Object of class \code{ursaGrid} or NULL. Reference CRS and boundary box for visu
 Character. Pattern for field (attribute, column,...) selection by name using \link[base:regex]{regular expressions}. Multiple selection is allowed. Default is \code{".+"}; all fields.
 }
   \item{size}{
-Integer of length 1 or 2 or character of length 1. Size of plotting panel in pixels. If character, then parsed to integer of length 1 or 2. Length 2 is used only for web cartography. If length 1, then \code{size} defines width of panel, and height is defined automatically. If integer, then width of panel for plotting in pixels. Default is \code{NA}; for web cartogrpaphy value of maximal size of static maps, and code{640} for other cases.
+Integer of length 1 or 2 or character of length 1. Size of plotting panel in pixels. If character, then parsed to integer of length 1 or 2. Length 2 is used only for web cartography. If length 1, then \code{size} defines width of panel, and height is defined automatically. If integer, then width of panel for plotting in pixels. Default is \code{NA}; for web cartogrpaphy value of maximal size of static maps, and \code{640} for other cases.
 }
   \item{expand}{
 Numeric. Multiplier for plotting panel zoom in relation to extent of plotting geometry. Default is \code{1.0}.

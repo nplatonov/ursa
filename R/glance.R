@@ -66,7 +66,7 @@
   # }
   # str(arglist)
    if (is.character(arglist[[1]])) {
-      if (.lgrep("\\.(gpkg|tab|kml|json|geojson|mif|sqlite|shp|osm)(\\.(zip|gz|bz2))*$"
+      if (.lgrep("\\.(gpkg|tab|kml|json|geojson|mif|sqlite|fgb|shp|osm)(\\.(zip|gz|bz2))*$"
                      ,arglist[[1]])) {
          ret <- do.call(".glance",arglist)
          if (plotKnitr)
@@ -130,7 +130,6 @@
                return(do.call("display",arglist))
             }
          }
-         
          b <- if (file.exists(arglist[[1]])) open_gdal(arglist[[1]]) else NULL
          if (!is.null(b)) {
             close(b)
@@ -276,7 +275,7 @@
       art <- .gsub2(tilePatt,"\\1",style)
       proj <- "merc"
    }
-   isWeb <- .lgrep(tilePatt,art) | isUrl
+   isWeb <- .lgrep(tilePatt,art)>0 | isUrl
   # proj <- match.arg(proj)
   # attr(obj,"grid") <- NULL
   # attr(obj,"toUnloadMethods") <- NULL
@@ -285,8 +284,11 @@
    basemapRetina <- FALSE
    if (isWeb) {
       bbox <- with(g0,c(minx,miny,maxx,maxy))
-      lim <- c(.project(matrix(bbox,ncol=2,byrow=TRUE)
-                                               ,g0$crs,inv=TRUE))[c(1,3,2,4)]
+      if (grepl("\\+proj=longlat",g0$crs))
+         lim <- bbox
+      else
+         lim <- c(.project(matrix(bbox,ncol=2,byrow=TRUE),g0$crs
+                          ,inv=TRUE,verbose=verbose))[c(1,3,2,4)]
       ostyle <- unlist(strsplit(style,split="\\s+"))
       isStatic <- ostyle[1] %in% staticMap
       ustyle <- ""#ostyle[1]
@@ -294,7 +296,7 @@
          nextStyle <- .grep(ostyle[1],staticMap
                            ,invert=TRUE,value=TRUE)
       else
-         nextStyle <- .grep(ostyle[1],c("mapnik","cartoDB","opentopomap")
+         nextStyle <- .grep(ostyle[1],c("CartoDB","mapnik","opentopomap")
                            ,invert=TRUE,value=TRUE)[seq(3)]
       nsize <- length(nextStyle)+1
       cache <- .getPrm(arglist,"cache",class=c("logical","character"),default=TRUE)

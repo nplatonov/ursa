@@ -12,7 +12,7 @@
    interimExt <- if (isGeoJSON) fext else c("gpkg","geojson","shp","sqlite")[4]
    driverList <- c(shp="ESRI Shapefile"
                   ,sqlite="SQLite",json="GeoJSON",geojson="GeoJSON",gpkg="GPKG"
-                  ,tab="Mapinfo File",kml="KML")
+                  ,tab="Mapinfo File",kml="KML",fgb="FlatGeobuf")
    if (!nchar(compress)) {
       packPatt <- "^(zip|bz(ip)*2|gz(ip)*|xz)$"
       if (.lgrep(packPatt,fext)>0) {
@@ -248,8 +248,11 @@
      # dopt <- c(dopt,"SPATIALITE=yes")
       lopt <- c(lopt,"LAUNDER=NO")#,"SPATIAL_INDEX=YES")
    }
+   if (driver=="FlatGeobuf") {
+      lopt <- c(lopt,"SPATIAL_INDEX=NO")
+   }
    if ((is.logical(compress))&&(compress)) {
-      compress <- if (driver %in% c("GeoJSON","SQLite","GPKG","KML")) "gz" 
+      compress <- if (driver %in% c("GeoJSON","SQLite","FlatGeobuf","GPKG","KML")) "gz" 
                   else "zip"
    }
    if (verbose)

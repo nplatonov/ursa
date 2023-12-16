@@ -7,6 +7,7 @@
 \alias{names.ursaColorTable}
 \alias{names<-.ursaColorTable}
 \alias{ursa_colorindex}
+\alias{ursa_color}
 
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
@@ -26,6 +27,8 @@ ursa_colortable(x)
 ursa_colortable(x) <- value
 
 ursa_colorindex(ct)
+   
+ursa_color(ct, ...)
 
 \method{names}{ursaColorTable}(x)
 
@@ -35,7 +38,7 @@ ursa_colorindex(ct)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{
-\code{ursaRaster} object. 
+\code{ursaRaster} object. Extended for numeric (integer or real) of character vector.
 }
   \item{ct}{
 \code{ursaColorTable} object with or without indexing.
@@ -45,7 +48,7 @@ Named character vector. In Replacement functions:
 
 For \code{ursa_colortable()}: values are colors in \dQuote{#RRGGBB} notation or \R color names (\code{\link[grDevices]{colors}}). \code{names(value)} are names of categories.
 
-For \code{names()}: values are names of categories. If length of names is \code{n-1}, where \code{n} is length of colors, then intervaling is assumed, and code{value} are assign to interval breaks.
+For \code{names()}: values are names of categories. If length of names is \code{n-1}, where \code{n} is length of colors, then intervaling is assumed, and \code{value} are assign to interval breaks.
 }
   \item{i}{
 Integer vector. Indices specifying elements to extract part (subset) of color table.
@@ -53,8 +56,9 @@ Integer vector. Indices specifying elements to extract part (subset) of color ta
   \item{\dots}{
 In \code{print()}, passing to generic \code{\link[base]{print}}. Currently not used.
 \cr
-In \code{ursa_colorable()}, passing to generic \code{\link[base]{print}}. Currently not used.
-
+In \code{ursa_colortable()}, passing to generic \code{\link[base]{print}}. Currently not used.
+\cr
+In \code{ursa_color()}, passing to \code{\link[ursa]{colorize}}.
 }
 }
 \details{
@@ -81,6 +85,8 @@ Class of \code{$colortable} element is \dQuote{ursaColorTable}. This is named ch
 \emph{Replace} function \code{names<-} for \code{ursaColorTable} object returns \code{ursaColorTable} with changed names of categories.
 
 \code{ursa_colorindex} returns index (if presents) for \code{ursaColorTable} object.
+
+\code{ursa_color} returns character vector of colors in hex format.
 
 Color tables are written to ENVI header file.
 }
@@ -119,11 +125,17 @@ print(ursa_colortable(b2))
 ursa_colortable(b2) <- c("Low"="darkolivegreen1"
                         ,"Moderate"="darkolivegreen2"
                         ,"High"="darkolivegreen3"
-                        ,"errata"="darkolivegreen4")
+                        ,"undefined"="darkolivegreen4")
 print(ursa_colortable(b2))
 names(ursa_colortable(b2))[4] <- "Polar"
 print(ursa_colortable(b2))
 display(b2)
+
+lab <- sample(c("A","B","C"),9,replace=TRUE)
+lab
+ct <- ursa_color(lab)
+names(ct) <- lab
+ct
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

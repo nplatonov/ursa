@@ -1,10 +1,14 @@
 # wrappers to spatial (not raster) objects
 #.syn('spatial_crs',0,...)
 'spatial_proj4' <- 'spatial_proj' <- 'spatial_crs' <- function(obj,verbose=FALSE) {
-   if (!is.null(attr(obj,"crs"))) {
+   if (!is.null(attr(obj,"crs",exact=TRUE))) {
       res <- attr(obj,"crs")
-      if (inherits(res,"crs"))
+      if (inherits(res,"crs")) {
+         if ((is.list(res))&&(!is.null(res$wkt))&&("sf" %in% loadedNamespaces())) {
+            return(sf::st_crs(res$wkt)$proj4string)
+         }
          return(res$proj4string)
+      }
       return(res)
    }
    if ((TRUE)&&(is.character(obj))&&(nchar(obj)>0)&&(length(spatial_dir(obj))==1)) {
@@ -812,7 +816,7 @@
 }
 'spatial_filelist' <- 'spatial_dir' <- function(path=".",pattern=NA,full.names=TRUE
                                                ,recursive=FALSE,ignore.case=TRUE) {
-   patt0 <- "\\.(gpkg|tab|kml|json|geojson|mif|sqlite|shp|osm)(\\.(zip|gz|bz2))*$"
+   patt0 <- "\\.(gpkg|tab|kml|json|geojson|mif|sqlite|fgb|shp|osm)(\\.(zip|gz|bz2))*$"
    if (devel <- TRUE & all(!dir.exists(path))) {
       dname <- dirname(path)
       if (dname!=".") {
@@ -1364,7 +1368,7 @@
 }
 'spatial_basename' <- function(fname) {
    gsub(paste0("\\."
-              ,"(shp|geojson|json|sqlite|gpkg|mif|kml|osm|csv|tif|envi|bin|envigz|img|bingz)"
+              ,"(shp|geojson|json|fgb|sqlite|gpkg|mif|kml|osm|csv|tif|envi|bin|envigz|img|bingz)"
               ,"(\\.(gz|bz2|zip|rar))*$")
        ,"",basename(fname),ignore.case=TRUE)
 }

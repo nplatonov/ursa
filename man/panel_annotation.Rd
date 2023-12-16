@@ -58,7 +58,7 @@ panel_annotation(...)
    \item{fill}{Character. Color name or code for circumscribed rectangle around labels. Default is \code{NA}, which is interpreted as \code{"#FFFFFF7F"} for \emph{captions} and as \code{"transparent"} for \emph{annotations}.}
 %%~    \item{font}{Character. Font family. Default is \code{par("family")}.}
    \item{font}{Character. Font family. Default is \code{getOption("ursaPngFamily")}, which is specified by argument \code{font} (or \code{family}) in \code{compose_open()}.}
-   \item{vertical}{Logical or numeric. Vertical or inclined orientation of label. If \code{FALSE}, then horizontal labeling. If \code{numeric} then code{vertical} defines text direction in degrees. Limitation: value \code{1} is interpreted as \code{TRUE}. Default is \code{FALSE}, which means horizontal text direction.}
+   \item{vertical}{Logical or numeric. Vertical or inclined orientation of label. If \code{FALSE}, then horizontal labeling. If \code{numeric} then \code{vertical} defines text direction in degrees. Limitation: value \code{1} is interpreted as \code{TRUE}. Default is \code{FALSE}, which means horizontal text direction.}
    \item{interpolate}{Logical. Passed as argument \code{interpolate} to function \code{\link[graphics:rasterImage]{rasterImage}} for logo annotation.}
    \item{resample}{Logical or numeric. Passed as argument \code{resample} to function \code{\link[ursa]{regrid}} for logo annotation. Default is \code{FALSE}. If \code{TRUE} , then resized logo is drawn smoothly.}
    \item{alpha}{Numeric or character. Level of transparency for logos. If numeric, the either \verb{0 <= alpha <= 1} or \code{0 <= alpha <= 255}. If character, then one byte of hexadecimal value \verb{"00" <= alpha <= "FF"}. Default is \code{1}.}

@@ -150,7 +150,8 @@
    tile$time[which(tile$x<tile$x[1])] <- date-1L
    crind <- cr-apply(cr,1,min)
    tind <- expand.grid(z=zoom,r=seq_along(seqr)-1,c=seq_along(seqc)-1)
-   img <- array(1,dim=c(tsize*length(seqc),tsize*length(seqr),4))
+   img <- array(0,dim=c(tsize*length(seqc),tsize*length(seqr),4))
+   img[,,4] <- 1
    a <- .getEarthdataTile(x=tile[,"x"],y=tile[,"y"],z=tile[,"z"]
                          ,epsg=ifelse(is3413,"3413","3857")
                          ,product=product,time=tile[,"time"]
@@ -220,15 +221,16 @@
          if (cache) {
             dst <- try(.ursaCacheDownload(src[i],mode="wb",quiet=!verbose))
             if (inherits(dst,"try-error")) {
-               print(dst)
-               a[[i]] <- NULL
+               if (verbose)
+                  cat(dst)
+              # a[[i]] <- NULL
                next
             }
          }
          else {
             res <- try(download.file(src[i],dst,mode="wb",quiet=!verbose))
             if (inherits(res,"try-error")) {
-               a[[i]] <- NULL
+              # a[[i]] <- NULL
                next
             }
          }
