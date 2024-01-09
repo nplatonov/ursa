@@ -1,10 +1,23 @@
-2023-12-16
+2024-01-09
 
 <!--
 + Depends on R (>= 4.1.0) instead of R (>= 3.0.0) due to using native pipes `|>` in code
 + Depends on R (>= 4.1.0) instead of R (>= 3.0.0) due to changed behaviour in `*apply()` functions with argument `simplify`
 + Ongoing...
 -->
+
+### Version 3.10.4
+
+-   New function `whiteboxing()` for manipulation with
+    [WhiteboxTools](https://github.com/jblindsay/whitebox-tools/releases)
+    using `ursaRaster` objects.
+
+-   Fixed issues `update_coastline()` for polygons with 180 meridian
+    cutting.
+
+-   Improved tile URL parsing for external leaflet providers.
+
+-   Coastline is updated to version 2024-01-09T04:48.
 
 ### Version 3.10.3
 
@@ -14,7 +27,7 @@
 -   `get_earhthdata()` returns “black” image in the case of missed tiles
     instead of error.
 
--   Coastline is updated to version 2023-10-06T03:39.
+-   Coastline is updated to version 2023-12-16T04:43.
 
 ### Version 3.10.2
 

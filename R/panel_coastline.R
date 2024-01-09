@@ -718,7 +718,7 @@
          }
       }
       if ((!.isPackageInUse())&&(devel <- F)) {
-         a5 <- subset(a,FID %in% pair[[1]])
+         a5 <- subset(a,FID %in% pair[[2]])
          message("writing `wrangel_fail.sqlite`")
          spatial_write(spatial_transform(a5,3571),"wrangel_fail.sqlite")
          q()
@@ -728,9 +728,42 @@
          ##~ q()
       }
       a180 <- vector("list",length(pair))
+      if (devel3 <- TRUE) {
+        # pair <- pair[2]
+         for (i in seq_along(pair)) {
+            fid5 <- pair[[i]]
+            a180[[i]] <- subset(a,FID %in% fid5)
+            a0 <- spatialize(a180[[i]],resetProj=TRUE)
+           # a0 <- spatialize(subset(a,FID %in% fid5),style="merc",lon0=180)
+           # print(spatial_crs(a0))
+           # spatial_write(a0,"wrangel_fail.sqlite")
+           # str(a0)
+           # print(spatial_area(a0))
+            a1 <- spatial_union(a0)
+            a1 <- sf::st_cast(a1,"MULTIPOLYGON")
+           # str(a1)
+           # cat("------------\n")
+           # str(spatial_geometry(a1)[[1]])
+            ng <- length(spatial_geometry(a1)[[1]])
+           # str(ng)
+           # cat("------------\n")
+            if (ng>1)
+               next
+            spatial_data(a1) <- data.frame(FID=65000L+i)
+            a180[[i]] <- sf::st_transform(a1,prj1)
+           # print(spatial_area(a1))
+           # print(spatial_count(a2))
+           # glance(a2,resetGrid=TRUE,decor=FALSE)
+         }
+        # cat("===============\n")
+      }
       for (i in seq_along(pair)) {
-         fid5 <- pair[[i]]
-         a0 <- spatial_transform(subset(a,FID %in% fid5),3571)
+         if (spatial_count(a180[[i]])==1)
+            next
+         a0 <- a180[[i]]
+        # fid5 <- pair[[i]]
+        # a0 <- spatial_transform(subset(a,FID %in% fid5),3571)
+         a0 <- spatial_transform(a0,3571)
          xy0 <- spatial_coordinates(a0)
          if (devel6 <- F) {
             if (i==4) {
@@ -814,6 +847,13 @@
          q()
       }
       .elapsedTime("spliting - done")
+      if (F) {
+         a180 <- spatial_bind(a180)
+         a180 <- spatialize(a180,style="merc",lon0=180)
+         str(a180)
+         spatial_write(a180,"wrangel_fail.sqlite")
+         q()
+      }
       a <- list(subset(a,!(FID %in% unlist(pair))))
       a <- do.call("rbind",c(a,a180))
       .elapsedTime("merging - done")

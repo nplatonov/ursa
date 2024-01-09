@@ -1,3 +1,4 @@
+# utils::globalVariables("wbttools")
 '.ursaToolSetDummyFunction' <- function() NULL
 #try(Sys.setenv(R_PLASTER_TEMPLATE=
 #     file.path(chartr("\\","/",Sys.getenv("R_USER")),"template.idr")))

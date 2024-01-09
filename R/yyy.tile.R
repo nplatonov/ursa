@@ -44,7 +44,7 @@
 }
 # https://leaflet-extras.github.io/leaflet-providers/preview/
 # https://leaflet-extras.github.io/leaflet-providers/leaflet-providers.js
-'.tileService' <- function(server="") {
+'.tileService' <- function(server="",providers=FALSE) {
    language <- if (.lgrep("Russian",ctype <- Sys.getlocale("LC_TIME"))) "ru"
                else Sys.getenv("LANGUAGE")
    osmCr <- "\uA9 OpenStreetMap contributors"
@@ -84,7 +84,7 @@
                  ,paste0(osmCr,", \u0421\u043F\u0443\u0442\u043D\u0438\u043A \uA9 \u0420\u043E\u0441\u0442\u0435\u043B\u0435\u043A\u043E\u043C"))
   # http://cartodb-basemaps-c.global.ssl.fastly.net/light_all/6/37/21.png   
   # http://a.basemaps.cartocdn.com/light_only_labels/6/39/18.png
-   s$CartoDB <- c("https://{abcd}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+   s$'internal.CartoDB' <- c("https://{abcd}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
                  ,paste0(osmCr,", \uA9 CartoDB"))
    s$'Positron' <- c("https://{abcd}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
                     ,paste0(osmCr,", \uA9 CartoDB"))
@@ -94,7 +94,7 @@
                        ,paste0(osmCr,", \uA9 CartoDB"))
    s$kosmosnimki <- c("http://{abcd}.tile.osm.kosmosnimki.ru/kosmo/{z}/{x}/{y}.png"
                      ,paste0(osmCr,", \uA9 ScanEx"))
-   s$Esri.Ocean <- c("https://services.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}.jpg"
+   s$Esri.Ocean <- c("https://services.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}.jpg"
                     ,"\uA9 Esri: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri")
    s$Esri.Topo <- c("http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}.jpg"
                    ,"\uA9 Esri - contributors to Esri World Topo Map")
@@ -110,7 +110,7 @@
                       ,"\uA9 ESRI World Hillshade")
    s$Esri.Satellite <- c("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.jpg"
                       ,"\uA9 ESRI Satellite")
-   s$Esri.WorldImagery <- c("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.jpg"
+   s$internal.Esri.WorldImagery <- c("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.jpg"
                       ,"Tiles \uA9 Esri - Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community")
    s$Esri.Clarity <- c("https://clarity.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
                       ,"ESRI.Clarity")
@@ -135,8 +135,8 @@
                         ,"jpg")
    s$opentopomap <- c("http://{abc}.tile.opentopomap.org/{z}/{x}/{y}.png"
                      ,paste0(osmCr,", \uA9 OpenTopoMap"))
-   s$wiki <- c("https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png"
-              ,paste0("Wikimedia | ",osmCr))
+   s$wikimedia <- c("https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png"
+                   ,paste0("Wikimedia | ",osmCr))
    s$ArcticConnect <- c("https://{abc}.tiles.arcticconnect.ca/osm_{l}/{z}/{x}/{y}.png"
                   ,paste0("Map \uA9 ArcticConnect. Data ",osmCr))
    s$ArcticSDI <- c(paste0("http://basemap.arctic-sdi.org/mapcache?"
@@ -187,16 +187,16 @@
    s$'Yandex.ru' <- c(paste0("https://vec0{1234}.maps.yandex.net/"
                               ,"tiles?l=map&x={x}&y={y}&z={z}&scale={r}&lang=ru_RU"),yandexCr)
    s$mapy <- c("https://mapserver.mapy.cz/base-m/{r}/{z}-{x}-{y}","mapy.cz")
-   s$'Stadia.AlidateSmooth' <- c(paste0("https://tiles.stadiamaps.com/tiles/alidade_smooth"
+   s$'internal.Stadia.AlidateSmooth' <- c(paste0("https://tiles.stadiamaps.com/tiles/alidade_smooth"
                                        ,"/{z}/{x}/{y}{r}.png","?api_key=",StadiaKey)
                                 ,StadiaCr)
-   s$'Stadia.AlidateSmoothDark' <- c(paste0("https://tiles.stadiamaps.com/tiles/alidade_smooth_dark"
+   s$'internal.Stadia.AlidateSmoothDark' <- c(paste0("https://tiles.stadiamaps.com/tiles/alidade_smooth_dark"
                                            ,"/{z}/{x}/{y}{r}.png","?api_key=",StadiaKey)
                                 ,StadiaCr)
-   s$'Stadia.OSMBright' <- c(paste0("https://tiles.stadiamaps.com/tiles/osm_bright"
+   s$'internal.zzzStadia.OSMBright' <- c(paste0("https://tiles.stadiamaps.com/tiles/osm_bright"
                                    ,"/{z}/{x}/{y}{r}.png","?api_key=",StadiaKey)
                             ,StadiaCr)
-   s$'Stadia.Outdoors' <- c(paste0("https://tiles.stadiamaps.com/tiles/outdoors"
+   s$'internal.Stadia.Outdoors' <- c(paste0("https://tiles.stadiamaps.com/tiles/outdoors"
                                   ,"/{z}/{x}/{y}{r}.png","?api_key=",StadiaKey)
                            ,StadiaCr)
    s$'Stamen.Terrain' <- c(paste0("https://stamen-tiles-{abcd}.a.ssl.fastly.net/terrain"
@@ -207,10 +207,26 @@
                           ,StamenCr)
    s$'rumap' <- c("https://{abcd}tilecart.kosmosnimki.ru/rw/{z}/{x}/{y}.png"
                  ,"\u0420\u435\u043b\u044c\u0435\u0444 \u0420\u0443\u043c\u0430\u043f Scanex")
+   s$'wikimapia' <- c("https://{s}.wikimapia.org/?x={x}&y={y}&zoom={z}&type=map&lng=1"
+                 ,"Wikimapia CC-BY-SA")
   # http://a.maps.owm.io/map/precipitation_new/6/37/19?appid=b1b15e88fa797225412429c1c50c122a1   
    if (!sum(nchar(server))) {
+      val1 <- .grep(".*zzz(google|yandex).*",names(s),value=TRUE,invert=TRUE)
+      if ((providers)&&(requireNamespace("leaflet",quietly=.isPackageInUse()))&&
+          (requireNamespace("leaflet.providers",quietly=.isPackageInUse()))) {
+         cname <- file.path(.ursaCacheDir(),"leaflet_providers.rds")
+         if (!file.exists(cname)) {
+            val2 <- try(leaflet.providers::get_providers())
+            if (!inherits(val2,"try-error"))
+               saveRDS(val2,cname)
+         }
+         if (file.exists(cname)) {
+            val2 <- readRDS(cname)$providers
+            val1 <- unique(c(val1,val2))
+         }
+      }
      # print(.grep(".*zzz(google|yandex).*",names(s),value=TRUE,invert=TRUE))
-      return(.grep(".*zzz(google|yandex).*",names(s),value=TRUE,invert=TRUE))
+      return(val1)
    }
    if (!(server[1] %in% names(s))) {
       for (i in seq_along(s)) {
@@ -301,6 +317,7 @@
                            ,"&width=256&height=256"
                            ,"&service=WMS&request=GetMap")
       }
+      attr(tile$url,"credentials") <- attr(style,"credentials")
    }
   # print(tile);q()
    tile
@@ -335,16 +352,22 @@
                  ,2,function(x) strtoi(paste(x,collapse=""),base=2L))
       tile <- .gsub("{q}",paste(b5,collapse=""),tile)
    }
-   if ((FALSE)&&(.lgrep("\\{..+}",tile))) {
+   if (grepl("\\{s\\}\\.wikimapia\\.org",tile)) {
+      s <- paste0("i",(x %% 4)+(y %% 4)*4L)
+      tile <- gsub("\\{s\\}",s,tile)
+   }
+   if ((!FALSE)&&(.lgrep("\\{..+}",tile))) {
       dom <- unlist(strsplit(.gsub2("\\{(.+)\\}","\\1",gsub("\\{.\\}","",tile)),""))
       ##~ print(tile)
       ##~ print(dom)
       tile <- .gsub("{.+}",sample(dom,1),tile)
    }
   # fname <- tempfile(fileext=".tile")
-   if (!.isPackageInUse())
-      print(tile)
-  # q()
+   if (!.isPackageInUse()) {
+      tile2prn <- tile
+      attr(tile2prn,"credentials") <- NULL
+      print(tile2prn)
+   }
    if ((dir.exists(tile))&&(requireNamespace("RSQLite",quietly=!.isPackageInUse()))) {
      ## try SAS Planet
       list1 <- dir(path=file.path(tile,paste0("z",z+1L)),pattern="\\.sqlitedb$"

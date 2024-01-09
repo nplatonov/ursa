@@ -196,13 +196,13 @@
      # requireNamespace("methods",quietly=.isPackageInUse())
    }
    obj <- spatialize(dsn=dsn,engine=engine,layer=layer,field=field,geocode=geocode
-                   ,place=place,area=area,grid=grid,size=size
-                  # ,expand=expand,border=border
-                   ,expand=expand,border=0
-                   ,lat0=lat0,lon0=lon0
-                   ,resetProj=resetProj,resetGrid=resetGrid
-                   ,style=style#,zoom=NA
-                   ,verbose=verbose)
+                    ,place=place,area=area,grid=grid,size=size
+                   # ,expand=expand,border=border
+                    ,expand=expand,border=0
+                    ,lat0=lat0,lon0=lon0
+                    ,resetProj=resetProj,resetGrid=resetGrid
+                    ,style=style#,zoom=NA
+                    ,verbose=verbose)
    if (inherits(obj,"NULL"))
       return(invisible(NULL))
    isSF <- inherits(obj,c("sfc","sf"))
@@ -221,27 +221,32 @@
       print(g0)
    }
    toUnloadMethods <- if (S4) toUnloadMethods else attr(obj,"toUnloadMethods")
+   if (is.null(toUnloadMethods))
+      toUnloadMethods <- FALSE
   # dname <- attr(obj,"colnames")
    dname <- spatial_fields(obj)
    style <- attr(obj,"style")
    geocodeStatus <- attr(obj,"geocodeStatus")
+   if (is.null(geocodeStatus))
+      geocodeStatus <- FALSE
   # obj <- sp::SpatialLinesDataFrame(obj,data=data.frame(uid="test it")) ## for debug
    noAttr <- geocodeStatus |
        ((isSF)&&(inherits(obj,"sfc"))) |
        ((isSP)&&(!inherits(obj,paste0("Spatial",c("Points","Lines","Polygons")
                                      ,"DataFrame"))))
    toColor <- ((is.numeric(dsn))||(noAttr))||(TRUE)
-   if ((toColor)&&(!.lgrep("(colo(u)*r|gr[ae]y(scale)*)",style))&&
+   art <- style
+   if ((toColor)&&(!.lgrep("\\s(colo(u)*r|gr[ae]y(scale)*)",style))&&
           (length(style)==1))
       style <- paste(style,"color")
-   else if ((!toColor)&&(!.lgrep("(colo(u)*r|gr[ae]y(scale)*)",style)&&
+   else if ((!toColor)&&(!.lgrep("\\s(colo(u)*r|gr[ae]y(scale)*)",style)&&
           (length(style)==1)))
       style <- paste(style,"greyscale")
    if (!.lgrep(projPatt,style))
       proj <- "auto"
    else
       proj <- .gsub2(projPatt,"\\1",style)
-   if (!FALSE) { ## dev
+   if (FALSE) { ## dev
       s1 <- .tileService()
       s2 <- strsplit(style,split="\\s+")
       s <- expand.grid(s1,s2)
@@ -263,9 +268,17 @@
       ind <- .grep("http(s)*://",style)
       style[ind] <- unlist(strsplit(style[ind],split="\\s+"))[1]
    }
+   if (!is.null(style))
+      providers <- .tileService(providers=TRUE)
+   else
+      providers <- ""
    if (!.lgrep(tilePatt,style)) {
       if (isUrl) {
-         art <- style
+        # art <- style
+         proj <- "merc"
+      }
+      else if ((length(art))&&(art %in% providers)) {
+        # art <- style
          proj <- "merc"
       }
       else
@@ -275,7 +288,9 @@
       art <- .gsub2(tilePatt,"\\1",style)
       proj <- "merc"
    }
-   isWeb <- .lgrep(tilePatt,art)>0 | isUrl
+   isWeb <- .lgrep(tilePatt,art)>0 | art %in% providers | isUrl
+   if (verbose)
+      str(list(style=style,art=art,proj=proj,isUrl=isUrl,isWeb=isWeb))
   # proj <- match.arg(proj)
   # attr(obj,"grid") <- NULL
   # attr(obj,"toUnloadMethods") <- NULL
@@ -322,12 +337,15 @@
          message(paste("failed to get map; cancel"))
          print(lim)
          basemap <- NULL
+         g0 <- session_grid()
       }
       else {
          basemapRetina <- isTRUE(attr(basemap,"retina"))
          g0 <- ursa(basemap,"grid") ## 0605 TODO
       }
-     # print(g0)
+      if (is.null(g0)) {
+         g0 <- session_grid()
+      }
    }
    else {
       basemap <- NULL

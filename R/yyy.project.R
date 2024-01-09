@@ -1,5 +1,6 @@
 '.project' <- function(xy,proj,inv=FALSE,verbose=FALSE) {
-  # verbose <- TRUE; print("ENTERED IN"); on.exit(print("ENTERED OUT"))
+   on.exit(NULL)
+  # verbose <- TRUE; print("ENTERED IN"); on.exit(print("ENTERED OUT"),add=TRUE)
    ## because of quicker load of 'proj4' package
   # show.error.messages=verbose
    if (isSF <- .isSF(xy)) {
@@ -13,7 +14,7 @@
   # print("---")
   # print(class(xy))
   # print("===")
-   opW <- options(warn=-11,show.error.messages=verbose);on.exit(options(opW))
+   opW <- options(warn=-11,show.error.messages=verbose);on.exit(options(opW),add=TRUE)
   # if (("package:rgdal" %in% search())||
   #     (!requireNamespace("proj4",quietly=.isPackageInUse())))
   #    res <- project(xy=xy,proj=proj,inv=inv) ## project() from 'rgdal'
@@ -97,6 +98,13 @@
          },silent=TRUE)
       }
    }
+   if (!a) {
+      if ((!is_rgdal)&&(!.isPackageInUse())) {
+         is_rgdal <- .rgdal_requireNamespace()
+      }
+      if ((!is_rgdal)&&(!is_sf))
+         is_sf <- TRUE
+   }
    if ((!a)&&(is_sf)) {
       if (verbose)
          message("'sf' is used")
@@ -160,6 +168,7 @@
    if (!a) {
       if (verbose)
          message("'rgdal' is used")
+      q()
       if (.isPackageInUse()) {
          opWG <- options(warn=1)
          warning("Unable to reproject without `rgdal` package")

@@ -93,7 +93,7 @@
    if ((isSF)&&(!("sf" %in% loaded)))
       isSF <- requireNamespace("sf",quietly=.isPackageInUse())
    if (verbose)
-      print(c(isSF=isSF))
+      print(data.frame(isSF=isSF,engine=engine))
    if (isSF) {
      # str(md <- sf::gdal_metadata(fname,parse=!FALSE))
      # str(ds <- sf::gdal_subdatasets(fname,name=TRUE))

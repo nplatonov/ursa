@@ -169,22 +169,27 @@ cat(" ----------- end of quoting ---------------\n")
 try(system(cmd,wait=FALSE))
 }
 
-require(sp)
-a <- data.frame(lat=c(70.734,71.657),lon=c(178.577,-177.38),place="Wrangel Island")
-coordinates(a) <- ~lon+lat
-proj4string(a) <- "EPSG:4326"
+if (isSP <- require(sp)) {
+   a <- data.frame(lat=c(70.734,71.657),lon=c(178.577,-177.38),place="Wrangel Island")
+   coordinates(a) <- ~lon+lat
+   proj4string(a) <- "EPSG:4326"
+}
 
 \donttest{ ## internet connection is required
-glance(a,style="google color maptype=terrain")
+if (isSP)
+   glance(a,style="google color maptype=terrain")
 }
 \donttest{ ## internet connection is required
-glance(a,style="Positron",border=0)
+if (isSP)
+   glance(a,style="Positron",border=0)
 }
 \donttest{ ## internet connection is required
-glance(a,style="mapnik color tile",border=0)
+if (isSP)
+   glance(a,style="mapnik color tile",border=0)
 }
 \donttest{ ## internet connection is required
-glance("Svalbard",resetGrid=TRUE)
+if (isSP)
+   glance("Svalbard",resetGrid=TRUE)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

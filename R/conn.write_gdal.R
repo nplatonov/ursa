@@ -104,8 +104,11 @@
       return(invisible(datatype))
    invisible(-97L)   
 }
-'write_gdal' <- function (obj,...) {
-   if (.isPackageInUse()) {
+'write_gdal' <- function(obj,...) {
+   arglist <- list(...)
+   engine <- .getPrm(arglist,name="engine",default="native")
+  # if ((.isPackageInUse())||(!.rgdal_requireNamespace())) { ## .rgdal_loadedNamespaces
+   if ((.isPackageInUse())||(engine!="rgdal")) {
       res <- try(.write_sfgdal(obj,...))
      # ret <- .try(res <- .write_sfgdal(obj,...))
       if (!inherits(res,"try-error"))
@@ -118,10 +121,13 @@
    if (is.null(res))
       return(invisible(-99L))
    res[] <- obj
+   opt <- list(...)
+   opt <- opt[nchar(names(opt))>0]
+   res$con$compress <- opt
    close(res)
    return(invisible(res$con$datatype))
 }
-'.write_sfgdal' <- function(obj,fname,driver) {
+'.write_sfgdal' <- function(obj,fname,driver,options,...) {
    if ((!"sf" %in% loadedNamespaces())&&(T | isTRUE(getOption("ursaForceSF"))))
       requireNamespace("sf",quietly=.isPackageInUse())
    if (!requireNamespace("stars",quietly=.isPackageInUse()))
@@ -150,15 +156,31 @@
       if (is.null(driver))
          driver <- "ENVI"
    }
-   if (driver=="GTiff") {
-      opt <- c("COMPRESS=DEFLATE"
-              ,paste0("PREDICTOR=",ifelse(datatype %in% c(4,5),"3","2"))
-              ,paste0("INTERLEAVE=",ifelse(length(obj)==1,"PIXEL","BAND"))
-              ,"TILED=NO"
-              )
+   if (missing(options)) {
+      if (driver=="GTiff") {
+         opt <- c("COMPRESS=DEFLATE"
+                 ,paste0("PREDICTOR=",ifelse(datatype %in% c(4,5),"3","2"))
+                 ,paste0("INTERLEAVE=",ifelse(length(obj)==1,"PIXEL","BAND"))
+                 ,"TILED=NO"
+                 )
+      }
+      else
+         opt <- character()
    }
-   else
-      opt <- character()
+   else {
+      if (is.character(options)) {
+         oname <- names(options)
+         if (is.null(oname))
+            opt <- do.call(c,strsplit(options,split="\\s+"))
+         else
+            opt <- paste0(oname,"=",options)
+      }
+      else if (is.list(options))
+         opt <- paste0(names(options),"=",sapply(options,\(x) x))
+      else
+         opt <- character()
+     # opt <- paste(opt,collapse=" ")
+   }
    ret <- sf::gdal_write(as_stars(obj),driver=driver
                  ,file=fname,type=dtName,NA_value=nodata,options=opt
                  ,geotransform=with(ursa_grid(obj),c(minx,resx,0,maxy,0,-resy))

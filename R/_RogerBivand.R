@@ -231,20 +231,38 @@
 '.rgdal_close_Transient' <- function(con,bname) {
    .rgdal_requireNamespace()
    dr <- rgdal::getDriverName(rgdal::getDriver(con$handle))
-   op <- NULL
-   if (dr=="GTiff")
-      op=c(paste0("COMPRESS=",c("DEFLATE","ZSTD","LZW")[1])
-          ,paste0("PREDICTOR=",ifelse(con$mode=="numeric",3,2))
-          ,"TILED=NO"
-          ,"ZLEVEL=9"
-          ,"ZSTD_LEVEL=9"
-          ,paste0("INTERLEAVE=",switch(con$interleave,bil="PIXEL","BAND")))
-   else if (dr=="HFA") {
-      op=c("COMPRESSED=YES")
+   opt <- con$compress
+   if (length(opt))
+      opt <- opt[[.grep("options",names(opt))]]
+   if (!length(opt)) {
+      op <- NULL
+      if (dr=="GTiff")
+         op=c(paste0("COMPRESS=",c("DEFLATE","ZSTD","LZW")[1])
+             ,paste0("PREDICTOR=",ifelse(con$mode=="numeric",3,2))
+             ,"TILED=NO"
+             ,"ZLEVEL=9"
+             ,"ZSTD_LEVEL=9"
+             ,paste0("INTERLEAVE=",switch(con$interleave,bil="PIXEL","BAND")))
+      else if (dr=="HFA") {
+         op=c("COMPRESSED=YES")
+      }
+      else if (dr=="ENVI") {
+        # print(con$interleave)
+         op <- paste0("INTERLEAVE=",toupper(con$interleave))
+      }
    }
-   else if (dr=="ENVI") {
-     # print(con$interleave)
-      op <- paste0("INTERLEAVE=",toupper(con$interleave))
+   else {
+      if (is.character(opt)) {
+         oname <- names(opt)
+         if (is.null(oname))
+            op <- do.call(c,strsplit(opt,split="\\s+"))
+         else
+            op <- paste0(oname,"=",opt)
+      }
+      else if (is.list(opt))
+         op <- paste0(names(opt),"=",sapply(opt,\(x) x))
+      else
+         op <- character()
    }
    rgdal::saveDataset(con$handle,con$fname,options=op)
   # rgdal::closeDataset(con$handle)
@@ -470,6 +488,11 @@
    if (isTRUE(getOption("ursaPackageInUse")))
       .DeadEnd()
    rgdal::project(...)
+}
+'.rgdal_loadedNamespaces' <- function() {
+   if (isTRUE(getOption("ursaPackageInUse")))
+      .DeadEnd()
+  "rgdal" %in% loadedNamespaces()
 }
 '.rgdal_requireNamespace' <- function() {
    if (isTRUE(getOption("ursaPackageInUse")))

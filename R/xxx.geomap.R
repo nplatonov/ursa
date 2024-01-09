@@ -46,81 +46,173 @@
          art <- "sascache"
       }
    }
+  # str(list(art=art,style=style))
+  # q()
    if ((art=="none")&&(length(style)==1)&&
          (requireNamespace("leaflet",quietly=.isPackageInUse()))&&
          (requireNamespace("leaflet.providers",quietly=.isPackageInUse()))) {
      # p <- leaflet::providers
       cname <- file.path(.ursaCacheDir(),"leaflet_providers.rds")
-      if (!file.exists(cname))
-         saveRDS(leaflet.providers::get_providers(),cname)
-      p <- readRDS(cname)$providers_details
+      if (!file.exists(cname)) {
+         p <- try(leaflet.providers::get_providers())
+         if (!inherits(p,"try-error"))
+            saveRDS(p,cname)
+      }
+      if (file.exists(cname))
+         p <- readRDS(cname)$providers_details
       osmCr <- p$'OpenStreetMap'$options$attribution
       osmCr <- gsub("(^.*)(<a\\s.+>)(.+)(</a>)(.*$)","\\1\\3\\5",osmCr)
       osmCr <- gsub("&copy;","\uA9",osmCr)
      # style <- "Stadia" ## devel
       spatt <- "^(\\w+)(\\.(\\w+))*$"
-      s1 <- gsub(spatt,"\\1",style)
-      s2 <- gsub(spatt,"\\3",style)
-      if (s1 %in% names(p)) {
-         p1 <- p[[s1]]
-         ##~ cat('p1:--------\n')
-         ##~ str(p1)
-         ##~ cat('-----------\n')
-         sUrl <- p1$url
-         sAttr <- p1$options$attribution
-         t1 <- unlist(gregexpr("<",sAttr))
-         t2 <- unlist(gregexpr(">",sAttr))
-         if ((length(t1)>0)&&(length(t1)==length(t2))) {
-            t2 <- c(1,t2+1)
-            t1 <- c(t1-1,nchar(sAttr))
-            res <- character()
-            for (i in seq_along(t1))
-               res <- c(res,substr(sAttr,t2[i],t1[i]))
-            sAttr <- paste(res,collapse="")
-            sAttr <- gsub("&copy;","\uA9",sAttr)
-            sAttr <- gsub("&mdash;","\u2014",sAttr)
-         }
-         if (nchar(s2)>0) {
-            if (s2 %in% names(p1$variants)) {
-               p2 <- p1$variants[[s2]]
-               ##~ cat('p2:--------\n')
-               ##~ str(p2)
-               ##~ cat('-----------\n')
-               if (!is.null(p2$url))
-                  sUrl <- p2$url
-               if (isExt <- grepl("\\{ext\\}",sUrl))
-                  if (!is.null(p2$options$ext))
-                     sUrl <- gsub("\\{ext\\}",p2$options$ext,sUrl)
-               if (grepl("\\{variant\\}",sUrl))
-                  if (!is.null(p2$options$variant))
-                     sUrl <- gsub("\\{variant\\}",p2$options$variant,sUrl)
+      style1 <- gsub("^(\\S+)(\\s+\\S+)*$","\\1",style)
+      s1 <- gsub(spatt,"\\1",style1)
+      s2 <- gsub(spatt,"\\3",style1)
+      if (devel <- TRUE) {
+         if (s1 %in% names(p)) {
+            p1 <- p[[s1]]
+            sUrl <- p1$url
+            isExt <- grepl("\\{ext\\}",sUrl)
+            o1 <- p1$options
+            if ((!nchar(s2))&&(grepl("\\{variant\\}",sUrl))&&(length(p1$variants))) {
+               if ("variant" %in% names(o1)) {
+                  a <- sapply(p1$variants,function(x) {
+                     if (is.character(x))
+                        return(x)
+                     x$options$variant
+                  })
+                  s2 <- names(a)[match(o1$variant,a)]
+               }
+               else
+                  s2 <- sample(names(p1$variants),1)
             }
-         }
-         if (isExt <- grepl("\\{ext\\}",sUrl))
-            if (!is.null(p1$options$ext))
-               sUrl <- gsub("\\{ext\\}",p1$options$ext,sUrl)
-         if (grepl("\\{variant\\}",sUrl))
-            if (!is.null(p1$options$variant))
-               sUrl <- gsub("\\{variant\\}",p1$options$variant,sUrl)
-         if (grepl("\\{s\\}",sUrl)) {
-            if (!is.null(p1$options$subdomains))
-               sdomain <- p1$options$subdomains
-            else
-               sdomain <- "abc"
-            sUrl <- gsub("\\{s\\}",paste0("{",sdomain,"}"),sUrl)
-         }
-         if (grepl("^//",sUrl))
-            sUrl <- paste0("https:",sUrl)
-         if (grepl("\\{attribution\\.OpenStreetMap\\}",sAttr))
+            if (nchar(s2)>0) {
+               p2 <- p1$variants[[s2]]
+               if (is.character(p2))
+                  o2 <- list(variant=p2)
+               else {
+                  o2 <- p2$options
+                  if (!"variant" %in% names(o2))
+                     o2$variant=s2
+               }
+               for (oname in names(o2)) {
+                  if (oname=="attribution") {
+                     o1[[oname]] <- gsub(paste0("\\{attribution\\.",s1,"\\}")
+                                        ,o1[[oname]],o2[[oname]])
+                  }
+                  else
+                     o1[[oname]] <- o2[[oname]]
+               }
+            }
+            sCr <- NULL
+            for (oname in names(o1)) {
+               patt <- paste0("(^.*)(\\{",oname,"\\})(.*$)")
+               if (!grepl(patt,sUrl))
+                  next
+               if (grepl("<insert.+here>",o1[[oname]])) {
+                  sCr <- c(sCr,oname)
+                  next
+               }
+               sUrl <- gsub(patt,paste0("\\1",o1[[oname]],"\\3"),sUrl)
+            }
+            if (grepl("\\{s\\}",sUrl)) {
+               if (!is.null(p1$options$subdomains))
+                  sdomain <- p1$options$subdomains
+               else
+                  sdomain <- "abc"
+               sUrl <- gsub("\\{s\\}",paste0("{",sdomain,"}"),sUrl)
+            }
+            sAttr <- o1$attribution
+            t1 <- unlist(gregexpr("<",sAttr))
+            t2 <- unlist(gregexpr(">",sAttr))
+            if ((length(t1)>0)&&(length(t1)==length(t2))) {
+               t2 <- c(1,t2+1)
+               t1 <- c(t1-1,nchar(sAttr))
+               res <- character()
+               for (i in seq_along(t1))
+                  res <- c(res,substr(sAttr,t2[i],t1[i]))
+               sAttr <- paste(res,collapse="")
+               sAttr <- gsub("&copy;","\uA9",sAttr)
+               sAttr <- gsub("&mdash;","\u2014",sAttr)
+            }
             sAttr <- gsub("\\{attribution\\.OpenStreetMap\\}",osmCr,sAttr)
-        # print(c(url=sUrl,attr=sAttr))
-         if (isExt)
-            style <- c(sUrl,sAttr)
-         else
-            style <- c(sUrl,"png",sAttr)
-        # art <- style
+            if (isExt)
+               style <- c(sUrl,sAttr)
+            else
+               style <- c(sUrl,"png",sAttr)
+            if (length(sCr))
+               attr(style,"credentials") <- sCr
+         }
+      }
+      else { ## to deprecate
+         if (s1 %in% names(p)) {
+            p1 <- p[[s1]]
+            sUrl <- p1$url
+            ##~ cat('p1:--------\n')
+            ##~ str(p1)
+            ##~ cat('-----------\n')
+            sAttr <- p1$options$attribution
+            t1 <- unlist(gregexpr("<",sAttr))
+            t2 <- unlist(gregexpr(">",sAttr))
+            if ((length(t1)>0)&&(length(t1)==length(t2))) {
+               t2 <- c(1,t2+1)
+               t1 <- c(t1-1,nchar(sAttr))
+               res <- character()
+               for (i in seq_along(t1))
+                  res <- c(res,substr(sAttr,t2[i],t1[i]))
+               sAttr <- paste(res,collapse="")
+               sAttr <- gsub("&copy;","\uA9",sAttr)
+               sAttr <- gsub("&mdash;","\u2014",sAttr)
+            }
+            sAttr <- gsub("\\{attribution\\.OpenStreetMap\\}",osmCr,sAttr)
+            if (nchar(s2)>0) {
+               if (s2 %in% names(p1$variants)) {
+                  p2 <- p1$variants[[s2]]
+                  ##~ cat('p2:--------\n')
+                  ##~ str(p2)
+                  ##~ cat('-----------\n')
+                  if (is.list(p2)) {
+                     if (!is.null(p2$url))
+                        sUrl <- p2$url
+                     if (isExt <- grepl("\\{ext\\}",sUrl))
+                        if (!is.null(p2$options$ext))
+                           sUrl <- gsub("\\{ext\\}",p2$options$ext,sUrl)
+                     if (grepl("\\{variant\\}",sUrl))
+                        if (!is.null(p2$options$variant))
+                           sUrl <- gsub("\\{variant\\}",p2$options$variant,sUrl)
+                  }
+                  else {
+                     sUrl <- gsub("\\{variant\\}",p2,p1$url)
+                  }
+               }
+            }
+            if (isExt <- grepl("\\{ext\\}",sUrl))
+               if (!is.null(p1$options$ext))
+                  sUrl <- gsub("\\{ext\\}",p1$options$ext,sUrl)
+            if (grepl("\\{variant\\}",sUrl))
+               if (!is.null(p1$options$variant))
+                  sUrl <- gsub("\\{variant\\}",p1$options$variant,sUrl)
+            if (grepl("\\{s\\}",sUrl)) {
+               if (!is.null(p1$options$subdomains))
+                  sdomain <- p1$options$subdomains
+               else
+                  sdomain <- "abc"
+               sUrl <- gsub("\\{s\\}",paste0("{",sdomain,"}"),sUrl)
+            }
+            if (grepl("^//",sUrl))
+               sUrl <- paste0("https:",sUrl)
+            if (grepl("\\{attribution\\.OpenStreetMap\\}",sAttr))
+               sAttr <- gsub("\\{attribution\\.OpenStreetMap\\}",osmCr,sAttr)
+           # print(c(url=sUrl,attr=sAttr))
+            if (isExt)
+               style <- c(sUrl,sAttr)
+            else
+               style <- c(sUrl,"png",sAttr)
+           # art <- style
+         }
       }
    }
+  # str(list(art=art,style=style))
    isStatic <- .lgrep("static",style)>0
   # if ((!isStatic)&&("ursa" %in% loadedNamespaces())) {
   #    stop("Operation is prohibited: unable to display attribution.")
@@ -511,7 +603,7 @@
             epsgWeb <- paste("+proj=merc +a=6378137 +b=6378137"
                              ,"+lat_ts=0.0 +lon_0=0.0"
                              ,"+x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null"
-                             ,"+wktext  +no_defs")
+                             ,"+wktext +no_defs")
          if (FALSE) {
             g2 <- regrid(g0,res=2*pi*B0/dz)
             xr <- with(g2,seq(minx,maxx,by=resx)[-1]-resx/2)+dx0
@@ -679,8 +771,17 @@
             return(0)
          dim(x)[3]
       })
-      if (all(nb==0))
+      if (all(nb==0)) {
+         session_grid(g0)
          stop("all tiles are failed")
+         opW <- options(warn=1)
+         warning("all tiles are failed")
+        # g2 <- session_grid()
+        # on.exit(session_grid(g2))
+         session_grid(g0)
+         return(NULL)
+        # return(ursa_new())
+      }
       nbmax <- max(nb)
       if (length(unique(nb))>1) {
          img1 <- lapply(img1,function(x) {

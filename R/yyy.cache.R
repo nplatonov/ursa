@@ -121,10 +121,52 @@
    enc <- "UTF-8"
    inventory <- .ursaCacheInventory()
    src0 <- src
-   if (.lgrep("\\{..+}",src)) {
-      dom <- unlist(strsplit(.gsub2("\\{(.+)\\}","\\1",gsub("\\{.\\}","",src)),""))
+   attr(src0,"credentials") <- NULL
+   if (!is.null(cred <- attr(src,"credentials"))) {
+      for (cr in cred) {
+         m1 <- gregexpr(paste0("\\{",cr,"\\}"),src)[[1]]
+         if (any(m1<0))
+            next
+         m2 <- regmatches(src,m1)
+         m3 <- gsub("^\\{(.+)\\}$","\\1",m2)
+         if (grepl("thunderforest\\.com",src)) {
+            getCr <- getOption("ThunderforestApiKey")
+         }
+         else if (grepl("api\\.here\\.com",src)) {
+            getCr <- getOption("HEREapp")
+         }
+         else if (grepl("api\\.mapbox\\.com",src)) {
+            getCr <- getOption("mapboxToken")
+         }
+         else
+            getCr <- NULL
+         if (is.null(getCr))
+            next
+         if (is.character(getCr))
+            value <- getCr
+         else {
+            value <- getCr[[match(cr,names(getCr))]]
+         }
+         if ((is.character(value))&&(length(value)==1))
+            regmatches(src,m1) <- value
+      }
+      attr(src,"credentials") <- NULL
+   }
+   else if (grepl("tiles\\.stadiamaps\\.com",src)) {
+      getCr <- getOption("stadiamaps_api_key")
+      if (!is.null(getCr)) {
+         src <- paste0(src,ifelse(grepl("\\.(png|jpg)$",src),"?","&")
+                      ,"api_key=",getCr)
+      }
+   }
+   src1 <- src
+   patt <- "(^http(s)*://)\\{(.+)\\}(.+$)" ## \\1 \\3 \\4
+   if (.lgrep(patt,src)) {
+      dom <- unlist(strsplit(gsub(patt,"\\3",src),""))
+      src <- unname(sapply(sample(dom),function(x) gsub(patt,paste0("\\1",x,"\\4"),src1)))
+     # dom <- unlist(strsplit(.gsub2("\\{(.+)\\}","\\1",gsub("\\{.\\}","",src)),""))
      # src <- .gsub("{.+}",sample(dom,1),src0)
-      src <- unname(sapply(sample(dom),function(x) .gsub("{.+}",x,src0)))
+     # src <- unname(sapply(sample(dom),function(x) .gsub("{.+}",x,src0)))
    }
    if (missing(dst))
       dst <- NULL

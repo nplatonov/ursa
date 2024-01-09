@@ -17,6 +17,7 @@
 '.rgdal_project' <- function(...) .DeadEnd()
 '.rgdal_showP4' <- function(...) .DeadEnd()
 '.rgdal_requireNamespace' <- function(...) .DeadEnd()
+'.rgdal_loadedNamespaces' <- function(...) .DeadEnd()
 '.rgeos_requireNamespace' <- function(...) .DeadEnd()
 '.rgeos_readWKT' <- function(...) .DeadEnd()
 '.rgeos_gLength' <- function(...) .DeadEnd()

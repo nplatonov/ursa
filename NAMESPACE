@@ -12,7 +12,7 @@ importFrom("stats", "aggregate", "density", "loess", "median", "pf",
            "as.dist", "cutree", "dist", "hclust", "quantile")
 importFrom("utils", "str", "download.file", "head", "tail", "methods",
            "object.size", "unzip", "URLencode", "localeToCharset",
-           "read.table", "write.table", "browseURL")
+           "read.table", "write.table", "browseURL", "data")
 export("allocate")
 export("as.Raster")
 export("as.ursa")
@@ -241,6 +241,7 @@ export("ursaProgressBar")
 export("value_cr")
 export("value_ll")
 export("value_xy")
+export("whiteboxing")
 export("write_envi")
 export("write_gdal")
 export("zonal_stat")

@@ -76,6 +76,13 @@
       if (isClass)
          names(ct) <- ctName
       class(ct) <- "ursaColorTable"
+      if (length(ind <- which(names(ct)==""))) {
+         if (length(ind <- ind[ind>1])>0) {
+            if (length(ctCol <- unique(substr(ct[ind],1,7)))==1) {
+               ct <- ct[-ind]
+            }
+         }
+      }
    }
    if ((isCat)||((T & !.lgrep("float",obj$datatype)))) {
      # .elapsedTime("F")

@@ -372,7 +372,7 @@
            # else
            #    obj <- NULL
             if (limLonLat) {
-               sp::proj4string(obj) <- sp::CRS("+init=epsg:4326")
+               sp::proj4string(obj) <- sp::CRS("EPSG:4326")
             }
             else if (!is.null(proj4)) {
                sp::proj4string(obj) <-  sp::CRS(proj4,doCheckCRSArgs=FALSE)
@@ -388,7 +388,7 @@
             sp::coordinates(obj) <- coords
             limLonLat <- all(dsn[,coords]>=-360 & dsn[,coords]<=+360)
             if (limLonLat)
-               sp::proj4string(obj) <- sp::CRS("+init=epsg:4326")
+               sp::proj4string(obj) <- sp::CRS("EPSG:4326")
             dsn <- class(dsn)
          }
          else if (inherits(dsn,"ursaGrid")) {
@@ -521,7 +521,7 @@
                }
                if (isSP) {
                   obj <- sp::SpatialLines(list(sp::Lines(sp::Line(da),1L))
-                                         ,proj4string=sp::CRS("+init=epsg:4326"))
+                                         ,proj4string=sp::CRS("EPSG:4326"))
                }
                geocodeStatus <- TRUE
                hasOpened <- TRUE
@@ -1057,8 +1057,9 @@
       proj <- "auto"
    else
       proj <- .gsub2(projPatt,"\\1",style)
-   if (!.lgrep(tilePatt,style))
+   if (!.lgrep(tilePatt,style)) {
       art <- "none"
+   }
    else {
       art <- .gsub2(tilePatt,"\\1",style)
       proj <- "merc" #ifelse(art=="polarmap",art,"merc")
@@ -1069,7 +1070,17 @@
       len[len>mlen] <- mlen
    }
   # canTile <- .lgrep(art,eval(as.list(args(".tileService"))$server))>0
-   canTile <- .lgrep(art,.tileService())>0
+   if (proj %in% c("onemorekwd?",projClass))
+      canTile <- FALSE
+   else {
+      canTile <- .lgrep(art,.tileService())>0
+      if (!canTile) {
+         canTile <- style %in% .tileService(providers=TRUE)
+        # if (canTile)
+        #    art <- style
+      }
+   }
+  # str(list(style=style,art=art,canTile=canTile))
    isTile <- .lgrep("(tile|polarmap)",style)>0 & canTile | 
       .lgrep("(ArcticSDI|ArcticConnect)",style)>0
    if ((!isStatic)&&(!isTile)) {
@@ -1153,7 +1164,7 @@
             rm(asf2,asf_geom2)
          }
          if (isSP) {
-            asp2 <- sp::spTransform(obj,"+init=epsg:4326")
+            asp2 <- sp::spTransform(obj,"EPSG:4326")
             if (geoType=="POINT") {
                xy <- sp::coordinates(asp2)
             }
@@ -1598,7 +1609,10 @@
       })
       obj <- obj[sapply(obj,function(o) !is.null(o))]
    }
-   if (i_am_not_ready_to_cancel_it <- !FALSE) {
+  # print("WORK FOR SPATIAL TRIM")
+  # str(list(style=style,proj=proj))
+   cond1 <- ((proj!=style[1])&&(!style %in% c("none","keep","web")))
+   if (i_am_not_ready_to_cancel_it <- cond1) {
       if (!inherits(obj,"SpatialPixels"))
          attr(obj,"grid") <- g0
       else

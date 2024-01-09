@@ -45,6 +45,8 @@
       removeSrc <- TRUE
       .src <- src
       nodata <- ignorevalue(src)
+      credits <- attr(.src,"copyright")
+      attr(.src,"copyright") <- NULL
       src <- .maketmp(ext=".")
       if (resample=="near")
          write_envi(.src,src)
@@ -155,6 +157,7 @@
       ret <- if (driver=="ENVI") read_envi(dst) else read_gdal(dst)
       if (!is.null(ct))
          ursa_colortable(ret) <- ct
+      attr(ret,"copyright") <- credits
    }
    else if (!close)
       ret <- if (driver=="ENVI") open_envi(dst) else open_gdal(dst)
