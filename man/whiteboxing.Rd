@@ -31,19 +31,33 @@ If argument \code{output} is missed or \code{output=FALSE}, then object of class
 \author{
 Nikita Platonov \email{platonov@sevin.ru}
 }
+\note{
+Internally, for piping support, first character argument without \code{*.tif} suffix is interpreted as \code{tool_name}. First unnamed character argument with \code{*.tif} suffix or \code{ursaRaster} object is interpreted as input.
+
+}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
 \href{https://github.com/jblindsay/whitebox-tools/releases/}{WhiteboxTools}
-\pkg{\link[whitebox]{whitebox}}
+\pkg{\link[whitebox]{whitebox}}  
 
 }
 \examples{
-if ((requireNamespace("whitebox"))&&(requireNamespace("stars"))) {
-   a1 <- read_gdal(c(DEM=whitebox::sample_dem_data()))
+if ((requireNamespace("whitebox"))&&(isTRUE(whitebox::wbt_init()))&&
+    (requireNamespace("stars"))) {
+   dem <- whitebox::sample_dem_data()
+   a1 <- c(DEM=read_gdal(dem))
    a2 <- whiteboxing("BreachDepressions",input=a1)
-   print(list(value=c(a1,a2),diff=a1-a2))
+   b <- list(value=c(a1,a2),difference=c(diff=a1-a2))
+   print(b)
+   display(b,layout=c(2,NA),legend=list(list("first","left"),list("last","left")))
+   if (getRversion()>="4.1.0") {
+      a5 <- dem |>
+         whiteboxing("feature_preserving_smoothing",filter=9) |>
+         whiteboxing("breach_depressions") |>
+         print()
+   }
 }
 }
 \keyword{manip}

@@ -1,5 +1,17 @@
 'whiteboxing' <- function(tool_name,...) {
-   prm <- list(...)
+   if (is.character(tool_name))
+      prm <- c(tool_name,list(...))
+   else {
+      prm <- c(list(...),list(tool_name))
+   }
+   ind <- which(sapply(prm,function(x) (is.character(x))&&(!grepl(".+\\.tif$",x))))
+   if (length(ind)==1) {
+      tool_name <- prm[[ind]]
+      prm <- prm[-ind]
+   }
+   else {
+      stop("cannot extract 'tool_name'")
+   }
    verbose <- .getPrm(prm,name="verbose",default=F)
    wbt <- !.isPackageInUse() & .getPrm(prm,name="^wbt$",default=F)
    if (!wbt) {
@@ -17,10 +29,18 @@
   #    }
   #    tool_name <- wbttools$tool_name[indF]
   # }
+   if (grepl("\\w_\\w",tool_name)) {
+      if (!grepl("^wbt_\\w",tool_name))
+         tool_name <- paste0("wbt_",tool_name)
+   }
    tool_name <- gsub("_(\\w)","\\U\\1",gsub("(^wbt)(_.+)$","\\2",tool_name),perl=TRUE)
    if (wbt)
       prm <- prm[grep("^wbt$",names(prm),invert=TRUE)]
    pname <- names(prm)
+   if (is.null(pname))
+      pname <- rep("",length(prm))
+   if (!nchar(pname[1]))
+      pname[1] <- "input"
    for (i in seq_along(prm)) {
       if (is_ursa(prm[[i]])) {
          fname <- tempfile(fileext=".tif")
@@ -59,7 +79,7 @@
       prm <- gsub("--.+=FALSE","",prm)
       prm <- paste(prm[nchar(prm)>0],collapse=" ")
       if (verbose)
-         print(prm)
+         cat(paste0(tool_name,": ",prm,"\n"))
       whitebox::wbt_run_tool(tool_name=tool_name,args=prm)
    }
    else {
