@@ -49,18 +49,22 @@
       if (length(list1)==1)
          fname <- list1
    }
-   if ((engine=="vapour")&&(requireNamespace("vapour",quite=!.isPackageInUse()))) {
+   if ((engine=="vapour")&&(requireNamespace("vapour",quietly=.isPackageInUse()))) {
       return(.read_vapour(fname,resetGrid=resetGrid,band=band
                          ,engine=engine,verbose=verbose))
    }
-   if ((engine=="gdalraster")&&(requireNamespace("gdalraster",quite=!.isPackageInUse()))) {
+  # .elapsedTime("load gdalraster -- start")
+   if ((engine=="gdalraster")&&(requireNamespace("gdalraster",quietly=.isPackageInUse()))) {
+     # .elapsedTime("load gdalraster -- finish")
       return(.read_gdalraster(fname,resetGrid=resetGrid,band=band
                          ,engine=engine,verbose=verbose))
    }
    if (engine %in% c("vapour","gdalraster"))
       engine <- "native"
+   if ((engine=="native")&&(.forceRGDAL()))
+      engine <- "rgdal"
    loaded <- loadedNamespaces() #.loaded()
-   forceSF <- isTRUE(getOption("ursaForceSF"))
+   forceSF <- .forceSF()
    if (accepted_changes <- TRUE) {
       if ((is.null(band))&&(engine %in% "native")) {
          if ((!forceSF)&&(("sp" %in% loaded)||("rgdal" %in% loaded)))
@@ -101,7 +105,7 @@
       res <- as_ursa(sf::gdal_read(fname))
       options(opW)
       if (forcedNoData <- TRUE) {
-         gi <- sf::gdal_utils("info",fname,quiet=!FALSE)
+         gi <- sf::gdal_utils("info",fname,quiet=TRUE)
          gi <- strsplit(gi,split="\\n")[[1]]
          gi <- grep("NoData Value",gi,value=TRUE)
          if (length(gi)>0) {

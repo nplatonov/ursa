@@ -55,7 +55,7 @@
                      ##~ (requireNamespace("stars",quietly=.isPackageInUse()))) {
       ##~ ret <- .write_sfgdal(obj,fname)
    ##~ }
-   if ((!"sf" %in% loadedNamespaces())&&(isTRUE(getOption("ursaForceSF"))))
+   if ((!"sf" %in% loadedNamespaces())&&(.forceSF()))
       requireNamespace("sf",quietly=.isPackageInUse())
    ftmp <- .maketmp()
    ret <- write_envi(obj,paste0(ftmp,"."))
@@ -128,7 +128,7 @@
    return(invisible(res$con$datatype))
 }
 '.write_sfgdal' <- function(obj,fname,driver,options,...) {
-   if ((!"sf" %in% loadedNamespaces())&&(T | isTRUE(getOption("ursaForceSF"))))
+   if ((!"sf" %in% loadedNamespaces())&&(T | .forceSF()))
       requireNamespace("sf",quietly=.isPackageInUse())
    if (!requireNamespace("stars",quietly=.isPackageInUse()))
       warning("Package `stars` is required for raster writting")

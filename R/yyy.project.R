@@ -33,21 +33,25 @@
   ## CHECK LATER (currently not quick):
   # dst <- with(PROJ::proj_trans_generic(src,source="EPSG:4326",target=crs),cbind(x_,y_))
    loaded <- loadedNamespaces()
-   is_proj4 <- (("proj4" %in% loaded)||
-       (!isTRUE(getOption("ursaForceSF")))&&
-       (requireNamespace("proj4",quietly=.isPackageInUse()))) ## `proj4` faster `sf`20220216
-   is_rgdal <- !.isPackageInUse() & "rgdal" %in% loaded
+   is_rgdal <- if (F) .forceRGDAL() else "rgdal" %in% loaded
    is_sf <- "sf" %in% loaded
-   if ((!is_sf)&&(!is_rgdal)&&(!is_proj4)) {
-      is_pro4 <- requireNamespace("proj4",quietly=.isPackageInUse())
-      if ((!is_proj4)&&(T | .isPackageInUse()))
-         is_sf <- requireNamespace("sf",quietly=.isPackageInUse())
+   is_gdalraster <- "gdalraster" %in% loaded
+   if ((!is_sf)&&(!is_gdalraster)&&(grepl("^PROJCS",proj)))
+      is_sf <- .forceSF(TRUE)
+   if (.forceProj4())  ## `proj4` faster `sf` 20220216
+      is_proj4 <- TRUE
+   else if ((!is_sf)&&(!is_rgdal)&&(!is_gdalraster)&&(.forceProj4(TRUE)))
+      is_proj4 <- TRUE
+   else
+      is_proj4 <- FALSE
+   if ((!is_sf)&&(!is_rgdal)&&(!is_proj4)&&(!is_gdalraster)) {
+     # if (!"rgdal" %in% loadedNamespaces())
+      is_sf <- .forceSF(TRUE)
    }
    if (verbose)
-      print(c(proj4=is_proj4,rgdal=is_rgdal,sf=is_sf))
+      print(c(proj4=is_proj4,rgdal=is_rgdal,sf=is_sf,gdalraster=is_gdalraster))
   # if ((!FALSE)&&(!("package:rgdal" %in% search()))&&
-   if ((!a)&&((is_proj4)||
-       ((FALSE)&&(requireNamespace("proj4",quietly=.isPackageInUse()))))) {
+   if ((!a)&&(is_proj4)) {
       if (verbose)
          message("'proj4' is used")
       if (F) {
@@ -81,10 +85,10 @@
                Sys.setenv(PROJ_LIB=system.file("proj",package="rgdal"))
          }
          if (proj4version>="1.0.10") {
-            res <- proj4::project(xy=xy,proj=proj,inverse=inv)
+            res <- .proj4_project(xy=xy,proj=proj,inverse=inv)
          }
          else
-            res <- proj4::project(xy=t(xy),proj=proj,inverse=inv)
+            res <- .proj4_project(xy=t(xy),proj=proj,inverse=inv)
         # res <- proj4::project(xy=list(xy[,1],xy[,2]),proj=proj,inverse=inv)
       },silent=TRUE)
       if ((!FALSE)&&(!a)&&(nrow(xy)==2)) {
@@ -94,18 +98,74 @@
          }
          a <- .try({
            ## suppressMessages(require(proj4)) ## uncomment?
-            res <- proj4::project(xy=xy,proj=proj,inverse=inv)
+            res <- .proj4_project(xy=xy,proj=proj,inverse=inv)
          },silent=TRUE)
       }
    }
-   if (!a) {
-      if ((!is_rgdal)&&(!.isPackageInUse())) {
-         is_rgdal <- .rgdal_requireNamespace()
+   if (FALSE) {
+      if (!a) {
+         if ((!is_rgdal)&&(!.isPackageInUse())) {
+            is_rgdal <- .rgdal_requireNamespace()
+         }
+         if ((!is_rgdal)&&(!is_sf))
+            is_sf <- TRUE
       }
-      if ((!is_rgdal)&&(!is_sf))
-         is_sf <- TRUE
    }
-   if ((!a)&&(is_sf)) {
+   if ((!a)&&(is_rgdal)) {
+      if (verbose)
+         message("'rgdal' is used")
+      if (.isPackageInUse()) {
+         opWG <- options(warn=1)
+         warning("Unable to reproject without `rgdal` package")
+         options(opWG)
+      }
+     # if (!("rgdal" %in% loadedNamespaces())) {
+     #    .rgdal_requireNamespace()
+     # }
+      if (!is.character(proj))
+         proj <- .epsg2proj4(proj)
+      if (is.list(xy))
+         xy <- cbind(xy[[1]],xy[[2]])
+      else if (!is.matrix(xy))
+         xy <- matrix(xy,ncol=2)
+     # ind <- which((is.na(xy[,1]))|(is.na(xy[,2])))
+      ind <- which(is.na(xy[,1])) ## less conditions
+      if (length(ind)) {
+         res <- matrix(NA,ncol=2,nrow=nrow(xy))
+         a <- .try(res[-ind,] <- .rgdal_project(xy=xy[-ind,],proj=proj,inv=inv))
+      }
+      else {
+         a <- .try(res <- .rgdal_project(xy=xy,proj=proj,inv=inv))
+      }
+      if (!a) {
+         if (verbose)
+            message("patch with backing to 'proj4' via interim projection")
+         .epsg3411 <- paste("+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1"
+                           ,"+x_0=0 +y_0=0 +a=6378273 +b=6356889.449 +units=m +no_defs")
+         if (.proj4_requireNamespace()) {
+            a <- .try(res <- .proj4_project(xy=xy,proj=.epsg3411))
+            if (a) {
+               a <- .try(res <- .proj4_ptransform(res,.epsg3411,proj))
+               if (a)
+                  return(res)
+            }
+         }
+      }
+      if ((FALSE)&&(!a)) {
+         str(xy)
+         str(proj)
+         if (inv) {
+            xy <- as.data.frame(xy)
+            sp::coordinates(xy) <- ~x+y
+            sp::proj4string(xy) <- sp::CRS(proj,doCheckCRSArgs=FALSE)
+            a <- .try(res <- sp::spTransform(xy,sp::CRS("+init=epsg:4326")))
+            str(a)
+            q()
+         }
+         q()
+      }
+   }
+   if ((!a)&&((is_sf)||(is_gdalraster))) {
       if (verbose)
          message("'sf' is used")
       if (inv) {
@@ -143,8 +203,14 @@
             a <- .try(res[-ind,] <- unclass(sf::st_transform(sf::st_sfc(
                               sf::st_multipoint(xy[-ind,]),crs=crs_s),crs_t)[[1]]))
          else {
-            a <- .try(res[-ind,] <- sf::sf_project(from=crs_s,to=crs_t,pts=xy[-ind,]
-                                                  ,keep=TRUE))
+            if (is_gdalraster) {
+               a <- .try(res[-ind,] <- gdalraster::transform_xy(pts=xy[-ind,]
+                        ,srs_from=gdalraster::srs_to_wkt(crs_s)
+                        ,srs_to=gdalraster::srs_to_wkt(crs_t)))
+            }
+            if (!a)
+               a <- .try(res[-ind,] <- sf::sf_project(from=crs_s,to=crs_t,pts=xy[-ind,]
+                                                     ,keep=TRUE))
          }
       }
       else {
@@ -152,72 +218,24 @@
             a <- .try(res <- unclass(sf::st_transform(sf::st_sfc(
                                      sf::st_multipoint(xy),crs=crs_s),crs_t)[[1]]))
          else {
-            if (T & !sf::sf_proj_network())
-               try(sf::sf_proj_network(url="",TRUE))
-            if (F & verbose) {
-               print(xy)
-               print(crs_s)
-               print(crs_t)
-               print(sf::st_crs(crs_t)$proj4string)
+            if (is_gdalraster) {
+               a <- .try(res <- gdalraster::transform_xy(pts=xy
+                        ,srs_from=gdalraster::srs_to_wkt(crs_s)
+                        ,srs_to=gdalraster::srs_to_wkt(crs_t)))
             }
-            a <- .try(res <- sf::sf_project(from=crs_s,to=crs_t,pts=xy
-                                           ,keep=TRUE))
-         }
-      }
-   }
-   if (!a) {
-      if (verbose)
-         message("'rgdal' is used")
-      q()
-      if (.isPackageInUse()) {
-         opWG <- options(warn=1)
-         warning("Unable to reproject without `rgdal` package")
-         options(opWG)
-      }
-      if (!("rgdal" %in% loadedNamespaces())) {
-         .rgdal_requireNamespace()
-      }
-      if (!is.character(proj))
-         proj <- .epsg2proj4(proj)
-      if (is.list(xy))
-         xy <- cbind(xy[[1]],xy[[2]])
-      else if (!is.matrix(xy))
-         xy <- matrix(xy,ncol=2)
-     # ind <- which((is.na(xy[,1]))|(is.na(xy[,2])))
-      ind <- which(is.na(xy[,1])) ## less conditions
-      if (length(ind)) {
-         res <- matrix(NA,ncol=2,nrow=nrow(xy))
-         a <- .try(res[-ind,] <- .rgdal_project(xy=xy[-ind,],proj=proj,inv=inv))
-      }
-      else {
-         a <- .try(res <- .rgdal_project(xy=xy,proj=proj,inv=inv))
-      }
-      if (!a) {
-         if (verbose)
-            message("patch with backing to 'proj4' via interim projection")
-         .epsg3411 <- paste("+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1"
-                           ,"+x_0=0 +y_0=0 +a=6378273 +b=6356889.449 +units=m +no_defs")
-         if (requireNamespace("proj4",quietly=.isPackageInUse())) {
-            a <- .try(res <- proj4::project(xy=xy,proj=.epsg3411))
-            if (a) {
-               a <- .try(res <- proj4::ptransform(res,.epsg3411,proj))
-               if (a)
-                  return(res)
+            if (!a) {
+               if (T & !sf::sf_proj_network())
+                  try(sf::sf_proj_network(url="",TRUE))
+               if (F & verbose) {
+                  print(xy)
+                  print(crs_s)
+                  print(crs_t)
+                  print(sf::st_crs(crs_t)$proj4string)
+               }
+               a <- .try(res <- sf::sf_project(from=crs_s,to=crs_t,pts=xy
+                                              ,keep=TRUE))
             }
          }
-      }
-      if ((FALSE)&&(!a)) {
-         str(xy)
-         str(proj)
-         if (inv) {
-            xy <- as.data.frame(xy)
-            sp::coordinates(xy) <- ~x+y
-            sp::proj4string(xy) <- sp::CRS(proj,doCheckCRSArgs=FALSE)
-            a <- .try(res <- sp::spTransform(xy,sp::CRS("+init=epsg:4326")))
-            str(a)
-            q()
-         }
-         q()
       }
    }
    if ((FALSE)&&(!inv)&&(.lgrep("\\+proj=merc",g1$crs))) {

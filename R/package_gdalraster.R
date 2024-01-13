@@ -35,8 +35,8 @@
    res <- ds$res()
    if (TRUE) {
       g1 <- regrid(bbox=bbox,res=res
-                  ,crs=sf::st_crs(ds$getProjectionRef())$proj4string
-                 # ,crs=ds$getProjectionRef()
+                 # ,crs=sf::st_crs(ds$getProjectionRef())$proj4string
+                  ,crs=ds$getProjectionRef()
                   )
    }
    else {
@@ -124,8 +124,8 @@
    nodata <- ds$getNoDataValue(band=1)
    md0 <- ds$getMetadata(band=0,domain="")
    g1 <- regrid(bbox=ds$bbox(),res=ds$res()
-               ,crs=sf::st_crs(ds$getProjectionRef())$proj4string
-              # ,crs=ds$getProjectionRef()
+              # ,crs=sf::st_crs(ds$getProjectionRef())$proj4string
+               ,crs=ds$getProjectionRef()
                )
    session_grid(g1)
    patt <- "^Band_(\\d+)=(.+)$"
@@ -155,5 +155,12 @@
    }
    if (verbose)
       cat(" done!\n")
+   ctval <- data.frame(ds$getColorTable(band=1))
+   if (nrow(ctval)) {
+      ct <- with(ctval,rgb(red,green,blue,alpha,names=value,maxColorValue=255))
+      class(ct) <- "ursaColorTable"
+      ursa_colortable(out) <- ct
+      class(out$value) <- "ursaCategory"
+   }
    out
 }

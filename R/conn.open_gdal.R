@@ -10,13 +10,13 @@
    engine <- match.arg(engine,engList)
   # if (engine=="native")
   #    engine <- "sf" ## replace to 'sf'
-  # if (verbose)
-  #    print(c(engine=engine))
+   if (verbose)
+      print(c(engine=engine),quote=FALSE)
    fname <- gsub("\\.$","",fname)
-   if ((engine=="vapour")&&(requireNamespace("vapour",quite=!.isPackageInUse()))) {
+   if ((engine=="vapour")&&(requireNamespace("vapour",quietly=.isPackageInUse()))) {
       return(.open_vapour(fname,engine=engine,verbose=verbose))
    }
-   if ((engine=="gdalraster")&&(requireNamespace("gdalraster",quite=!.isPackageInUse()))) {
+   if ((engine=="gdalraster")&&(requireNamespace("gdalraster",quietly=.isPackageInUse()))) {
       return(.open_gdalraster(fname,engine=engine,verbose=verbose))
    }
    if (engine!="rgdal") {

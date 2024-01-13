@@ -172,34 +172,20 @@
    }
    coast_xy <- cbind(lon=xy[,1],lat=xy[,2])
    ind <- .grep("^\\d+$",proj)
-  # isLoaded <- .lgrep("package:rgdal",search())>0
-   isLoaded <- "rgdal" %in% loadedNamespaces()
    if (length(ind))
    {
       proj4 <- "" ## was NA
       try(proj4 <- get(paste0("epsg",proj[ind])))
       if (!nchar(proj4))
       {
-         if (!isLoaded)
-            requireNamespace(ifelse(.isPackageInUse(),"sf","rgdal")
-                            ,quietly=.isPackageInUse())
-         proj4 <- .rgdal_CRSargs(sp::CRS(sprintf("+init=epsg:%s",proj[ind])))
-      }
-      else if (!isLoaded) {
-         if (!requireNamespace("proj4",quietly=.isPackageInUse()))
-            requireNamespace(ifelse(.isPackageInUse(),"sf","rgdal")
-                            ,quietly=.isPackageInUse())
+         if (.rgdal_loadedNamespaces())
+            proj4 <- .rgdal_CRSargs(sp::CRS(sprintf("EPSG:%s",proj[ind])))
+         else
+            proj4 <- sf::st_crs(proj[ind])$proj4string
       }
    }
    else
    {
-      if (!isLoaded) {
-         if (!("sf" %in% loadedNamespaces())) {
-            if (!requireNamespace("proj4",quietly=.isPackageInUse()))
-               requireNamespace(ifelse(.isPackageInUse(),"sf","rgdal")
-                               ,quietly=.isPackageInUse())
-            }
-      }
       proj4 <- paste(proj,collapse=" ")
    }
    if ((!isLongLat)&&(!isMerc)) {

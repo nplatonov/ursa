@@ -728,3 +728,35 @@
    cond2 <- !is.na(.is.near(v1,v2))
    cond1 & cond2
 }
+'.forceRGDAL' <- function(value) {
+   if (missing(value))
+      return(isTRUE(getOption("ursaForceRGDAL")))
+   if (isTRUE(value)) {
+      if (.isPackageInUse())
+         value <- FALSE
+      else
+         value <- .rgdal_requireNamespace()
+   }
+   options(ursaForceRGDAL=value)
+   invisible(value)
+}
+'.forceProj4' <- function(value) {
+   if (missing(value))
+      return(isTRUE(getOption("ursaForceProj4")))
+   if (isTRUE(value)) {
+      if (T & .isPackageInUse())
+         value <- FALSE
+      else
+         value <- .proj4_requireNamespace()
+   }
+   options(ursaForceProj4=value)
+   invisible(value)
+}
+'.forceSF' <- function(value) {
+   if (missing(value))
+      return(isTRUE(getOption("ursaForceSF")))
+   options(ursaForceSF=value)
+   if (value)
+      requireNamespace("sf",quietly=.isPackageInUse())
+   invisible(value)
+}

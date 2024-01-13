@@ -85,9 +85,15 @@
    isLonLat <- .lgrep("(\\+proj=longlat|epsg:4326)",proj4)>0
    isMerc <- .lgrep("\\+proj=merc",proj4)>0
    minx <- g1$minx
-   miny <- g1$miny
    maxx <- g1$maxx
-   maxy <- g1$maxy
+   if (g1$miny<g1$maxy) {
+      miny <- g1$miny
+      maxy <- g1$maxy
+   }
+   else {
+      maxy <- g1$miny
+      miny <- g1$maxy
+   }
    if (any(is.na(marginalia)))
       marginalia <- TRUE
    if ((!anyNA(lon))&&(!anyNA(lat)))
@@ -723,8 +729,14 @@
             da0$at[nrow(da0)] <- g1$maxx+sx
          }
          else {
-            da0$at[1] <- g1$miny-sy
-            da0$at[nrow(da0)] <- g1$maxy+sy
+            if (g1$miny<g1$maxy) {
+               da0$at[1] <- g1$miny-sy
+               da0$at[nrow(da0)] <- g1$maxy+sy
+            }
+            else {
+               da0$at[1] <- g1$maxy-sy
+               da0$at[nrow(da0)] <- g1$miny+sy
+            }
          }
       }
       nr <- nrow(da0)
@@ -732,7 +744,7 @@
       da0$ind <- seq(nr)
       k <- 0
       width <- with(g1,if (i %in% c(1,3)) (maxx-minx) else (maxy-miny))
-      res <- with(g1,if (i %in% c(1,3)) resx else resy)
+      res <- abs(with(g1,if (i %in% c(1,3)) resx else resy))
       repeat ({
          if (k>200)
             break
@@ -758,10 +770,12 @@
          wD1 <- c(1e-6,wD)
          wD2 <- c(wD,1e-6) # length(w)
          ind2 <- which.min(wD2)
-         if (wD2[ind2]>=0)
+         if (wD2[ind2]>=0) {
             break
-         if (length(ind2)==length(w))
+         }
+         if (length(ind2)==length(w)) {
             break
+         }
          ind2 <- c(ind2,ind2+1L)
          adj <- da0[ind2,"adj"]
          adj <- adj+c(0.0999,-0.0999)

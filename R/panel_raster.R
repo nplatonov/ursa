@@ -174,17 +174,19 @@
    }
    img <- as.matrix(obj,coords=TRUE)
    g1 <- ursa_grid(obj) #session_grid()
-   xo <- with(g1,seq(minx,maxx,len=columns+1L))
-   yo <- with(g1,seq(miny,maxy,len=rows+1L))
-   if (!FALSE)
-   {
-      xo <- xo[-1]-g1$resx/2
-      yo <- yo[-1]-g1$resy/2
-   }
-   if ((FALSE)&&(useRaster))
-   {
-      xo <- xo-0.5*g1$resx/scale
-      yo <- yo+0.5*g1$resy/scale
+   if (F) {
+      xo <- with(g1,seq(minx,maxx,len=columns+1L))
+      yo <- with(g1,seq(miny,maxy,len=rows+1L))
+      if (!FALSE)
+      {
+         xo <- xo[-1]-g1$resx/2
+         yo <- yo[-1]-g1$resy/2
+      }
+      if ((FALSE)&&(useRaster))
+      {
+         xo <- xo-0.5*g1$resx/scale
+         yo <- yo+0.5*g1$resy/scale
+      }
    }
    if (.is.colortable(attr(img,"colortable")))
    {
@@ -204,7 +206,7 @@
   # require(grid)
   # a <- grDevices::as.raster(t(img$z)/max(img$z,na.rm=TRUE))
   # grid.raster(a,x=unit(0.5,"npc"),y=unit(0.5,"npc"),interpolate=FALSE)
-   image(x=xo,y=yo,z=img$z,col=col,asp=NA,zlim=zlim,useRaster=useRaster,add=TRUE)
+   image(x=img$x,y=img$y,z=img$z,col=col,asp=NA,zlim=zlim,useRaster=useRaster,add=TRUE)
   ##### rasterImage(img$z,min(xo),min(yo),max(xo),max(yo),)
    if ((verbose)&&(!useRaster))
       .elapsedTime(paste0("useRaster=",useRaster,"--finish"))

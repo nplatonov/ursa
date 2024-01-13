@@ -2,8 +2,15 @@
 {
    arglist <- list(...)
    value <- .getPrm(arglist,name="(^$|^value)"
-                   ,class=list("numeric","matrix","array")
+                   ,class=list("numeric","matrix","array","ursaRaster")
                    ,coerce=FALSE,default=NA,verbose=FALSE)
+   isUrsa <- inherits(value,"ursaRaster")
+   if (isUrsa) {
+      result <- value
+      value <- as.array(value)
+   }
+   else
+      result <- .raster.skeleton()
    nd <- length(dim(value))
    isMatrix <- if (nd==2) TRUE else FALSE
    isArray <- if (nd==3) TRUE else FALSE
@@ -24,11 +31,14 @@
                  ,default=NULL)
    verbose <- .getPrm(arglist,name="verbose",default=FALSE)
    if (verbose) {
-      str(list(value=value,iaArray=isArray,isMarix=isMatrix
+      str(list(value=value,isUrsa=isUrsa,isArray=isArray,isMarix=isMatrix
               ,nband=bands,bandname=bname,datatype=datatype
               ,colorTable=colorTable,permute=permute,flip=flip))
    }
-   grid <- getOption("ursaSessionGrid") ## grid <- session_grid()
+   if (isUrsa)
+      grid <- ursa_grid(result)
+   else
+      grid <- getOption("ursaSessionGrid") ## grid <- session_grid()
    if ((is.null(grid))||(!.is.grid(grid)))
    {
       if (.is.grid(crs))
@@ -36,7 +46,6 @@
       else if (is.character(crs))
          session_grid(ursa_grid(crs))
    }
-   result <- .raster.skeleton()
    grid <- session_grid()
    sp <- with(grid,columns*rows)
    if (is.array(value)) ## # if ((is.null(grid))&&(is.array(value)))
@@ -86,7 +95,8 @@
             value <- value[,rev(seq(dima[2])),,drop=FALSE]
       }
    }
-   result$grid <- grid
+   if (!isUrsa)
+      result$grid <- grid
    if ((is.matrix(value))&&((sp==dim(value)[1]))) {
       result$value <- value
       dimnames(result$value) <- NULL
@@ -155,6 +165,8 @@
       }
       result$dim <- dim3
    }
+   if (isUrsa)
+      return(result)
   # result$name <- sprintf(sprintf("%s%%0%dd","tmp"
   #                          ,nchar(length(1:x$con$bands))),1:x$con$bands)
    result$con <- .con.skeleton()

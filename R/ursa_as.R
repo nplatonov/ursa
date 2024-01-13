@@ -2,8 +2,11 @@
 'as.ursa' <- function(obj,...) {
    if (missing(obj))
       return(ursa_new(...))
-   if (is.ursa(obj))
-      return(obj)
+   if (is.ursa(obj)) {
+      if (length(as.list(match.call()))==2)
+         return(obj)
+      return(ursa_new(obj,...))
+   }
    if (.is.ursa_stack(obj))
       return(ursa_brick(obj)) ## 20170122 removed 'return(obj)'
    if (is.data.frame(obj)) {
@@ -180,7 +183,8 @@
       maxy <- obj$geotransform[4]
       maxx <- minx+columns*resx
       miny <- maxy-rows*resy
-      if (miny>maxy) {
+     # print(c(minx=minx,miny=miny,maxx=maxx,maxy=maxy))
+      if (dontFlip <- miny>maxy) {
          interim <- maxy
          maxy <- miny
          miny <- interim
@@ -227,7 +231,7 @@
             if (devel2 <- TRUE) {
                if (length(dimv)==2)
                   dimv <- c(dimv,band=1L)
-               dimv <- unname(c(prod(dimv[1:2]),dimv[3]))
+              # dimv <- unname(c(prod(dimv[1:2]),dimv[3]))
                dim(v) <- dimv
                isClass <- length(obj$attribute_tables[[1]])>0
                isColor <- length(obj$color_tables[[1]])>0
@@ -274,7 +278,7 @@
                }
               # .elapsedTime("as.ursa -- before")
               # res <- as.ursa(v) ## RECURSIVE
-               res <- ursa_new(v)
+               res <- ursa_new(v,flip=!dontFlip)
               # .elapsedTime("as.ursa -- after")
                if (isCat) {
                   ursa_colortable(res) <- ct

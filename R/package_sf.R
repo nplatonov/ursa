@@ -48,6 +48,7 @@
                          ,Byte=1L,UInt8=1L,Int8=11
                          ,Int16=2L,UInt16=12,UInt32=13,Int32=3
                          ,Float32=4L,Float64=5L
+                         ,CInt16=21L,CInt32=22L,CFloat32=23L,CFloat64=24L
                      ,NULL)
    con$handle <- obj
    res$con <- con

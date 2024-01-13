@@ -51,6 +51,7 @@
       }
    }
    a1 <- as.numeric(a)
+  # names(a1) <- attr(a,"names")
    g1 <- regrid()
    g1$rows <- as.integer(a1[1])
    g1$columns <- as.integer(a1[2])
@@ -489,17 +490,17 @@
       .DeadEnd()
    rgdal::project(...)
 }
-'.rgdal_loadedNamespaces' <- function() {
+'.rgdal_loadedNamespaces' <- function(...) {
    if (isTRUE(getOption("ursaPackageInUse")))
       .DeadEnd()
   "rgdal" %in% loadedNamespaces()
 }
-'.rgdal_requireNamespace' <- function() {
+'.rgdal_requireNamespace' <- function(...) {
    if (isTRUE(getOption("ursaPackageInUse")))
       .DeadEnd()
    requireNamespace("rgdal",quietly=.isPackageInUse())
 }
-'.rgeos_requireNamespace' <- function() {
+'.rgeos_requireNamespace' <- function(...) {
    if (isTRUE(getOption("ursaPackageInUse")))
       .DeadEnd()
    requireNamespace("rgeos",quietly=.isPackageInUse())
@@ -553,4 +554,19 @@
    if (isTRUE(getOption("ursaPackageInUse")))
       .DeadEnd()
    rgeos::gIsValid(...)
+}
+'.proj4_requireNamespace' <- function(...) {
+   if (isTRUE(getOption("ursaPackageInUse")))
+      .Retired()
+   requireNamespace("proj4",quietly=.isPackageInUse())
+}
+'.proj4_project' <- function(...) {
+   if (isTRUE(getOption("ursaPackageInUse")))
+      .Retired()
+   proj4::project(...)
+}
+'.proj4_ptransform' <- function(...) {
+   if (isTRUE(getOption("ursaPackageInUse")))
+      .Retired()
+   proj4::ptransform(...)
 }

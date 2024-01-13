@@ -32,6 +32,9 @@
       }
    }
    dim(z) <- with(g1,c(columns,rows))
+   isFlip <- g1$miny>g1$maxy
+   if (isFlip)
+      yo <- rev(yo)
    z <- z[,rev(seq(g1$rows)),drop=FALSE]
    img <- list(x=xo,y=yo,z=z)#,nodata=ignorevalue(x),crs=proj4[length(proj4)])
    attr(img,"crs") <- with(g1,crs[length(crs)])

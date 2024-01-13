@@ -1,10 +1,16 @@
-2024-01-09
+2024-01-12
 
 <!--
 + Depends on R (>= 4.1.0) instead of R (>= 3.0.0) due to using native pipes `|>` in code
 + Depends on R (>= 4.1.0) instead of R (>= 3.0.0) due to changed behaviour in `*apply()` functions with argument `simplify`
 + Ongoing...
 -->
+
+### Version 3.10.5
+
+-   ongoing…
+
+-   Package **`proj4`** is removed from ‘Suggests’.
 
 ### Version 3.10.4
 
