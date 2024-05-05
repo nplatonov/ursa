@@ -8,7 +8,7 @@ file type = ENVI Standard
 data type = 1
 interleave = bsq
 byte order = 0
-map info = {NSIDC Sea Ice North,1.000000,1.000000,-3850000.000000,5850000.000000,25000.000000,25000.000000,Hughes,units=meters}
-projection info = {31,6378273.000,6356889.449,70.0,-45.0,0.0,0.0,NSIDC Sea Ice North,units=meters}
+map info = {R, 1, 1, -3850000, 5850000, 25000, 25000, unknown, units=meters}
+coordinate system string = {PROJCS["NSIDC Sea Ice Polar Stereographic North",GEOGCS["Hughes 1980",DATUM["Hughes_1980",SPHEROID["Hughes 1980",6378273,298.279411123064]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","10345"]],PROJECTION["Polar_Stereographic"],PARAMETER["latitude_of_origin",70],PARAMETER["central_meridian",-45],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1],AXIS["Easting",SOUTH],AXIS["Northing",SOUTH],AUTHORITY["EPSG","3411"]]}
 band names = {
 	areassmi}

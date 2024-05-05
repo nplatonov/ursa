@@ -86,7 +86,7 @@ try({
 b2["fourth"] <- 40+as.matrix(b1[3])
 b2[5] <- 50+as.array(b1[4])
 set.seed(352)
-b2["six"] <- 60+6+runif(5,min=-1,max=1) ## only first value is used (66.42849)
+try(b2["six"] <- 60+6+runif(5,min=-1,max=1)) ## Data structures mismatching
 print(b2)
 print(object.size(b2))
 

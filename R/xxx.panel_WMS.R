@@ -705,10 +705,11 @@
       if (!nchar(Sys.which("gdalwarp")))
          message("'gdalwarp' is required to be in search paths")
    }
-   proj4s <- unlist(strsplit(g0$crs,split="\\s+"))
-   ind <- .grep("\\+(proj=merc|[ab]=6378137|[xy]_0=0|k=1|units=m|lat_ts=0)",proj4s)
-   isMerc <- ((length(ind)==8)&&(!gdalwarp))
-   isLonLat <- .lgrep("\\+proj=longlat",g0$crs)>0
+  # proj4s <- unlist(strsplit(g0$crs,split="\\s+"))
+  # ind <- .grep("\\+(proj=merc|[ab]=6378137|[xy]_0=0|k=1|units=m|lat_ts=0)",proj4s)
+  # isMerc <- ((length(ind)==8)&&(!gdalwarp))
+   isMerc <- (.isMerc(g0$crs))&&(.crsSemiMajor==6378137)
+   isLonLat <- .isLongLat(g0$crs) # .lgrep("\\+proj=longlat",g0$crs)>0
    sc <- getOption("ursaPngScale")
    g3 <- g0
    if ((is.numeric(sc))&&(sc<1e11+0.75)) {
@@ -722,8 +723,9 @@
      # print(g3,digits=15)
    }
    if (isMerc) {
-      ind <- .grep("\\+lon_0",proj4s)
-      lon0 <- as.numeric(.gsub(".+=(.+)","\\1",proj4s[ind]))
+     # ind <- .grep("\\+lon_0",proj4s)
+     # lon0 <- as.numeric(.gsub(".+=(.+)","\\1",proj4s[ind]))
+      lon0 <- .crsLon0(g0$crs)
       if (lon0==0)
          isMerc <- FALSE
       else {
@@ -871,7 +873,7 @@
             download.file(src2,dst,mode="wb",quiet=!verbose)
          }
          if (isPNG)
-            a <- try(png::readPNG(dst))
+            a <- try(.readPNG(dst))
          else if (isJPEG)
             a <- try(jpeg::readJPEG(dst))
          else {
@@ -882,7 +884,7 @@
             if (isPNG)
                a <- try(jpeg::readJPEG(dst))
             else if (isJPEG)
-               a <- try(png::readPNG(dst))
+               a <- try(.readPNG(dst))
          }
          if (inherits(a,"try-error")) {
             error <- paste(readLines(dst),collapse="\n")
@@ -945,7 +947,7 @@
          }
          if (!inherits(dst,"try-error")) {
             if (isPNG)
-               logo2 <- try(png::readPNG(dst))
+               logo2 <- try(.readPNG(dst))
             else if (isJPEG)
                logo2 <- try(jpeg::readJPEG(dst))
             else {
@@ -995,7 +997,7 @@
             }
             if (!inherits(dst,"try-error")) {
                if (isPNG)
-                  logo[[i]] <- try(png::readPNG(dst))
+                  logo[[i]] <- try(.readPNG(dst))
                else if (isJPEG)
                   logo[[i]] <- try(jpeg::readJPEG(dst))
                else {

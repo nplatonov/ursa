@@ -50,7 +50,7 @@
    sp <- with(grid,columns*rows)
    if (is.array(value)) ## # if ((is.null(grid))&&(is.array(value)))
    {
-      dimb <- dima <- dim(value)
+      dimb <- dima <- unname(dim(value))
       if (length(dima)==2) {
          if ((TRUE)&&(dima[1]!=with(grid,columns*rows))) {## added 20160201
             value <- value[,rev(seq(dima[2])),drop=FALSE]

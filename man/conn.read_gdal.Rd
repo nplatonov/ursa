@@ -9,7 +9,7 @@ Read GDAL supported raster files.
 }
 \usage{
 read_gdal(fname, resetGrid = TRUE, band = NULL,
-          engine = c("native", "sf", "gdalraster", "vapour"),
+          engine = c("native", "sf"),
           verbose = FALSE, ...)
 
 ursa_read(fname, verbose = FALSE)
@@ -74,13 +74,11 @@ session_grid(NULL)
 # rgdal::gdalDrivers()
 if (requireNamespace("sf"))
    print(sf::st_drivers())
-# Fin1 <- system.file("pictures/Rlogo.jpg",package="rgdal")
-Fin1 <- system.file("img/Rlogo.png",package="png")
-a1 <- read_gdal(Fin1)
-print(a1)
-display(a1)
-
-# Fin2 <- system.file("pictures/test_envi_class.envi",package="rgdal")
+if (file.exists(Fin1 <- system.file("gdal/gdalicon.png",package="sf"))) {
+   a1 <- read_gdal(Fin1)
+   print(a1)
+   display(a1)
+}
 Fin2 <- tempfile(fileext=".")
 a <- ursa_dummy(1,resetGrid=TRUE)
 b <- colorize(a[a>91],stretch="equal",name=format(Sys.Date()+seq(0,6),"\%A \%d"))
@@ -88,11 +86,19 @@ write_envi(b,Fin2)
 b1 <- read_gdal(Fin2)
 b2 <- read_envi(Fin2,resetGrid=TRUE)
 envi_remove(Fin2)
-print(identical(ursa_grid(b1),ursa_grid(b2)))
-print(identical(ursa_value(b1),ursa_value(b2)))
-print(identical(ursa_colortable(b1),ursa_colortable(b2)))
+print(c('same colortable?'=identical(ursa_colortable(b1),ursa_colortable(b2))))
 print(ursa_colortable(b1))
 print(as.table(b1))
+print(c('same values?'=identical(ursa_value(b1),ursa_value(b2))))
+print(c('same grid?'=identical(ursa_grid(b1),ursa_grid(b2))))
+if (requireNamespace("sf")) {
+   p1 <- sf::st_crs(ursa_crs(b1))
+   p2 <- sf::st_crs(ursa_crs(b2))
+   print(c('same proj4string for CRS?'=identical(p1$proj4string,p2$proj4string)))
+   print(c('same WKT for CRS?'=identical(p1$Wkt,p2$Wkt)))
+   ursa_crs(b1) <- ursa_crs(b2)
+   print(c('after same CRS, same grid?'=identical(ursa_grid(b1),ursa_grid(b2))))
+}
 display(b1,detail="l")
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

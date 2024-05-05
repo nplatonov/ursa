@@ -158,6 +158,11 @@
          y <- x[,2]
          x <- x[,1]
       }
+      else if (is_spatial(x)) {
+         x <- spatial_coordinates(x)
+         y <- x[,2]
+         x <- x[,1]
+      }
       else
          stop("specify 'y'")
    }

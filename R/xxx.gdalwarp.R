@@ -18,6 +18,8 @@
    else
       grid <- ursa_grid(grid)
    isSF <- isTRUE(sf) & requireNamespace("sf",quietly=.isPackageInUse())
+   if (F & !isSF)
+      isSF <- requireNamespace("sf",quietly=.isPackageInUse())
    if (!isSF & !nchar(Sys.which("gdalwarp"))) {
       withRaster <- requireNamespace("raster",quietly=.isPackageInUse())
       if (withRaster) {
@@ -42,6 +44,7 @@
    ct <- NULL
    if (is.ursa(src)) {
       ct <- ursa_colortable(src)
+      ursa_colortable(src) <- character()
       removeSrc <- TRUE
       .src <- src
       nodata <- ignorevalue(src)
@@ -77,7 +80,7 @@
    }
    if (!("co" %in% names(opt))) {
       if (driver=="GTiff") {
-         pr <- ifelse(((removeSrc)&&(inherits(.src$value,"ursaNumeric"))),3,2)
+         pr <- ifelse(((removeSrc)&&(inherits(.src$value,"ursaNumeric"))),c(3,1)[2],c(2,1)[2])
          opt <- c(opt,co=paste0("COMPRESS=",c("DEFLATE","ZSTD")[1])
                      ,co=paste0("PREDICTOR=",pr)
                      ,co="TILED=NO")
@@ -90,7 +93,6 @@
       optF <- ""
    }
    else if (!is.null(names(opt))) {
-      str(opt)
       if (T) ## 20230228++
          optF <- paste(lapply(names(opt),\(x) {
             val <- opt[[x]]
@@ -119,6 +121,11 @@
    if (!("r" %in% names(opt))) {
       optF <- paste(optF,"-r",resample)
    }
+   proj4 <- gsub("\\n\\s+","",unclass(proj4))
+   if (!isSF)
+      proj4 <- gsub("\"","\\\\\"",proj4)
+  # if (.isWKT(proj4))
+  #    proj4 <- .proj4string(proj4)
    if (is.null(grid))
       cmd <- paste("-overwrite -of",driver
                   ,ifelse(is.na(nodata),"",paste("-srcnodata",nodata,"-dstnodata",nodata))
@@ -128,7 +135,7 @@
       cmd <- with(grid,c(NULL
                  ,"-overwrite"
                  ,"-of",driver
-                 ,if (nchar(proj4)) c("-t_srs",.dQuote(proj4))
+                 ,if (nchar(proj4)) c("-t_srs",ifelse(isSF,proj4,.dQuote(proj4)))
                 # ,if (nchar(proj4)) c("-t_srs",proj4)
                  ,"-nosrcalpha"
                  ,"-tr",resx,resy,"-te",minx,miny,maxx,maxy
@@ -150,14 +157,20 @@
      # Sys.setenv(PROJ_LIB=proj_lib)
    }
    else {
-      sf::gdal_utils("warp",src,dst,options=gsub("\"","",cmd),quiet=verbose==0L)
+      cmd <- gsub("(^\"|\"$)","",cmd)
+      sf::gdal_utils("warp",src,dst,options=cmd,quiet=verbose==0L)
    }
    session_grid(NULL)
    if (inMemory) {
       ret <- if (driver=="ENVI") read_envi(dst) else read_gdal(dst)
-      if (!is.null(ct))
-         ursa_colortable(ret) <- ct
-      attr(ret,"copyright") <- credits
+     # hdr <- readLines(paste0(dst,".hdr"))
+     # print(hdr)
+      if (!is.null(ct)) {
+         ret <- colorize(ret,colorable=ct,lazyload=TRUE) ## ++ 20240304
+        # ursa_colortable(ret) <- ct ## -- 20240304
+      }
+      if (is.ursa(src))
+         attr(ret,"copyright") <- credits
    }
    else if (!close)
       ret <- if (driver=="ENVI") open_envi(dst) else open_gdal(dst)

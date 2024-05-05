@@ -356,7 +356,7 @@
       s <- paste0("i",(x %% 4)+(y %% 4)*4L)
       tile <- gsub("\\{s\\}",s,tile)
    }
-   if ((!FALSE)&&(.lgrep("\\{..+}",tile))) {
+   if ((FALSE)&&(.lgrep("\\{..+}",tile))) {
       dom <- unlist(strsplit(.gsub2("\\{(.+)\\}","\\1",gsub("\\{.\\}","",tile)),""))
       ##~ print(tile)
       ##~ print(dom)
@@ -397,8 +397,9 @@
    else if (file.exists(tile)) {
       fname <- tile
    }
-   else
+   else {
       fname <- .ursaCacheDownload(tile,mode="wb",cache=cache,quiet=!verbose)
+   }
    if (inherits(fname,"try-error")) {
       return(fname)
      # message(a)
@@ -410,11 +411,13 @@
    isPNG <- FALSE
    isJPEG <- FALSE
    isGIF <- FALSE
-   if (isPNG <- fileext %in% c("png"))
+   isGDAL <- FALSE
+   if (isPNG <- fileext %in% c("png")) {
       a <- try(255*png::readPNG(fname),silent=!verbose)
+   }
    else if (isJPEG <- fileext %in% c("jpg","jpeg")) {
-      if (!requireNamespace("jpeg",quietly=.isPackageInUse()))
-         stop("Suggested package 'jpeg' missed, but is required here.")
+     # if (!requireNamespace("jpeg",quietly=.isPackageInUse()))
+     #    stop("Suggested package 'jpeg' missed, but is required here.")
       a <- try(255*jpeg::readJPEG(fname),silent=!verbose)
    }
    else {
@@ -437,22 +440,12 @@
          if (inherits(a,"try-error"))
             a <- try(255*jpeg::readJPEG(fname),silent=!verbose)
          if (inherits(a,"try-error")) {
-           # if (requireNamespace("miss_caTools",quietly=.isPackageInUse())) {
-           #    stop("caTools")
-           # }
-            g0 <- session_grid()
-            a <- read_gdal(fname)
-            session_grid(g0)
-            if (inherits(a,"try-error"))
-               cat(geterrmessage())
-            if (ursa_blank(a,NA))
-               ursa_value(a) <- 0
-            a <- as.array(a)
+            a <- 255*.readPNG(fname)
          }
       }
       else
          cat(geterrmessage())
-      return(a)
+     # return(a)
    }
   # file.remove(fname)
    dima <- dim(a)
@@ -470,7 +463,7 @@
             ,cover=1e-6,verbose=0L))
       dima <- dim(a)
       if (isPNG)
-         png::writePNG(a/256,fname)
+         .writePNG(a/256,fname)
       else if (isJPEG)
          jpeg::writeJPEG(a/256,fname)
       else
@@ -498,4 +491,63 @@
   # session_grid(b)
   # display(b,scale=1,coast=FALSE)
    b
+}
+'.readPNG' <- function(fname,...) {
+   if (requireNamespace("png",quietly=T | .isPackageInUse()))
+      return(png::readPNG(fname,...))
+   .readGRAPHICS(fname,...)
+}
+'.readJPEG' <- function(fname,...) {
+   if (requireNamespace("jpeg",quietly=T | .isPackageInUse()))
+      return(jpeg::readJPEG(fname,...))
+   .readGRAPHICS(fname,...)
+}
+'.writePNG' <- function(obj,fileout,...) {
+   if (requireNamespace("png",quietly=T | .isPackageInUse()))
+      return(png::writePNG(obj,fileout,...))
+   .writeGRAPHICS(obj,fileout,...)
+}
+'.writeJPEG' <- function(obj,fileout,...) {
+   if (requireNamespace("jpeg",quietly=T | .isPackageInUse()))
+      return(jpeg::writeJPEG(obj,fileout,...))
+   .writeGRAPHICS(obj,fileout,...)
+}
+'.readGRAPHICS' <- function(fname,...) {
+  # g0 <- options()[c("ursaSessionGrid","ursaSessionGrid_prev")]
+   g0 <- session_grid()
+   session_grid(NULL)
+   b <- read_gdal(fname,engine="sf")
+   if (ursa_blank(b,NA))
+      a <- ursa(0L)
+   if (!is.na(nodata <- ignorevalue(b)))
+      b[is.na(b)] <- nodata
+  # if (inherits(b,"try-error"))
+  #    cat(geterrmessage())
+   if (nband(b)<3) {
+      ct <- ursa_colortable(b)
+      lut <- col2rgb(ct,alpha=any(nchar(substr(ct,8,9))>0))
+      ind <- match(ursa_value(b),as.integer(colnames(lut)))
+      a <- ursa(nband=nrow(lut))
+      for (i in seq(a)) {
+         ursa_value(a)[,i] <- lut[i,ind] 
+      }
+   } else {
+      a <- b
+   }
+   a <- as.array(a,aperm=TRUE)
+   session_grid(g0)
+  # options(g0)
+   a/255
+}
+'.writeGRAPHICS' <- function(obj,fileout,...) {
+   g0 <- session_grid()
+   a <- as.ursa(obj*255,aperm=TRUE,flip=TRUE)
+  # write_gdal(a,fileout)
+  # q()
+   ret <- ursa_write(a,fileout)
+   auxfile <- paste0(fileout,".aux.xml")
+   if (file.exists(auxfile))
+      file.remove(auxfile)
+   session_grid(g0)
+   ret
 }

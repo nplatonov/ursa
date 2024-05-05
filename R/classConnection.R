@@ -3,7 +3,7 @@
    obj <- list(driver=NA_character_
               ,samples=NA_integer_,lines=NA_integer_,bands=NA_integer_
               ,datatype=NA_integer_,interleave=NA_character_,byteorder=NA_integer_
-              ,endian=NA_character_,swap=NA_integer_,signed=NA
+              ,endian=NA_character_,swap=NA_integer_,signed=NA,scale=NA_real_
               ,offset=NA_integer_,wkt=FALSE,nodata=NA_real_,mode="raw"
               ,sizeof=NA_integer_,indexC=NA_integer_,indexR=NA_integer_,indexZ=NA_integer_
               ,posC=NA_integer_,posR=NA_integer_,posZ=NA_integer_

@@ -10,7 +10,7 @@
                    ,'3'="MODIS_Aqua_CorrectedReflectance_TrueColor"
                    ,'4'="MODIS_Terra_CorrectedReflectance_TrueColor"
                    ,'5'="VIIRS_SNPP_CorrectedReflectance_TrueColor"
-                   ,'6'="Coastlines")
+                   ,'6'="Coastlines_15m")
    epsg3413 <- paste("+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1"
                  ,"+x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs")
    epsg3857 <- paste("+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0"
@@ -18,7 +18,8 @@
                     ,"+wktext +no_defs")
    if ((length(bbox)==1)&&(is.na(bbox))) {
       g0 <- session_grid()
-      if (.lgrep("\\+proj=merc",g0$crs)) {
+     # g0$crs <- .proj4string(g0$crs)
+      if (.isMerc(g0$crs)) {
          ll <- with(g0,.project(cbind(c(minx,maxx),c(miny,maxy)),crs,inv=TRUE))
         # bbox <- c(min(ll[,1]),min(ll[,2]),max(ll[,1]),max(ll[,2]))
          bbox <- c(ll[1,1],ll[1,2],ll[2,1],ll[2,2])
@@ -170,7 +171,7 @@
    if ((nband(b)==4)&&(global_min(b[4])==255)&&(global_max(b[4])==255))
       b <- b[-4]
    attr(b,"copyright") <- "Global Imagery Browse Services, NASA/GSFC/ESDIS"
-   cond1 <- .lgrep("\\+proj=merc\\s",g1$crs) & .lgrep("\\+proj=merc\\s",g4$crs)
+   cond1 <- .isMerc(g1$crs) & .isMerc(g4$crs)
    cond2 <- g1$columns==g4$columns & g1$rows==g4$rows &
             .is.near(g1$miny,g4$miny) & .is.near(g1$maxy,g4$maxy) &
             .is.near(g1$resx,g4$resx) & .is.near(g1$resy,g4$resy) &
@@ -192,20 +193,46 @@
    if (inherits(time,c("Date","POSIXct","POSIXlt")))
       time <- format(time,"%Y-%m-%d")
   # product <- c("Coastlines","arctic_coastlines")[1]
-   isDecor <- product %in% c("Coastlines","arctic_coastline")
+   isDecor <- product %in% c("Coastlines","Coastlines_15m","arctic_coastline")
    if (isDecor)
       time <- ""
-   ext <- ifelse(product %in% c("Coastlines","arctic_coastline"),".png",".jpg")
+   ext <- ifelse(product %in% c("Coastlines","Coastlines_15m","arctic_coastline")
+                ,".png",".jpg")
    epsg <- match.arg(epsg)
-   matrixSet <- switch(epsg,'3413'="250m",'3857'="GoogleMapsCompatible_Level9")
+   matrixSet <- switch(epsg,'3413'="250m"
+                           ,'3857'=ifelse(isDecor,"GoogleMapsCompatible_Level13"
+                                                 ,"GoogleMapsCompatible_Level9"))
    isPNG <- length(grep("png",ext))>0
+   if (isPNG) {
+      if (!requireNamespace("png",quietly=.isPackageInUse()))
+         stop("Suggested package 'png' is missed, but is required here.")
+   }
    isJPEG <- length(grep("jpg",ext))>0
    if (isJPEG) {
       if (!requireNamespace("jpeg",quietly=.isPackageInUse()))
          stop("Suggested package 'jpeg' is missed, but is required here.")
    }
-   src <- file.path("https://gibs.earthdata.nasa.gov/wmts",paste0("epsg",epsg)
-                   ,"best",product,"default",time,matrixSet,paste0(z,"/",y,"/",x,ext))
+   if (T) {
+      src <- file.path("https://gibs.earthdata.nasa.gov/wmts",paste0("epsg",epsg)
+                      ,"best",product,"default",time,matrixSet,paste0(z,"/",y,"/",x,ext))
+   }
+   else {
+     # https://gibs-a.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?Request=GetCapabilities
+      src <- file.path("https://gibs-a.earthdata.nasa.gov/wmts",paste0("epsg",epsg),"best/wmts.cgi")
+      prm <- paste(paste0("Request=GetTile")
+                  ,paste0("format=image/",gsub("\\.","",ext))
+                  ,paste0("Version=1.0.0")
+                  ,paste0("Service=WMTS")
+                  ,paste0("layer=Coastlines_15m")#,product)
+                  ,paste0("tilematrixset=",matrixSet)
+                  ,paste0("TileMatrix=",z)
+                  ,paste0("TileCol=",x)
+                  ,paste0("TileRow=",y)
+                  ,sep="&"
+                  )
+      src <- paste(src,prm,sep="?")
+      
+   }
   # dst <- paste0("tmp-",z,"-",y,"-",x,ext)
   # dst <- sapply(seq_along(src),function(x) tempfile())
    method <- getOption("download.file.method")
@@ -236,7 +263,7 @@
          }
       }
       if (isPNG) {
-         a[[i]] <- aperm(png::readPNG(dst),c(2,1,3))
+         a[[i]] <- aperm(.readPNG(dst),c(2,1,3))
       }
       else if (isJPEG)
          a[[i]] <- aperm(jpeg::readJPEG(dst),c(2,1,3))

@@ -8,7 +8,7 @@
    list2 <- ls(envir=ns)
    unloadNamespace(ns)
    list2 <- grep("^[A-Za-z]",list2,value=TRUE)
-   list2 <- grep("\\.(ursa(Raster|Grid|ColorTable|Connection|Numeric|Category|Stack|ProgressBar))"
+   list2 <- grep("\\.(ursa(Raster|Grid|CRS|ColorTable|Connection|Numeric|Category|Stack|ProgressBar))"
                 ,list2,value=TRUE,invert=TRUE)
    list2 <- grep("^(as\\.Raster|djqwotrhfndh)\\.",list2,value=TRUE,invert=TRUE)
    if (length(list3 <- grep("^C_.+",list2,value=TRUE,invert=FALSE))) {
@@ -115,6 +115,12 @@
 }
 '.buildAndInstall' <- function() {
    wd <- setwd("C:/platt/R/ursa-package");on.exit(setwd(wd))
+   src <- "ursa/DESCRIPTION"
+   dst <- tempfile()
+   file.copy(src,dst)
+   wd2 <- setwd("news")
+   source("versionConsistence.R")
+   setwd(wd2)
    if (requireNamespace("tools")) {
       toWrite <- TRUE
       md5fname <- "ursa/R/_md5"
@@ -132,17 +138,37 @@
       if (toWrite)
          write.table(new,md5fname,quote=FALSE
                     ,col.names=FALSE,row.names=FALSE)
-      else
+      else {
+         cat("`ursa` is up-to-date\n")
+         file.rename(dst,src)
          return(NULL)
+      }
    }
    if (requireNamespace("ursa"))
       stopifnot(!.generate_namespace(verbose=FALSE))
    patt <- "^ursa_.*(\\.tar\\.gz|\\.zip)$"
    nul <- file.remove(dir(pattern=patt))
+   desc <- readLines(src)
+   pattV <- "^(Version:\\s*)(\\S+)\\s*$"
+   if (subVersion <- length(indC <- grep(pattV,desc))>0) {
+      cfile <- "ursa/.counter"
+      ver <- unlist(package_version(gsub(pattV,"\\2",desc[indC])))
+      if (length(ver)==3)
+         ver[3] <- ver[3]-1
+      ver <- paste(ver[1:3],collapse=".")
+      counter <- as.integer(readLines(cfile))
+      desc[indC] <- gsub(pattV,sprintf("\\1%s-%04d",ver,counter),desc[indC])
+      print(desc[indC],quote=FALSE)
+      writeLines(desc,src)
+   }
    system("R --vanilla CMD build ursa")
+  # if (file.exists(dst))
+  #    file.rename(dst,src)
    pkg <- tail(dir(pattern=patt))
    if (length(pkg)!=1)
       return(NULL)
+  # if (length(indC))
+  #    writeLines(sprintf("%04d",counter+1L),cfile)
    opt1 <- "--fake" ## --no-multiarch
    opt2 <- "--no-html"
    opt3 <- "--no-html --build"
@@ -169,8 +195,11 @@
    else {
       Sys.setenv(R_LIBS_USER=.libPaths()[1])
      # Sys.setenv(BINPREF=Sys.getenv("R_BINPREF"))
-      system2("R",c("--vanilla","CMD","INSTALL",opt3,pkg)[-1])
+      ret <- system2("R",c("--vanilla","CMD","INSTALL",opt3,pkg)[-1])
      # system(paste("R","--vanilla","CMD","INSTALL",opt2,pkg))
+      if ((!ret)&&(subVersion)) {
+         writeLines(sprintf("%04d",counter+1L),cfile)
+      }
    }
   # file.remove(pkg)
    NULL

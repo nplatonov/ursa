@@ -90,17 +90,17 @@
              ,x=as.numeric(x$value),bg=as.numeric(nodata)
              ,dim=as.integer(dimx),cover=as.numeric(cover)
              ,weight=weight,sum=as.integer(sum)
-             ,res=numeric(dimx[1]*1L),NAOK=FALSE)
+             ,res=numeric(dimx[1]*1L),NAOK=FALSE)$res
       if (verbose)
          .elapsedTime(paste(fun,"stop",sep=":"))
       if (is.na(x$con$posR[1])) {
-         obj$value[] <- a$res
+         obj$value[] <- a
          class(obj$value) <- "ursaNumeric"
       }
       else
       {
          obj$con$posR <- x$con$posR
-         obj$value <- a$res
+         obj$value <- a
          dim(obj$value) <- c(dimx[1],1)
       }
       if (abs(nodata)<1)

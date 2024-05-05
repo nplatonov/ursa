@@ -5,8 +5,16 @@
       return(invisible(NULL))
    arglist <- list(...)
    if ((length(arglist))&&(is_spatial(arglist[[1]]))) {
-      obj <- spatial_transform(arglist[[1]],session_crs())
+      bbox <- ursa_bbox(.panel_grid())
+      obj <- spatial_transform(arglist[[1]],.panel_crs())
+      if (F & is_spatial_polygons(obj)) {
+         obj <- spatial_intersection(obj,polygonize(bbox))
+      }
       xy <- spatial_coordinates(spatial_centroid(obj))
+      ind <- which(xy[,1]>=bbox["xmin"] & xy[,1]<=bbox["xmax"] &
+                   xy[,2]>=bbox["ymin"] & xy[,2]<=bbox["ymax"])
+      obj <- obj[ind,]
+      xy <- xy[ind,]
       da <- spatial_data(obj)
       noLabel <- !ncol(da)
      # if (noLabel)
@@ -75,7 +83,7 @@
       str(list(label=label,position=position,cex=cex,adjust=adjust,fg=fg,bg=bg
               ,fill=fill,buffer=buffer,vertical=vertical,verbose=verbose))
    opt <- par(family=font)
-   g1 <- getOption("ursaPngPanelGrid") # session_grid()
+   g1 <- .panel_grid() # session_grid()
    minx <- g1$minx
    miny <- g1$miny
    maxx <- g1$maxx
@@ -173,7 +181,7 @@
       else
          width <- strwidth(paste(label,"|",sep=""),units="user",cex=mycex)
    }
-   if (vertical) {
+   if (abs(vertical)>45) {
       .w <- width
       width <- height
       height <- .w*1.05

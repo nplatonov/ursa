@@ -44,10 +44,26 @@
    }
    if (verbose)
       print(xName[ind[1],])
-   i <- match(xName[ind[1],"where"],myname)
+   if (verbose) {
+      print(myname)
+   }
+   if (F & length(ind2 <- which(!nchar(myname)))>1) {
+      print("DEV")
+      print(ind2)
+      print(grepl("\\^\\$",xName[ind,"what"]))
+      str(link[ind2])
+      i <- ind2
+   }
+   else
+     i <- match(xName[ind[1],"where"],myname)
    cl <- class(link[[i]])
+  # cl <- do.call(c,lapply(link[i],"class"))
    if ("ursaStack" %in% cl)
       cl <- "list"
+   else if ("array" %in% cl) {
+      if (is.numeric(link[[i]]))
+         cl <- c(cl,"numeric")
+   }
    isList <- is.list(link[[i]])
    if (!is.list(class))
       class <- list(class)
@@ -101,7 +117,7 @@
          m2 <- length(na.omit(match(cl2,cl)))>0 ##cl2 %in% cl
       }
       if (verbose)
-         print(m2)
+         print(c(m2=m2))
       if (!m2) {
          if (length(valid)) {
             if (!any(cl %in% cl2))
@@ -162,6 +178,10 @@
       if (!coerce)
          return(link[[i]])
       if (toInteger) {
+         if (is.array(link[[i]])) {
+            storage.mode(link[[i]]) <- "integer"
+            return(link[[i]])
+         }
          return(as.integer(link[[i]]))
       }
       else if (toLogical) {

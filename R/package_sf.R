@@ -1,7 +1,34 @@
+'.gdal_sfinfo' <- function(fname) {
+   md <- list(nodata=NA,scale=NA,offset=NA)
+   if (forceInfo <- TRUE) {
+      gi <- sf::gdal_utils("info",fname,quiet=TRUE)
+      gi <- strsplit(gi,split="\\n")[[1]]
+      nd <- grep("NoData Value",gi,value=TRUE)
+      if (length(nd)>0) {
+         md$nodata <- as.numeric(gsub("^.*=(\\s*(\\S+))$","\\1",nd))
+        # if (typeof(ursa_value(res))=="integer")
+        #    ignorevalue(res) <- as.integer(unique(nodata))
+        # else
+        #    ignorevalue(res) <- as.numeric(unique(nodata))
+      }
+      sc <- grep("(Offset:|Scale:)",gi,value=TRUE)
+      if (length(sc)>0) {
+         md$offset <- as.numeric(gsub(".*Offset:\\s*((-)*\\d(\\.\\d+)*)(\\D.*|$)","\\1",sc))
+         md$scale <- as.numeric(gsub(".*Scale:\\s*((-)*\\d(\\.\\d+)*)(\\D.*|$)","\\1",sc))
+      }
+      if ((!is.na(md$nodata[1]))&&(!is.na(md$scale))&&(!is.na(md$offset))) {
+         md$nodata <- md$nodata*md$scale+md$offset
+      }
+   }
+   md
+}
 '.open_sfgdal' <- function(fname,engine="sf",verbose=FALSE) {
    if (!requireNamespace("sf",quietly=.isPackageInUse()))
       stop("Package 'sf' is required for this operation")
+   if (verbose)
+      print(c('open_gdal'="`sf::gdal_read()` without data"))
    obj <- sf::gdal_read(fname,read_data=FALSE)
+   md <- .gdal_sfinfo(fname)
    columns <- obj$cols[2]
    rows <- obj$rows[2]
    bands <- length(obj$bands)
@@ -9,8 +36,10 @@
       crs <- obj[[ind]]
    if (is.character(crs))
       crs <- sf::st_crs(crs)$proj4string
-   if (inherits(crs,"crs"))
-      crs <- crs$proj4string
+   if (inherits(crs,"crs")) {
+      crs <- .WKT(crs)
+     # crs <- .proj4string(crs)
+   }
    if (is.na(crs))
       crs <- ""
    if (all(is.na(obj$geotransform))) {
@@ -29,8 +58,12 @@
       maxx <- minx+columns*resx
       miny <- maxy-rows*resy
    }
+   ##~ a <- list(minx=minx,maxx=maxx,miny=miny,maxy=maxy,columns=columns,rows=rows
+               ##~ ,crs=crs # sf::st_crs(obj$crs)$proj4string
+               ##~ )
+   ##~ str(a,digits=16)
    g1 <- regrid(minx=minx,maxx=maxx,miny=miny,maxy=maxy,columns=columns,rows=rows
-               ,crs=crs # sf::st_crs(obj$crs)$proj4string
+               ,crs=.ursaCRS(crs) # sf::st_crs(obj$crs)$proj4string
                )
    res <- .raster.skeleton()
    res$grid <- g1
@@ -85,13 +118,20 @@
          }
       }
    }
-   if ((isCat)||((T & !.lgrep("float",obj$datatype)))) {
-     # .elapsedTime("F")
-     # v <- as.integer(v)
-     # dim(v) <- dimv
-     # storage.mode(v) <- "integer"
-      mode(res$value) <- "integer"
-     # .elapsedTime("G")
+   if (.lgrep("float",obj$datatype))
+      vmode <- "numeric"
+   else
+      vmode <- "integer"
+   if ((isCat)||(vmode=="integer")) {
+      if ((!is.na(md$scale))&&(!is.na(md$offset))) {
+        # .elapsedTime("F")
+        # v <- as.integer(v)
+        # dim(v) <- dimv
+        # storage.mode(v) <- "integer"
+         vmode <- "numeric"
+         res$con$datatype <- 4L
+        # .elapsedTime("G")
+      }
    }
   # .elapsedTime("as.ursa -- before")
   # res <- as.ursa(v) ## RECURSIVE
@@ -116,22 +156,12 @@
       names(res) <- bname
    }
    res$dim <- as.integer(c(columns*rows,bands))
-   gi <- sf::gdal_utils("info",fname,quiet=!FALSE)
-   gi <- strsplit(gi,split="\\n")[[1]]
-   if (tryToUseOnlyInfoForGridAndMetadata <- FALSE) {
-      cat("---------------\n")
-      print(gi)
-      cat("---------------\n")
-      q()
+   if (!is.na(md$nodata[1])) {
+      if (vmode!=mode(md$nodata))
+         mode(md$nodata) <- vmode
+      ignorevalue(res) <- unique(md$nodata)
    }
-   gi <- grep("NoData Value",gi,value=TRUE)
-   if (length(gi)>0) {
-      nodata <- gsub("^.*=(\\s*(\\S+))$","\\1",gi)
-      if (typeof(ursa_value(res))=="integer")
-         ignorevalue(res) <- as.integer(unique(nodata))
-      else
-         ignorevalue(res) <- as.numeric(unique(nodata))
-   }
+   mode(res$value) <- vmode
    res
 }
 '.read_stars' <- function(fname) {
@@ -172,6 +202,8 @@
    res
 }
 'as_stars' <- function(obj) {
+   if (inherits(obj,"stars"))
+      return(obj)
    if (!inherits(obj,"ursaRaster"))
       return(NULL)
    g <- ursa_grid(obj)

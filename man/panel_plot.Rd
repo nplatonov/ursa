@@ -80,7 +80,7 @@ Package \pkg{graphics} (\code{help(package="graphics")}) and functions \code{\li
 }
 \examples{
 session_grid(NULL)
-# require(rgdal) ## 'rgdal is retired'
+# require(rgdal) ## 'rgdal' is retired
 a <- pixelsize()
 g1 <- session_grid()
 n <- 12L
@@ -88,21 +88,37 @@ k <- 5L
 x <- with(g1,runif(n,min=minx,max=maxx))
 y <- with(g1,runif(n,min=miny,max=maxy))
 panel_plot(x,y) ## plots nothing, because 'compose_open(...,dev=F)' is not called yet
-sl <- lapply(seq(k),function(id){
-   x <- sort(with(g1,runif(n,min=minx,max=maxx)))
-   y <- sort(with(g1,runif(n,min=miny,max=maxy)))
-   sp::Lines(sp::Line(cbind(x,y)),ID=id)
-})
-sl <- sp::SpatialLines(sl,proj4string=sp::CRS(ursa_proj(g1)))#,id=length(sl))
-lab <- t(sapply(sp::coordinates(sl),function(xy) xy[[1]][round(n/2),]))
-lab <- as.data.frame(cbind(lab,z=seq(k)))
-sl <- sp::SpatialLinesDataFrame(sl
-              ,data=data.frame(ID=runif(k,min=5,max=9),desc=LETTERS[seq(k)]))
-print(sl@data)
-ct <- colorize(sl@data$ID)#,name=sldf@data$desc)
-shpname <- tempfile(pattern = "___tmp",tmpdir=".",fileext=".shp")
+shpname <- tempfile(fileext=".shp")
 layername <- gsub("\\\\.shp$","",basename(shpname))
-try(writeOGR(sl,dirname(shpname),layername,driver="ESRI Shapefile"))
+if (requireNamespace("sp")) {
+   sl <- lapply(seq(k),function(id){
+      x <- sort(with(g1,runif(n,min=minx,max=maxx)))
+      y <- sort(with(g1,runif(n,min=miny,max=maxy)))
+      sp::Lines(sp::Line(cbind(x,y)),ID=id)
+   })
+   sl <- sp::SpatialLines(sl,proj4string=sp::CRS(ursa_proj(g1)))#,id=length(sl))
+   lab <- t(sapply(sp::coordinates(sl),function(xy) xy[[1]][round(n/2),]))
+   lab <- as.data.frame(cbind(lab,z=seq(k)))
+   sl <- sp::SpatialLinesDataFrame(sl
+                 ,data=data.frame(ID=runif(k,min=5,max=9),desc=LETTERS[seq(k)]))
+   print(sl@data)
+   ct <- colorize(sl@data$ID)#,name=sldf@data$desc)
+   try(writeOGR(sl,dirname(shpname),layername,driver="ESRI Shapefile")) ## 'rgdal' is retired
+   spatial_write(sl,shpname)
+} else if (requireNamespace("sf")) {
+   sl <- lapply(seq(k),function(id) {
+      x <- sort(with(g1,runif(n,min=minx,max=maxx)))
+      y <- sort(with(g1,runif(n,min=miny,max=maxy)))
+      sf::st_linestring(cbind(x,y))
+   })
+   sl <- sf::st_sfc(sl,crs=as.character(ursa_crs(g1)))
+   sl <- sf::st_sf(ID=runif(k,min=5,max=9),desc=LETTERS[seq(k)],geometry=sl)
+   print(spatial_data(sl))
+   lab <- do.call("rbind",lapply(sf::st_geometry(sl),colMeans))
+   lab <- as.data.frame(cbind(lab,z=seq(k)))
+   ct <- colorize(sl$ID)
+   sf::st_write(sl,shpname)
+}
 compose_open(layout=c(1,2),legend=list(list("bottom",2)))
 panel_new()
 panel_decor()
@@ -112,11 +128,14 @@ panel_points(0,0,pch=3)
 panel_text(0,0,"North\nPole",pos=4,cex=1.5,family="Courier New",font=3)
 panel_new()
 panel_decor()
-panel_plot(sl,lwd=4,col="grey20")
-if (file.exists(shpname))
+if (exists("sl"))
+   panel_plot(sl,lwd=4,col="grey20")
+if ((exists("ct"))&&(file.exists(shpname)))
    panel_plot(shpname,lwd=3,col=ct$colortable[ct$index])
-panel_points(lab$x,lab$y,pch=as.character(lab$z),cex=2)
-compose_legend(ct$colortable)
+if (exists("lab"))
+   panel_points(lab$x,lab$y,pch=as.character(lab$z),cex=2)
+if (exists("ct"))
+   compose_legend(ct$colortable)
 compose_close()
 file.remove(dir(path=dirname(shpname)
                ,pattern=paste0(layername,"\\\\.(cpg|dbf|prj|shp|shx)")

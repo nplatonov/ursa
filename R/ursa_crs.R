@@ -26,7 +26,7 @@
 }
 'ursa_crs<-' <- function(obj,keepGrid=FALSE,value) {
    if ((is.numeric(value))&&(.is.integer(value)))
-      value <- paste0("+init=epsg:",round(value))
+      value <- paste0("EPSG:",round(value))
    else if (inherits(value,"CRS"))
       value <- methods::slot(value,"projargs")
    else if (!is.character(value))
@@ -37,10 +37,11 @@
    if (!is.ursa(obj)) {
       if (!.is.grid(obj))
          return(NULL)
-      obj$crs <- ursa_crs(value)
+      obj$crs <- .ursaCRS(ursa_crs(value))
+     # obj$crs <- ursa_crs(value)
       return(obj)
    }
-   obj$grid$crs <- ursa_crs(value)
+   obj$grid$crs <- .ursaCRS(ursa_crs(value))
    if (!keepGrid)
       session_grid(obj)
    obj

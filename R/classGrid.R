@@ -4,7 +4,7 @@
              ,minx=NA_real_,maxx=NA_real_,miny=NA_real_,maxy=NA_real_
              ,seqx=numeric(0),seqy=numeric(0)
              ,crs="",retina=NA)
-  # class(g1$crs) <- c("character","ursaProjection")
+   class(g1$crs) <- c("ursaCRS","character")[1]
    class(g1) <- "ursaGrid"
    g1
 }
@@ -17,6 +17,7 @@
       x$seqy <- NULL
    if (is.na(x$retina))
       x$retina <- NULL
+  # x$crs <- .crsBeauty(x$crs)
    str(x,formatNum=function(x) format(x,scientific=FALSE),...)
 }
 'str.ursaGrid' <- function(object,...) {
@@ -38,6 +39,7 @@
       object$seqy <- NULL
    if ((!is.null(object$retina))&&(is.na(object$retina)))
       object$retina <- NULL
+  # object$crs <- .crsBeauty(object$crs)
    str(object,...)#,formatNum=function(x) format(x,scientific=FALSE),...)
   # do.call("str",lx,...)#,formatNum=function(x) format(x,scientific=FALSE),...)
 }

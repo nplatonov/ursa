@@ -102,7 +102,7 @@
       colnames(vec) <- c("x","y")
       ind <- .grep("^(lon|lat)",mname)
       if ((length(ind)==2)&&(is.null(proj4)))
-         proj4 <- paste("+proj=longlat +datum=WGS84 +no_defs")
+         proj4 <- paste(.crsWGS84())
    }
    if (is.null(proj4))
       proj4 <- ""
@@ -121,8 +121,6 @@
          z[,i] <- as.numeric(val)-1
       }
    }
-   if (is.na(nodata))
-      nodata <- .optimal.nodata(z)
    if (!.is.grid((getOption("ursaSessionGrid")))) {
       x <- sort(unique(vec$x))
       y <- sort(unique(vec$y))
@@ -203,7 +201,7 @@
    }
    if (onlyGrid)
       return(session_grid())
-   res <- ursa_new(bandname=lname,ignorevalue=nodata)
+   res <- ursa_new(bandname=lname) ## --20240217, skip ignorevalue<-
    z <- as.matrix(z)
    z[is.na(z)] <- nodata
    g1 <- res$grid
@@ -212,6 +210,8 @@
    dimy <- with(res$grid,c(columns,rows,nb))
    if (verbose)
       .elapsedTime(paste0(fun,":start"))
+   if (is.na(nodata))
+      nodata <- .optimal.nodata(z)
    res$value <- .Cursa(C_rasterize,dat=numeric(prod(dimy)),dim=as.integer(dimy)
                   ,bbox=as.numeric(with(g1,c(minx,miny,maxx,maxy)))
                   ,x=as.numeric(vec$x),y=as.numeric(vec$y),value=as.numeric(z)

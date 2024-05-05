@@ -1,5 +1,8 @@
 '.DeadEnd' <- function() stop("Dead End after {rgdal}/{rgeos}/{maptools} retiring")
 '.Retired' <- function() stop("This function is retired")
+'.Missing' <- function(p) {
+   stop(paste0("Required package ",ifelse(missing(p),"",dQuote(p))," is missing"))
+}
 '.open_rgdal' <- function(...) .DeadEnd()
 '.rgdal_getRasterData' <- function(...) .DeadEnd()
 '.rgdal_putRasterData' <- function(...) .DeadEnd()
@@ -30,15 +33,3 @@
 '.rgeos_gUnion' <- function(...) .DeadEnd()
 '.rgeos_gSimplify' <- function(...) .DeadEnd()
 '.rgeos_gIsValid' <- function(...) .DeadEnd()
-'.proj4_requireNamespace' <- function(...) {
-  # requireNamespace("proj4",quietly=.isPackageInUse())
-   .Retired()
-}
-'.proj4_project' <- function(...) {
-  # proj4::project(...)
-   .Retired()
-}
-'.proj4_ptransform' <- function(...) {
-  # proj4::ptransform(...)
-   .Retired()
-}

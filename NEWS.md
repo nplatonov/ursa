@@ -1,16 +1,36 @@
-2024-01-12
+2024-02-13
 
 <!--
 + Depends on R (>= 4.1.0) instead of R (>= 3.0.0) due to using native pipes `|>` in code
 + Depends on R (>= 4.1.0) instead of R (>= 3.0.0) due to changed behaviour in `*apply()` functions with argument `simplify`
-+ Ongoing...
 -->
 
-### Version 3.10.5
+### Version 3.11.1
 
 -   ongoing…
 
--   Package **`proj4`** is removed from ‘Suggests’.
+-   In function `colorize()` default value of argument `lazyload` is
+    changed from `FALSE` to `TRUE` to speed-up rendering large rasters.
+
+-   Plotting doesn’t affect sessional grid.
+
+-   Layout matrix can be specified directly (argument `layout` in
+    `compose_design()` and superior functions).
+
+-   Package start-up initializes `options(ursaProj4Legacy=TRUE)` to keep
+    using PROJ4, primarely, for printing. This initialization is skipped
+    if `ursaProj4Legacy` option was assigned before package loading.
+
+-   Package **`png`** is added to ‘Suggests’ (from ‘Imports’).
+
+<!--
++ Package **`proj4`** is removed from 'Suggests'.
+-->
+
+### Version 3.11 (interim)
+
+-   MAJOR: WKT as well as PROJ4 is used for coordinate reference
+    systems.
 
 ### Version 3.10.4
 
@@ -65,7 +85,7 @@
 -   Package **`RSQLite`** is added as suggested for using map tiles from
     specified directory of SAS Planet cache
 
--   In `segmentize()` 1) improved response of `by` argument, 2) order of
+-   In `trackline()` 1) improved response of `by` argument, 2) order of
     `type` argument is reversed to `c("united","conseqwent")`
 
 -   Coastline is updated to version 2023-08-24T03:31.
@@ -110,7 +130,7 @@
 -   New argunent `expand` in function `ursa_crop()` for spatial
     expansion using relative value.
 
--   New argument `by` in function `segmentize()` to split segments by
+-   New argument `by` in function `trackline()` to split segments by
     specified field name.
 
 -   New function `spatial_levelsplit()` trasforms nested polygons (e.g.,
@@ -158,13 +178,13 @@
 
 ### Version 3.9.4
 
--   Fixed example of `segmentize()` for non-Windows systems.
+-   Fixed example of `trackline()` for non-Windows systems.
 
 ### Version 3.9.3
 
 -   Test building for R 4.1.0.
 
--   New function `segmentize()` to connect sequence of spatial points to
+-   New function `trackline()` to connect sequence of spatial points to
     line segments.
 
 -   New return value `ursaLegend` in function `panel_plot()` for spatial
@@ -174,8 +194,8 @@
 -   New arguments `...` in function `session_grid()` for preliminary
     passing to `regrid()`.
 
--   New argument `connect` in function `segmentize()` for creating
-    either solid multi-segment or multiple consequent segments.
+-   New argument `connect` in function `trackline()` for creating either
+    solid multi-segment or multiple consequent segments.
 
 -   Patterned argument `vertical` in function `panel_annnotation()` can
     be numeric (degrees on label inclination).

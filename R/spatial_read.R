@@ -1,4 +1,4 @@
-'spatial_read' <- function(dsn,engine=c("native","sf","geojsonsf")) {
+'spatial_read' <- function(dsn,engine=c("native","sf")) {
    if (.lgrep("\\.(tif|tiff|tif\\.zip|img|png|bmp|dat)$",dsn))
       return(ursa_read(dsn))
    g0 <- getOption("ursaSessionGrid")

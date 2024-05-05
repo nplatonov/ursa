@@ -71,7 +71,7 @@
          if (TRUE) { #(.isPackageInUse())
             fann <- .dir(path=system.file("optional/sponsorship",package="ursa")
                          ,pattern="\\.png$",full.names=TRUE)
-            ann <- png::readPNG(sample(fann,1))
+            ann <- .readPNG(sample(fann,1))
             panel_annotation(ann,alpha=0.5,pos="bottomright",cex=0.5)
          }
          if (.isKnitr())
@@ -115,11 +115,13 @@
       print(all(p<500)) ## return
    }
    e.avg <- na.omit(e$mean)
-   e.sd <- na.omit(e$sd)
-   e.min <- na.omit(e$min)
-   e.max <- na.omit(e$max)
    if (!length(e.avg))
       return(TRUE)
+   e.sd <- na.omit(e$sd)
+   if (!length(e.sd))
+      return(TRUE)
+   e.min <- na.omit(e$min)
+   e.max <- na.omit(e$max)
    ##~ sd.avg <- sd(e.avg)
    ##~ sd.sd <- sd(e.sd)
    ##~ sd.min <- sd(e.min)

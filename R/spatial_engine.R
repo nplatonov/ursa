@@ -1,15 +1,23 @@
 # wrappers to spatial (not raster) objects
 #.syn('spatial_crs',0,...)
-'spatial_proj4' <- 'spatial_proj' <- 'spatial_crs' <- function(obj,verbose=FALSE) {
+'spatial_proj4' <- 'spatial_proj' <- 'spatial_crs' <- function(obj
+                                                 # ,beauty=FALSE
+                                                  ,verbose=FALSE) {
+   beauty <- FALSE
+   if (.isUrsaCRS(obj))
+      return(obj)
    if (!is.null(attr(obj,"crs",exact=TRUE))) {
       res <- attr(obj,"crs")
       if (inherits(res,"crs")) {
          if ((is.list(res))&&(!is.null(res$wkt))&&("sf" %in% loadedNamespaces())) {
-            return(sf::st_crs(res$wkt)$proj4string)
+            if (.crsForceProj4())
+               return(.ursaCRS(.proj4string(res)))
+            else
+               return(.ursaCRS(.WKT(res)))
          }
-         return(res$proj4string)
+         return(.ursaCRS(res$proj4string))
       }
-      return(res)
+      return(.ursaCRS(res))
    }
    if ((TRUE)&&(is.character(obj))&&(nchar(obj)>0)&&(length(spatial_dir(obj))==1)) {
       obj <- spatial_read(obj)
@@ -21,7 +29,12 @@
    if (verbose)
       print(data.frame(ursa=isUrsa,sf=isSF,sp=isSP,prm=isPrm,row.names="engine"))
    if ((isSF)||(inherits(obj,"crs"))) {
-      return(sf::st_crs(obj)$proj4string)
+      if (.crsForceProj4())
+         return(.ursaCRS(sf::st_crs(obj)$proj4string))
+      if (beauty)
+         return(.ursaCRS(.crsBeauty(.WKT(sf::st_crs(obj)))))
+     # return(gsub("\\n\\s+","",.WKT(sf::st_crs(obj))))
+      return(.ursaCRS(.WKT(sf::st_crs(obj))))
    }
    if (isSP) {
       if (FALSE) ## `sp`<1.4-2
@@ -30,16 +43,25 @@
       if (methods::is(spCRS,"CRS")) {
          wkt <- comment(spCRS)
          ret <- methods::slot(spCRS,"projargs")
-         if (FALSE) ## possible for future use
-            comment(ret) <- wkt
-         return(ret)
+         if (.crsForceProj4())
+            return(.ursaCRS(ret))
+         if (is.null(wkt))
+            return(.ursaCRS("")) ## return(.ursaCRS(ret))
+         if (beauty)
+            return(.ursaCRS(.crsBeauty(wkt)))
+         return(.ursaCRS(wkt))
       }
-      return(NA_character_)
+      return(.ursaCRS(NA_character_))
    }
-   if (isUrsa)
+   if (isUrsa) {
+      if (beauty)
+         return(.crsBeauty(ursa_crs(obj)))
       return(ursa_crs(obj))
+   }
    if (isPrm) {
-      return(.epsg2proj4(obj,verbose=verbose,force=TRUE))
+      if (!is.null(dim(obj)))
+         return(NULL)
+      return(.ursaCRS(.epsg2proj4(obj,verbose=verbose,force=TRUE)))
    }
    if (isTRUE(all(sapply(obj,.isSF))))
       return(lapply(obj,spatial_crs,verbose=verbose))
@@ -134,6 +156,11 @@
 'spatial_bbox' <- function(obj,verbose=FALSE) {
    isSF <- .isSF(obj)
    isSP <- .isSP(obj)
+   if (is_ursa(obj))
+      return(ursa_bbox(obj))
+   if (.is.ursa_stack(obj)) {
+      return(lapply(obj,spatial_bbox,verbose=verbose))
+   }
    if ((!isSF)&&(!isSP)&&(is.list(obj))) {
       if (isTRUE(all(sapply(obj,function(o) isTRUE(.isSF(o)) | isTRUE(.isSP(o)))))) {
          return(lapply(obj,spatial_bbox,verbose=verbose))
@@ -142,7 +169,7 @@
    if (verbose)
       print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
    res <- NULL
-   isLongLat <- .lgrep("\\+proj=longlat",spatial_crs(obj))>0
+   isLongLat <- .isLongLat(spatial_crs(obj))
    if (F & isLongLat) {
       xy <- spatial_coordinates(obj)
       if (F & isSF) {
@@ -407,6 +434,8 @@
       crs <- session_crs()
    else if ((is.ursa(crs))||(is.ursa(crs,"grid")))
       crs <- ursa(crs,"crs")
+   else if (inherits(crs,"ursaCRS"))
+      crs <- unclass(crs)
    if (verbose)
       print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
    if (isSF) {
@@ -424,6 +453,8 @@
          spatial_crs(obj) <- methods::slot(sp::CRS(crs0,doCheckCRSArgs=TRUE),"projargs")
       }
       ret <- sp::spTransform(obj,crs,...)
+      if (!length(spatial_fields(ret)))
+         spatial_data(ret) <- NULL
       options(opW)
       return(ret)
      # return(sp::spTransform(obj,crs,...)) ## sp::CRS(crs) ?
@@ -711,8 +742,7 @@
          )
       }
       else {
-         res <- sp::SpatialLinesLengths(obj
-                         ,longlat=.lgrep("\\+proj=longlat",spatial_crs(obj))>0)
+         res <- sp::SpatialLinesLengths(obj,longlat=.isLongLat(spatial_crs(obj))>0)
       }
       return(res)
    }
@@ -826,8 +856,15 @@
             path <- file.path(dirname(path),dpath[ind])
       }
    }
-   res <- dir(path=path,pattern=patt0,full.names=full.names
-             ,recursive=recursive,ignore.case=ignore.case)
+   if ((TRUE)&&(file.exists(path))&&(grepl("\\.zip",basename(path)))) {
+      res <- unzip(path,list=TRUE)$Name
+      res <- res[grep(patt0,basename(res))]
+     # if (full.names)
+     #    res 
+   }
+   else
+      res <- dir(path=path,pattern=patt0,full.names=full.names
+                ,recursive=recursive,ignore.case=ignore.case)
    if ((!length(res))&&(is.na(pattern))) {
       if ((path==basename(path))&&(!dir.exists(path))) {
         # print("A")
@@ -957,11 +994,11 @@
          sf::st_agr(y) <- "constant"
       if (missedAttrTable <- is.null(spatial_data(x))) {
          xname <- basename(tempfile(pattern="field",tmpdir=""))
-         spatial_data(x) <- data.frame(array(0,dim=c(spatial_length(x),1)
+         spatial_data(x) <- data.frame(array(0,dim=c(spatial_count(x),1)
                                             ,dimnames=list(NULL,xname)))
          sf::st_agr(x) <- "constant"
       }
-      res <- try(sf::st_intersection(x,y))
+      res <- try(sf::st_intersection(x,y),silent=TRUE)
       if (inherits(res,"try-error")) {
          if (length(grep("st_crs\\(x\\) == st_crs\\(y\\) is not TRUE"
                         ,as.character(res))))
@@ -1312,8 +1349,11 @@
       return(NULL)
    if ((length(arglist)==1)&&
        (any(sapply(arglist[[1]],is_spatial)))&&
-       (!is_spatial(arglist[[1]])))
+       (!is_spatial(arglist[[1]]))) {
       arglist <- arglist[[1]]
+      if (length(ind <- which(sapply(arglist,is.null))))
+         arglist <- arglist[-ind]
+   }
    res <- arglist[[1]]
    isSF <- .isSF(res)
    isSP <- .isSP(res)
@@ -1440,6 +1480,8 @@
    obj
 }
 'spatial_grid' <- function(obj) {
+   if (missing(obj))
+      return(session_grid())
    if (!is_spatial(obj))
       return(ursa_grid(obj))
    if ((is.numeric(obj))&&(length(obj)==4)) {
@@ -1455,12 +1497,33 @@
          bbox <- bbox+100*c(-1,-1,1,1)
       crs <- spatial_crs(obj)
    }
-   if ((.lgrep("\\+proj=longlat",crs))&&(bbox["xmax"]<0)&&(bbox["xmin"]>0))
+   if ((.isLongLat(crs))&&(bbox["xmax"]<0)&&(bbox["xmin"]>0))
       bbox["xmax"] <- bbox["xmax"]+360
-   nc <- (bbox["xmax"]-bbox["xmin"])
-   nr <- (bbox["ymax"]-bbox["ymin"])
-   res <- max(nc,nr)/640
-   p <- as.numeric(pretty(res))
-   res <- p[which.min(abs(res-p))]
-   regrid(setbound=unname(bbox),crs=crs,res=res)
+   if (isWeb <- .isWeb(session_grid())) {
+      res <- session_cellsize()
+   }
+   else {
+      nc <- (bbox["xmax"]-bbox["xmin"])
+      nr <- (bbox["ymax"]-bbox["ymin"])
+      res <- max(nc,nr)/640
+      p <- as.numeric(pretty(res))
+      res <- p[which.min(abs(res-p))]
+   }
+   ret <- regrid(setbound=unname(bbox),crs=crs,res=res)
+   ret
+}
+'spatial_crop' <- function(x,y) {
+   if (!.isSF(x))
+      return(NULL)
+  # if (!.isSF(y))
+  #    return(NULL)
+   if (anyNA(sf::st_agr(x)))
+      sf::st_agr(x) <- "constant"
+   if (is_spatial_points(y))
+      y <- spatialize(spatial_bbox(y))
+   else if (length(match(na.omit(names(y)),c("minx","miny","maxx","maxy")))==4)
+      y <- spatialize(y)
+   else if (.is.grid(y))
+      y <- spatialize(spatial_bbox(y))
+   sf::st_crop(x,y)
 }

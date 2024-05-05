@@ -125,10 +125,11 @@
         # print(range(j2))
         # print(i)
         # str(value)
-         for (m in seq(along=i))
-         {
+         dimv <- rep(seq(dim(value)[2]),length.out=length(i))
+         for (m in seq(along=i)) {
            # obj$data[j,i[m]] <- value[,m]
-            val <- value[,m,drop=FALSE]
+           # val <- value[,m,drop=FALSE] ## -- 20240225
+            val <- value[,dimv[m],drop=FALSE] ## ++ 20240225
            # val[val==con$nodata] <- NA
             if (FALSE)
             {
@@ -205,8 +206,10 @@
          j <- seq(dimy[1])
       else if (toSeek)
          toSeek <- toSeek+1
-      if (missing(i))
-         i <- seq(dimy[2])
+      if (missing(i)) {
+        # i <- seq(dimy[2]) ## --
+         i <- seq(dimx[2]) ## ++ 20240225
+      }
       else if (toSeek)
          toSeek <- toSeek+2
       if (is.list(j))
@@ -458,13 +461,16 @@
                      listJ[[j3]] <- i[j1:j2]
                      j1 <- j2+1
                   }
+                  dimV <- dim(value$value)[3]
                   for (j0 in seq_along(listJ))
                   {
                      j1 <- listJ[[j0]]
                      minJ <- min(j1)-1
                      j2 <- match(j1,i)
+                     j2 <- rep(seq(dimV),length.out=length(j2)) ## ++ 20240225
                      for (r in seq(dimz[2]))
                      {
+                       # str(value$value[,])
                         if (toSeek)
                         {
                            pos <- with(con,((r-1)*nb+minJ)*samples*sizeof+offset)
@@ -502,16 +508,17 @@
             else if (con$interleave=="bsq")
             {
                toSeek <- con$seek ## introdiced 2012-08-27
+               r2 <- rep(seq(dim(value$value)[3]),length.out=length(i)) ## ++ 20240225: r -> r2[r]
                for (r in seq(along=i))
                {
                   if (toSeek)
                      seek(con$handle,origin="start"
                          ,with(con,(i[r]-1)*lines*samples*sizeof+offset),rw="w")
                   if (toRound)
-                     writeBin(as.vector(.round(value$value[,,r],0),con$mode)
+                     writeBin(as.vector(.round(value$value[,,r2[r]],0),con$mode)
                              ,size=con$sizeof,endian=con$endian,con$handle)
                   else
-                     writeBin(as.vector(value$value[,,r],con$mode)
+                     writeBin(as.vector(value$value[,,r2[r]],con$mode)
                              ,size=con$sizeof,endian=con$endian,con$handle)
                  # if ((!toSeek)&&(r<dimy[3]))
                  #    seek(con$handle,where=myoffset,origin="current")
@@ -559,7 +566,15 @@
                is.na(value$value) <- con$nodata ## don't trust
          }
          value <- decompress(value)
-         dim(value$value) <- with(con,c(samples,lines,bands))
+         dimv <- dim(value$value)
+         if ((length(dimv)==2)&&(con$samples*con$lines==dimv[1])) {
+            rv <- rep(seq(dimv[2]),length.out=con$bands)
+            dim(value$value) <- c(con$samples,con$lines,dimv[2])
+         }
+         else {
+            dim(value$value) <- with(con,c(samples,lines,bands))
+            rv <- seq(bands)
+         }
          if (con$driver %in% c("ENVI","EGDAL")) {
             Fout <- con$handle
             if (con$seek)
@@ -589,20 +604,21 @@
             {
                if (con$interleave=="bil") ## R's [col,row,band] -> bil [col,band,row]
                {
-                  for (r in seq(dim(value$value)[2]))
-                     writeBin(as.vector(value$value[,r,],con$mode)
+                  for (r in seq(dim(value$value)[2])) {
+                     writeBin(as.vector(value$value[,r,rv],con$mode)
                              ,size=con$sizeof,endian=con$endian,Fout)
+                  }
                }
                else if (con$interleave=="bip") ## R's [col,row,band] -> bip [band,col,row]
                {
                   for (r in seq(dim(value$value)[2]))
-                     writeBin(as.vector(t(value$value[,r,]),con$mode)
+                     writeBin(as.vector(t(value$value[,r,rv]),con$mode)
                              ,size=con$sizeof,endian=con$endian,Fout)
                }
                else if (con$interleave=="bsq") ## R's [col,row,band] -> bsq [col,row,band] 
                {
-                  for (r in seq(dim(value$value)[3]))
-                     writeBin(as.vector(value$value[,,r],con$mode)
+                  for (r in seq(con$bands))
+                     writeBin(as.vector(value$value[,,rv[r]],con$mode)
                              ,size=con$sizeof,endian=con$endian,Fout)
                }
             }

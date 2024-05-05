@@ -1,3 +1,5 @@
 ^\.github$
+^\.git$
 ^src/ursa.dll$
+^src/ursa.o$
 ^.git.*$

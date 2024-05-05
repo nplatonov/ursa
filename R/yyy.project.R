@@ -1,6 +1,7 @@
 '.project' <- function(xy,proj,inv=FALSE,verbose=FALSE) {
    on.exit(NULL)
-  # verbose <- TRUE; print("ENTERED IN"); on.exit(print("ENTERED OUT"),add=TRUE)
+  # print("ENTERED IN"); on.exit(print("ENTERED OUT"),add=TRUE)
+  # verbose <- TRUE
    ## because of quicker load of 'proj4' package
   # show.error.messages=verbose
    if (isSF <- .isSF(xy)) {
@@ -33,20 +34,31 @@
   ## CHECK LATER (currently not quick):
   # dst <- with(PROJ::proj_trans_generic(src,source="EPSG:4326",target=crs),cbind(x_,y_))
    loaded <- loadedNamespaces()
-   is_rgdal <- if (F) .forceRGDAL() else "rgdal" %in% loaded
-   is_sf <- "sf" %in% loaded
+   is_rgdal <- if (F) .forceRGDAL() else ("rgdal" %in% loaded)&&(.forceRGDAL(TRUE))
+   is_sf <- TRUE # "sf" %in% loaded ## if F then trying to use `proj4`
    is_gdalraster <- "gdalraster" %in% loaded
-   if ((!is_sf)&&(!is_gdalraster)&&(grepl("^PROJCS",proj)))
-      is_sf <- .forceSF(TRUE)
-   if (.forceProj4())  ## `proj4` faster `sf` 20220216
-      is_proj4 <- TRUE
-   else if ((!is_sf)&&(!is_rgdal)&&(!is_gdalraster)&&(.forceProj4(TRUE)))
-      is_proj4 <- TRUE
-   else
+   if ((!is_sf)&&(!is_gdalraster)&&(.isWKT(proj)))
+      is_sf <- .forceSFpackage(TRUE)
+   if (.isWKT(proj)) {
       is_proj4 <- FALSE
+   }
+   else if (.forceProj4package()) { ## `proj4` faster `sf` 20220216
+     # print("B1")
+      is_proj4 <- TRUE
+     # if (is_sf)
+     #    is_sf <- FALSE
+   }
+   else if ((!is_sf)&&(!is_rgdal)&&(!is_gdalraster)&&(.forceProj4package(TRUE))) {
+     # print("B2")
+      is_proj4 <- TRUE
+   }
+   else {
+     # print("B3")
+      is_proj4 <- FALSE
+   }
    if ((!is_sf)&&(!is_rgdal)&&(!is_proj4)&&(!is_gdalraster)) {
      # if (!"rgdal" %in% loadedNamespaces())
-      is_sf <- .forceSF(TRUE)
+      is_sf <- .forceSFpackage(TRUE)
    }
    if (verbose)
       print(c(proj4=is_proj4,rgdal=is_rgdal,sf=is_sf,gdalraster=is_gdalraster))
@@ -87,8 +99,9 @@
          if (proj4version>="1.0.10") {
             res <- .proj4_project(xy=xy,proj=proj,inverse=inv)
          }
-         else
+         else {
             res <- .proj4_project(xy=t(xy),proj=proj,inverse=inv)
+         }
         # res <- proj4::project(xy=list(xy[,1],xy[,2]),proj=proj,inverse=inv)
       },silent=TRUE)
       if ((!FALSE)&&(!a)&&(nrow(xy)==2)) {
@@ -110,6 +123,9 @@
          if ((!is_rgdal)&&(!is_sf))
             is_sf <- TRUE
       }
+   }
+   if ((!a)&&(is_proj4)) {
+      is_sf <- TRUE
    }
    if ((!a)&&(is_rgdal)) {
       if (verbose)
@@ -169,12 +185,12 @@
       if (verbose)
          message("'sf' is used")
       if (inv) {
-         crs_t <- "+proj=longlat +datum=WGS84 +no_defs"
-         crs_s <- proj
+         crs_t <- .crsWGS84()
+         crs_s <- proj # unclass(proj)
       }
       else {
-         crs_s <- "+proj=longlat +datum=WGS84 +no_defs"
-         crs_t <- proj
+         crs_s <- .crsWGS84()
+         crs_t <- proj # unclass(proj)
       }
       if (is.list(xy))
          xy <- cbind(xy[[1]],xy[[2]])
@@ -182,7 +198,21 @@
          xy <- matrix(xy,ncol=2)
      # ind <- which((is.na(xy[,1]))|(is.na(xy[,2])))
       hasNA <- anyNA(xy[,1])
-      tryMatrix <- TRUE
+      tryMatrix <- T # (.isProj4(crs_s))&&(.isProj4(crs_t))
+      if ((FALSE)&&(!.crsForceProj4())&&(.crsForceWKT())) {
+         crs_s <- list(input=NULL,wkt=crs_s)
+         class(crs_s) <- "crs"
+         crs_t <- list(input=NULL,wkt=crs_t)
+         class(crs_t) <- "crs"
+      }
+      if (F) {
+        # dimnames(xy) <- NULL
+         str(crs_s)
+         str(crs_t)
+      }
+      if (verbose)
+         .elapsedTime(paste(ifelse(tryMatrix,"sf_project","st_transform")
+         ,ifelse(.isWKT(crs_s),"(wkt)","(proj4string)")," -- start"))
       if (omitOutside <- FALSE) {
         # if (length(ind180 <- which(xy[,1]>180)))
         #    xy[ind180,1] <- xy[ind180,1]-180
@@ -199,24 +229,28 @@
       if (hasNA) {
          ind <- which(is.na(xy[,1])) ## less conditions
          res <- matrix(NA,ncol=2,nrow=nrow(xy))
-         if (!tryMatrix)
+         if (!tryMatrix) {
             a <- .try(res[-ind,] <- unclass(sf::st_transform(sf::st_sfc(
                               sf::st_multipoint(xy[-ind,]),crs=crs_s),crs_t)[[1]]))
+         }
          else {
             if (is_gdalraster) {
                a <- .try(res[-ind,] <- gdalraster::transform_xy(pts=xy[-ind,]
                         ,srs_from=gdalraster::srs_to_wkt(crs_s)
                         ,srs_to=gdalraster::srs_to_wkt(crs_t)))
             }
-            if (!a)
+            if (!a) {
+              # qs::qsave(list(from=crs_s,to=crs_t,pts=xy[-ind,],keep=TRUE),"C:/tmp/interim.qs")
                a <- .try(res[-ind,] <- sf::sf_project(from=crs_s,to=crs_t,pts=xy[-ind,]
                                                      ,keep=TRUE))
+            }
          }
       }
       else {
-         if (!tryMatrix)
+         if (!tryMatrix) {
             a <- .try(res <- unclass(sf::st_transform(sf::st_sfc(
                                      sf::st_multipoint(xy),crs=crs_s),crs_t)[[1]]))
+         }
          else {
             if (is_gdalraster) {
                a <- .try(res <- gdalraster::transform_xy(pts=xy
@@ -228,15 +262,21 @@
                   try(sf::sf_proj_network(url="",TRUE))
                if (F & verbose) {
                   print(xy)
+                  print(class(crs_s))
+                  print(class(crs_t))
+                  print(.isProj4(crs_s))
+                  print(.isProj4(crs_t))
                   print(crs_s)
                   print(crs_t)
                   print(sf::st_crs(crs_t)$proj4string)
-               }
+               } ## slow for WKT
                a <- .try(res <- sf::sf_project(from=crs_s,to=crs_t,pts=xy
                                               ,keep=TRUE))
             }
          }
       }
+      if (verbose)
+         .elapsedTime(paste(ifelse(tryMatrix,"sf_project","st_transform")," -- finish"))
    }
    if ((FALSE)&&(!inv)&&(.lgrep("\\+proj=merc",g1$crs))) {
       g1 <- session_grid()
@@ -259,10 +299,13 @@
   # dismissEPSG: ## dev - FALSE, release and next versions - TRUE
   ## 'proj4::project' doesnot understand pure EPSG
   # a <- try(as.integer(code),silent=TRUE)
+   if (.isUrsaCRS(code))
+      return(code)
    if ((is.character(code))&&(!nchar(code)))
       return(code)
    if (is.matrix(code))
       return(NULL)
+   shortNames <- c("WGS84","NAD27")
    if (!.lgrep("\\D",code))
       p4epsg <- paste0(c("+init=epsg:","EPSG:")[2],code)
    else if (.lgrep("^epsg:\\d+",code))
@@ -272,10 +315,25 @@
                  ,toupper(.gsub("\\+init=","",code))))[2]
    else if ((force)&&(.lgrep("^ESRI\\:",code,ignore.case=FALSE)))
       p4epsg <- code
-   else if (is.character(code))
-      return(code)
+   else if (is.character(code)) {
+      if ((code %in% shortNames)||(grepl("\\s",code))) {
+         if (!force)
+            p4epsg <- code
+         else
+            return(code)
+      }
+      else if (nchar(code)<16)
+         return("")
+      else if (.isWKT(code)) {
+         return(code)
+      }
+      else {
+         p4epsg <- code
+      }
+   }
    else
       stop(code)
+  # print(c(input=code,p4=p4epsg))
    loaded <- loadedNamespaces()
    if (dismissEPSG)
       force <- TRUE
@@ -283,7 +341,10 @@
       if ("sf" %in% loaded) {
          if (verbose)
             message("force to use 'sf'")
-         p4s <- sf::st_crs(code)$proj4string
+         if (.crsForceProj4())
+            p4s <- .proj4string(code)
+         else
+            p4s <- .WKT(code)
       }
       else {
          if (verbose)
@@ -298,7 +359,12 @@
          if (verbose)
             message("'sf' loaded")
         # p4s <- try(sf::st_crs(as.integer(code))$proj4string) ## 'code', not 'p4epsg'
-         p4s <- try(sf::st_crs(.p4s2epsg(p4epsg))$proj4string)
+         if (.crsForceProj4()) {
+            p4s <- try(.proj4string(.p4s2epsg(p4epsg)),silent=!verbose)
+         }
+         else {
+            p4s <- try(.WKT(p4epsg),silent=!verbose)
+         }
          if (!inherits(p4s,"try-error"))
             fail <- FALSE
       }
@@ -307,7 +373,8 @@
             message("'sp'/'rgdal' loaded")
          if (dismissEPSG) {
             opW <- options(warn=ifelse(verbose,0,-1))
-            p4s <- try(methods::slot(sp::CRS(p4epsg,doCheckCRSArgs=TRUE),"projargs"))
+            p4s <- try(methods::slot(sp::CRS(p4epsg,doCheckCRSArgs=TRUE),"projargs")
+                      ,silent=!verbose)
             options(opW)
          }
          else {
@@ -317,7 +384,8 @@
             ##~ str(p4s)
            ##~ # sp::CRS(SRS_string=p4epsg)
             ##~ q()
-            p4s <- try(methods::slot(sp::CRS(p4epsg,doCheckCRSArgs=TRUE),"projargs"))  ## -- 20220124 FALSE
+            p4s <- try(methods::slot(sp::CRS(p4epsg,doCheckCRSArgs=TRUE),"projargs")
+                      ,silent=!verbose)  ## -- 20220124 FALSE
          }
          if (!inherits(p4s,"try-error")) {
             fail <- FALSE
@@ -325,23 +393,30 @@
            #    requireNamespace("rgdal",quietly=.isPackageInUse())
          }
       }
-      if ((fail)&&(!FALSE)&&(requireNamespace("sf",quietly=.isPackageInUse()))) {
+      if ((fail)&&(!isNamespaceLoaded("sf"))&&
+                  (requireNamespace("sf",quietly=.isPackageInUse()))) {
          if (verbose)
             message("force to load 'sf'")
-         p4s <- try(sf::st_crs(code)$proj4string)
+         if (.crsForceProj4())
+            p4s <- try(.proj4string(code),silent=!verbose)
+         else {
+            p4s <- try(.WKT(code),silent=!verbose)
+         }
          if (!inherits(p4s,"try-error"))
             fail <- FALSE
       }
-      if (fail) {
+      if ((fail)&&(nchar(system.file(package="sp"))>0)) {
          if (verbose)
             message("Otherwise, use 'sp' + ('rgdal' for reprojection - SKIPPED)")
          if (dismissEPSG) {
             opW <- options(warn=ifelse(verbose,0,-1))
-            p4s <- try(methods::slot(sp::CRS(p4epsg,doCheckCRSArgs=TRUE),"projargs"))
+            p4s <- try(methods::slot(sp::CRS(p4epsg,doCheckCRSArgs=TRUE),"projargs")
+                      ,silent=!verbose)
             options(opW)
          }
          else {
-            p4s <- try(methods::slot(sp::CRS(p4epsg,doCheckCRSArgs=TRUE),"projargs")) ## -- 20220124 FALSE
+            p4s <- try(methods::slot(sp::CRS(p4epsg,doCheckCRSArgs=TRUE),"projargs")
+                      ,silent=!verbose) ## -- 20220124 FALSE
          }
          if (inherits(p4s,"try-error")) {
             fail <- TRUE
@@ -369,7 +444,7 @@
    xy
 }
 '.p4s2epsg' <- function(p4s) {
-   patt <- "\\+init=epsg\\:(\\d+)$"
+   patt <- "EPSG\\:(\\d+)$"
    if (!length(grep(patt,p4s)))
       return(p4s)
    code <- gsub(patt,"\\1",p4s)

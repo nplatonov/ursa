@@ -18,7 +18,7 @@
   # g1$resy <- -a$geotransform[4]
    g1$resx <- with(g1,(maxx-minx)/columns)
    g1$resy <- with(g1,(maxy-miny)/rows)
-   g1$crs <- a$projstring
+   g1$crs[] <- if (T) a$projection else a$projstring
   # comment(g1$crs) <- a$projection
   # if (is.na(g1$crs))
   #    g1$crs <- ""
@@ -64,9 +64,10 @@
                 ,c3=as.integer(gsub(patt,"\\3",ct))
                 ,c4=as.integer(gsub(patt,"\\4",ct))
                 )
-      ct <- apply(ct,1,function(x) {
-         rgb(x[1],x[2],x[3],x[4],maxColorValue=255)
-      })
+      if (all(ct$c4==255))
+         ct <- apply(ct,1,function(x) rgb(x[1],x[2],x[3],maxColorValue=255))
+      else
+         ct <- apply(ct,1,function(x) rgb(x[1],x[2],x[3],x[4],maxColorValue=255))
    }
    else
       ct <- NULL
@@ -85,16 +86,18 @@
    class(ct) <- "ursaColorTable"
    patt <- "^\\s*<MDI key=\"Band_(\\d+)\">(.+)</MDI>$"
    b <- vrt[grep(patt,vrt)]
-   if (!length(b))
-      bname <- paste("Band",seq_along(con$bands))
-   else
+   if (!length(b)) {
+      bname <- paste("Band",seq_len(con$bands))
+   }
+   else {
       bname <- gsub(patt,"\\2",b)[as.integer(gsub(patt,"\\1",b))]
+   }
    ursa_grid(res) <- g1
    names(res) <- bname
    ursa_colortable(res) <- ct
   # if (!is.null(a$nodata_value))
   #    ignorevalue(res) <- a$nodata_value
-   class(res$value) <- ifelse(length(ct),"ursaCategory","ursaNumeric")
+   class(res$value) <- ifelse(length(ct)>0,"ursaCategory","ursaNumeric")
    res
 }
 '.read_vapour' <- function(fname,resetGrid=TRUE,band=NULL
@@ -115,10 +118,12 @@
         # print(is.raw(b[[1]]))
         # .elapsedTime("vapour -- step4")
         # if (ri$datatype %in% c("Byte","Int32","UInt32","Int64"))
+         clval <- class(a$value)
          if (a$con$datatype %in% c(1L,2L,3L,11L,12L,13L))
             ursa_value(a) <- as.integer(do.call(cbind,b))
          else
-            ursa_value(a) <- do.call(cbind,b)
+            ursa_value(a)[] <- do.call(cbind,b)
+         class(a$value) <- clval
         # .elapsedTime("vapour -- step5")
       }
       else

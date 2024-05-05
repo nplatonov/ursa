@@ -1,8 +1,11 @@
-'polygonize' <- function(obj,fname,engine=c("native","sp","sf")
+'polygonize' <- function(obj,fname,engine=c("native","sf")
                         ,verbose=NA,...) {
   # class(obj)
    missing(obj) ## keep`session_grid` from reset in `a <- polygonize(envi_read())`
-   engine <- match.arg(engine)
+   engList <- as.character(as.list(match.fun("polygonize"))[["engine"]])[-1]
+   if ((isNamespaceLoaded("sp"))||(nchar(system.file(package="sp"))>0))
+      engList <- c(engList,"sp")
+   engine <- match.arg(engine[1],engList)
    if (engine=="sp") {
       isSF <- FALSE
       isSP <- TRUE
@@ -29,7 +32,8 @@
    if ((!missing(obj))&&(is.numeric(obj))&&(length(obj)==4)&&
        ((!anyNA(match(names(obj),c("minx","maxx","miny","maxy"))))||
         (!anyNA(match(names(obj),c("xmin","xmax","ymin","ymax")))))) {
-      obj <- regrid(bbox=unname(obj),dim=c(1,1),crs=session_crs())
+      crs <- if (is.null(attr(obj,"crs"))) session_crs() else attr(obj,"crs")
+      obj <- regrid(bbox=unname(obj),dim=c(1,1),crs=crs)
    }
    onlyGeometry <- missing(obj) || .is.grid(obj)
    isList <- !onlyGeometry && .is.ursa_stack(obj)

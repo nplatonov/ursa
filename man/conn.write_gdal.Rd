@@ -9,7 +9,7 @@ Write raster image to GDAL file(s)
 }
 \usage{
 write_gdal(obj, ...)
-ursa_write(obj, fname)
+ursa_write(obj, fname, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -17,7 +17,14 @@ ursa_write(obj, fname)
 Object of class \code{ursaRaster}.
 }
   \item{\dots}{
-Arguments, which are passed to \code{\link[ursa:conn.create_any]{create_gdal}}. Usually, only file name with extension (character) is required. If extension is ".envi", then GDAL driver "ENVI" is used. If extension is ".tif", then GDAL driver "GTiff" is used. If extension is ".img", then GDAL driver "HFA" is used. If extension is ".jpg" or "*.jpeg", then GDAL driver "JPEG" is used. If extension is ".bmp", then GDAL driver "BMP" is used. If extension is ".png", then GDAL driver "PNG" is used. Additionally, argument \code{driver} should be specified. If argument \code{\dots} is \link[base]{missing}, then occasional name is assigned. 
+Arguments, which are passed to \code{\link[ursa:conn.create_any]{create_gdal}}. Usually, only file name with extension (character) is required. If extension is ".envi", then GDAL driver "ENVI" is used. If extension is ".tif", then GDAL driver "GTiff" is used. If extension is ".img", then GDAL driver "HFA" is used. If extension is ".jpg" or "*.jpeg", then GDAL driver "JPEG" is used. If extension is ".bmp", then GDAL driver "BMP" is used. If extension is ".png", then GDAL driver "PNG" is used. Additionally, argument \code{driver} should be specified. If argument \code{\dots} is \link[base]{missing}, then occasional name is assigned.
+
+For GDAL formats it is creation options \code{"-co"}, e. g., \code{compress="LZW",tiled="NO"} are interpeted as \code{-co "COMPRESS=LZW" -co "TILED=NO"}.
+
+For GDAL formats \code{options=} (named list \code{list(foo="bar1", foo2="bar2")}, named characters \code{c(foo="bar1", foo2="bar2")}, characters in format \code{"foo1=bar1 foo2=bar2"}) is interpeted as creation options (\code{-co}) explicitly. 
+
+For GDAL formats \code{driver=} is interpeted as driver short name (\code{-fo}) explicitly.
+
 }
   \item{fname}{
 Character. File name with extension.

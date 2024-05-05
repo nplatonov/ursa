@@ -16,7 +16,7 @@ colorize(obj, value = NULL, breakvalue = NULL, name = NULL, pal = NULL, inv = NA
                      "grayscale", "greyscale", ".onetoone"),
          minvalue = NA, maxvalue = NA, byvalue = NA, ltail = NA, rtail = NA, tail = NA,
          ncolor = NA, nbreak = NA, interval = 0L, ramp = TRUE, byte = FALSE,
-         lazyload = FALSE, reset = FALSE, origin = "1970-01-01" ,format = "",
+         lazyload = TRUE, reset = FALSE, origin = "1970-01-01" ,format = "",
          alpha = "", colortable = NULL, verbose = FALSE, ...)
                           
 palettize(...) ## wrapper for non-spatial vectors
@@ -87,7 +87,7 @@ palettize(...) ## wrapper for non-spatial vectors
       Logical. Forcing to produce color table for storage in byte format (not more than 255 colors). Default is \code{FALSE}.
    }
    \item{lazyload}{
-      Logical. If \code{FALSE} then raster is reclassified to categories. If \code{TRUE} then color table is created without any change to source raster. Default is \code{FALSE}.
+      Logical. If \code{FALSE} then raster is reclassified to categories. If \code{TRUE} then color table is created without any change to source raster and raster value just postponed for change. Default is \code{TRUE}.
    }
    \item{reset}{
       Logical. If \code{TRUE} and source raster has color table, then this color table is destroyed, and new one is created. Default is \code{FALSE}.

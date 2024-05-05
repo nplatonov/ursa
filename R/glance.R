@@ -186,7 +186,7 @@
   # print(c(dsn=class(dsn)))
   # obj <- spatialize(dsn)
    if (missing(dsn)) {
-      dsn <- if (style!="auto") .geomap(style=style) else .geomap()
+      dsn <- if (style!="auto") .geomap(style=style,verbose=verbose) else .geomap(verbose=verbose)
       return(display(dsn,...)) ## ++20180617
    }
    toUnloadMethods <- !("methods" %in% .loaded())
@@ -194,6 +194,10 @@
    if (S4) {
       .require("methods",quietly=.isPackageInUse())
      # requireNamespace("methods",quietly=.isPackageInUse())
+   }
+   if (!is.null(getOption("ursaSessionGrid"))) {
+      g5 <- session_grid()
+      on.exit(session_grid(g5))
    }
    obj <- spatialize(dsn=dsn,engine=engine,layer=layer,field=field,geocode=geocode
                     ,place=place,area=area,grid=grid,size=size
@@ -209,7 +213,7 @@
    isSP <- !isSF
    g0 <- attr(obj,"grid")
    if (is.null(g0))
-      g0 <- session_grid()
+      g0 <- .compose_grid()
   # g1 <- getOption("ursaSessionGrid")
   # if (identical(g0,g1))
   #    border <- 0
@@ -225,7 +229,8 @@
       toUnloadMethods <- FALSE
   # dname <- attr(obj,"colnames")
    dname <- spatial_fields(obj)
-   style <- attr(obj,"style")
+   if (!is.null(attr(obj,"style")))
+      style <- attr(obj,"style")
    geocodeStatus <- attr(obj,"geocodeStatus")
    if (is.null(geocodeStatus))
       geocodeStatus <- FALSE
@@ -289,6 +294,11 @@
       proj <- "merc"
    }
    isWeb <- .lgrep(tilePatt,art)>0 | art %in% providers | isUrl
+   if (F & isWeb) {
+      if (!.isWeb(g0)) {
+         stop("Grid is inconsistent for tiling")
+      }
+   }
    if (verbose)
       str(list(style=style,art=art,proj=proj,isUrl=isUrl,isWeb=isWeb))
   # proj <- match.arg(proj)
@@ -299,7 +309,7 @@
    basemapRetina <- FALSE
    if (isWeb) {
       bbox <- with(g0,c(minx,miny,maxx,maxy))
-      if (grepl("\\+proj=longlat",g0$crs))
+      if (.isLongLat(g0$crs))
          lim <- bbox
       else
          lim <- c(.project(matrix(bbox,ncol=2,byrow=TRUE),g0$crs
@@ -406,8 +416,8 @@
    if ((is.null(basemap))&&(border>0)) {
       g0 <- regrid(g0,border=border)
    }
-   attr(obj,"grid") <- g0
-   session_grid(g0)
+   .compose_grid(g0)
+  # session_grid(g0)
   # str(g0)
   # xy <- with(g0,.project(rbind(c(minx,miny),c(maxx,maxy)),crs,inv=TRUE))
   # display(blank="white",col="black");q()
@@ -529,8 +539,9 @@
          retina <- ifelse(is.na(retina2),retina3,retina2)
          compose_open(res,scale=1,retina=retina,...)
       }
-      else
+      else {
          compose_open(res,...)
+      }
       gline <- compose_graticule(...)
       if (toCoast)
          cline <- compose_coastline(...)

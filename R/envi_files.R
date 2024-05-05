@@ -142,8 +142,8 @@
          if (!(grepl("(^\\^|\\$$|\\\\[dDwWsS](\\{|\\+|\\*))",pattern)))
             pattern <- gsub("\\\\","/",pattern) ## failed for sia\\d{4}
    }
-   if (.lgrep("(/|\\\\)",pattern))
-   {
+  # print(c(path=path,pattern=pattern))
+   if (.lgrep("(/|\\\\)",pattern)) {
       isDir <- file.info(pattern)$isdir
       if ((!is.na(isDir))&&(isDir)) {
          path <- pattern
@@ -156,10 +156,29 @@
          }
          else if (file.exists(dirname(pattern))) {
             path <- dirname(pattern)
-            pattern <- gsub(paste0(path,"(/+|\\\\)"),"",pattern)
+           # pattern <- gsub(paste0(path,"(/+|\\\\)"),"",pattern)
+            pattern <- gsub(paste0(path,c("/+","(/+|\\\\)")[1]),"",pattern)
            # pattern <- basename(pattern)
             recursive <- FALSE
             full.names <- TRUE
+         }
+         else if (path==".") { ## ++ 20240303
+            if (F)
+               path <- dirname(pattern)
+            else {
+               p <- strsplit(pattern,split="/")[[1]]
+               if (length(p)>1) {
+                  path <- head(p,-1)
+                 # print(c(path=path,pattern=pattern))
+                  if (!dir.exists(path)) {
+                     return(character())
+                  }
+                  if (F)
+                     patterm <- basename(pattern)
+                  else
+                     pattern <- tail(p,1)
+               }
+            }
          }
       }
      # print(c(path=path,pattern=pattern))

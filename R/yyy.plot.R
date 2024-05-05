@@ -205,7 +205,7 @@
 }
 '.panel_attribution' <- function(pos=ifelse(vertical,"bottomright","bottomright")
                                 ,vertical=TRUE) {
-   g0 <- getOption("ursaPngPanelGrid") # getOption("ursaSessionGrid_prev")
+   g0 <- .panel_grid() # getOption("ursaSessionGrid_prev")
    g1 <- getOption("ursaSessionGrid")
    prev <- !identical(g0,g1)
    if (prev)

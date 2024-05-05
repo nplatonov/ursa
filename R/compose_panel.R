@@ -16,7 +16,7 @@
       }
       else {
          aname <- names(arglist)
-         indB <- .grep("^blank",aname)
+         indB <- .grep("(^blank|^(ref|dim)$)",aname)
          do.call("panel_new",arglist[indB])
         # indSP <- which(sapply(arglist,inherits,"Spatial"))
         # indSF <- which(sapply(arglist,inherits,c("sfc","sf")))

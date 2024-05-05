@@ -57,18 +57,18 @@
    if (verbose)
       str(list(col=col,lon=lon,lat=lat,col=col,lwd=lwd,lty=lty,panel=panel
               ,marginalia=marginalia,trim=trim,cex=cex))
-   opStrangeWarn <- options(warn=-1) ## strings not representable in native encoding will be translated to UTF-8
+  # opStrangeWarn <- options(warn=-1) ## strings not representable in native encoding will be translated to UTF-8
    ret <- .compose_graticule(panel=panel,col=col,border=border
                             ,lon=lon,lat=lat,lwd=lwd,lty=lty
                             ,marginalia=marginalia,trim=trim
                             ,language=language,cex=cex,verbose=verbose)
-   options(opStrangeWarn)
+  # options(opStrangeWarn)
    ret
 }
 '.compose_graticule' <- function(panel=0L,col="grey70",border="grey70",lon=NA,lat=NA
                               ,lwd=0.5,lty=2,marginalia=rep(FALSE,4),trim=FALSE
                               ,language=NA_character_,cex=0.75,verbose=FALSE) {
-# verbose <- TRUE
+   # verbose <- TRUE
    if (is.na(language)) {
       if (TRUE) {
          ctype <- Sys.getlocale("LC_TIME")
@@ -78,12 +78,28 @@
       else
          language <- Sys.getenv("LANGUAGE")
    }
-   g1 <- session_grid()
-   proj4 <- g1$crs
-   isProj <- nchar(proj4)>0
-   projClass <- if (isProj) .gsub(".*\\+proj=(\\S+)\\s.+","\\1",proj4) else ""
-   isLonLat <- .lgrep("(\\+proj=longlat|epsg:4326)",proj4)>0
-   isMerc <- .lgrep("\\+proj=merc",proj4)>0
+   g1 <- .panel_grid() # session_grid()
+   if (is.null(g1)) ## e.g. from `glance()`
+      g1 <- .compose_grid()
+   if (!.crsForceWKT())
+      proj4 <- .proj4string(g1$crs)
+   else
+      proj4 <- g1$crs ## proj4sring is FASTER for 'sf'
+   isProj <- .isCRS(g1$crs)
+  # projClass <- if (isProj) .gsub(".*\\+proj=(\\S+)\\s.+","\\1",proj4) else ""
+   if (isProj) {
+      projClass <- .crsProj(proj4)
+      if (T & !nchar(projClass)) {
+         proj4 <- if (.crsForceProj4()) .proj4string(proj4) else .WKT(proj4)
+         projClass <- .crsProj(proj4)
+      }
+   }
+   else
+      projClass <- ""
+   isLonLat <- projClass=="longlat" # .isLongLat(proj4) # lgrep("(\\+proj=longlat|epsg:4326)",proj4)>0
+   isMerc <- projClass=="merc" # .isMerc(proj4) # .lgrep("\\+proj=merc",proj4)>0
+   if (verbose)
+      print(data.frame(isProj=isProj,projClass=projClass,isLonLat=isLonLat,isMerc=isMerc))
    minx <- g1$minx
    maxx <- g1$maxx
    if (g1$miny<g1$maxy) {
@@ -191,7 +207,7 @@
          ##~ print(apply(xy2,2,range))
       ##~ }
       if (!isLonLat) {
-         xy <- .project(with(g2,cbind(x,y)),g1$crs,inv=TRUE)
+         xy <- .project(with(g2,cbind(x,y)),proj4,inv=TRUE,verbose=!.isPackageInUse())
          if (is.null(xy)) {
             xy <- with(g2,cbind(x,y))
             minx <- min(xy[,1])
@@ -203,7 +219,7 @@
             maxx <- max(xy[,1])
             miny <- min(xy[,2])
             maxy <- max(xy[,2])
-            xy <- .project(xy,g1$crs,inv=TRUE)
+            xy <- .project(xy,proj4,inv=TRUE)
             if (is.null(xy)) {
                cat("Likely, reprojection is failed.\n")
                res <- list(gridline=NULL,margin=NULL)
@@ -364,9 +380,8 @@
          if ((TRUE)||(any(round(mm,6)!=0)))
          {
             if (isMerc) {
-               lon_0 <- as.numeric(.gsub2("\\+lon_0=(\\S+)\\s","\\1",proj4))
-               lat_ts <- .gsub2("\\+lat_ts=(\\S+)\\s","\\1",proj4)
-               lat_ts <- ifelse(lat_ts==proj4,0,as.numeric(lat_ts))
+               lon_0 <- .crsLon0(proj4)
+               lat_ts <- .crsLatTS(proj4)
               # lat_ts <- 0
                lon <- c(minx,maxx)/6378137/pi*180/cos(lat_ts*pi/180)+lon_0
             }
@@ -403,8 +418,7 @@
          lat1 <- lat0 <- .prettyLabel(lat,ncol=nr+2)$at
          mm <- (lat0-floor(lat0))*60
         # mm <- 0.5
-         if ((TRUE)&&(any(round(mm,6)!=0)))
-         {
+         if ((TRUE)&&(any(round(mm,6)!=0))) {
             v1 <- -90 #floor(min(lat))
             v2 <- 90 #ceiling(max(lat))
             dl2 <- dl[resa/(2*nr*111)<dl]
@@ -416,12 +430,18 @@
                lat3 <- seq(v1,v2,by=i)
                lat3 <- lat3[lat3>lat[1] & lat3<lat[2]]
                if (length(lat3)<=nr) {
-                  lat0 <- lat3
+                  if ((length(lat3)<nr)&&(nr<4))
+                     lat0 <- lat3
+                  else
+                     lat0 <- lat3
                   break
                }
+               lat4 <- lat3
             }
          }
          lat <- if (length(lat0)>1) lat0 else lat1
+        # if (length(lat)<nr) ## ++ 20240216
+        #    lat <- lat4
          dlon <- mean(diff(lon))
          dlat <- mean(diff(lat))
          if (length(lon)>1) {
@@ -463,8 +483,9 @@
       }
       lonList <- list(unique(lon))
       latList <- list(unique(lat))
-     # print(lon)
-     # print(lat)
+      if (verbose) {
+         print(list(lon=lon,lat=lat))
+      }
    }
    marginalia <- rep(marginalia,length=4)
   # north <- 89.5
@@ -477,7 +498,7 @@
    }
    outframe <- NULL
    alim <- 15 ## critical anlge (degree) between border line and grid line
-   projclass <- .gsub(".+proj=(\\S+)\\s.+","\\1",g1$crs)
+  # projclass <- .crsProj(g1$crs) ## was assign earlier
    for (j in seq_along(lonList))
    {
       lonSet <- unique(round(lonList[[j]],11))
@@ -495,105 +516,156 @@
       llkind <- rep(0L,length(gridline))
       llval <- rep(NA,length(gridline))
       i <- 0L
+      if (isMerc) {
+         B <- .crsSemiMajor(g1$crs)*pi
+         ##~ lon_0 <- as.numeric(.gsub(".*\\+lon_0=(\\S+)\\s.*","\\1",g1$crs))
+         ##~ lat_ts <- .gsub2("\\+lat_ts=(\\S+)\\s","\\1",g1$crs)
+         ##~ lat_ts <- ifelse(lat_ts==g1$crs,0,as.numeric(lat_ts))
+         lon_0 <- .crsLon0(g1$crs)
+         lat_ts <- .crsLatTS(g1$crs)
+         lonS <- seq(-180,360,len=10)
+      }
       if (!isProj) {
-         lat <- seq(min(latSet),max(latSet),len=10)
+         latS <- seq(min(latSet),max(latSet),len=10)
+         lonS <- seq(min(lonSet),max(lonSet),len=10)
       }
       else {
          latSet <- na.omit(latSet)
-         if (projclass %in% c("stere","laea")[1])
-            lat <- seq(min(latSet),max(latSet),len=2)
-         else if (projclass %in% c("merc"))
-            lat <- c(-1,1)*(90-1e-6)
+         if (projClass %in% c("stere","laea")[1])
+            latS <- seq(min(latSet),max(latSet),len=2)
+         else if (projClass %in% c("merc"))
+            latS <- c(-1,1)*(90-1e-6)
          else {
             if (length(latSet)==1)
-               lat <- latSet
+               latS <- latSet
             else {
-               lat <- seq(min(latSet),max(latSet),by=mean(diff(latSet))/10)
+               latS <- seq(min(latSet),max(latSet),by=abs(mean(diff(latSet))/10))
             }
          }
+         lonS <- seq(min(lonSet),max(lonSet),by=mean(abs(diff(lonSet)))/(j*10))
       }
-      if (isMerc) {
-         B <- .getMajorSemiAxis(g1$crs)*pi
-         lon_0 <- as.numeric(.gsub(".*\\+lon_0=(\\S+)\\s.*","\\1",g1$crs))
-         lat_ts <- .gsub2("\\+lat_ts=(\\S+)\\s","\\1",g1$crs)
-         lat_ts <- ifelse(lat_ts==g1$crs,0,as.numeric(lat_ts))
-      }
-      for (lon in lonSet)
-      {
-         if (!((isLonLat)||(isMerc))) {
-            if ((lon==360)&&(0 %in% lonSet))
-               next
-            if ((lon==-180)&&(+180 %in% lonSet))
-               next
+      if (projectAtOnce <- TRUE) {
+         for (lon in lonSet) {
+            if (!((isLonLat)||(isMerc))) {
+               if ((lon==360)&&(0 %in% lonSet))
+                  next
+               if ((lon==-180)&&(+180 %in% lonSet))
+                  next
+            }
+            i <- i+1L
+            gridline[[i]] <- cbind(rep(lon,length(latS)),unname(latS))
+            llkind[i] <- 1L
+            llval[i] <- lon
          }
-         i <- i+1L
-         ll <- cbind(rep(lon,length(lat)),lat)
-        # proj4a <- "+proj=merc +lon_0=48 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs "
-        # gridline[[i]] <- if (isProj & !isLonLat) proj4::project(t(ll),g1$crs) else ll
+         for (lat in latSet) {
+            if (abs(lat)==max(abs(latSet)))
+               next
+            i <- i+1L
+            gridline[[i]] <- cbind(unname(lonS),rep(lat,length(lonS)))
+            llkind[i] <- 2L
+            llval[i] <- lat
+         }
          if (isProj & !isLonLat) {
-            gridline[[i]] <- .project(ll,g1$crs)
-           # gridline[[i]] <- .project(ll,proj4a)
-            if ((FALSE)&&(isMerc)) {
-               x <- gridline[[i]][1,1]
-               print(data.frame(lon=lon,x=x,y=(lon-lon_0)/180*B))
-               ##~ if (((lon<0)&&(x>maxx))||(lon<=(-180)))
-                  ##~ x <- x-2*20037508
-               ##~ else if ((lon>360)&(x<minx))#(+180))
-                  ##~ x <- x+2*20037508
-               if ((lon<0)&&(x>0))
-                  x <- x-2*B
-               else if ((lon>360)&(x<B))
-                  x <- x+2*B
-              # if (x>maxx)
-              #    x <- x-2*20037508
-              # else if (x<minx)
-              #    x <- x+2*20037508
-              # print(data.frame(lon=lon,lonL=lon-360,lonR=lon+360
-              #               ,minx=minx,src=xtmp,dst=x,maxx=maxx))
-               gridline[[i]][,1] <- x
+            xy <- do.call("rbind",gridline)
+            ind <- do.call(c,lapply(seq_along(gridline),\(i) rep(i,length(gridline[[i]])/2)))
+            xy <- .project(xy,proj4,verbose=FALSE)
+            xy <- by(data.frame(xy),ind,function(x) x)
+            for (i in seq_along(xy)) {
+               ll <- cbind(xy[[i]][[1]],xy[[i]][[2]])
+               if (isMerc) {
+                  if (llkind[i]==1L) {
+                     ll[,1] <- (llval[i]-lon_0)/180*B*cos(lat_ts*pi/180)
+                  }
+                  else { ## 2
+                     ll <- ll[order(ll[,1]),]
+                     ll[1,1] <- ll[1,1]-1e8
+                     ll[nrow(ll),1] <- ll[nrow(ll),1]+1e8
+                  }
+               }
+               if (llkind[i]==2L) {
+                  ind <- which(diff(ll[,1])<0)
+                  if ((length(ind)==2)&&((ind[1]+1)!=ind[2])) {
+                     ll <- ll[(ind[1]+1):ind[2],,drop=FALSE]
+                  }
+               }
+               gridline[[i]] <- ll
             }
-            if ((!FALSE)&&(isMerc)) ## -- 20180423
-               gridline[[i]][,1] <- (lon-lon_0)/180*B*cos(lat_ts*pi/180)
-           # print(gridline[[i]])
-           # if ((isMerc)&&((lon<0)&&(gridline[[i]][1,1]>0)))
-           #    gridline[[i]][,1] <- -2*20037508+gridline[[i]][,1]
          }
-         else
-            gridline[[i]] <- ll
-         llkind[i] <- 1L
-         llval[i] <- lon
       }
-      if (projclass %in% c("merc"))
-         lon <- seq(-180,360,len=10)
-      else if (isProj)
-         lon <- seq(min(lonSet),max(lonSet),by=mean(abs(diff(lonSet)))/(j*10))
-      else
-         lon <- seq(min(lonSet),max(lonSet),len=10)
-      for (lat in latSet)
-      {
-         i <- i+1L
-         if (abs(lat)==max(abs(latSet)))
-            gridline[[i]] <- cbind(NA,NA)
-         else {
-            ll <- cbind(lon,rep(lat,length(lon)))
-           # print(series(ll,3))
+      else { ## deprecated
+         if (!.isPackageInUse())
+            cat("Deprecated: multiple calling '.project()'\n")
+         for (lon in lonSet)
+         {
+            if (!((isLonLat)||(isMerc))) {
+               if ((lon==360)&&(0 %in% lonSet))
+                  next
+               if ((lon==-180)&&(+180 %in% lonSet))
+                  next
+            }
+            i <- i+1L
+            ll <- cbind(rep(lon,length(latS)),unname(latS))
+           # proj4a <- "+proj=merc +lon_0=48 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs "
            # gridline[[i]] <- if (isProj & !isLonLat) proj4::project(t(ll),g1$crs) else ll
             if (isProj & !isLonLat) {
-               ll <- .project(ll,g1$crs)
-               if (projclass %in% "merc") {
-                  ll <- ll[order(ll[,1]),]
-                  ll[1,1] <- ll[1,1]-1e8
-                  ll[nrow(ll),1] <- ll[nrow(ll),1]+1e8
+               gridline[[i]] <- .project(ll,proj4)
+              # gridline[[i]] <- .project(ll,proj4a)
+               if ((FALSE)&&(isMerc)) {
+                  x <- gridline[[i]][1,1]
+                  print(data.frame(lon=lon,x=x,y=(lon-lon_0)/180*B))
+                  ##~ if (((lon<0)&&(x>maxx))||(lon<=(-180)))
+                     ##~ x <- x-2*20037508
+                  ##~ else if ((lon>360)&(x<minx))#(+180))
+                     ##~ x <- x+2*20037508
+                  if ((lon<0)&&(x>0))
+                     x <- x-2*B
+                  else if ((lon>360)&(x<B))
+                     x <- x+2*B
+                 # if (x>maxx)
+                 #    x <- x-2*20037508
+                 # else if (x<minx)
+                 #    x <- x+2*20037508
+                 # print(data.frame(lon=lon,lonL=lon-360,lonR=lon+360
+                 #               ,minx=minx,src=xtmp,dst=x,maxx=maxx))
+                  gridline[[i]][,1] <- x
                }
-               ind <- which(diff(ll[,1])<0)
-               if ((length(ind)==2)&&(ind[1]+1!=ind[2])) {
-                  ll <- ll[(ind[1]+1):ind[2],,drop=FALSE]
-               }
+               if ((!FALSE)&&(isMerc)) ## -- 20180423
+                  gridline[[i]][,1] <- (lon-lon_0)/180*B*cos(lat_ts*pi/180)
+              # print(gridline[[i]])
+              # if ((isMerc)&&((lon<0)&&(gridline[[i]][1,1]>0)))
+              #    gridline[[i]][,1] <- -2*20037508+gridline[[i]][,1]
             }
-            gridline[[i]] <- ll
+            else
+               gridline[[i]] <- ll
+            llkind[i] <- 1L
+            llval[i] <- lon
          }
-         llkind[i] <- 2L
-         llval[i] <- lat
+         for (lat in latSet)
+         {
+            i <- i+1L
+            if (abs(lat)==max(abs(latSet)))
+               gridline[[i]] <- cbind(NA,NA)
+            else {
+               ll <- cbind(unname(lonS),rep(lat,length(lonS)))
+              # print(series(ll,3))
+              # gridline[[i]] <- if (isProj & !isLonLat) proj4::project(t(ll),g1$crs) else ll
+               if (isProj & !isLonLat) {
+                  ll <- .project(ll,proj4)
+                  if (projClass %in% "merc") {
+                     ll <- ll[order(ll[,1]),]
+                     ll[1,1] <- ll[1,1]-1e8
+                     ll[nrow(ll),1] <- ll[nrow(ll),1]+1e8
+                  }
+                  ind <- which(diff(ll[,1])<0)
+                  if ((length(ind)==2)&&(ind[1]+1!=ind[2])) {
+                     ll <- ll[(ind[1]+1):ind[2],,drop=FALSE]
+                  }
+               }
+               gridline[[i]] <- ll
+            }
+            llkind[i] <- 2L
+            llval[i] <- lat
+         }
       }
       for (i in seq(along=gridline))
       {
@@ -830,7 +902,7 @@
    if ((length(gridline)==1)&&(!gridline))
       return(NULL)
    obj <- .getPrm(arglist,class="ursaGridLine",default=NULL)
-   g1 <- session_grid()
+   g1 <- .panel_grid() # session_grid()
   # if ((!is.null(g1$labx))&&(!is.null(g1$laby))) {
    if ((length(g1$seqx))&&(length(g1$seqy))) {
       .repairForScatterPlot()
@@ -875,10 +947,8 @@
    .panel_graticule(obj,marginalia=marginalia,verbose=verbose)
 }
 '.panel_graticule' <- function(obj,marginalia=rep(TRUE,4),verbose=FALSE) {
-   g1 <- getOption("ursaPngComposeGrid")
-   g2 <- getOption("ursaPngPanelGrid")
-  # print(g1)
-  # print(g2)
+   g1 <- .compose_grid()
+   g2 <- .panel_grid()
   # internal <- isTRUE(comment(marginalia)=="internal")
    internal <- !identical(g1,g2)
    if (internal) {
@@ -921,6 +991,8 @@
                   }
                   else
                      cond3 <- TRUE
+                  if (!.isPackageInUse())
+                     cat("============ panel_graticule: try `.identicalCRS()`\n")
                   ret <- cond1 & cond2 & cond3
                }
             }
@@ -932,8 +1004,7 @@
    with(obj,{
       if (verbose)
          str(list(col=col,lwd=lwd,lty=lty))
-      for (i in seq(along=gridline))
-      {
+      for (i in seq(along=gridline)) {
          xy <- gridline[[i]]
         # if (all(is.na(xy)))
         #    next
@@ -944,9 +1015,13 @@
       pngOp <- options()[.grep("^ursaPng.+",names(options()))]
       layout <- pngOp[["ursaPngLayout"]][["layout"]]
       layout0 <- (layout==pngOp[["ursaPngFigure"]])
-      indr <- which(rowSums(layout0)==1)
-      indc <- which(colSums(layout0)==1)
-     # print(c(row=indr,column=indc))
+      indr <- which(rowSums(layout0)>0)
+      indc <- which(colSums(layout0)>0)
+      if (length(indr)>1)
+         indr <- seq(min(indr),max(indr))
+      if (length(indc)>1)
+         indc <- seq(min(indc),max(indc))
+     # str(list(row=indr,column=indc))
       if (FALSE) {
          isTop <- all(layout[1L:(indr-1L),indc]==0)
          isBottom <- all(layout[(indr+1L):nrow(layout),indc]==0)
@@ -954,10 +1029,10 @@
          isRight <- all(layout[indr,(indc+1L):ncol(layout)]==0)
       }
       else {
-         isTop <- all(layout[(indr-2L):(indr-1L),indc]==0)
-         isBottom <- all(layout[(indr+1L):(indr+2L),indc]==0)
-         isLeft <- all(layout[indr,(indc-2L):(indc-1L)]==0)
-         isRight <- all(layout[indr,(indc+1L):(indc+2L)]==0)
+         isTop <- all(layout[(min(indr)-2L):(min(indr)-1L),indc]==0)
+         isBottom <- all(layout[(max(indr)+1L):(max(indr)+2L),indc]==0)
+         isLeft <- all(layout[indr,(min(indc)-2L):(min(indc)-1L)]==0)
+         isRight <- all(layout[indr,(max(indc)+1L):(max(indc)+2L)]==0)
       }
       marginalia0 <- marginalia
       marginalia <- as.integer(marginalia0 & c(isBottom,isLeft,isTop,isRight))
@@ -971,10 +1046,10 @@
         # fig2 <- pngOp[["ursaPngFigure"]]
          layout2 <- layout
          layout2[layout2<=panel2] <- 0L
-         isTop2 <- all(layout2[(indr-2L):(indr-1L),indc]==0)
-         isBottom2 <- all(layout2[(indr+1L):(indr+2L),indc]==0)
-         isLeft2 <- all(layout2[indr,(indc-2L):(indc-1L)]==0)
-         isRight2 <- all(layout2[indr,(indc+1L):(indc+2L)]==0)
+         isTop2 <- all(layout2[(min(indr)-2L):(min(indr)-1L),indc]==0)
+         isBottom2 <- all(layout2[(max(indr)+1L):(max(indr)+2L),indc]==0)
+         isLeft2 <- all(layout2[indr,(min(indc)-2L):(min(indc)-1L)]==0)
+         isRight2 <- all(layout2[indr,(max(indc)+1L):(max(indc)+2L)]==0)
          marginalia2 <- as.integer(marginalia0 & c(isBottom2,isLeft2,isTop2,isRight2))
          marginalia2 <- as.integer(!marginalia)*marginalia2
          if ((marginalia[4])&&(marginalia2[2]))

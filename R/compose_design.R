@@ -2,8 +2,10 @@
    arglist <- list(...)
   # str(lapply(arglist,function(x) list(class=class(x),names=names(x))))
    obj <- .getPrm(arglist,name="^$",default=NULL
-                 ,class=list(c("list","ursaRaster"),"ursaRaster","integer"))
-   layout <- .getPrm(arglist,name="layout",default=NA_integer_)
+                 ,class=list(c("list","ursaRaster"),"ursaRaster","integer","matrix"))
+  # layout <- .getPrm(arglist,name="layout",default=NA_integer_)
+   layout <- .getPrm(arglist,name="layout",class=list(c("matrix","integer"),"integer")
+                    ,default=NA_integer_)
   # if (identical(obj,layout))
   #    obj <- NULL
    byrow <- .getPrm(arglist,name="byrow",default=TRUE)
@@ -24,7 +26,11 @@
       str(list(obj=if (is.list(obj)) sapply(obj,class) else class(obj)
               ,layout=layout,byrow=byrow,skip=skip,legend=legend
               ,side=side,ratio=ratio,fixed=fixed))
-   if (is.null(legend)) {
+   if ((is.matrix(layout))&&(is.na(legend))) {
+      forcedLegend <- FALSE
+      legend <- NA
+   }
+   else if (is.null(legend)) {
       forcedLegend <- FALSE
       legend <- NA
    }
@@ -48,8 +54,15 @@
      # stop("NULL")
       if (any(is.na(layout)))
          layout <- c(1L,1L)
-      panelr <- layout[1]
-      panelc <- layout[2]
+      if (is.matrix(layout)) {
+         dima <- dim(layout)
+         panelr <- dima[1]
+         panelc <- dima[2]
+      }
+      else {
+         panelr <- layout[1]
+         panelc <- layout[2]
+      }
       isList <- FALSE
    }
    else
@@ -187,10 +200,10 @@
          }
       }
    }
-   mosaic <- matrix(0,ncol=panelc*2+3,nrow=panelr*2+3)
+   mosaic <- matrix(0L,ncol=panelc*2+3,nrow=panelr*2+3)
    k <- 0L
    m <- k
-   if (byrow)
+   if ((byrow)&&(!is.matrix(layout)))
    {
       for (ir in 1:panelr)
       {
@@ -218,7 +231,11 @@
          }
       }
    }
-   k <- m+1
+   if (is.matrix(layout)) {
+      m <- length(unique(c(layout)))
+      mosaic[mosaic>0] <- layout
+   }
+   k <- m+1L
    if (length(legend)==1) {
       if ((isList)&&(forcedLegend)&&((panelc>1)||(panelr>1))) { ## 20160112 added &&(forcedLegend)
          nl <- length(unique(fld[fld>0]))
@@ -372,7 +389,7 @@
       else if ((length(leg2)>1)&&((length(leg1)==1)))
          posc <- posc[posc>1 & posc<ncol(mosaic)]
       mosaic[posr,posc] <- k
-      k <- k+1
+      k <- k+1L
    }
    if (FALSE)
    {

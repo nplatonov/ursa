@@ -13,6 +13,18 @@
    p <- proc.time()
    options(ursaTimeStart=p,ursaTimeDelta=p) # ,ursaForceSF=TRUE 
    rm(p)
+   options(ursaNoticeMatchCall=FALSE & !.isPackageInUse())
+   if (!.isPackageInUse())
+      options(show.error.messages=TRUE)
+   if (is.null(getOption("ursaProj4Legacy")))
+      options(ursaProj4Legacy=TRUE)
+   if (is.null(getOption("ursaForceWKT")))
+      options(ursaForceWKT=FALSE) ## sf_project: proj4 is faster than WKT
+  # if (is.null(getOption("ursaTolerance")))
+  #    options(ursaTolerance=1e-8)
+   if ((FALSE)&&(nchar(system.file(package="proj4"))>0)) {
+      .forceProj4package(TRUE)
+   }
   # session_pngviewer()
    fpath <- getOption("ursaCacheDir") ## e.g., from ~/.Rprofile
    if (is.null(fpath))
@@ -50,7 +62,6 @@
    }
   # try(Sys.setenv(R_RMAP_TEMPLATE=fpath))
    try(options(ursaRequisite=fpath0))
-   options(ursaNoticeMatchCall=FALSE & !.isPackageInUse())
    invisible(0L)
 }
 .onAttach <- function(lib, pkg) { ## FAILED for 'Rscript -e "ursa::display()"'

@@ -44,7 +44,7 @@
    for (i in seq_along(prm)) {
       if (is_ursa(prm[[i]])) {
          fname <- tempfile(fileext=".tif")
-         write_gdal(prm[[i]],fname,options="COMPRESS=LZW")
+         write_gdal(prm[[i]],fname,COMPRESS="LZW",TILED="NO")
          prm[[i]] <- fname
       }
       if (!nchar(pname[i])) {

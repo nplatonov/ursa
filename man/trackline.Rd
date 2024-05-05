@@ -1,5 +1,5 @@
-\name{segmentize}
-\alias{segmentize}
+\name{trackline}
+\alias{trackline}
 \title{
 Create segmented line from points' sequence
 }
@@ -7,7 +7,7 @@ Create segmented line from points' sequence
 Connect sequence of points (locations) by direct lines (tracks)
 }
 \usage{
-segmentize(obj, by=NULL, connect=c("united", "consequent"))
+trackline(obj, by=NULL, connect=c("united", "consequent"))
 }
 \arguments{
   \item{obj}{
@@ -35,10 +35,15 @@ n <- 15
 lon <- rev(sort(runif(n,min=40,max=60)))
 lat <- sort(runif(n,min=30,max=50))
 pt <- data.frame(lon=lon,lat=lat,value=seq(n))
-sp::coordinates(pt) <- c("lon","lat")
-sp::proj4string(pt) <- "+proj=longlat"
+if (requireNamespace("sp")) {
+   sp::coordinates(pt) <- c("lon","lat")
+   sp::proj4string(pt) <- "EPSG:4326"
+} else {
+   pt <- sf::st_as_sf(pt,coords=c("lon","lat"),crs="WGS84")
+}
 ct <- ursa_colortable(colorize(pt$value))
-tr <- segmentize(pt)
+tr <- trackline(pt,connect="consequent")
+#opW <- options(warn=0)
 session_grid(pt,expand=1.1)
 compose_open(2)
 panel_new()
@@ -47,7 +52,7 @@ panel_decor()
 panel_new()
 panel_plot(tr,col=ct,lwd=3)
 panel_decor()
-compose_legend(ct)
+compose_legend(ct,unit="step number")
 compose_close()
 }
 \keyword{attribute}

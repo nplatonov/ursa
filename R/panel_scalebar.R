@@ -15,8 +15,8 @@
    }
    position <- .getPrm(arglist,name="pos(ition)*",kwd=kwd
                       ,class=list("character","numeric"),default="---")
-   g0 <- session_grid()
-   canScale <- .lgrep("(epsg:3857|\\+proj=(merc|zzzzz)\\s)",g0$crs)>0
+   g0 <- .panel_grid() # session_grid()
+   canScale <- .isMerc(g0$crs) # .lgrep("(epsg:3857|\\+proj=(merc|zzzzz)\\s)",g0$crs)>0
    if ((all(position=="---"))&&(canScale)) {
       lat <- with(g0,.project(rbind(c(minx,miny),c(maxx,maxy)),crs,inv=TRUE))[,2]
       sc <- sort(1/cos(lat*pi/180))
@@ -56,7 +56,7 @@
       indirect <- FALSE
    if (verbose)
       str(list(position=position,w=w,cex=cex,col=col,bg=bg,fill=fill,verbose=verbose))
-   g1 <- session_grid()
+   g1 <- .panel_grid() # session_grid()
    paperScale <- getOption("ursaPngPaperScale")
    if (is.na(language)) {
       if (TRUE) {
@@ -85,7 +85,7 @@
       options(opW)
       return(invisible(NULL))
    }
-   isLonLat <- .lgrep("(\\+proj=longlat|epsg:4326)",g1$crs)>0
+   isLonLat <- .isLongLat(g1$crs) # .lgrep("(\\+proj=longlat|epsg:4326)",g1$crs)>0
    if ((isLonLat)||((TRUE)&&(!nchar(g1$crs))))
       return(invisible(NULL))
    isGeo <- nchar(g1$crs)>0
@@ -93,7 +93,7 @@
       return(invisible(NULL))
    dx <- with(g1,maxx-minx)
    dy <- with(g1,maxy-miny)
-   isMerc <- .lgrep("(\\+proj=merc|epsg\\:3857)",g1$crs)>0
+   isMerc <- .isMerc(g1$crs) # .lgrep("(\\+proj=merc|epsg\\:3857)",g1$crs)>0
    if (isMerc) {
       x3 <- pos[1]
       if (pos[1]<0.1)

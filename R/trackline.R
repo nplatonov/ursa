@@ -1,9 +1,9 @@
-'segmentize' <- function(obj,by=NULL,connect=c("united","consequent")) {
+'trackline' <- function(obj,by=NULL,connect=c("united","consequent")) {
    connect <- match.arg(connect)
   # if (!is.null(by))
   #    connect <- "united"
    if ((!is.null(by))&&(connect=="consequent")) {
-      ret <- do.call(spatial_bind,by(obj,by,segmentize,connect=connect)) ## RECURSIVE
+      ret <- do.call(spatial_bind,by(obj,by,trackline,connect=connect)) ## RECURSIVE
       ##~ for (a in spatial_fields(obj)) {
          ##~ byvalue <- obj[[a]]
          ##~ str(a)
@@ -20,7 +20,7 @@
    if ((TRUE)&&(T & is.null(by))&&(spatial_geotype(obj) %in% c("MULTIPOINT"))&&
        (spatial_count(obj)>1)) {
       ret <- lapply(seq_len(spatial_count(obj)),\(j) {
-         res <- segmentize(obj[j,],by=spatial_data(obj[j,]),connect=connect) ## RECURSIVE
+         res <- trackline(obj[j,],by=spatial_data(obj[j,]),connect=connect) ## RECURSIVE
       })
       ret <- do.call(spatial_bind,ret)
       return(ret)
@@ -87,7 +87,7 @@
               # sp::coordinates(x) <- c("coords.x1","coords.x2")
                sp::coordinates(x) <- crd
             }
-            ret <- segmentize(x,connect=connect) ## RECURSIVE
+            ret <- trackline(x,connect=connect) ## RECURSIVE
             ret
          })
          ind <- which(!sapply(res,is.null))

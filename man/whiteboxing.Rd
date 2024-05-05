@@ -44,8 +44,7 @@ Internally, for piping support, first character argument without \code{*.tif} su
 
 }
 \examples{
-if ((requireNamespace("whitebox"))&&(isTRUE(whitebox::wbt_init()))&&
-    (requireNamespace("stars"))) {
+if ((requireNamespace("whitebox"))&&(isTRUE(whitebox::wbt_init()))) {
    dem <- whitebox::sample_dem_data()
    a1 <- c(DEM=read_gdal(dem))
    a2 <- whiteboxing("BreachDepressions",input=a1)

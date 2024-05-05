@@ -275,7 +275,7 @@
    geocodeStatus <- FALSE
    if (.isSP(loc)) {
       proj4 <- sp::proj4string(loc)
-      if (!.lgrep("\\+proj=longlat",proj4)) {
+      if (!.isLongLat(proj4)) {
          loc <- sp::bbox(loc)
          if (length(loc)==6)
             loc <- loc[c(1,2,4,5)]
@@ -287,8 +287,8 @@
       if (inherits(loc,"sf"))
          loc <- sf::st_bbox(loc)
       proj4 <- attr(loc,"crs")$proj4string
-     # if (proj4!="+proj=longlat +datum=WGS84 +no_defs")
-      if (!.lgrep("\\+proj=longlat",proj4))
+     # if (proj4!=.crsWGS84())
+      if (!.isLongLat(proj4))
          loc <- c(.project(matrix(loc,ncol=2,byrow=TRUE),proj4
                           ,inv=TRUE))[c(1,3,2,4)]
    }
@@ -298,8 +298,11 @@
    if ((TRUE)||(isWMS)) {
       if (is.null(loc)) {
          border <- 0
-         g3 <- g0 <- getOption("ursaSessionGrid")#session_grid()
+         g0 <- getOption("ursaPngPanelGrid")
+         if (is.null(g0)) ## not after 'panel_new()'
+            g0 <- getOption("ursaSessionGrid")#session_grid()
          notYetGrid <- is.null(g0)
+         g3 <- g0
          if (notYetGrid)
             loc <- c(-179,-82,179,82)
          else {
@@ -347,8 +350,8 @@
          x[1] <- x[1]-2*B
          lon_0 <- round(180*mean(x)/B,6)
       }
-      else if ((TRUE)&&(!is.null(g3))&&(.lgrep("\\+proj=(merc|laea)",g0$crs))) ## ++20180325
-         lon_0 <- as.numeric(.gsub(".*\\+lon_0=(\\S+)\\s.*","\\1",g0$crs))
+      else if ((TRUE)&&(!is.null(g3))&&(.lgrep("^(merc|laea)$",.crsProj(g0$crs)))) ## ++20180325
+         lon_0 <- .crsLon0(g0$crs) # as.numeric(.gsub(".*\\+lon_0=(\\S+)\\s.*","\\1",g0$crs))
       else
          lon_0 <- round(180*mean(x)/B,6)
       if (isPolar) {
@@ -443,9 +446,14 @@
          else if ((g0$columns<=size[1])&&(g0$rows<=size[2]))
             break
       }
+      if ((!notYetGrid)&&(!fixRes)&&(i==1)) {
+         spatialize(polygonize(ursa_bbox(g3)),style="web")
+         g0 <- session_grid()
+         i <- which.min(abs(s-ursa(g0,"cellsize")))
+      }
       if ((isPolar)&&(!notYetGrid)) { ## more accurate checking is required
-         m1 <- gsub(".*\\+proj=laea\\s.+\\+lon_0=(\\S+)\\s.*","\\1",g0$crs)
-         m2 <- gsub(".*\\+proj=laea\\s.+\\+lon_0=(\\S+)\\s.*","\\1",g3$crs)
+         m1 <- .crsLon0(g0$crs) # gsub(".*\\+proj=laea\\s.+\\+lon_0=(\\S+)\\s.*","\\1",g0$crs)
+         m2 <- .crsLon0(g3$crs) # gsub(".*\\+proj=laea\\s.+\\+lon_0=(\\S+)\\s.*","\\1",g3$crs)
          m3 <- !is.na(.is.near(g0$resx,g3$resx))
          m4 <- !is.na(.is.near(g0$resy,g3$resy))
          m <- m1==m2 & m3 & m4
@@ -592,8 +600,8 @@
          B0 <- 6378137
          B <- B0*pi
          dz <- 2^zoom
-         res <- 2*pi*B0/dz
-         dx0 <- lon_0*pi/180*B0
+         res <- 2*B/dz
+         dx0 <- lon_0*B/180 # lon_0*pi/180*B0
          minx <- g0$minx+dx0
          maxx <- g0$maxx+dx0
          if (isWGS84)
@@ -613,7 +621,7 @@
          }
          else {
             g1 <- regrid(g0,setbound=c(minx,g0$miny,maxx,g0$maxy),proj=epsgWeb)
-            g1 <- regrid(g1,res=2*pi*B0/dz)
+            g1 <- regrid(g1,res=2*B/dz)
             g1 <- regrid(g1,res=c(g0$resx,g0$resy),crs=g0$crs)
             g1$minx <- g1$minx-dx0
             g1$maxx <- g1$maxx-dx0
@@ -944,7 +952,7 @@
                                        ,quiet=!verbose
                                        )
             j <- if (i==1) 0 else sum(col2[seq(i-1)])
-            img[,j+seq(col2[i]),] <- png::readPNG(fname)
+            img[,j+seq(col2[i]),] <- .readPNG(fname)
            # file.remove(fname)
          }
          basemap <- as.integer(255*as.ursa(img,aperm=TRUE,flip=TRUE))
@@ -982,7 +990,7 @@
             download.file(src,fname,mode="wb"
                          ,quiet=!verbose)
          }
-         basemap <- as.integer(255L*as.ursa(png::readPNG(fname)
+         basemap <- as.integer(255L*as.ursa(.readPNG(fname)
                                            ,aperm=TRUE,flip=TRUE))
          if (!cache)
             file.remove(fname)

@@ -12,6 +12,8 @@
    fname <- gsub("\\.$","",fname)
    wname <- fname
    fname <- envi_list(wname,exact=TRUE)
+   if (!length(fname))
+      return(NULL)
    dname <- unique(dirname(fname))
    if (identical(wname,dname)) ## 20220130
       fname <- envi_list(file.path(dirname(wname),paste0("^",basename(wname),"$"))
@@ -106,7 +108,7 @@
       {
          map <- unlist(strsplit(f5,","))
          if (map[1]=="Geographic Lat/Lon")
-            grid$crs <- c("4326","+proj=longlat +datum=WGS84 +no_defs")[-1]
+            grid$crs <- c("4326",.crsWGS84())[-1]
          else if (map[1]=="UTM")
             grid$crs <- paste("+proj=utm",paste0("+zone=",map[8])
                              ,paste0("+datum="
@@ -163,7 +165,7 @@
                           ,basename(fname))
    if (con$mode=="integer")
       con$nodata <- as.integer(con$nodata)
-   if (length(p))
+   if (((.crsForceProj4())||(!nchar(wkt)))&&(length(p)))
    {
       proj4 <- NULL
       pr <- NULL
@@ -283,7 +285,8 @@
    grid2 <- getOption("ursaSessionGrid")
    if (!.is.grid(grid2))
    {
-      session_grid(grid)
+      if (nchar(grid$crs))
+         session_grid(grid)
       con$indexC <- seq(grid$columns)
       con$indexR <- seq(grid$rows)
    }
@@ -399,7 +402,7 @@
    }
    else if ((file.exists(fname.gz))&&(!file.info(fname.gz)$isdir))
    {
-      verbose <- Sys.Date()<=as.Date("2020-04-20") & !.isPackageInUse()
+      verbose <- Sys.Date()<=as.Date("2024-04-20") & !.isPackageInUse()
       solved <- FALSE
       if (nchar(Sys.which("gzip"))) {
          if (cache) {
@@ -461,8 +464,7 @@
             con$fname <- file.path(dirname(fbase)
                                   ,paste0(basename(fname)
                                          ,".unpacked",basename(fbase),"~"))
-           # print(con$fname)
-           # q()
+            attr(con$fname,"source") <- fname.envigz
             system2("gzip",c("-f -d -c",.dQuote(fname.envigz)),stdout=con$fname,stderr=FALSE)
             solved <- !is.null(con$fname)
          }
@@ -684,15 +686,19 @@
    }
    if (is.null(grid$crs))
       grid$crs <- ""
+   if ((forceWKT <- TRUE)&&(!nchar(grid$crs))&&(nchar(wkt))) {
+      grid$crs <- .ursaCRS(wkt)
+      session_grid(grid)
+   }
    if ((!nchar(grid$crs))&&(nchar(wkt)))
    {
-      lverbose <- FALSE
+      lverbose <- !FALSE
       if (lverbose)
          .elapsedTime("wkt -> proj4 start")
      # (!("package:rgdal" %in% search()))) { 
       isSF <- ("sf" %in% loadedNamespaces())&&(utils::packageVersion("sf")<"99990.9")
       isSP <- "sp" %in% loadedNamespaces()
-      if ((nchar(Sys.which("gdalsrsinfo")))&&(!isSF)&&(!isSP)) {
+      if ((FALSE)&&(nchar(Sys.which("gdalsrsinfo")))&&(!isSF)&&(!isSP)) {
          if (lverbose)
             message("'gdalsrsinfo' engine (read)")
          if (FALSE) ## slow
@@ -710,7 +716,7 @@
             grid$crs <- grid$crs[nchar(grid$crs)>0]
          }
       }
-      else if (!isSF) {
+      else if ((!isSF)&&(isSP)) {
          if (lverbose)
             message("showP4() in 'rgdal'")
          .try(grid$crs <- .rgdal_showP4(wkt))
@@ -755,7 +761,7 @@
       session_grid(grid)
    }
    con$driver <- "ENVI"
-  # class(grid$crs) <- c("character","ursaProjection")
+   grid$crs <- .ursaCRS(grid$crs)
    obj$grid <- grid
    obj$con <- con
    arglist <- list(...)
@@ -763,8 +769,9 @@
                     ,class=c("integer","numeric"),default=NA,verbose=FALSE)
    if (!is.na(nodata))
       obj$con$nodata <- nodata
-   if (!.lgrep("(layer|band)*name",names(arglist)))
+   if (!.lgrep("(layer|band)*name",names(arglist))) {
       return(obj)
+   }
    ln1 <- obj$name
    ln2 <- arglist[[.grep("(layer|band)*name",names(arglist))]]
    if (identical(ln1,ln2))

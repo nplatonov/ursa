@@ -1,7 +1,9 @@
 'spatial_write' <- function(obj,fname,layer,driver=NA,compress=""
-                        ,ogr2ogr=nchar(Sys.which("ogr2ogr"))>0
+                       # ,ogr2ogr=nchar(Sys.which("ogr2ogr"))>0
                         ,verbose=FALSE) {
   # obj <- head(obj,100)
+   ogr2ogr <- TRUE
+   gdalUtils <- TRUE
    bname <- basename(fname)
    dname <- dirname(fname)
    if ((dname!=".")&&(!dir.exists(dname)))
@@ -181,13 +183,16 @@
       for (i in seq_along(fname1)) {
          if (!allSF)
             setUrsaProgressBar(pb)
-         b <- paste(fname,fname1[i],"-nln",lname[i])
+         if (gdalUtils)
+            b <- c("-nln",lname[i])
+         else
+            b <- c(fname,fname1[i],"-nln",lname[i])
          if (length(dopt))
-            b <- paste(paste("-dco",dopt),b)
+            b <- c("-dco",dopt,b)
          if (length(lopt))
-            b <- paste(paste("-lco",lopt),b)
+            b <- c("-lco",lopt,b)
          if ((i==1)&&(keepCRS))
-            b <- paste(b,"-t_srs",.dQuote(p4s[1]))
+            b <- c(b,"-t_srs",p4s[1])
          if ((interimExt=="shp")&&(!is.null(iname[[i]]))) {
             aname <- sprintf("fld%03d",seq_along(iname[[i]]))
             s <- paste("select",paste(aname,"as",paste0("\\\"",iname[[i]],"\\\"")
@@ -195,20 +200,40 @@
                       ,"from",paste0("\\\""
                                     ,.gsub("\\.shp$","",basename(fname1[i]))
                                     ,"\\\""))
-            s <- paste("-sql",.dQuote(s))
+            s <- c("-sql",s)
             ##~ cat(s)
             ##~ cat("\n")
             ##~ s <- ""
          }
          else
             s <- ""
-         if (i==1)
-            cmd <- paste("ogr2ogr",s,"-f",.dQuote(driver),b)
-         else
-            cmd <- paste("ogr2ogr",s,"-update -append",b)
-         if (verbose)
-            message(cmd)
-         if (!system(cmd)) {
+         if (!gdalUtils) {
+            if (i==1) {
+               cmd <- paste("ogr2ogr",s,"-f",.dQuote(driver),b)
+            }
+            else {
+               cmd <- paste("ogr2ogr",s,"-update -append",b)
+            }
+            if (verbose)
+               message(cmd)
+            ret <- system(cmd)==0
+         }
+         else {
+            if (i==1) {
+               opt <- c(s,"-f",driver,b)
+            }
+            else {
+               opt <- c(s,"-update","-append",b)
+            }
+            opt <- opt[nchar(opt)>0]
+            ret <- sf::gdal_utils("vectortranslate"
+                                 ,source=fname1[i]
+                                 ,destination=fname
+                                 ,options=opt
+                                 ,quiet=!verbose
+                                 )
+         }
+         if (ret) {
             if (.lgrep("\\.shp$",basename(fname1[i])))
                .shp.remove(fname1[i])
             else if (file.exists(fname1[i]))
@@ -299,7 +324,11 @@
       }
    }
    isSF <- inherits(obj,c("sf","sfc"))
-   isSP <- !isSF
+   isSP <- (!isSF)&&(.forceRGDAL()) ## .forceRGDAL(TRUE)
+   if ((!isSP)&&(!isSF)) {
+      obj <- sf::st_as_sf(obj)
+      isSF <- TRUE
+   }
    if (verbose)
       print(data.frame(sf=isSF,sp=isSP,row.names="engine"))
    if (isSF)
@@ -329,7 +358,7 @@
    }
    if (isSP) {
       if (driver %in% c("GeoJSON","KML","GPX")) {
-         obj <- sp::spTransform(obj,sp::CRS("+init=epsg:4326"))
+         obj <- sp::spTransform(obj,sp::CRS("EPSG:4326"))
       }
       opW <- options(warn=1)
      # dsn <- if (driver %in% c("zzzESRI Shapefile")) dname else fname
@@ -438,9 +467,8 @@
                   obj[,i] <- format(c(obj[,i,drop=TRUE]),tz="UTC","%Y-%m-%dT%H:%M:%SZ")
                }
             }
-            a <- geojsonsf::sf_geojson(obj,atomise=F,simplify=F,digits=6)
+            a <- geojsonsf::sf_geojson(obj,atomise=T,simplify=F,digits=6)
            # a <- iconv(a,to="UTF-8")
-           # writeLines(a,Fout)
             writeLines(a,Fout)
          }
          close(Fout)
@@ -480,11 +508,11 @@
       }
       b <- character()
       if (length(dopt))
-         b <- c(b,paste("-dco",.dQuote(dopt)))
+         b <- c(b,c("-dco",dopt))
       if (length(lopt))
-         b <- c(b,paste("-lco",.dQuote(lopt)))
+         b <- c(b,c("-lco",lopt))
       lnameF <- ifelse(interimExt=="shp",.gsub("\\.shp$","",basename(fname)),lname)
-      if (length(aname)) {
+      if ((exists("iname"))&&(length(aname))) {
          s <- paste("select"
                    ,paste(iname,"as",paste0("\\\"",aname,"\\\""),collapse=",")
                    ,"from",paste0("\\\"",lnameF,"\\\""))
@@ -492,21 +520,33 @@
       }
       else
          s <- ""
-      cmd <- paste("ogr2ogr"
-                  ,ifelse(verbose,"-progress",""),s
-                  ,"-f",.dQuote(driver0)
-                  ,ifelse(interimExt=="shp","",paste("-t_srs",.dQuote(p4s)))
-                  ,b
-                  ,.dQuote(fname0),.dQuote(fname),"-nln",lname)
-      if (verbose)
-         message(cmd)
       keepHDR <- length(envi_list(lname))
       if (keepHDR) {
          fhdr2 <- tempfile()
          fhdr1 <-paste0(lname,".hdr")
          file.rename(fhdr1,fhdr2)
       }
-      system(cmd) ## this ov
+      if (!gdalUtils) {
+         cmd <- paste("ogr2ogr"
+                     ,ifelse(verbose,"-progress",""),s
+                     ,"-f",.dQuote(driver0)
+                     ,ifelse(interimExt=="shp","",paste("-t_srs",.dQuote(p4s)))
+                     ,b
+                     ,.dQuote(fname0),.dQuote(fname),"-nln",lname)
+         if (verbose)
+            message(cmd)
+         system(cmd) ## this ov
+      }
+      else {
+         opt <- c(if (verbose) "-progress",if (nchar(s)) s,"-f",driver0
+                 ,if (interimExt!="shp") c("-t_srs",p4s),b)
+         ret <- sf::gdal_utils("vectortranslate"
+                              ,source=fname
+                              ,destination=fname0
+                              ,options=opt
+                              ,quiet=!verbose
+                              )
+      }
       if (keepHDR) {
          file.rename(fhdr2,fhdr1)
       }

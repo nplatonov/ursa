@@ -12,7 +12,7 @@
                                     ,"bathy","grayscale","greyscale",".onetoone")
                           ,minvalue=NA,maxvalue=NA,byvalue=NA,ltail=NA,rtail=NA
                           ,tail=NA,ncolor=NA,nbreak=NA,interval=0L,ramp=TRUE
-                          ,byte=FALSE,lazyload=FALSE,reset=FALSE
+                          ,byte=FALSE,lazyload=TRUE,reset=FALSE
                           ,origin="1970-01-01",format="",alpha=""
                           ,colortable=NULL
                           ,verbose=FALSE,...)
@@ -239,8 +239,9 @@
    if (.is.colortable(obj$colortable)) {
       ct <- obj$colortable
       if (all(!is.na(ct))) {
-         if (.is.category(obj)) ## attr(obj$value,"category")
+         if (.is.category(obj)) {## attr(obj$value,"category")
             return(obj)
+         }
          else {
             rel$pal <- unclass(unname(ct))
          }
@@ -323,7 +324,9 @@
       }
       return(res)
    }
-   stretch <- match.arg(stretch)
+   stretchList <- as.character(as.list(match.fun("colorize"))[["stretch"]])[-1]
+   stretchList <- c(stretchList,".onetoone")
+   stretch <- match.arg(stretch[1],stretchList)
    if (length(name)) {
       ncolor <- length(name)
       ramp <- FALSE
@@ -1302,7 +1305,7 @@
          col <- rev(col)
    }
    obj <- .as.colortable(obj,col=col,name=name,alpha=alpha)
-   class(obj$value) <- ifelse(lazyload,"ursaNumeric","ursaCategory")
+   class(obj$value) <- ifelse(lazyload,c("ursaNumeric","ursaSymbol")[2],"ursaCategory")
    if (!lazyload)
       ignorevalue(obj) <- n
    else if (is.na(ignorevalue(obj)))

@@ -15,8 +15,7 @@
    arglist2 <- list(...) ## remove dupe of 'add=TRUE'
    ct <- NULL
    if (inherits(obj,c("raster"))) {
-      ret <- with(session_grid()
-                 ,rasterImage(as.raster(obj),minx,miny,maxx,maxy,...))
+      ret <- with(.panel_grid(),rasterImage(as.raster(obj),minx,miny,maxx,maxy,...))
    }
    else if (is.character(obj)) {
       if (.lgrep("\\.(shp(\\.zip)*|(geojson|sqlite|gpkg)(\\.(gz|bz2))*)$",obj)) {
@@ -40,7 +39,7 @@
          ret <- panel_raster(read_gdal(obj),...)
       }
       else if ((getOption("ursaPngScale")==1)&&
-             (.lgrep("\\+proj=merc",session_crs())>0)&&
+             (.isMerc()>0)&&
              ((TRUE)||(.lgrep(obj,.tileService())))) {
          ret <- panel_raster(obj,...)
       }
@@ -52,8 +51,11 @@
    }
    else if (is_spatial(obj)) {
       oprj <- spatial_crs(obj)
-      sprj <- session_crs()
-      if (!identical(oprj,sprj)) {
+      sprj <- .panel_crs() # session_crs()
+      if (!identical(.crsBeauty(oprj,extended=TRUE),.crsBeauty(sprj,extended=TRUE))) {
+         if (F & !.isPackageInUse()) {
+            cat("Please check comparison of WKT strings\n")
+         }
          if ((is.list(oprj))&&("input" %in% names(oprj)))
             oprj <- oprj[["input"]]
          if ((is.list(sprj))&&("input" %in% names(sprj)))
@@ -230,8 +232,14 @@
                if ((.lgrep("pch",names(arglist2)))&&
                    (arglist2$pch %in% c(21,22,23,24,25))) { ## ?pch
                   op <- median(col2rgb(arglist2$bg,alpha=T)["alpha",])
+                  if (!is.null(arglist2$border)) {
+                     bg <- c(col2rgb(arglist2$border))
+                     arglist2$col <- rgb(bg[1],bg[2],bg[3],op,maxColorValue=255)
+                  }
+                  else {
                   arglist2$col <- rgb(0,0,0,op,maxColorValue=255)
-                 # arglist2$bg <- "transparent"
+                    # arglist2$bg <- "transparent"
+                  }
                }
             }
             if (!.lgrep("cex",names(arglist2))) {
@@ -265,6 +273,7 @@
                   else
                      mul <- 1
                   lwd <- mul*as.numeric(gsub("\\D","",lwd))
+                  print("LWD")
                   cell <- session_cellsize()
                   sc <- getOption("ursaPngScale")
                   dpi <- getOption("ursaPngDpi")/96
@@ -368,7 +377,7 @@
       if ((TRUE)&&(.lgrep("point",geoType))&&(!is.null(ct))) {
          ret$col <- ct$colortable
       }
-      if ((all(ret$bg!="transpareny"))&&(all(ret$border=="transparent"))) {
+      if ((isTRUE(all(ret$bg!="transpareny")))&&(isTRUE(all(ret$border=="transparent")))) {
          ret$fill <- ret$bg
       }
       if ((TRUE)&&(.lgrep("polygon",geoType))) {
@@ -507,6 +516,8 @@
          opW <- options(warn=-1) ## release 'warn=-1': no warnings
    }
    ##~ message("-----------------")
+   ##~ str(.panel_grid())
+   ##~ str(par())
    ##~ str(obj)
    ##~ str(arglist)
    ##~ message("-----------------")

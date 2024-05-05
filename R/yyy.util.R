@@ -228,7 +228,7 @@
    op <- options()
    op <- op[.grep("^ursa(Png|[A-Z]).+",names(op))]
    indPng <- .grep("^ursaPng.+",names(op))
-   if (length(indPng))
+   if (F & length(indPng))
       return(str(op[indPng]))
    str(op)
 }
@@ -261,7 +261,7 @@
          try(res <- x[which.max(predict(locfit::locfit(~x),newdata=x))])
       res
    }
-   isLonLat <- .lgrep("(\\+proj=longlat|epsg:4326)",spatial_crs(src))>0
+   isLonLat <- .isLongLat(spatial_crs(src))
    isUrsa <- FALSE
    if ((is_spatial(src))&&((is_spatial(dst)))) {
       if (!identical(spatial_crs(src),spatial_crs(dst)))
@@ -375,29 +375,6 @@
    if (verbose)
       message(".is.near: fuzzy matching")
    b1
-}
-'.getMajorSemiAxis' <- function(proj4) {
-   ell <- .gsub(".*\\+ellps=(\\S+)\\s.*","\\1",proj4)
-   if (ell=="WGS84")
-      B <- 6378137
-   else if (ell==proj4) {
-      B <- .gsub(".*\\+a=(\\S+)\\s.*","\\1",proj4)
-      if (B!=proj4)
-         B <- as.numeric(B)
-      else {
-         opW <- options(warn=-1)
-         warning("Supposed that this projection is not supported yet")
-         options(opW)
-         B <- 6378137
-      }
-   }
-   else {
-      opW <- options(warn=-1)
-      warning("Supposed that this projection is not supported yet")
-      options(opW)
-      B <- 6378137
-   }
-   B
 }
 '.degminsec' <- function(x,suffix=c("A","B"),unique=FALSE) {
    s <- sign(x)
@@ -597,6 +574,8 @@
       return(x)
    if (missing(n))
       return(sample(x))
+   if (!length(n))
+      return(sample(x))
    if (n>=length(x))
       return(sample(x))
    sample(x,n)
@@ -719,11 +698,14 @@
 '.isColor' <- function(x) !inherits(try(col2rgb(x),silent=TRUE),"try-error")
 '.isWeb' <- function(grid) {
    if (missing(grid))
-      grid <- session_grid()
+      grid <- getOption("ursaSessionGrid")
+   if (is.null(grid))
+      return(FALSE)
    crs <- ursa(grid,"crs")
    v1 <- ursa(grid,"cellsize")
    v2 <- 2*6378137*pi/(2^(1:21+8))
-   cond1 <- grepl("\\+proj=merc",crs)>0
+   cond1 <- .isMerc(crs)
+  # cond1 <- grepl("\\+proj=merc",crs)>0
   # print(format(v2,sci=FALSE),quote=FALSE)
    cond2 <- !is.na(.is.near(v1,v2))
    cond1 & cond2
@@ -740,19 +722,17 @@
    options(ursaForceRGDAL=value)
    invisible(value)
 }
-'.forceProj4' <- function(value) {
+'.forceProj4package' <- function(value) {
    if (missing(value))
       return(isTRUE(getOption("ursaForceProj4")))
-   if (isTRUE(value)) {
-      if (T & .isPackageInUse())
-         value <- FALSE
-      else
-         value <- .proj4_requireNamespace()
-   }
+   if (!nchar(system.file(package="proj4")))
+      return(FALSE)
+  # if (isTRUE(value))
+  #    value <- requireNamespace("proj4",quietly=.isPackageInUse())
    options(ursaForceProj4=value)
    invisible(value)
 }
-'.forceSF' <- function(value) {
+'.forceSFpackage' <- function(value) {
    if (missing(value))
       return(isTRUE(getOption("ursaForceSF")))
    options(ursaForceSF=value)

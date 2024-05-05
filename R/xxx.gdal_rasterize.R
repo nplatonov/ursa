@@ -43,7 +43,14 @@
       dsn <- attr(obj,"dsn")
   # print(c(dsn=dsn,dsnE=dsnE))
    g0 <- attr(obj,"grid")
+   if (is.null(g0)) {
+      g0 <- getOption("ursaSessionGrid")
+      if (is.null(g0))
+         g0 <- spatial_grid(obj)
+   }
    dname <- attr(obj,"colnames")
+   if (is.null(dname))
+      dname <- spatial_fields(obj)
    dmask <- .getPrm(arglist,name="(attr|field)",default=".+")
    feature <- .getPrm(arglist,name="feature",valid=c("field","geometry","FID"))
    where <- .getPrm(arglist,name="subset",default="")
@@ -129,7 +136,7 @@
    proj4 <- .gsub("(^\\s|\\s$)","",proj4)
    proj4 <- proj4[nchar(proj4)>0]
    if (noProj <- !length(proj4))
-      proj4 <- "+proj=longlat +datum=WGS84 +no_defs"
+      proj4 <- .crsWGS84()
    ftemp <- .maketmp() # .maketmp() #tempfile(pattern="") # ".\\tmp1"
    cmd <- paste("ogrinfo","-q",.dQuote(dsn))
    if (verbose)
@@ -177,14 +184,14 @@
             bb2 <- bb2[c(1,2,4,5)]
       }
      # print(proj4)
-      if (.lgrep("\\+proj=longlat",proj4)) {
+      if (.isLongLat(proj4)) {
          bb2[1][bb2[1]<(-179)] <- -180
          bb2[3][bb2[3]>(179)] <- 180
       }
      ## https://gdal.org/ogr2ogr.html https://gis-lab.info/qa/ogr2ogr-examples.html
       g1 <- regrid(g0,border=5)
-      cmd <- paste("ogr2ogr","-t_srs",.dQuote(g0$crs)
-              ,ifelse(noProj,paste("-s_srs",.dQuote(proj4)),"")
+      cmd <- paste("ogr2ogr","-t_srs",.dQuote(.proj4string(g0$crs))
+              ,ifelse(noProj,paste("-s_srs",.dQuote(.proj4string(proj4))),"")
               ,"-sql",.dQuote(paste("select FID,* from",.dQuote(.dQuote(lname))))
               ,"-dialect",c("SQLITE","OGRSQL")[2]
               ,"-select FID"
@@ -234,7 +241,7 @@
               ,"-sql",.dQuote(paste("select FID,* from",.dQuote(.dQuote(lname))))
               ,"-dialect",c("SQLITE","OGRSQL")[2]
               ,"-init -1 -a_nodata -1"
-              ,"-a_srs",.dQuote(proj4)
+              ,"-a_srs",.dQuote(.proj4string(proj4))
               ,"-tr",resx,resy
              # ,"-where",dQuote(subset)
               ,"-te",minx,miny,maxx,maxy

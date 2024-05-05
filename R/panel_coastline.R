@@ -30,7 +30,7 @@
    bg <- sum(c(col2rgb(getOption("ursaPngBackground")))*c(0.30,0.59,0.11))
    defcol <- ifelse(bg<128,"#FFFFFF3F","#0000003F") # grey60
    col <- .getPrm(arglist,name="(col|line)",kwd=kwd,default=defcol) 
-   fill <- .getPrm(arglist,name="fill",kwd=kwd,default="transparent")
+   fill <- .getPrm(arglist,name="fill",kwd=kwd,default=c("#FFFF003F","transparent")[2])
    detail <- .getPrm(arglist,name="detail",kwd=kwd,default=NA_character_)
    density <- .getPrm(arglist,name="density",kwd=kwd,default=NA_real_)
    angle <- .getPrm(arglist,name="angle",kwd=kwd,default=NA_real_)
@@ -55,11 +55,15 @@
 '.compose_coastline' <- function(obj=NULL,panel=0,col=NA,fill="transparent"
                                 ,detail=NA,density=NA,angle=NA,land=FALSE
                                 ,lwd=0.5,lty=1,fail180=NA,verbose=FALSE) {
+  # forceProj4string <- isTRUE(getOption("ursaTransformProj4sring"))
    if (verbose)
       str(list(obj=obj,panel=panel,col=col,fill=fill,detail=detail
               ,density=density,angle=angle
-              ,land=land,lwd=lwd,lty=lty,fail180=fail180))
-   g1 <- session_grid()
+              ,land=land,lwd=lwd,lty=lty,fail180=fail180
+              ,forceProj4string=isTRUE(getOption("ursaSFProjectProj4string"))))
+   g1 <- .panel_grid() # session_grid()
+   if (is.null(g1))
+      g1 <- .compose_grid()
    if (!is.null(obj)) {
       isPoly <- inherits(obj,c("sf","SpatialPolygonsDataFrame"))
       if ((is.matrix(obj))&&(ncol(obj)==2))
@@ -101,9 +105,10 @@
             }
          }
          else if (.lgrep("\\.rds$",obj)) {
-            g1 <- session_grid()
+            stop("COASLINE GRID AGAIN")
+           # g1 <- session_grid() ## earlier
             coast_xy <- readRDS(obj)
-            if (nchar(g1$crs)) {
+            if (.isCRS(g1$crs)) {
               # b <- attributes(coast_xy)
                coast_xy <- .project(coast_xy,g1$crs)
               # attributes(coast_xy) <- b
@@ -124,16 +129,19 @@
          return(res)
       }
    }
-   isLongLat <- .lgrep("(\\+proj=longlat|epsg:4326)",g1$crs)>0
-   isMerc <- .lgrep("\\+proj=merc",g1$crs)>0
-   isCea <- .lgrep("\\+proj=cea",g1$crs)>0
-   isUTM <- .lgrep("\\+proj=utm",g1$crs)>0
+   projClass <- .crsProj(g1$crs)
+   isLongLat <- "longlat" %in% projClass
+   isMerc <- "merc" %in% projClass
+   isCea <- "cea" %in% projClass
+   isUTM <- "utm" %in% projClass
    proj <- g1$crs
    if ((is.list(proj))&&("input" %in% names(proj)))
       proj <- proj[["input"]]
-   proj <- proj[nchar(proj)==max(nchar(proj))]
-   if ((any(is.na(proj)))||(nchar(proj)==0))
+   if (length(proj)>1)
+      proj <- proj[nchar(proj)==max(nchar(proj))]
+   if (!.isCRS(proj)) {
       return(NULL)
+   }
    isDetail <- !is.na(detail)
    if (is.na(detail))
       detail <- "l"
@@ -184,43 +192,52 @@
             proj4 <- sf::st_crs(proj[ind])$proj4string
       }
    }
-   else
-   {
-      proj4 <- paste(proj,collapse=" ")
+   else {
+      proj4 <- proj # paste(proj,collapse=" ")
+      if (!.crsForceWKT()) ## proj4sting is faster, if operated by 'sf'
+         proj4 <- .proj4string(proj4)
    }
-   if ((!isLongLat)&&(!isMerc)) {
-      lat0 <- .gsub("^.*\\+lat_[012]=(\\S+)\\s.*$","\\1",proj4)
-      if (lat0==proj4) {
-        # lat0 <- .gsub("^.*\\+lat_ts=(\\S+)\\s.*$","\\1",proj4)
+  # print(data.frame(isLongLat=isLongLat,isMerc=isMerc))
+   if (FALSE) { ## deprecate
+      if ((!isLongLat)&&(!isMerc)) {
+         lat0 <- .gsub("^.*\\+lat_[012]=(\\S+)\\s.*$","\\1",proj4)
+         lat0 <- .crsLat0(proj4)
          if (lat0==proj4) {
-            epsg <- .gsub("^.+init=epsg:(\\d+).*$","\\1",proj4)
-            if ((epsg==proj4))
-               lat0 <- NA
-            else {
-               epsg <- as.integer(epsg)
-               if (epsg %in% c(3411,3413,3408,3571:3576,6931,6973))
-                  lat0 <- 90
-               else if (epsg %in% c(3409,6932,6974,3412,3976))
-                  lat0 <- -90
-               else
+           # lat0 <- .gsub("^.*\\+lat_ts=(\\S+)\\s.*$","\\1",proj4)
+            if (lat0==proj4) {
+               epsg <- .gsub("^.+init=epsg:(\\d+).*$","\\1",proj4)
+               if ((epsg==proj4))
                   lat0 <- NA
+               else {
+                  epsg <- as.integer(epsg)
+                  if (epsg %in% c(3411,3413,3408,3571:3576,6931,6973))
+                     lat0 <- 90
+                  else if (epsg %in% c(3409,6932,6974,3412,3976))
+                     lat0 <- -90
+                  else
+                     lat0 <- NA
+               }
             }
+            else
+               lat0 <- as.numeric(lat0)
          }
          else
             lat0 <- as.numeric(lat0)
       }
       else
-         lat0 <- as.numeric(lat0)
+         lat0 <- NA
    }
-   else
-      lat0 <- NA
+   else {
+      lat0 <- .crsLat0(proj4)
+   }
    ant_xy <- NULL
    ind <- attr(xy,"antarctic")
    if (!is.null(ind))
       indS <- which(abs(coast_xy[ind,2])<(85.0-1e-3))
    if (!isLongLat) {
      # indNA <- which(is.na(coast_xy[,1]) | is.na(coast_xy[,2]))
-      coast_xy <- .project(coast_xy,proj4)
+     # qs::qsave(coast_xy,"C:/tmp/interim.qs");q()
+      coast_xy <- .project(coast_xy,proj4,verbose=!.isPackageInUse())
       isInf <- any(is.infinite(coast_xy))
       if (isInf) {
          shadow <- unname(col2rgb(fill,alpha=TRUE)[4,1]) # if (shadow!=0)
@@ -285,14 +302,14 @@
       fail180 <- (isMerc || isLongLat)
    if ((fail180)||(isLongLat || isMerc)) {
       if (!isLongLat) {
-         lon0 <- as.numeric(.gsub(".*\\+lon_0=(\\S+)\\s*.*","\\1",proj4))
+         lon0 <- .crsLon0(proj4)
          B <- mean(abs(.project(rbind(cbind(lon0-180+1e-9,-45),cbind(lon0+180-1e-9,+45))
                                ,proj4)[,1]))
       }
       else
          B <- 180
       if (isMerc) {
-        # B <- .getMajorSemiAxis(proj4)*pi
+        # B <- .crsSemiMajor(proj4)*pi
         # B <- 7720000
          '.shift' <- function(seg) {
            # if (all(seg[,2]>0)) ## debug Chukotka vs 
@@ -527,7 +544,7 @@
       ##~ isFound <- FALSE
    if (!coastline)
       return(NULL)
-   g1 <- session_grid()
+   g1 <- .panel_grid() ## session_grid()
   # if (!isFound)
    obj <- .getPrm(arglist,class="ursaCoastLine",default=NULL)
    figure <- getOption("ursaPngFigure")
@@ -550,9 +567,10 @@
       }
    }
    if ((any(obj$panel))&&(!(figure %in% obj$panel)))
-      return(NULL)
-   if (is.null(obj$coast_xy))
-      return(NULL)
+      return(invisible(NULL))
+   if (is.null(obj$coast_xy)) {
+      return(invisible(NULL))
+   }
    if (!FALSE) {
       obj$col <- .getPrm(arglist,name="col",kwd=kwd,default=obj$col)
       obj$fill <- .getPrm(arglist,name="fill",kwd=kwd,default=obj$fill)
@@ -607,8 +625,10 @@
             }
            ## ?polypath: Hatched shading (as implemented for polygon()) is not (currently) supported.
            ## if semi-opacity|trasparency them 'polygon' else fill is transparent
-            polypath(coast_xy[,1],coast_xy[,2],border=col,col=fill
-                    ,rule=c("winding","evenodd")[2],lwd=lwd) ##,density=15??
+            ret <- try(polypath(coast_xy[,1],coast_xy[,2],border=col,col=fill
+                    ,rule=c("winding","evenodd")[2],lwd=lwd)) ##,density=15??
+            if (inherits(ret,"try-error"))
+               cat("Plotting coastline...",ret)
          }
       }
    })

@@ -5,13 +5,12 @@
       if ((is.null(ref))||(!.is.grid(ref))) {
         # fname <- system.file("template","default.hdr",package="ursa")
          fname <- file.path(getOption("ursaRequisite"),"template.hdr")
-         if (file.exists(fname)) {
+         if (!file.exists(fname))
             fname <- system.file("requisite/template.hdr",package="ursa")
-            if (file.exists(fname))
-               ref <- .read.hdr(fname)$grid
-            else
-               ref <- .read.hdr("default")$grid ## read.idr
-         }
+         if (file.exists(fname))
+            ref <- .read.hdr(fname)$grid
+         else
+            ref <- .read.hdr("default")$grid ## read.idr
          options(ursaSessionGrid=ref)
       }
       if (!length(arglist)) {
@@ -23,8 +22,11 @@
          arglist <- NULL
       }
    }
+  # cat("`session_grid()` is called..............................\n")
   # above - 'Extract' (visible), below - 'Replace' (invisible)
-   options(ursaSessionGrid_prev=ref)
+  # options(ursaSessionGrid_prev=ref)
+  # if (is.null(getOption("ursaPngPanelGrid")))
+  #    options(ursaPngComposeGrid=NULL)
    if (is.null(obj))
       return(options(ursaSessionGrid=NULL))
    if (length(arglist)) {
@@ -57,8 +59,7 @@
      # print(spatial_dir(pattern=obj,recursive=FALSE))
       opW <- options(warn=2)
       a <- try(open_envi(obj,resetGrid=TRUE,decompress=FALSE))
-      options(opW)
-      if (inherits(a,"try-error")) {
+      if ((is.null(a))||(inherits(a,"try-error"))) {
          if (file.exists(obj)) {
             a <- open_gdal(obj)
          }

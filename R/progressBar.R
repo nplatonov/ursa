@@ -16,6 +16,7 @@
       n <- length(kind)
       max <- if ((n==1)&&(is.numeric(kind))&&(.is.integer(kind))) kind else n
       kind <- head(eval(formals()$kind),1)
+     # print(data.frame(n=n,max=max,kind=kind))
    }
    else
       kind <- kind0

@@ -6,9 +6,18 @@
    ##~ method <- c('1'="ward.D",'2'="ward.D2",'3'="single",'4'="complete"
               ##~ ,'5'="average",'6'="mcquitty",'7'="median"
               ##~ ,'8'="centroid")[4] ## 3 4! 8 
+   if (.skipPlot(TRUE))
+      return(NULL)
    method <- match.arg(method)
    fun <- match.arg(fun)
    cutted <- 1.05
+   bbox <- polygonize(ursa_bbox(getOption("ursaPngPanelGrid")))
+   if (.isSF(obj)) {
+      sf::st_agr(obj) <- "constant"
+      obj <- sf::st_crop(spatial_transform(obj,spatial_crs(bbox)),bbox)
+      if (!spatial_count(obj))
+         return(NULL)
+   }
    da <- spatial_data(obj)
   # str(colnames(da))
   # str(da[,colnames(da),drop=TRUE])
@@ -47,7 +56,7 @@
       print(c('Category'=indCat))
       print(c('Count'=indNum))
    }
-   g1 <- getOption("ursaPngPanelGrid")
+   g1 <- .panel_grid()
    xy <- spatial_coordinates(spatial_transform(spatial_geometry(obj),ursa_crs(g1)))
    xy <- cbind(xy,da)
    n <- if (!isNum) rep(1L,spatial_count(obj)) else obj[[indNum]]
@@ -99,13 +108,17 @@
      # print(ngroup)
    }
   # print(ngroup)
-   print(series(xy4))
-   str(bname)
+   if (verbose) {
+      print(series(xy4))
+      str(bname)
+   }
    if ((!fun %in% c("mean","sum"))&&(ncol(xy4)>3))
       bname <- bname[bname %in% xy4[[4]]]
    lutSep <- if (separate | length(bname)>1e6) sample(bname) else ".+"
-   str(bname)
-   print(lutSep)
+   if (verbose) {
+      str(bname)
+      print(lutSep)
+   }
    lutList <- lapply(lutSep,function(sep) {
       if (verbose)
          message(sQuote(sep),":")
@@ -191,7 +204,7 @@
       lut$.r <- log(lut$.n+1)
    else
       lut$.r <- lut$.n^ratio # rowSums(lut[,bname,drop=FALSE])^ratio
-   lut$.r <- lut$.r/min(lut$.r)
+  # lut$.r <- lut$.r/min(lut$.r)
    if (repel) {
       if (isTRUE(repel))
          repel <- 20L
@@ -405,11 +418,11 @@
        stop("'z' values must be positive.")
    if (verbose)
       cat("--------\nPIE\n----------\n")
-   g0 <- getOption("ursaPngPanelGrid")
+   g0 <- .panel_grid()
    if (verbose) {
       print(session_grid())
       print(g0)
-      print(getOption("ursaPngComposeGrid"))
+      print(.compose_grid())
       print(getOption("ursaSessionGrid"))
    }
    cell <- ursa(g0,"cellsize")

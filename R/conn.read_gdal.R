@@ -1,4 +1,13 @@
 'ursa_read' <- function(fname,verbose=FALSE) { ## ,resetGrid=TRUE
+   if (length(fname)>1) {
+      ret <- lapply(fname,ursa_read,verbose=verbose)
+      len <- sapply(ret,nband)
+      if (all(len==1)) {
+         ret <- as_ursa(ret)
+         names(ret) <- basename(fname)
+      }
+      return(ret)
+   }
    if (envi_exists(fname)) {
       return(read_envi(fname)) # ,resetGrid=resetGrid
    }
@@ -31,18 +40,25 @@
    NULL
 }
 'read_gdal' <- function(fname,resetGrid=TRUE,band=NULL
-                       ,engine=c("native","sf","gdalraster","vapour")
+                       ,engine=c("native","sf")
                        ,verbose=FALSE,...) { ## ,...
   # if (resetGrid)
   #    session_grid(NULL)
    engList <- as.character(as.list(match.fun("read_gdal"))[["engine"]])[-1]
    if (length(engine)<length(engList)) {
+      if (nchar(system.file(package="gdalraster"))>0)
+         engList <- c(engList,"gdalraster")
+      if (nchar(system.file(package="vapour"))>0)
+         engList <- c(engList,"vapour")
       if (!.isPackageInUse()) {
-         engList <- c(engList,"rgdal")
+         if (nchar(system.file(package="rgdal"))>0)
+            engList <- c(engList,"rgdal")
       }
    }
    engine <- match.arg(engine,engList)
    fname <- gsub("\\.$","",fname)
+   if (isURL <- grepl("^(http|ftp)(s)*",dirname(fname)))
+      fname <- .ursaCacheDownload(fname,mode="wb",quiet=!verbose)
    if (!file.exists(fname)) {
       list1 <- dir(path=dirname(fname),pattern=paste0("^",basename(fname)),full.names=TRUE)
       list1 <- list1[.grep("\\.(tif|tiff|img|hfa)$",basename(list1))]
@@ -64,7 +80,7 @@
    if ((engine=="native")&&(.forceRGDAL()))
       engine <- "rgdal"
    loaded <- loadedNamespaces() #.loaded()
-   forceSF <- .forceSF()
+   forceSF <- .forceSFpackage()
    if (accepted_changes <- TRUE) {
       if ((is.null(band))&&(engine %in% "native")) {
          if ((!forceSF)&&(("sp" %in% loaded)||("rgdal" %in% loaded)))
@@ -97,23 +113,34 @@
    if ((isSF)&&(!("sf" %in% loaded)))
       isSF <- requireNamespace("sf",quietly=.isPackageInUse())
    if (verbose)
-      print(data.frame(isSF=isSF,engine=engine))
+      print(data.frame('isSF (alt: open_gdal)'=isSF,engine=engine,check.names=FALSE))
    if (isSF) {
      # str(md <- sf::gdal_metadata(fname,parse=!FALSE))
      # str(ds <- sf::gdal_subdatasets(fname,name=TRUE))
       opW <- options(warn=ifelse(.isPackageInUse(),-1,1))
       res <- as_ursa(sf::gdal_read(fname))
       options(opW)
-      if (forcedNoData <- TRUE) {
+      if (forcedNoData <- FALSE) { ## see code `as_ursa`
          gi <- sf::gdal_utils("info",fname,quiet=TRUE)
          gi <- strsplit(gi,split="\\n")[[1]]
-         gi <- grep("NoData Value",gi,value=TRUE)
-         if (length(gi)>0) {
-            nodata <- gsub("^.*=(\\s*(\\S+))$","\\1",gi)
+         nd <- grep("NoData Value",gi,value=TRUE)
+         if (length(nd)>0) {
+            nodata <- gsub("^.*=(\\s*(\\S+))$","\\1",nd)
             if (typeof(ursa_value(res))=="integer")
                ignorevalue(res) <- as.integer(unique(nodata))
             else
                ignorevalue(res) <- as.numeric(unique(nodata))
+         }
+         str(ignorevalue(res))
+         q()
+         sc <- grep("(Offset:|Scale:)",gi,value=TRUE)
+         if (length(sc)>0) {
+            str(sc)
+            scB <- as.numeric(gsub(".*Offset:\\s*((-)*\\d(\\.\\d+)*)(\\D.*|$)","\\1",sc))
+            scK <- as.numeric(gsub(".*Scale:\\s*((-)*\\d(\\.\\d+)*)(\\D.*|$)","\\1",sc))
+            sc <- c(scale=scK,offset=scB)
+            str(sc)
+            q()
          }
       }
       if (!is.null(band))

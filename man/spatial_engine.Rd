@@ -44,6 +44,7 @@
 \alias{spatial_grid}
 \alias{spatial_centroid}
 \alias{spatial_bind}
+\alias{spatial_crop}
 \title{
 Wrapper functions for manipulation with non-raster spatial objects
 }
@@ -51,6 +52,9 @@ Wrapper functions for manipulation with non-raster spatial objects
 These wrappers return iniform properties or do consimilar manipulations for spatial objects of different types: simple features (package \pkg{sf}) and abstract class Spatial (package \pkg{sp}). Appropriate functionality (\emph{\dQuote{engine}}) of respective packages is used. 
  
 }
+%%~ spatial_crs(obj, beauty = FALSE, verbose = FALSE)
+%%~ spatial_proj(obj, beauty = FALSE, verbose = FALSE)
+%%~ spatial_proj4(obj, beauty = FALSE, verbose = FALSE)
 \usage{
 spatial_engine(obj, verbose = FALSE)
 
@@ -114,6 +118,7 @@ spatial_intersection(x, y,
 spatial_symdifference(x, y, verbose = FALSE)
 spatial_difference(x, y, verbose = FALSE)
 spatial_union(x, y, byid=NA, verbose = FALSE)
+spatial_crop(x, y)
 
 spatial_buffer(obj, dist = 0, quadsegs = 30L, verbose = FALSE)
 
@@ -132,7 +137,7 @@ spatial_bind(...)
 Simple feature (package \pkg{sf}) or Spatial abstract class (package \pkg{sp}) for all functions, excepting \code{spatial_geometry<-}. Data frame for \emph{Replace} function \code{spatial_geometry<-}.
 }
   \item{x, y}{
-Objects of simple feature (package \pkg{sf}) class or Spatial abstract class (package \pkg{sp}).
+Objects of simple feature (package \pkg{sf}) class or Spatial abstract class (package \pkg{sp}). Spatial abstracts are not applicable for \code{spatial_crop()}.
 }
   \item{crs}{
 Projection EPSG code or projection PROJ.4 string.
@@ -186,6 +191,9 @@ Character. Desired output geometry for \code{engine="sf"}. If \code{"default"} t
   \item{reason}{
 Logical. If \code{TRUE}, then the reason for validity ("Valid Geomerty") or invalidity is returned. If \code{FALSE}, then logical value of validity is returned. Default is \code{FALSE}.
 }
+%%~   \item{beauty}{
+%%~ Logical. If \code{TRUE} and projection is in WKT string, then simplified representation is given in output. If procection is in PROJ4 string, then this argument is ignored. Default is \code{FALSE}.
+%%~ }
   \item{verbose}{
 Logical. Value \code{TRUE} provides information on console. Default is \code{FALSE}.
 }
@@ -254,6 +262,8 @@ Logical. Value \code{TRUE} provides information on console. Default is \code{FAL
 \code{spatial_buffer} returns buffered spatial object.
 
 \code{spatial_union} returns combined geometry without internal boundaries.
+
+\code{spatial_crop} returns cropped geometry of first spatial object by second spatial object of boundary box derived from spatial object.
 
 \code{spatial_trim} returns spatial object without extra attributes added by \pkg{ursa} package.
 

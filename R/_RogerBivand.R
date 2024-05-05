@@ -65,6 +65,7 @@
    g1$crs <- attr(a,"projection")
    if (is.na(g1$crs))
       g1$crs <- ""
+   g1$crs <- .ursaCRS(g1$crs)
    b1 <- .grep("band",attr(a,"mdata"),value=TRUE)
    patt <- "^Band_(\\d+)=\\t*(.+)$"
    bname <- .gsub(patt,"\\2",b1)
@@ -554,19 +555,4 @@
    if (isTRUE(getOption("ursaPackageInUse")))
       .DeadEnd()
    rgeos::gIsValid(...)
-}
-'.proj4_requireNamespace' <- function(...) {
-   if (isTRUE(getOption("ursaPackageInUse")))
-      .Retired()
-   requireNamespace("proj4",quietly=.isPackageInUse())
-}
-'.proj4_project' <- function(...) {
-   if (isTRUE(getOption("ursaPackageInUse")))
-      .Retired()
-   proj4::project(...)
-}
-'.proj4_ptransform' <- function(...) {
-   if (isTRUE(getOption("ursaPackageInUse")))
-      .Retired()
-   proj4::ptransform(...)
 }

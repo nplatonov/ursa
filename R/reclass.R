@@ -22,19 +22,21 @@
       if (.is.colortable(dst)) {
          ct <- ursa_colortable(dst)
          val <- .deintervale(ct)
-         if (is.character(val))
-         {
+         if (is.character(val)) {
             if (length(val)==length(ct)) {## categoral
                cname <- val
                val <- seq_along(val)-1L
               # str(list(value=val,name=cname,pal=unclass(unname(ct))))
                pal <- unclass(unname(ct))
                if (anyNA(pal)) {
-                  res <- colorize(obj,value=val,name=cname)
+                 # print("COLORIZE LIMITED (value, name)")
+                  res <- colorize(obj,value=val,name=cname,lazyload=FALSE)
                   ursa_colortable(res) <- ct
                }
-               else
-                  res <- colorize(obj,value=val,name=cname,pal=unclass(unname(ct)))
+               else {
+                 # print("COLORIZE LIMITED (value, name, pal")
+                  res <- colorize(obj,value=val,name=cname,pal=pal,lazyload=FALSE)
+               }
             }
             else { ## interval ## not-tested
                res <- obj
@@ -44,12 +46,14 @@
          }
          else {
            # print(c(val=length(val),ct=length(ct)))
-            if (length(val)==length(ct)) ## categoral
-            {
-               res <- colorize(obj,value=val,pal=unclass(unname(ct)))
+            if (length(val)==length(ct)) { ## categoral
+              # print("COLORIZE LIMITED (value, pal)")
+               res <- colorize(obj,value=val,pal=unclass(unname(ct)),lazyload=FALSE)
             }
-            else ## interval
-               res <- colorize(obj,breakvalue=val,pal=unclass(unname(ct)))
+            else { ## interval
+              # print("COLORIZE LIMITED (value, breakvalue)")
+               res <- colorize(obj,breakvalue=val,pal=unclass(unname(ct)),lazyload=FALSE)
+            }
          }
          return(res)
       }
@@ -77,7 +81,8 @@
                class(obj$value) <- "ursaCategory"
             }
             else {
-               class(obj$value) <- "ursaNumeric"
+               class(obj$value) <- ifelse(.is.colortable(obj)
+                                         ,c("ursaNumeric","ursaSymbol")[2],"ursaNumeric")
             }
             if (TRUE) {
                n1 <- length(na.omit(c(obj$value)))
@@ -137,6 +142,8 @@
       args$src <- seq_along(ct)-1
       if (length(val)==length(ct)) { ## categoral
          args$dst <- as.numeric(val)
+         if (.is.integer(val))
+            args$dst <- as.integer(args$dst)
       }
       else { ## interval
          v1 <- as.numeric(val)
@@ -177,7 +184,7 @@
          if (TRUE) { ## ++ 20180706
             if (inherits(obj$value,"ursaCategory"))
                class(obj$value) <- "ursaNumeric"
-            else if (inherits(obj$value,"ursaNumeric"))
+            else if (inherits(obj$value,c("ursaNumeric")))
                class(obj$value) <- "ursaCategory"
          }
          return(obj)
@@ -201,6 +208,7 @@
       arglist <- list(...)
       if (!.lgrep("tail",names(arglist)))
          arglist$tail <- 0
+     # print("COLORIZE EXPANDED")
       res <- do.call("colorize",c(list(obj),arglist),quote=TRUE)
    }
    res$colortable[] <- rep(NA_character_,length(res$colortable))

@@ -148,7 +148,7 @@ Command line usage implies external software for PNG view \code{\link[ursa:sessi
 Nikita Platonov \email{platonov@sevin.ru}
 }
 \note{
-Package \pkg{sf} is 'Suggested' for package \pkg{ursa}.
+Package \pkg{sp} is 'Suggested' for package \pkg{ursa}.
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
@@ -169,27 +169,24 @@ cat(" ----------- end of quoting ---------------\n")
 try(system(cmd,wait=FALSE))
 }
 
-if (isSP <- require(sp)) {
-   a <- data.frame(lat=c(70.734,71.657),lon=c(178.577,-177.38),place="Wrangel Island")
-   coordinates(a) <- ~lon+lat
-   proj4string(a) <- "EPSG:4326"
-}
-
-\donttest{ ## internet connection is required
-if (isSP)
-   glance(a,style="google color maptype=terrain")
+a <- data.frame(lat=c(70.734,71.657),lon=c(178.577,-177.38),place="Wrangel Island")
+if (requireNamespace("sp")) {
+   sp::coordinates(a) <- ~lon+lat
+   sp::proj4string(a) <- "EPSG:4326"
+} else {
+   a <- sf::st_as_sf(a,coords=c("lon","lat"),crs=4326)
 }
 \donttest{ ## internet connection is required
-if (isSP)
-   glance(a,style="Positron",border=0)
+glance(a,style="google color maptype=terrain")
 }
 \donttest{ ## internet connection is required
-if (isSP)
-   glance(a,style="mapnik color tile",border=0)
+glance(a,style="Positron",border=0)
 }
 \donttest{ ## internet connection is required
-if (isSP)
-   glance("Svalbard",resetGrid=TRUE)
+glance(a,style="opentopomap grey",border=0)
+}
+\donttest{ ## internet connection is required
+glance("Svalbard",resetGrid=TRUE)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

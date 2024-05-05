@@ -79,7 +79,7 @@ print(a3)
 dima <- c(200,300,4)
 b1 <- as.ursa(array(runif(prod(dima)),dim=dima))
 print(b1)
-display_brick(b1,scale=1,palname="Greys",decor=FALSE)
+display_brick(b1,scale=1,pal=c("white","black"),decor=FALSE)
 
 session_grid(NULL)
 

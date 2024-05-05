@@ -7,7 +7,7 @@ Raster to vector (polygon) conversion.
 Representing each raster cell as a polygon. In comparison to common GIS raster to vector conversion, where neighbor cells with the same value are combined to the single polygon, the number of output polygons is equal to number of non-\code{NA} values.
 }
 \usage{
-polygonize(obj, fname, engine = c("native", "sp", "sf"), verbose = NA, ...)
+polygonize(obj, fname, engine = c("native", "sf"), verbose = NA, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -18,7 +18,7 @@ Object of class \code{ursaRaster}.
 Missing or character. If specified, then ESRI Shapefile is created. Default is \link[base]{missing}.
 }
   \item{engine}{
-Character keyword from list \code{c("native","sp","sf")}. Define package with tools for creating spatial data. If \code{engine="sp"}, then functions from package \pkg{sp} are used. If \code{engine="sf"}, then functions from package \pkg{sf} are used. If \code{engine="native"}, then appropriate package is used based on loaded namespaces before.
+Character keyword from list \code{c("native", "sf")}. Define package with tools for creating spatial data. If suggested packaged \pkg{"sp"} is loaded or can be loaded from default location, then \code{"sp"} is added to this list. If \code{engine="sf"}, then functions from package \pkg{sf} are used. If \code{engine="sp"}, then functions from package \pkg{sp} are used. If \code{engine="native"}, then appropriate package is used based on loaded namespaces before.
 }
   \item{verbose}{
 Logical. If \code{TRUE} then convertion is attended by progress bar. Default is \code{NA}; it means \code{TRUE} for \code{engine="sp"} and \code{FALSE} for \code{engine="sp"}.
@@ -64,10 +64,13 @@ a <- ursa_dummy(mul=1/16)
 a <- a[a>100]
 print(a)
 print(band_mean(a))
-b2 <- polygonize(a,engine="sp") ## try 'engine="sf"'
+b2 <- polygonize(a,engine=ifelse(requireNamespace("sp"),"sp","sf"))
+print(class(b2))
 print(colMeans(spatial_data(b2),na.rm=TRUE))
-print(ursa_bbox(a))
-print(spatial_bbox(b2))
+str(e1 <- spatial_bbox(a))
+str(e2 <- spatial_bbox(b2))
+print(as.numeric(e1))
+print(as.numeric(e2))
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

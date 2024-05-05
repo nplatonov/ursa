@@ -1,7 +1,8 @@
 # 'ursa_write' <- function(...) .syn('.write_gdal',2,...)
-'ursa_write' <- function(obj,fname) { ## proposed: compress=TRUE for DEFLATE, ZSTD, etc
+'ursa_write' <- function(obj,fname,...) { ## proposed: compress=TRUE for DEFLATE, ZSTD, etc
    if (!.lgrep("\\..+$",basename(fname))) {
-      return(write_envi(obj,fname))
+      if (!length(list(...)))
+         return(write_envi(obj,fname,...))
    }
   # stop("B")
    if (.lgrep("\\.zip$",basename(fname))) {
@@ -10,7 +11,7 @@
       dir.create(td)
       wd <- setwd(td)
       for (i in seq(obj)) {
-         ursa_write(obj[i],aname[i]) ## RECURSIVE!!!
+         ursa_write(obj[i],aname[i],...) ## RECURSIVE!!!
         # write_gdal(obj[i],aname[i])
       }
       if (!.is.colortable(obj))
@@ -26,7 +27,7 @@
      # print("interim ENVI, then system GDAL")
       ftmp <- .maketmp()
       ret <- write_envi(obj,paste0(ftmp,"."))
-      pr <- ifelse(ret %in% c(1L,2L,3L,11L,12L,13L),2L,3L)
+      pr <- 1L # ifelse(ret %in% c(1L,2L,3L,11L,12L,13L),2L,3L)
       fpath <- dirname(fname)
       if (!dir.exists(fpath))
          dir.create(fpath,recursive=TRUE)
@@ -55,27 +56,41 @@
                      ##~ (requireNamespace("stars",quietly=.isPackageInUse()))) {
       ##~ ret <- .write_sfgdal(obj,fname)
    ##~ }
-   if ((!"sf" %in% loadedNamespaces())&&(.forceSF()))
+   if ((!"sf" %in% loadedNamespaces())&&(.forceSFpackage()))
       requireNamespace("sf",quietly=.isPackageInUse())
    ftmp <- .maketmp()
    ret <- write_envi(obj,paste0(ftmp,"."))
-   ret2 <- .envi2gdal(src=ftmp,dst=fname,datatype=ret,bands=length(obj))
+   ret2 <- .envi2gdal(src=ftmp,dst=fname,datatype=ret,bands=length(obj),...)
    envi_remove(ftmp)
    if (ret==ret2)
       return(invisible(ret))
   # stop("Failed to write raster file ",dQuote(fname))
-   return(write_gdal(obj=obj,fname=fname))
+   return(write_gdal(obj=obj,fname=fname,...))
 }
-'.envi2gdal' <- function(src,dst,datatype,bands) {
+'.envi2gdal' <- function(src,dst,datatype,bands,...) {
+   arglist <- list(...)
+  # opts <- .getPrm(arglist,name="opt",class=c("list","character"))
+   opts <- arglist[[grep("^opt(ion)*s",names(arglist))[1]]]
+   driver <- arglist[[grep("^driver",names(arglist))[1]]]
+   if (is.null(opts))
+      opts <- arglist
+  # str(list(driver=driver,opts=opts))
    fpath <- dirname(dst)
    if (!dir.exists(fpath))
       dir.create(fpath,recursive=TRUE)
    if (file.exists(dst))
       file.remove(dst)
    op <- character()
-   if (.lgrep("\\.(tif(f)*)$",basename(dst))) {
-      pr <- ifelse(datatype %in% c(4L,5L),3L,2L)
-      op <- c("-of","GTiff"
+   if (!is.null(driver))
+      op <- c("-of",driver)
+   else if (!.lgrep("\\..+$",basename(dst))) {
+      op <- c("-of","ENVI")
+   }
+   else if (.lgrep("\\.(tif(f)*)$",basename(dst))) {
+      pr <- 1L # ifelse(datatype %in% c(4L,5L),3L,2L)
+      op <- c("-of","GTiff")
+      if (!length(opts))
+         op <- c(op
              ,"-co",paste0("COMPRESS=",c("DEFLATE","ZSTD")[1])
              ,"-co",paste0("PREDICTOR=",pr)
              ,"-co",paste0("ZSTD_LEVEL=9")
@@ -86,14 +101,36 @@
              )
    }
    else if (.lgrep("\\.(img|hfa)$",basename(dst))) {
-      op <- c("-of","HFA"
-             ,"-co",paste("COMPRESSED=YES")
-             )
+      op <- c("-of","HFA")
+      if (is.null(opts))
+         op <- c(op,"-co",paste("COMPRESSED=YES"))
+   }
+   else if (.lgrep("\\.(png)$",basename(dst))) {
+      op <- c("-of","PNG")
+   }
+   else if (.lgrep("\\.(jpg|jpeg)$",basename(dst))) {
+      op <- c("-of","JPEG")
    }
    else {
+     # op <- character()
+      warning("unimplemented")
       return(invisible(-98L))
    }
-  # print(paste(op,collapse=" "))
+   if (length(opts)) {
+      if (is.character(opts)) {
+         oname <- names(opts)
+         if (is.null(oname))
+            op2 <- do.call(c,strsplit(opts,split="\\s+"))
+         else
+            op2 <- paste0(oname,"=",opts)
+      }
+      else if (is.list(opts))
+         op2 <- paste0(names(opts),"=",sapply(opts,\(x) x))
+      else
+         op2 <- character()
+      op <- c(op,do.call("c",lapply(op2,function(x) c("-co",x))))
+   }
+ # print(paste(op,collapse=" "))
    gd <- sf::gdal_utils(util="translate"
                        ,source=src
                        ,destination=dst
@@ -109,7 +146,22 @@
    engine <- .getPrm(arglist,name="engine",default="native")
   # if ((.isPackageInUse())||(!.rgdal_requireNamespace())) { ## .rgdal_loadedNamespaces
    if ((.isPackageInUse())||(engine!="rgdal")) {
-      res <- try(.write_sfgdal(obj,...))
+      if (!requireNamespace("stars",quietly=.isPackageInUse())) {
+        # opW <- options(warn=1)
+        # warning("Package `stars` is required for raster writting")
+        # options(opW)
+         if (!is.null(aname <- names(arglist))) {
+            if (!nchar(aname)[1]) {
+               aname[1] <- "fname"
+               names(arglist) <- aname
+            }
+         }
+        # res <- try(ursa_write(obj=obj,fname=arglist[[1]],arglist[-1]))
+         res <- try(do.call("ursa_write",c(list(obj=obj),arglist)))
+      }
+      else {
+         res <- try(.write_sfgdal(obj,...))
+      }
      # ret <- .try(res <- .write_sfgdal(obj,...))
       if (!inherits(res,"try-error"))
          return(invisible(res))
@@ -128,10 +180,8 @@
    return(invisible(res$con$datatype))
 }
 '.write_sfgdal' <- function(obj,fname,driver,options,...) {
-   if ((!"sf" %in% loadedNamespaces())&&(T | .forceSF()))
+   if ((!"sf" %in% loadedNamespaces())&&(T | .forceSFpackage()))
       requireNamespace("sf",quietly=.isPackageInUse())
-   if (!requireNamespace("stars",quietly=.isPackageInUse()))
-      warning("Package `stars` is required for raster writting")
    datatype <- .optimal.datatype(obj)
    nodata <- ignorevalue(obj)
    dtName <- switch(as.character(datatype)
@@ -156,10 +206,16 @@
       if (is.null(driver))
          driver <- "ENVI"
    }
+   if (length(arglist <- list(...))>0) {
+      if (missing(options))
+         options <- arglist
+      else
+         options <- c(options,arglist)
+   }
    if (missing(options)) {
       if (driver=="GTiff") {
          opt <- c("COMPRESS=DEFLATE"
-                 ,paste0("PREDICTOR=",ifelse(datatype %in% c(4,5),"3","2"))
+                 ,paste0("PREDICTOR=",ifelse(datatype %in% c(4,5),c("3","1")[2],c("2","1")[2]))
                  ,paste0("INTERLEAVE=",ifelse(length(obj)==1,"PIXEL","BAND"))
                  ,"TILED=NO"
                  )
@@ -181,7 +237,10 @@
          opt <- character()
      # opt <- paste(opt,collapse=" ")
    }
-   ret <- sf::gdal_write(as_stars(obj),driver=driver
+   if (grepl("\\.$",basename(fname)))
+      fname <- gsub("\\.$","",fname)
+   .obj <- as_stars(obj)
+   ret <- sf::gdal_write(as_stars(.obj),driver=driver
                  ,file=fname,type=dtName,NA_value=nodata,options=opt
                  ,geotransform=with(ursa_grid(obj),c(minx,resx,0,maxy,0,-resy))
                  )

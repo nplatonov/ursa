@@ -99,7 +99,7 @@
          ref$resx <- ref$resy <- 1
       }
    }
-   g0 <- getOption("ursaPngComposeGrid")
+   g0 <- .compose_grid()
    isPlot <- isFALSE(is.null(g0))
    if (!isPlot)
       g0 <- getOption("ursaSessionGrid")
@@ -116,7 +116,7 @@
       obj <- g0
    if (identical(obj,ref))
       return(obj)
-   isWeb <- ((.lgrep("\\+proj=merc",session_crs()))&&
+   isWeb <- ((.isMerc())&&
       (!is.na(.is.near(ursa(obj,"cellsize"),2*6378137*pi/(2^(1:21+8))))))
    if (is_spatial(ref))
       ref <- spatial_grid(ref)
@@ -185,9 +185,38 @@
    }
    ##~ d4 <- c(ursa(g3,"nrow"),ursa(g3,"ncol"))
    ##~ print(d4)
-   if (isPlot) {
+   if ((FALSE)&&(isPlot)) {
      # options(ursaPngPanelGrid=g3)
       session_grid(g3)
    }
    g3
 }
+'.compose_grid' <- function(obj) {
+   if (missing(obj)) {
+      g <- getOption("ursaPngComposeGrid")
+      if (is.null(g)) {
+         g <- getOption("ursaSessionGrid")
+        # options(ursaPngComposeGrid=g)
+      }
+      if (is.null(g))
+         return(invisible(NULL))
+      return(g)
+   }
+   options(ursaPngComposeGrid=ursa_grid(obj))
+   invisible(NULL)
+}
+'.panel_grid' <- function(obj) {
+   if (.skipPlot(TRUE)) {
+      options(ursaPngComposeGrid=NULL)
+      return(invisible(NULL))
+   }
+   if (missing(obj))
+      return(getOption("ursaPngPanelGrid"))
+   g1 <- .compose_grid()
+   g2 <- spatial_grid(obj)
+   g3 <- consistent_grid(g2,ref=g1)
+   options(ursaPngPanelGrid=g3)
+   invisible(NULL)
+}
+'.panel_crs' <- function() .panel_grid()$crs
+'.panel_cellsize' <- function() ursa(.panel_grid(),"cellsize")

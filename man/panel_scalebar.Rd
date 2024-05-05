@@ -99,7 +99,7 @@ session_grid(NULL)
               ,scalebar=TRUE,scalebar.col="white",scalebar.fill="black")
 
 # example no.3 -- for paper copy
-   a <- colorize(pixelsize(),breakvalue=seq(400,650,by=50),pal="Greys",inv=FALSE)
+   a <- colorize(pixelsize(),breakvalue=seq(400,650,by=50),pal=c("gray90","gray30"))
    compose_open(scale="1:95000000",dpi=150,device="cairo",family="Times")
    compose_plot(a,graticule=TRUE,coastline=FALSE,scalebar=TRUE,scalebar.x=1,units=expression(km^2))
    compose_close(bpp=8)

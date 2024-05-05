@@ -82,16 +82,24 @@
   #    panel_new()
   # print(obj)
   # q()
-  # print(c(isCT=.is.colortable(obj),isC=obj$category))
-   isCT <-  .is.colortable(obj) & .is.category(obj) # & attr(obj$value,"category")
+  # print(c(isCT=.is.colortable(obj),isC=.is.category(obj)))
+  # isCT <-  .is.colortable(obj) & .is.category(obj) # & attr(obj$value,"category")
+   isCT <- .postponed.category(obj) ## ++ 20240213
    if (isCT)
       ct <- ursa_colortable(obj)
    scale <- getOption("ursaPngScale")
    e <- band_nNA(obj)
    isRGB <- nband(obj) %in% c(2,3,4) & all(band_nNA(obj)>=0) # '==0' is NA used for RGB?
-   g1 <- getOption("ursaPngPanelGrid")
-   if (ursa_crs(g1)!=ursa_crs(obj))
+   g1 <- .panel_grid()
+   if (!.identicalCRS(ursa_crs(g1),ursa_crs(obj))) { ## if (ursa_crs(g1)!=ursa_crs(obj)) {
+     # print(ursa_crs(g1) |> unclass())
+     # print(ursa_crs(obj) |> unclass())
+      if (!.isPackageInUse()) {
+         str(ursa_crs(g1))
+         str(ursa_crs(obj))
+      }
       obj <- .gdalwarp(obj,grid=g1)
+   }
    toResample <- floor(1/scale)>1 & !isRGB
    if (is.na(useRaster)) {
       cond1 <- getOption("ursaPngDevice")!="windows"
@@ -100,8 +108,7 @@
       useRaster <- cond1 && cond2
    }
    if (verbose)
-      str(list(isRGB=isRGB,isCT=isCT,toResample=toResample,isColorTable=isCT
-              ,useRasrer=useRaster))
+      str(list(isRGB=isRGB,isCT=isCT,toResample=toResample,useRasrer=useRaster))
    if (toResample)
    {
      # obj <- contract(obj,size=sc,verbose=TRUE)
@@ -127,6 +134,8 @@
    if (!isCT) {
       if (!.is.colortable(obj)) {
          arglist[[1]] <- quote(obj)
+        # if (!length(grep("^lazy(load)*",names(arglist))))
+        #    arglist$lazyload <- FALSE
          obj <- do.call("colorize",arglist)
       }
       else if (!.is.category(obj)) { # attr(obj$value,"category")
@@ -172,6 +181,8 @@
          names(obj$colortable) <- ctname
      }
    }
+   if (inherits(obj$value,"ursaSymbol"))
+      obj <- reclass(obj)
    img <- as.matrix(obj,coords=TRUE)
    g1 <- ursa_grid(obj) #session_grid()
    if (F) {

@@ -9,14 +9,14 @@ Read either simple features (package \pkg{sf})
 from disk using appropriate functionality (\emph{\dQuote{engine}}) of respective packages is used. 
 }
 \usage{
-spatial_read(dsn, engine = c("native", "sf", "geojsonsf"))
+spatial_read(dsn, engine = c("native", "sf"))
 }
 \arguments{
   \item{dsn}{
 Character. File name of spatial object (vector GIS).
 }
   \item{engine}{
-Character. Functionality of which package is used for reading data. If value is \code{"sf"}, then package \pkg{sf} is used and simple features are returned. If value is \code{"geojsonsf"}, GDAL driver is GeoJSON and package \pkg{geojsonsf} can be loaded, then package \pkg{geojsonsf} is used and simple features are returned.
+Character. Functionality of which package is used for reading data. If value is \code{"sf"}, then package \pkg{sf} is used and simple features are returned. If value is \code{"geojsonsf"}, GDAL driver is GeoJSON and package \pkg{geojsonsf} can be loaded, then package \pkg{geojsonsf} is used and simple features are returned. If value is \code{"sp"} and package \pkg{sp} can be loaded, then Spatial abstracts (package \pkg{sp}) are returned. 
 %%~ If value is \code{"sp"}, then package \pkg{rgdal} is used and Spatial abstracts (package \pkg{sp}) are returned.
 If value is \code{"native"} then engine selection depends on has suggested package \pkg{sf} been installed and is there possibility to use \pkg{geosonjf} for GeoJSON driver.
 %%~ If these checks are failed then package \pkg{rgdal} is used and Spatial abstracts (package \pkg{sp}) are returned.
@@ -26,8 +26,8 @@ If value is \code{"native"} then engine selection depends on has suggested packa
 Currently, list of arguments of this funtion is simplified and can be expanded.
 }
 \value{
-%%~ Depending of used engine, either simple features (package \pkg{sf}) or Spatial abstracts (\pkg{sp}). 
-Object of Simple Features (package \pkg{sf}). 
+Depending of used engine, either simple features (package \pkg{sf}) or Spatial abstracts (\pkg{sp}). 
+%%~ Object of Simple Features (package \pkg{sf}). 
 }
 \author{
 Nikita Platonov \email{platonov@sevin.ru}

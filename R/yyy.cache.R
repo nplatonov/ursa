@@ -37,6 +37,7 @@
          dhw <- file.path(fpath,"htmlwidgets")
          if (dir.exists(dhw))
             unlink(dhw)
+         file.remove(.dir(path=fpath,pattern="^___ursa\\d+.+$",full.names=TRUE)) ## '.*png' etc
       }
       unlink(fpath)
       return(invisible(NULL))
@@ -116,8 +117,8 @@
    }
    0L
 }
-'.ursaCacheDownload' <- function(src,dst,method,quiet=FALSE,cache=TRUE
-                                ,mode="w",headers=NULL) {
+'.ursaCacheDownload' <- function(src,dst,method,quiet=FALSE,cache=TRUE,mode="w"
+                                ,extra=getOption("download.file.extra"),headers=NULL) {
    enc <- "UTF-8"
    inventory <- .ursaCacheInventory()
    src0 <- src
@@ -160,10 +161,10 @@
       }
    }
    src1 <- src
-   patt <- "(^http(s)*://)\\{(.+)\\}(.+$)" ## \\1 \\3 \\4
+   patt <- "(^http(s)*://(tile|mt)*)\\{(.+)\\}(.+$)" ## \\1 \\4 \\5
    if (.lgrep(patt,src)) {
-      dom <- unlist(strsplit(gsub(patt,"\\3",src),""))
-      src <- unname(sapply(sample(dom),function(x) gsub(patt,paste0("\\1",x,"\\4"),src1)))
+      dom <- unlist(strsplit(gsub(patt,"\\4",src),""))
+      src <- unname(sapply(sample(dom),function(x) gsub(patt,paste0("\\1",x,"\\5"),src1)))
      # dom <- unlist(strsplit(.gsub2("\\{(.+)\\}","\\1",gsub("\\{.\\}","",src)),""))
      # src <- .gsub("{.+}",sample(dom,1),src0)
      # src <- unname(sapply(sample(dom),function(x) .gsub("{.+}",x,src0)))
@@ -191,7 +192,7 @@
         # message("check inventory")
          was <- utils::read.table(inventory,sep=",",encoding=enc)
          colnames(was) <- c("time","stamp","visits","size","src","dst")
-         if (is.character(dst)) {
+         if (F & is.character(dst)) {
             stop("dst")
          }
          ind <- tail(which(!is.na(match(was$src,src0))),1) ## match(src0,was$src)
@@ -216,7 +217,7 @@
       for (i in seq_along(src)) {
          ret <- try(download.file(url=URLencode(iconv(src[i],to="UTF-8")) 
                       ,destfile=dst,method=method,quiet=quiet,mode=mode
-                      ,headers=headers))
+                      ,extra=extra,headers=headers))
          if (!inherits(ret,"try-error"))
             break
       }

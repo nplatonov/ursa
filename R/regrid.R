@@ -6,7 +6,8 @@
    arglist <- list(...)
    if (missing(x)) {
       result <- .regrid(...)
-      resetGrid <- .getPrm(arglist,name="^reset",default=TRUE)
+      isPlot <- .is.grid(.compose_grid())
+      resetGrid <- .getPrm(arglist,name="^reset",default=!isPlot)
       if (resetGrid)
          session_grid(result)
       return(result)
@@ -30,7 +31,7 @@
    session_grid(x) ## added 20160619
    resetGrid <- TRUE
    cover <- NA
-   resample <- 1
+   resample <- resample0 <- 1
    verbose <- 0L
    cascade <- FALSE
    myname <- names(arglist)
@@ -41,8 +42,13 @@
          g2 <- ursa_grid(a)
       else if (.lgrep("^reset",n))
          resetGrid <- as.logical(a)
-      else if (.lgrep("resample",n))
+      else if (.lgrep("resample",n)) {
+         opW <- options(warn=-1)
          resample <- as.numeric(a)
+         options(opW)
+         if (is.na(resample))
+            resample <- a
+      }
       else if (.lgrep("cover",n))
          cover <- as.numeric(a)
       else if (.lgrep("cascade",n))
@@ -53,6 +59,18 @@
    if (is.na(cover))
       cover <- 0.5-1e-3
    g1 <- x$grid
+   if (!.identicalCRS(spatial_crs(x),spatial_crs(g2))) {
+      if ((verbose)||(!.isPackageInUse())) {
+         cat("'gdalwarp' is used due to CRS iconsistence\n")
+      }
+      arglist[[1]] <- g2
+      names(arglist)[1] <- "grid"
+      arglist <- c(list(src=x),arglist)
+      res <- do.call(".gdalwarp",arglist)
+      return(res)
+   }
+   if (is.character(resample))
+      resample <- resample0
   # isCT <- x$category # .is.category(x)
    ct <- x$colortable
    isCT <- length(ct)>0
@@ -175,7 +193,7 @@
                              ,proj4=NA,crs=NA,border=0
                              ,zero=c("keep","node","center")
                              ,raster=FALSE,tolerance=NA #1e-10
-                             ,zoom=NA
+                             ,zoom=NA,adjust=c(0.5,0.5)
                              ,verbose=FALSE,...)
 {
    if (is.character(border)) ## cuttof 'border' in 'plot' functions
@@ -205,6 +223,12 @@
       if (verbose)
          message("grid from raster")
       g <- ursa_grid(grid)
+   }
+   else if (is_spatial(grid)) {
+      checkZero <- TRUE
+      if (verbose)
+         message("grid from vector")
+      g <- spatial_grid(grid)
    }
    else if ((is.character(grid))&&(envi_exists(grid,exact=TRUE))) {
       checkZero <- TRUE
@@ -281,26 +305,49 @@
    if (!anyNA(expand)) {
       x0 <- (g$minx+g$maxx)/2
       y0 <- (g$miny+g$maxy)/2
-      sx <- (g$maxx-g$minx)/2
-      sy <- (g$maxy-g$miny)/2
+      if (T) {
+         sx <- (g$maxx-g$minx)/2
+         sy <- (g$maxy-g$miny)/2
+      } else {
+         sx <- (g$maxx-g$minx)*c(adjust[1],1-adjust[1])
+         sy <- (g$maxy-g$miny)*c(adjust[2],1-adjust[2])
+      }
       if (length(expand)==1) {
-         expand <- rep(expand,length.out=2)
-         s <- sqrt(sx*sy)
+         if (expand>=1)
+            dx <- dy <- sqrt(sx*sy)*(expand-1)
+         else {
+            asp <- (sy/sx)^expand 
+            v <- (sx+sy)*expand/(1+asp)*c(1,asp)-c(sx,sy)
+            dx <- v[1]
+            dy <- v[2]
+         }
          if (T) {
-            dx <- sx+round(s*(expand[1]-1)/g$resx*2)*g$resx/2
-            dy <- sy+round(s*(expand[2]-1)/g$resy*2)*g$resy/2
+            dx <- sx+round(dx/g$resx*2)*g$resx/2
+            dy <- sy+round(dy/g$resy*2)*g$resy/2
          }
          else { ## deprecated
-            dx <- sx+s*(expand[1]-1)
-            dy <- sy+s*(expand[2]-1)
+            s <- sqrt(sx*sy)
+            dx <- sx+s*(expand-1)
+            dy <- sy+s*(expand-1)
          }
+         bbox <- c(x0-dx*(0.5+adjust[1])
+                  ,y0-dy*(0.5+adjust[2])
+                  ,x0+dx*(0.5+(1-adjust[1]))
+                  ,y0+dy*(0.5+(1-adjust[2]))
+                  )
       }
       else {
-         dx <- (expand[1])*sx
-         dy <- (expand[2])*sy
+         expand <- rep(expand,length.out=4)
+        # names(expand) <- c("miny","minx","maxy","maxx")
+         names(expand) <- c("minx","miny","maxx","maxy")
+        # expand <- expand[c(2,1,4,3)]
+         dx1 <- expand["minx"]*sx
+         dy1 <- expand["miny"]*sy
+         dx2 <- expand["maxx"]*sx
+         dy2 <- expand["maxy"]*sy
+         bbox <- unname(c(x0-dx1,y0-dy1,x0+dx2,y0+dy2))
       }
      # print(with(g,c(minx,miny,maxx,maxy)))
-      bbox <- c(x0-dx,y0-dy,x0+dx,y0+dy)
      # print(bbox)
    }
    if ((anyNA(res))&&(!is.na(resx))&&(!is.na(resy)))
@@ -333,6 +380,8 @@
          g$maxy <- maxy
          minx <- miny <- maxx <- maxy <- NA
       }
+      if (is.na(tolerance))
+         tolerance <- getOption("ursaTolerance",NA)
       if (is.na(tolerance)) {
          tolx <- .Machine$double.eps*max(abs(c(g$minx,g$maxx)))*mtol
          toly <- .Machine$double.eps*max(abs(c(g$miny,g$maxy)))*mtol
@@ -539,9 +588,9 @@
          print(seq(g,"y"))
       }
    }
-  # str(list(crs=crs,crs=proj4,'g$crs'=g$crs))
    if ((is.na(proj4))&&(!is.na(crs)))
       proj4 <- crs
+  # str(list(crs=crs,proj4=proj4,'g$crs'=g$crs))
    if (FALSE) {
       if (is.character(proj4))
          g$crs <- proj4
@@ -594,6 +643,7 @@
    }
    g$seqx <- numeric()
    g$seqy <- numeric()
+   g$crs <- .ursaCRS(g$crs)
    if (!raster)
       return(invisible(g))
    session_grid(g)

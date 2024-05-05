@@ -17,9 +17,9 @@
          src <- "\\$proj(4)*"
          dst <- "$crs"
       }
-      else if (stage2 <- F) {
-         src <- "crsstring"
-         dst <- "proj4string"
+      else if (stage2 <- T) {
+         src <- "sleeping\\("
+         dst <- "verbosing\\("
       }
       else if (stage3 <- F) {
          src <- "proj4="
@@ -33,15 +33,21 @@
          src <- "crs=="
          dst <- "ZZZ=="
       }
-      else if (stage6 <- T) {
-         src <- ".DeadRoad"
-         dst <- ".DeadEnd"
+      else if (stage6 <- F) {
+         if (step1 <- T) {
+            src <- "segmentize"
+            dst <- "trackline"
+         }
+         else {
+            src <- "st_trackline"
+            dst <- "st_segmentize"
+         }
       }
       else {
          stop("please select stage")
       }
       toWrite <- FALSE
-      ind <- "1" # as.character(c(1,2,3,4,5,6,7,8,9,10,11,12))
+      ind <- 11 # as.character(c(1,2,3,4,5,6,7,8,9,10,11,12))
       dpath1 <- c('1'="C:/platt/R/ursa-package/ursa/R"
                  ,'2'="C:/platt/R/ursa-package/ursa/man"
                  ,'3'="C:/platt/R/ursa-package/example"
@@ -53,8 +59,8 @@
                  ,'8'="D:/DATA"
                  ,'9'="D:/NRT"
                  ,'10'="D:/update"
-                 ,'11'="D:/RAS/2020"
-                 ,'12'="D:/RAS/2019"
+                 ,'11'="D:/RAS/2024"
+                 ,'12'="D:/RAS/2023"
                  )
       ind1 <- which(names(dpath1) %in% ind)
       ind2 <- which(names(dpath2) %in% ind)
@@ -101,3 +107,4 @@ invisible({
    rm(.a)
    NULL
 })
+warnings()

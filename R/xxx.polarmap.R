@@ -28,7 +28,7 @@
                       ,addFeature=TRUE,addHomeButton=TRUE
                       ,addMouseCoordinates=TRUE,addScaleBar=TRUE
                       ,addMeasure=FALSE
-                      ,style=c("Arctic Connect","Arctic SDI")) {
+                      ,style=c("Arctic SDI","Arctic Connect")) {
    isSDI <- isTRUE(.lgrep("sdi",style[1])>0)
    isConnect <- !isSDI
    if (onlyBasemap <- missing(obj)) {
@@ -67,11 +67,11 @@
    }
    else {
       layer <- as.character(as.list(match.call())[["obj"]]) ## try mget(names(match.call())[-1])
-      if (!length(grep("\\+proj=laea",spatial_crs(obj))))
+      if (.crsProj(spatial_crs(obj))!="laea") ## if (!length(grep("\\+proj=laea",spatial_crs(obj))))
          obj <- spatialize(obj,resetProj=TRUE,resetGrid=TRUE,style=style)
    }
    if (is.na(epsg)) {
-      lon_0 <- as.numeric(gsub(".*\\+lon_0=(\\S+)\\s*.*$","\\1",spatial_crs(obj)))
+      lon_0 <- .crsLon0(spatial_crs(obj)) # as.numeric(gsub(".*\\+lon_0=(\\S+)\\s*.*$","\\1",spatial_crs(obj)))
       epsg[lon_0<(-165) || lon_0>=(+135)] <- 3571 ## -180
       epsg[lon_0>=(-165) && lon_0<(-125)] <- 3572 ## -150
       epsg[lon_0>=(-125) && lon_0<(-70)] <- 3573 ## -100
@@ -98,7 +98,7 @@
       bounds <- list(c(-extent,extent),c(extent,-extent))
       resolutions <- sapply(0:18,function(x) maxResolution/(2^x))
       crsArctic <- leaflet::leafletCRS(crsClass="L.Proj.CRS",code=paste0("EPSG:",epsg)
-                             ,proj4def=ursa::spatial_crs(epsg)
+                             ,proj4def=.proj4string(epsg)
                              ,resolutions=resolutions,origin=origin,bounds=bounds)
       m <- leaflet::leaflet(options=leaflet::leafletOptions(crs=crsArctic,minZoom=3,maxZoom=12))
       m <- leaflet::addTiles(m
@@ -124,7 +124,7 @@
       maxZoom <- 10
       crsASDI <- leaflet::leafletCRS(crsClass="L.Proj.CRS"
                                     ,code=paste0("EPSG:",epsg)
-                                    ,proj4def=spatial_crs(epsg)
+                                    ,proj4def=.proj4string(epsg)
                                     ,resolutions=resolutions
                                     ,origin=c(-extentASDI,extentASDI)
                                     ,bounds=list(c(-extentASDI,extentASDI)

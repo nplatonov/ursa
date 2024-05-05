@@ -25,7 +25,10 @@
             file.remove(con$fname)
          else if (con$compress==-2L)
          {
-            fname <- .gsub("\\.unpacked(.*)~$",".envi",con$fname)
+            if (is.null(fname <- attr(con$fname,"source")))
+               fname <- .gsub("\\.unpacked(.*)~$",".envi",con$fname)
+            else
+               fname <- gsub("gz$","",fname)
             file.rename(con$fname,fname)
             if (file.exists(ftmp <- paste0(fname,".gz")))
                file.remove(ftmp)

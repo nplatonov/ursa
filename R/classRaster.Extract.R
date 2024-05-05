@@ -208,6 +208,7 @@
             dim(res$value) <- with(con,c(samples,lines,bands))
          }
          else {
+            seek(con,where=0L,origin="start",rw="r")
             res$value <- with(con,.readline(handle,datatype,n,endian))
             if (con$interleave=="bil") ##bil[col,band,row] -> R[col,row,band]
             {

@@ -19,7 +19,7 @@ compose_design(\dots)
   \item{\dots}{Set of arguments, which are recognized via their names and classes:
    \describe{
       \item{\code{obj}}{Object of class \code{ursaRaster} or list of objects of class \code{ursaRaster} or \code{NULL}. Default is \code{NULL}. Used to detect panel layout and coordinate reference system.}
-      \item{\code{layout}}{Integer of length 2 or \code{NA}. Layout matrix has dimensions\code{c(nr, nc)}, where \code{nr} is number of rows, and \code{nc} is number of columns. If \code{layout=NA} then layout matrix is recognized internally using number of bands of \code{obj} and argument \code{ratio}. If \code{layout=NA} and \code{obj=NULL} then matrix \code{c(1,1)} is used.}
+      \item{\code{layout}}{Integer of length 2, integer of length 1, two-dimensional matrix or \code{NA}. Layout matrix has dimensions\code{c(nr, nc)}, where \code{nr} is number of rows, and \code{nc} is number of columns.  If \code{layout} is positive integer of length 1, then sequense of this value unfolds to layout matrix using argument \code{ratio}. If \code{layout=NA} then layout matrix is recognized internally using number of bands of \code{obj} and argument \code{ratio}. If \code{layout=NA} and \code{obj=NULL} then matrix \code{c(1,1)} is used.}
       \item{\code{byrow}}{Logical. The order of filling of layout matrix. Default is \code{TRUE}. If \code{byrow=TRUE} then matrix is filled by rows (from top row, consequently from left element to right element, then next row). If \code{byrow=FALSE} then matrix is filled by columns.}
       \item{\code{skip}}{Positive integer of variable length. Default in \code{NULL} (length is zero). Indices of panels in the layout matrix, which are not used.}
       \item{\code{legend}}{The descripition of rules how color bars (legends) or panel captions are located in the layout. It is the list of embedded lists of two elements, which describe the color bars position in the layout. of Default is \code{NA}, it means using of internal rules. If \code{legend=NULL} then no plotting of color bars. If \code{legend} is positive integer in the range \code{1L:4L}, then sinlge color bar is used and legend's side is corresponded to margins of \R graphic system.}
@@ -179,6 +179,11 @@ cl6 <- compose_design(layout=c(2,3),skip=NA,legend=leg)
 print(cl6)
 compose_open(cl6,scale=3,pointsize=16)
 compose_close("nocrop")
+
+cl7 <- compose_design(layout=matrix(c(1,1,3,2,2,0),nrow=2,byrow=TRUE))
+print(cl7)
+compose_open(cl7)
+compose_close()
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

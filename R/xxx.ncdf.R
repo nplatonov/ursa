@@ -475,7 +475,7 @@
             g1$crs <- b[[proj4]] # code lost: 'g1$crs <- p'
          }
          else if (.lgrep("(lon|lat)",aname)==2)
-            g1$crs <- "+proj=longlat +datum=WGS84 +no_defs"
+            g1$crs <- .crsWGS84()
          if (TRUE)
             g1 <- with(g1,regrid(g1,setbound=c(minx,miny,maxx,maxy)
                                    ,dim=c(rows,columns)))

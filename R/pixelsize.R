@@ -9,9 +9,10 @@
       session_grid(NULL)
       g1 <- session_grid()
    }
-   if (.lgrep("\\+proj=stere",g1$crs))
+   projClass <- .crsProj(g1$crs)
+   if (projClass=="stere")
       return(.pxlsize.stere(g1,verbose=verbose))
-   if (.lgrep("\\+proj=merc",g1$crs))
+   if (projClass=="merc")
       return(.pxlsize.merc(g1,verbose=verbose))
    mul <- if (with(g1,resx*resy)<1e5) c("sq.m"=1) else c("sq.km"=1e-6)
    ursa_new(value=with(g1,resx*resy*mul)
@@ -29,7 +30,7 @@
 '.pxlsize.stere' <- function(g,verbose=FALSE) {
   # https://en.wikibooks.org/wiki/PROJ.4
    '.pow' <- function(x,y) x^y
-   proj4 <- g$crs
+   proj4 <- .proj4string(g$crs) ## 'sf' is loaded here
    if (FALSE)
       semi <- c("6378137","6356752.3") ## low-precision
    if (.lgrep("\\+datum=WGS84",proj4))
